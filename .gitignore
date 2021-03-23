@@ -1,0 +1,6 @@
+.vs/
+x64/
+Debug/
+!x64/**/*.exe
+PackedGame/
+*.zip
