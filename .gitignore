@@ -4,3 +4,5 @@ Debug/
 !x64/**/*.exe
 PackedGame/
 *.zip
+OpenGLRenderer/ext/
+OpenGLRenderer/out/
