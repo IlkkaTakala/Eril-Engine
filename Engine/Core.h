@@ -10,10 +10,9 @@
 class VisibleObject;
 class GameLoop;
 class INISettings;
+
 extern GameLoop* Loop;
 extern INISettings* INI;
-
-void Print(const char* text);
 
 void Exit();
 
@@ -30,7 +29,3 @@ Ref<T> SpawnObject()
 	base->BeginPlay();
 	return Ref<T>(next);
 }
-
-void MarkRenderUpdate();
-
-bool Trace(const Vector Start, const Vector End, Vector& Hit, VisibleObject** OutTarget = nullptr);

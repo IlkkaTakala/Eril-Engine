@@ -1,5 +1,4 @@
 #include "GameLoop.h"
-#include "Renderer.h"
 #include "Objects/VisibleObject.h"
 #include <fstream>
 #include <sstream>
@@ -48,54 +47,13 @@ void GC::AddObject(BaseObject* obj)
 	Pointers.push_back(obj);
 	Tickable* t = dynamic_cast<Tickable*>(obj);
 	if (t != nullptr) Loop->AddToTick(t);
-	VisibleObject* v = dynamic_cast<VisibleObject*>(obj);
-	if (v != nullptr) {
-		std::unique_lock<std::mutex> lock(Loop->Render->list_mutex);
-		Renderer::RenderObjects.push_back(v);
-	}
 }
 
 void GC::RemoveObject(BaseObject* obj)
 {
 	Tickable* t = dynamic_cast<Tickable*>(obj);
 	if (t != nullptr) Loop->RemoveFromTick(t);
-	VisibleObject* v = dynamic_cast<VisibleObject*>(obj);
-	if (v != nullptr) {
-		std::unique_lock<std::mutex> lock(Loop->Render->list_mutex);
-		Renderer::InvalidObjects.push_back(v);
-	}
 	obj->bMarked = true;
-}
-
-Mesh* GC::LoadMesh(std::string Name)
-{
-	Mesh* mesh = new Mesh();
-	auto iter = LoadedMeshes.find(Name);
-	if (iter != LoadedMeshes.end()) {
-		mesh->LoadedData = iter->second;
-		iter->second->ReferenceCount++;
-		mesh->ModelLoaded = true;
-		mesh->Vertices = new float[mesh->LoadedData->VertexCount * 3]();
-		memcpy(mesh->Vertices, mesh->LoadedData->vertices, mesh->LoadedData->VertexCount * 3 * sizeof(float));
-	}
-	else {
-		MeshData* newData = new MeshData();
-		mesh->ModelLoaded = Loop->Collector->LoadObj(Name, newData);
-		if (mesh->ModelLoaded) {
-			newData->ReferenceCount = 1;
-			mesh->LoadedData = newData;
-			LoadedMeshes.insert(std::pair<std::string, MeshData*>(Name, newData));
-			mesh->Vertices = new float[mesh->LoadedData->VertexCount * 3]();
-			memcpy(mesh->Vertices, mesh->LoadedData->vertices, mesh->LoadedData->VertexCount * 3 * sizeof(float));
-		}
-		else {
-			delete newData;
-			mesh->LoadedData = nullptr;
-		}
-	}
-	std::string na = std::to_string(rand());
-	mesh->NodeName = na;
-	return mesh;
 }
 
 template <typename Out>
@@ -181,7 +139,7 @@ bool GC::LoadObj(std::string Name, MeshData* Data)
 void GC::Quit()
 {
 	bQuitting = true;
-	Cleaner.join();
+	//Cleaner.join();
 }
 
 void GC::CleanRunner()
@@ -198,7 +156,7 @@ void GC::CleanRunner()
 				if (d->bMarked) {
 					VisibleObject* v = dynamic_cast<VisibleObject*>(d);
 					if (v != nullptr) {
-						if (v->Model == nullptr || v->Model->AddedToScene == false) {
+						if (v->Model == nullptr) {
 							delete d;
 							removal.push_back(d);
 						}

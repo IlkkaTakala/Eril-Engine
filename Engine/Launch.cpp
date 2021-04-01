@@ -1,10 +1,12 @@
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#define NOCOMM
+#include <Windows.h>
 #include <iostream>
 #include "GameLoop.h"
-//#include "../data.h"
+
 int main()
 {
-	//setup();
-	//setlocale(LC_ALL, "");
 	GameLoop* Game = new GameLoop();
 	int retur = Game->Start();
 	delete Game;

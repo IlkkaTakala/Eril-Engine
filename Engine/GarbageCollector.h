@@ -95,7 +95,6 @@ public:
 	~GC();
 	static void AddObject(BaseObject* obj);
 	static void RemoveObject(BaseObject* obj);
-	static Mesh* LoadMesh(std::string Name);
 	bool LoadObj(std::string Name, MeshData* Data);
 	void Quit();
 	static std::list<Data*> Pointers;

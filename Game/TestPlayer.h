@@ -25,7 +25,7 @@ private:
 	void LeftMouseDown(bool KeyDown);
 	void MouseMoved(float X, float Y);
 
-	void InputExit() { Exit(); }
+	void InputExit(bool) { Exit(); }
 
 	Ref<VisibleObject> Roads;
 	Ref<VisibleObject> Buildings;

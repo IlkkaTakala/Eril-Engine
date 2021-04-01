@@ -16,7 +16,7 @@ TestPlayer::TestPlayer()
 	Input::RegisterKeyInput(0x20, &TestPlayer::RunInputSpace, this);
 	Input::RegisterKeyInput(0x10, &TestPlayer::RunInputShift, this);
 	Input::RegisterKeyInput(0x01, &TestPlayer::LeftMouseDown, this);
-	Input::RegisterMainLoopInput(0x1B, &TestPlayer::InputExit, this);
+	Input::RegisterKeyInput(256, &TestPlayer::InputExit, this);
 	Input::RegisterMouseInput(0x0001, &TestPlayer::MouseMoved, this);
 }
 
@@ -126,13 +126,13 @@ void TestPlayer::BeginPlay()
 	//Domain->SetMaterial(211);
 	Domain->SetScale(Vector(100, 100, 100));
 
-	for (int i = 0; i < 10; i++) {
+	/*for (int i = 0; i < 10; i++) {
 		auto cube = SpawnObject<VisibleObject>();
 		cube->SetModel("Cube");
-		cube->SetMaterial(215);
+		cube->SetMaterial(nullptr);
 		cube->SetScale(Vector(300, 300, 300));
 		cube->SetLocation(Vector(i * 700.f, 0, 210.f));
 		cubes.push_back(cube);
-	}
+	}*/
 
 }
