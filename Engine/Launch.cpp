@@ -4,10 +4,12 @@
 #include <Windows.h>
 #include <iostream>
 #include "GameLoop.h"
+#include "IRender.h"
 
 int main()
 {
 	GameLoop* Game = new GameLoop();
+	if (InterfaceInit()) return 11;
 	int retur = Game->Start();
 	delete Game;
 	switch (retur)

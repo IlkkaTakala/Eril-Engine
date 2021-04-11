@@ -8,7 +8,7 @@ class TestPlayer : public Player
 {
 public:
 	TestPlayer();
-	virtual ~TestPlayer() { INI->SetValue("Player", "Start", CameraPoint.String()); INI->SetValue("Player", "Direction", CameraDirection.String()); }
+	virtual ~TestPlayer() { INI->SetValue("Player", "Start", CameraPoint.ToString()); INI->SetValue("Player", "Direction", CameraDirection.ToString()); }
 	virtual void Tick(float Delta) override;
 	virtual void BeginPlay() override;
 private:

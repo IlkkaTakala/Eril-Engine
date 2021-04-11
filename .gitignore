@@ -1,8 +1,7 @@
 .vs/
-x64/
-Debug/
-!x64/**/*.exe
+Builds/
+EngineGL.dir/
+CMakeFiles/
 PackedGame/
 *.zip
-OpenGLRenderer/ext/
-OpenGLRenderer/out/
+Engine/OpenGLRenderer/ext/

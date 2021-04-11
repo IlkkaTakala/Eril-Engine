@@ -3,13 +3,27 @@
 #include <string>
 #define PI 3.14159265359f
 
+typedef unsigned int uint;
+
+typedef unsigned char		uint8;
+typedef unsigned short		uint16;
+typedef unsigned long		uint32;
+typedef unsigned long long	uint64;
+
+typedef char		int8;
+typedef short		int16;
+typedef long		int32;
+typedef long long	int64;
+
+typedef std::string	String;
+
 struct Vector
 {
 	float X, Y, Z;
 
 	Vector() { X = 0, Y = 0, Z = 0; }
 	Vector(float X, float Y, float Z) : X(X), Y(Y), Z(Z) {};
-	Vector(std::string in) { 
+	Vector(String in) { 
 		size_t off = 0;
 		size_t o_off = 0;
 		X = std::stof(in.substr(o_off, off = in.find(',', off)));
@@ -58,7 +72,7 @@ struct Vector
 	}
 
 	static float Dot(const Vector& in1, const Vector& in2) { return in1.X* in2.X + in1.Y * in2.Y + in1.Z * in2.Z; }
-	std::string String() { return std::string(std::to_string(X) + ',' + std::to_string(Y) + ',' + std::to_string(Z)); }
+	String ToString() { return String(std::to_string(X) + ',' + std::to_string(Y) + ',' + std::to_string(Z)); }
 
 	friend Vector operator+(const Vector& obj, const Vector& obj2) { return Vector(obj2.X + obj.X, obj2.Y + obj.Y, obj2.Z + obj.Z); }
 

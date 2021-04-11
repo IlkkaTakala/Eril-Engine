@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Game\TestPlayer.cpp" />
+    <ClCompile Include="Game\TestUI.cpp" />
+    <ClCompile Include="D:\Ilkka\Documents\Visual Studio 2019\Game\Engine\OpenGLRenderer\ext\glfw-3.3.2\deps\glad_gl.c">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\OpenGLRenderer\Material.cpp">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\OpenGLRenderer\Mesh.cpp">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\OpenGLRenderer\Renderer.cpp">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\OpenGLRenderer\Texture.cpp">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\UI\UIElements.cpp">
+      <Filter>Engine\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\UI\UIHolder.cpp">
+      <Filter>Engine\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Objects\VisibleObject.cpp">
+      <Filter>Engine\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Gameplay\PlayerController.cpp">
+      <Filter>Engine\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Gameplay\InputControl.cpp">
+      <Filter>Engine\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Objects\Actor.cpp">
+      <Filter>Engine\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\EngineInterface.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GameLoop.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Gameplay\GameState.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GarbageCollector.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\IRender.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Settings.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Objects\BaseObject.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Ilkka\Documents\Visual Studio 2019\Game\Engine\Launch.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Game\TestPlayer.h" />
+    <ClInclude Include="Game\TestUI.h" />
+    <ClInclude Include="Engine\Core.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\BasicTypes.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Objects\BaseObject.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GameLoop.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Gameplay\GameState.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GarbageCollector.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Settings.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\IRender.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Ilkka\Documents\Visual Studio 2019\Game\Engine\OpenGLRenderer\ext\glfw-3.3.2\deps\glad\gl.h">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\OpenGLRenderer\Material.h">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\OpenGLRenderer\Mesh.h">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\OpenGLRenderer\Renderer.h">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\OpenGLRenderer\Texture.h">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\UI\UIElements.h">
+      <Filter>Engine\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\UI\UIHolder.h">
+      <Filter>Engine\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\EngineInterface.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Objects\VisibleObject.h">
+      <Filter>Engine\Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Gameplay\PlayerController.h">
+      <Filter>Engine\Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Gameplay\InputControl.h">
+      <Filter>Engine\Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Objects\Actor.h">
+      <Filter>Engine\Gameplay</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Ilkka\Documents\Visual Studio 2019\Game\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{4802cabf-b146-4b44-b50e-088fb3cc1f7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Public">
+      <UniqueIdentifier>{c4e38b86-90d0-4661-8ee7-fdacac5bcc6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\OpenGLRenderer">
+      <UniqueIdentifier>{a21995ee-6300-49dc-b8ca-91f2ab8be5d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Gameplay">
+      <UniqueIdentifier>{2d0356d1-d1d5-4085-835d-381e2136c489}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\UI">
+      <UniqueIdentifier>{5af41d5c-2548-40f0-b129-d0b19840d7fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Private">
+      <UniqueIdentifier>{9ce57ca7-4067-4ff9-bcb5-f7555506c756}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

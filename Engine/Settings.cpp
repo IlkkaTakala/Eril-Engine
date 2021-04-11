@@ -2,7 +2,7 @@
 #include <regex>
 
 
-INISettings::INISettings(const std::string& File)
+INISettings::INISettings(const String& File)
 {
 	file = std::ifstream(File);
 	Path = File;
@@ -16,9 +16,9 @@ void INISettings::parse(std::istream& in) {
 	static const std::regex comment_regex{ R"x(\s*[;#])x" };
 	static const std::regex section_regex{ R"x(\s*\[([^\]]+)\])x" };
 	static const std::regex value_regex{ R"x(\s*(\S[^ \t=]*)\s*=\s*((\s?\S+)+)\s*$)x" };
-	std::string current_section;
+	String current_section;
 	std::smatch pieces;
-	for (std::string line; std::getline(in, line);)
+	for (String line; std::getline(in, line);)
 	{
 		if (line.empty() || std::regex_match(line, pieces, comment_regex)) {
 			// skip comment lines and blank lines                    

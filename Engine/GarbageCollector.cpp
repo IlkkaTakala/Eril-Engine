@@ -8,7 +8,7 @@
 #include "GarbageCollector.h"
 
 std::list<Data*> GC::Pointers;
-std::map<std::string, MeshData*> GC::LoadedMeshes;
+//std::map<std::string, MeshData*> GC::LoadedMeshes;
 
 GC::GC(std::string dir)
 {
@@ -34,10 +34,10 @@ GC::~GC()
 		i.second->close();
 		delete i.second;
 	}
-	for (auto i : LoadedMeshes) {
+	/*for (auto i : LoadedMeshes) {
 		delete i.second;
 	}
-	LoadedMeshes.clear();
+	LoadedMeshes.clear();*/
 	Pointers.clear();
 	ModelStreams.clear();
 }
@@ -71,70 +71,70 @@ std::vector<std::string> split(const std::string& s, char delim) {
 	return elems;
 }
 
-bool GC::LoadObj(std::string Name, MeshData* Data)
-{
-	std::ifstream* s = ModelStreams[Name];
-	if (!s) return false;
-	s->seekg(0);
-	std::string in;
-	size_t v_index = 0;
-	size_t n_index = 0;
-	std::vector<float> verts;
-	std::vector<float> normals;
-	std::vector<unsigned int> normalIndices;
-	std::vector<unsigned int> faces;
-	while (std::getline(*s, in)) {
-		switch (in.front())
-		{
-		case 'v':
-		{
-			std::vector<std::string> vec = split(in, ' ');
-			if (vec[0] == "v") {
-				verts.push_back(std::stof(vec[1]));
-				verts.push_back(std::stof(vec[2]));
-				verts.push_back(std::stof(vec[3]));
-				v_index++;
-			}
-			else if (vec[0] == "vn") {
-				normals.push_back(std::stof(vec[1]));
-				normals.push_back(std::stof(vec[2]));
-				normals.push_back(std::stof(vec[3]));
-				n_index++;
-			}
-		}
-		break;
-
-		case 'f':
-		{
-			std::vector<std::string> face = split(in, ' ');
-			face.erase(face.begin(), face.begin() + 1);
-			for (std::string str : face) {
-				std::vector<std::string> data = split(str, '/');
-				faces.push_back(std::stoi(data[0]) - 1);
-				normalIndices.push_back(std::stoi(data[2]) - 1);
-			}
-		}
-		break;
-
-		default:
-			break;
-		}
-	}
-	Data->Name = Name;
-	Data->FaceCount = (unsigned int)faces.size() / 3;
-	Data->VertexCount = (unsigned int)v_index;
-	Data->NormalCount = (unsigned int)n_index;
-	Data->vertices = new float[v_index * 3]();
-	Data->normals = new float[n_index * 3]();
-	Data->faces = new unsigned int[faces.size()]();
-	Data->NormalIndices = new unsigned int[faces.size()]();
-	memcpy(Data->vertices, verts.data(), v_index * 3 * sizeof(float));
-	memcpy(Data->normals, normals.data(), n_index * 3 * sizeof(float));
-	memcpy(Data->faces, faces.data(), faces.size() * sizeof(unsigned int));
-	memcpy(Data->NormalIndices, normalIndices.data(), faces.size() * sizeof(unsigned int));
-
-	return true;
-}
+//bool GC::LoadObj(std::string Name, MeshData* Data)
+//{
+//	std::ifstream* s = ModelStreams[Name];
+//	if (!s) return false;
+//	s->seekg(0);
+//	std::string in;
+//	size_t v_index = 0;
+//	size_t n_index = 0;
+//	std::vector<float> verts;
+//	std::vector<float> normals;
+//	std::vector<unsigned int> normalIndices;
+//	std::vector<unsigned int> faces;
+//	while (std::getline(*s, in)) {
+//		switch (in.front())
+//		{
+//		case 'v':
+//		{
+//			std::vector<std::string> vec = split(in, ' ');
+//			if (vec[0] == "v") {
+//				verts.push_back(std::stof(vec[1]));
+//				verts.push_back(std::stof(vec[2]));
+//				verts.push_back(std::stof(vec[3]));
+//				v_index++;
+//			}
+//			else if (vec[0] == "vn") {
+//				normals.push_back(std::stof(vec[1]));
+//				normals.push_back(std::stof(vec[2]));
+//				normals.push_back(std::stof(vec[3]));
+//				n_index++;
+//			}
+//		}
+//		break;
+//
+//		case 'f':
+//		{
+//			std::vector<std::string> face = split(in, ' ');
+//			face.erase(face.begin(), face.begin() + 1);
+//			for (std::string str : face) {
+//				std::vector<std::string> data = split(str, '/');
+//				faces.push_back(std::stoi(data[0]) - 1);
+//				normalIndices.push_back(std::stoi(data[2]) - 1);
+//			}
+//		}
+//		break;
+//
+//		default:
+//			break;
+//		}
+//	}
+//	//Data->Name = Name;
+//	//Data->FaceCount = (unsigned int)faces.size() / 3;
+//	//Data->VertexCount = (unsigned int)v_index;
+//	//Data->NormalCount = (unsigned int)n_index;
+//	//Data->vertices = new float[v_index * 3]();
+//	//Data->normals = new float[n_index * 3]();
+//	//Data->faces = new unsigned int[faces.size()]();
+//	//Data->NormalIndices = new unsigned int[faces.size()]();
+//	//memcpy(Data->vertices, verts.data(), v_index * 3 * sizeof(float));
+//	//memcpy(Data->normals, normals.data(), n_index * 3 * sizeof(float));
+//	//memcpy(Data->faces, faces.data(), faces.size() * sizeof(unsigned int));
+//	//memcpy(Data->NormalIndices, normalIndices.data(), faces.size() * sizeof(unsigned int));
+//
+//	return true;
+//}
 
 void GC::Quit()
 {
@@ -156,10 +156,10 @@ void GC::CleanRunner()
 				if (d->bMarked) {
 					VisibleObject* v = dynamic_cast<VisibleObject*>(d);
 					if (v != nullptr) {
-						if (v->Model == nullptr) {
+						/*if (v->Model == nullptr) {
 							delete d;
 							removal.push_back(d);
-						}
+						}*/
 					}
 					else {
 						delete d;
@@ -180,7 +180,7 @@ void GC::CleanRunner()
 		}
 
 		std::vector<std::string> removed;
-		for (auto d : LoadedMeshes) {
+		/*for (auto d : LoadedMeshes) {
 			if (d.second->ReferenceCount < 1) {
 				delete d.second;
 				removed.push_back(d.first);
@@ -188,29 +188,8 @@ void GC::CleanRunner()
 		}
 		for (std::string s : removed) {
 			LoadedMeshes.erase(s);
-		}
+		}*/
 
 		duration = std::chrono::steady_clock::now() - start;
 	}
-}
-
-MeshData::MeshData()
-{
-	Name = "";
-	FaceCount = 0;
-	NormalCount = 0;
-	VertexCount = 0;
-	ReferenceCount = 0;
-	normals = nullptr;
-	vertices = nullptr;
-	faces = nullptr;
-	NormalIndices = nullptr;
-}
-
-MeshData::~MeshData()
-{
-	delete[] vertices;
-	delete[] normals;
-	delete[] faces;
-	delete[] NormalIndices;
 }

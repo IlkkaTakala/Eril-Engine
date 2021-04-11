@@ -1,13 +1,9 @@
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
-#define NOCOMM
-#include <Windows.h>
 #include "Objects/Actor.h"
 #include "Gameplay/GameState.h"
 #include "Gameplay/InputControl.h"
 #include "../Game/EngineInterface.h"
 #include "Settings.h"
-#include "Renderer.h"
+#include "IRender.h"
 #include "GameLoop.h"
 
 using namespace std;
@@ -39,9 +35,8 @@ int GameLoop::Start()
 	INI = new INISettings("Settings.ini");
 	if (!INI->IsValid()) return 10;
 
-	RI::SetupWindow();
+	RI->SetupWindow();
 
-	Sleep(100);
 	InputHandler = new Input();
 	Collector = new GC(INI->GetValue("Engine", "DataFolder"));
 	State = EngineInterface::CreateDefaults();
@@ -66,7 +61,7 @@ int GameLoop::MainLoop()
 
 		std::this_thread::sleep_until(start + time);
 
-		RI::Update();
+		RI->Update();
 
 		for (Tickable* t : TickList) {
 			bool found = false;
@@ -79,7 +74,7 @@ int GameLoop::MainLoop()
 			t->Tick(duration.count());
 		}
 
-		RI::Render();
+		RI->Render();
 
 		std::unique_lock<std::mutex> lock(TickListMutex);
 		for (Tickable* t : TickListRemoval) {
@@ -90,7 +85,7 @@ int GameLoop::MainLoop()
 		fps = 1.f / duration.count();
 	}
 	
-	RI::CleanRenderer();
+	RI->CleanRenderer();
 
 	return 0;
 }

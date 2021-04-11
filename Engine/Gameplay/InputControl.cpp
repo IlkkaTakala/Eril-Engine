@@ -1,5 +1,5 @@
 #include <string>
-#include "Renderer.h"
+#include "IRender.h"
 #include "InputControl.h"
 
 std::map<int, std::function<void(bool)>> Input::KeyCallers;
@@ -22,7 +22,7 @@ void InputCallback(int key, int code, int action, int mods)
 
 Input::Input()
 {
-	InputInterface::SetInputHandler(&InputCallback);
+	II->SetInputHandler(&InputCallback);
 }
 
 Input::~Input()

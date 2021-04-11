@@ -1,8 +1,7 @@
 #pragma once
 #include "Core.h"
 #include <string>
-#include "Mesh.h"
-#include "Material.h"
+#include "IRender.h"
 
 class VisibleObject : public BaseObject
 {
@@ -15,8 +14,9 @@ public:
 	void SetScale(Vector NewScale);
 	void AddLocation(Vector NewLocation) { SetLocation(NewLocation + Location); };
 	void AddRotation(Vector NewRotation) { SetRotation(NewRotation + Rotation); };
+
 	void SetModel(std::string Name);
-	void SetMaterial(Material* nextMat) { MaterialInstance = nextMat; }
+	std::string GetModel() const { return std::string(); }
 
 	const std::string GetName() const { return std::string(""); }
 
@@ -24,9 +24,6 @@ public:
 protected:
 	friend class GC;
 	
-	Material* MaterialInstance;
-	MeshData* Model;
-
 	Vector Location;
 	Vector Rotation;
 	Vector Scale;

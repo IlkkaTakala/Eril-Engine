@@ -5,7 +5,6 @@ VisibleObject::VisibleObject() : BaseObject()
 	Location = Vector(0, 0, 0);
 	Rotation = Vector(0, 0, 0);
 	Scale = Vector(1, 1, 1);
-	Model = nullptr;
 }
 
 void VisibleObject::SetLocation(Vector NewLocation)
