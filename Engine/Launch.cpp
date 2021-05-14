@@ -16,9 +16,12 @@ int main()
 	{
 	case 10:
 		printf("Failed to load INI file\n");
+		break;
+	case 11:
+		printf("Render error\n");
+		break;
 	default:
 		break;
 	}
-	system("pause");
 	return retur;
 }

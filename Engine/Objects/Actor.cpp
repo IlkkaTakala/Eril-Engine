@@ -2,5 +2,5 @@
 
 void Actor::Tick(float)
 {
-	//AddRotation(Vector(0, 0, 0));
+	//AddRotation(Vector(0, 0, 1.0));
 }

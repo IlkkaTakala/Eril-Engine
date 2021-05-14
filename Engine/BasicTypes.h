@@ -21,7 +21,7 @@ struct Vector
 {
 	float X, Y, Z;
 
-	Vector() { X = 0, Y = 0, Z = 0; }
+	Vector() { X = 0.f, Y = 0.f, Z = 0.f; }
 	Vector(float X, float Y, float Z) : X(X), Y(Y), Z(Z) {};
 	Vector(String in) { 
 		size_t off = 0;
@@ -76,7 +76,7 @@ struct Vector
 
 	friend Vector operator+(const Vector& obj, const Vector& obj2) { return Vector(obj2.X + obj.X, obj2.Y + obj.Y, obj2.Z + obj.Z); }
 
-	friend Vector operator-(const Vector& obj, const Vector& obj2) { return Vector(obj2.X - obj.X, obj2.Y - obj.Y, obj2.Z - obj.Z); }
+	friend Vector operator-(const Vector& obj, const Vector& obj2) { return Vector(obj.X - obj2.X, obj.Y - obj2.Y, obj.Z - obj2.Z); }
 
 	Vector& operator*=(const Vector& obj) { X *= obj.X; Y *= obj.Y; Z *= obj.Z; return *this; }
 	friend Vector operator*(Vector obj, const Vector& obj2) { obj *= obj2; return obj; }
@@ -92,6 +92,26 @@ struct Vector
 	friend Vector operator/(const Vector& obj, const Vector& obj2) { return Vector(obj2.X / obj.X, obj2.Y / obj.Y, obj2.Z / obj.Z); }
 
 	friend bool operator==(const Vector& obj, const Vector& obj2) { return obj2.X == obj.X && obj2.Y == obj.Y && obj2.Z == obj.Z; }
+
+	float& operator[](std::size_t idx) {
+		switch (idx)
+		{
+		case 0: return X;
+		case 1: return Y;
+		case 2: return Z;
+		default: return X;
+		};
+	}
+
+	const float& operator[](std::size_t idx) const {
+		switch (idx)
+		{
+		case 0: return X;
+		case 1: return Y;
+		case 2: return Z;
+		default: return X;
+		};
+	}
 
 	float Q_rsqrt(float number)
 	{

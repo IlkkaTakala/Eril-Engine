@@ -14,15 +14,21 @@ public:
 	void SetScale(Vector NewScale);
 	void AddLocation(Vector NewLocation) { SetLocation(NewLocation + Location); };
 	void AddRotation(Vector NewRotation) { SetRotation(NewRotation + Rotation); };
+	const Vector GetLocation() const { return Location; }
+	const Vector GetRotation() const { return Rotation; }
+	const Vector GetScale() const { return Scale; }
 
 	void SetModel(std::string Name);
-	std::string GetModel() const { return std::string(); }
+	std::string GetModelName() const { return std::string(); }
+	RenderMesh* GetModel() const { return RenderData; }
 
 	const std::string GetName() const { return std::string(""); }
 
 	virtual void BeginPlay() override {};
 protected:
 	friend class GC;
+
+	RenderMesh* RenderData;
 	
 	Vector Location;
 	Vector Rotation;

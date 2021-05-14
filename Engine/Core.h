@@ -7,7 +7,6 @@
 #define REN_UI 0x20
 #define REN_REQUIRESBUILD 0x21
 
-class VisibleObject;
 class GameLoop;
 class INISettings;
 
@@ -29,3 +28,5 @@ Ref<T> SpawnObject()
 	base->BeginPlay();
 	return Ref<T>(next);
 }
+
+Data* GetObjectByName(const String& name);

@@ -1,5 +1,6 @@
 #pragma once
 #include "Core.h"
+#include "IRender.h"
 
 class UIHolder;
 
@@ -16,23 +17,17 @@ public:
 		auto y = dynamic_cast<UIHolder*>(n);
 		if (y != nullptr) {
 			UI = y;
-			GC::Pointers.push_back(y);
+			GC::Pointers.emplace("Object_UI", y);
 			y->Construct();
 		}
 	}
 
+	Camera* GetCamera() const { return PlayerCamera; }
 
 protected:
-	friend class Renderer;
-	Vector CameraPoint;
-	Vector CameraDirection;
-	Vector CameraRotation;
-
-
-	void RotateCamera(Vector Rotation);
-	Vector RightVector();
-	Vector UpVector();
-
 	Ref<UIHolder> UI;
+
+private:
+	Camera* PlayerCamera;
 };
 

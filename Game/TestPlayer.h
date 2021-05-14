@@ -3,18 +3,17 @@
 #include "Settings.h"
 #include "Gameplay/PlayerController.h"
 
+class Actor;
 
 class TestPlayer : public Player
 {
 public:
 	TestPlayer();
-	virtual ~TestPlayer() { INI->SetValue("Player", "Start", CameraPoint.ToString()); INI->SetValue("Player", "Direction", CameraDirection.ToString()); }
+	virtual ~TestPlayer() { /*INI->SetValue("Player", "Start", CameraPoint.ToString()); INI->SetValue("Player", "Direction", CameraDirection.ToString());*/ }
 	virtual void Tick(float Delta) override;
 	virtual void BeginPlay() override;
 private:
-	short forward;
-	short right;
-	short up;
+	float mouseSens;
 
 	void RunInputW(bool KeyDown);
 	void RunInputA(bool KeyDown);
@@ -27,8 +26,6 @@ private:
 
 	void InputExit(bool) { Exit(); }
 
-	Ref<VisibleObject> Roads;
-	Ref<VisibleObject> Buildings;
-	Ref<VisibleObject> Domain;
+	Ref<Actor> Domain;
 	std::vector<Ref<VisibleObject>> cubes;
 };

@@ -5,35 +5,39 @@
 
 Shader::Shader(const char* const vertexShaderString, const char* const fragmentShaderString) 
 {
+	Success = false;
+
 	int vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertexShaderString, NULL);
 	glCompileShader(vertexShader);
 
-	int success;
 	char infoLog[512];
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-	if (!success) {
+	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &Success);
+	if (!Success) {
 		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
 		printf("ERROR: Shader compilation failed: \"%s\"\n", infoLog);
+		return;
 	}
 
 	int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragmentShader, 1, &fragmentShaderString, NULL);
 	glCompileShader(fragmentShader);
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-	if (!success) {
+	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &Success);
+	if (!Success) {
 		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
 		printf("ERROR: Shader compilation failed: \"%s\"\n", infoLog);
+		return;
 	}
 
 	ShaderProgram = glCreateProgram();
 	glAttachShader(ShaderProgram, vertexShader);
 	glAttachShader(ShaderProgram, fragmentShader);
 	glLinkProgram(ShaderProgram);
-	glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &success);
-	if (!success) {
+	glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &Success);
+	if (!Success) {
 		glGetProgramInfoLog(ShaderProgram, 512, NULL, infoLog);
 		printf("ERROR: Shader link failed: \"%s\"\n", infoLog);
+		return;
 	}
 
 	glDeleteShader(vertexShader);
@@ -55,6 +59,27 @@ void Shader::SetUniform(const String& name, const glm::mat4& m)
 	GLint loc = glGetUniformLocation(ShaderProgram, name.c_str());
 	if (loc < 0) return;
 	glUniformMatrix4fv(loc, 1, GL_FALSE, &m[0][0]);
+}
+
+void Shader::SetUniform(const String& name, const Vector& m)
+{
+	GLint loc = glGetUniformLocation(ShaderProgram, name.c_str());
+	if (loc < 0) return;
+	glUniform3fv(loc, 3, &m[0]);
+}
+
+void Shader::SetUniform(const String& name, const float m)
+{
+	GLint loc = glGetUniformLocation(ShaderProgram, name.c_str());
+	if (loc < 0) return;
+	glUniform1fv(loc, 1, &m);
+}
+
+void Shader::SetUniform(const String& name, const int m)
+{
+	GLint loc = glGetUniformLocation(ShaderProgram, name.c_str());
+	if (loc < 0) return;
+	glUniform1i(loc, m);
 }
 
 void Shader::AddUser(Material* m)
@@ -85,12 +110,4 @@ void Material::AddSection(Section* o)
 void Material::RemoveSection(Section* o)
 {
 	Objects.remove(o);
-}
-
-Section::~Section()
-{
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &Positions);
-	glDeleteBuffers(1, &Normals);
-	glDeleteBuffers(1, &UVs);
 }

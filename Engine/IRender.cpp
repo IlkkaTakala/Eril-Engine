@@ -2,6 +2,7 @@
 
 #ifdef OPENGL
 #include "OpenGLRenderer/Renderer.h"
+#include "OpenGLRenderer/InputControl.h"
 #endif // OPENGL
 
 

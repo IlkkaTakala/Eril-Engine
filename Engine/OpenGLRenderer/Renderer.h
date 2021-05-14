@@ -2,6 +2,9 @@
 #include <list>
 
 class Shader;
+class RenderBatch;
+class GLCamera;
+class RenderBuffer;
 
 struct GLFWwindow;
 
@@ -14,26 +17,41 @@ public:
 	virtual int SetupWindow() override;
 	virtual void CleanRenderer() override;
 
+	virtual Camera* CreateCamera(VisibleObject* parent = nullptr) override;
+	virtual void SetActiveCamera(Camera*) override;
+
+	virtual void LoadShaders() override;
+	virtual Material* GetMaterialByName(String name) const override;
+	virtual Material* LoadMaterialByName(String name) override;
+
 	virtual void Update() override;
 	virtual void Render() override;
 
 private:
 	friend class GLInput;
 
-	std::list<Shader*> Shaders;
+	std::map<String, Shader*> Shaders;
+	std::map<String, Material*> BaseMaterials;
 
-	GLFWwindow* Window = nullptr;
-};
-
-class GLInput : public IInput
-{
-	virtual void SetInputHandler(void(*Callback)(int, int, int, int)) override;
-
-protected:
+	GLFWwindow* Window;
+	RenderBatch* Batcher;
+	RenderBuffer* Buffer;
+	GLCamera* ActiveCamera;
+	uint ScreenPlane;
+	uint ScreenVao;
+	uint ScreenVbo;
+	uint ScreenTexVbo;
 };
 
 class GLMesh : public IMesh
 {
 public:
-	virtual	RenderObject* LoadData();
+	GLMesh();
+	virtual ~GLMesh();
+	virtual	RenderMesh* LoadData(VisibleObject* parent, String name) override;
+	virtual void StartLoading() override;
+
+private:
+	std::map<std::string, std::ifstream*> ModelStreams;
+	String ActiveDir;
 };

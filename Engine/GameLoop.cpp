@@ -1,6 +1,5 @@
 #include "Objects/Actor.h"
 #include "Gameplay/GameState.h"
-#include "Gameplay/InputControl.h"
 #include "../Game/EngineInterface.h"
 #include "Settings.h"
 #include "IRender.h"
@@ -24,9 +23,11 @@ GameLoop::GameLoop()
 GameLoop::~GameLoop()
 {
 	if (State != nullptr) State == nullptr;
-	if (InputHandler != nullptr) delete InputHandler;
 	if (Collector != nullptr) delete Collector;
 	delete INI;
+	delete RI;
+	delete MI;
+	delete II;
 }
 
 int GameLoop::Start()
@@ -35,10 +36,20 @@ int GameLoop::Start()
 	INI = new INISettings("Settings.ini");
 	if (!INI->IsValid()) return 10;
 
-	RI->SetupWindow();
-
-	InputHandler = new Input();
-	Collector = new GC(INI->GetValue("Engine", "DataFolder"));
+	try
+	{
+		RI->SetupWindow();
+		RI->LoadShaders();
+		II->SetInputHandler();
+		MI->StartLoading();
+	}
+	catch (const std::exception& e)
+	{
+		printf(e.what());
+		return 11;
+	}
+	
+	//Collector = new GC();
 	State = EngineInterface::CreateDefaults();
 
 	return MainLoop();
@@ -47,7 +58,7 @@ int GameLoop::Start()
 void GameLoop::Quit()
 {
 	bQuitStarted = true;
-	Collector->Quit();
+	if (Collector != nullptr) Collector->Quit();
 	bQuit = true;
 }
 
@@ -59,9 +70,11 @@ int GameLoop::MainLoop()
 	while (!bQuit) {
 		auto start = std::chrono::steady_clock::now();
 
-		std::this_thread::sleep_until(start + time);
+		//std::this_thread::sleep_until(start + time);
 
 		RI->Update();
+
+		II->ProcessInputs(duration.count());
 
 		for (Tickable* t : TickList) {
 			bool found = false;
@@ -83,6 +96,8 @@ int GameLoop::MainLoop()
 		lock.unlock();
 		duration = std::chrono::steady_clock::now() - start;
 		fps = 1.f / duration.count();
+		printf("\r%c[2K", 27);
+		printf("FPS: %.2f", fps);
 	}
 	
 	RI->CleanRenderer();
