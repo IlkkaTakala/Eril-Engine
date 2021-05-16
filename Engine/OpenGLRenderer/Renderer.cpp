@@ -9,10 +9,9 @@
 #include "Texture.h"
 #include "RenderBuffer.h"
 #include "../Objects/VisibleObject.h"
+#include "LightData.h"
 #include "Settings.h"
 #include <filesystem>
-#include <sstream>
-#include <iterator>
 #include <stdexcept>
 
 Renderer::Renderer()
@@ -21,6 +20,7 @@ Renderer::Renderer()
 	Buffer = nullptr;
 	Window = nullptr;
 	ActiveCamera = nullptr;
+	DeferredMaster = nullptr;
 
 	ScreenPlane = 0;
 	ScreenVao = 0;
@@ -33,7 +33,7 @@ Renderer::~Renderer()
 	if (Batcher != nullptr) delete Batcher;
 }
 
-int Renderer::SetupWindow()
+int Renderer::SetupWindow(int width, int height)
 {
 	//glfwSetErrorCallback([](int error, const char* description) {
 	//	fprintf(stderr, "Error %d: %s\n", error, description);
@@ -42,7 +42,7 @@ int Renderer::SetupWindow()
 	if (!glfwInit()) {
 		return -1;
 	}
-	Window = glfwCreateWindow(640, 480, "OpenGL window", NULL, NULL);
+	Window = glfwCreateWindow(width, height, "OpenGL window", NULL, NULL);
 	if (!Window) {
 		glfwTerminate();
 		return -1;
@@ -59,16 +59,16 @@ int Renderer::SetupWindow()
 	if (!gladLoadGL(glfwGetProcAddress)) exit(100);
 
 	Batcher = new RenderBatch(262144);
-	Buffer = new RenderBuffer(640, 480);
+	Buffer = new RenderBuffer(width, height);
 
 
 	float vertices[] = {
-		-1.f, -1.f, 0.f,
-		1.f, -1.f, 0.f,
-		1.f, 1.f, 0.f,
-		-1.f, -1.f, 0.f,
-		1.f, 1.f, 0.f,
-		-1.f, 1.f, 0.f
+		-1.f, -1.f, 1.f,
+		1.f, -1.f, 1.f,
+		1.f, 1.f, 1.f,
+		-1.f, -1.f, 1.f,
+		1.f, 1.f, 1.f,
+		-1.f, 1.f, 1.f
 	};
 
 	float texCoords[] = {
@@ -104,6 +104,13 @@ int Renderer::SetupWindow()
 
 	glBindVertexArray(0);
 
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+	glEnable(GL_CULL_FACE);
+
+	glViewport(0, 0, width, height);
+	glClearColor(0.f, 0.f, 0.f, 1.0f);
+
 	return 0;
 }
 
@@ -119,6 +126,7 @@ void Renderer::CleanRenderer()
 
 	delete Batcher;
 	delete Buffer;
+	delete DeferredMaster;
 
 	glDeleteBuffers(1, &ScreenVbo);
 	glDeleteBuffers(1, &ScreenTexVbo);
@@ -139,6 +147,22 @@ void Renderer::SetActiveCamera(Camera* cam)
 	ActiveCamera = dynamic_cast<GLCamera*>(cam);
 }
 
+void Renderer::CreateLight(const LightData* light)
+{
+	Lights.push_back(light);
+}
+
+void Renderer::RemoveLight(const LightData* light)
+{
+	for (auto i = Lights.begin(); i != Lights.end(); i++) {
+		if (*i == light)
+		{
+			Lights.erase(i);
+			break;
+		}
+	}
+}
+
 void Renderer::LoadShaders()
 {
 	namespace fs = std::filesystem;
@@ -150,6 +174,14 @@ void Renderer::LoadShaders()
 			String vertex;
 			String fragment;
 			String in_line;
+
+			std::getline(stre, in_line);
+
+			std::vector<String> params = split(in_line, ';');
+
+			do {
+				std::getline(stre, in_line);
+			} while (in_line != "###Vertex###");
 
 			while (std::getline(stre, in_line)) {
 				if (in_line != "###Fragment###")
@@ -164,8 +196,12 @@ void Renderer::LoadShaders()
 			}
 
 			Shader* nShader = new Shader(vertex.c_str(), fragment.c_str());
+			nShader->Pass = std::atoi(params[0].c_str());
  			if (!nShader->Success) nShader = nullptr;
-			if (nShader != nullptr) Shaders.emplace(f.path().filename().replace_extension("").string(), nShader);
+			if (nShader != nullptr) {
+				if (f.path().filename() == "Master.shader") DeferredMaster = nShader;
+				else Shaders.emplace(f.path().filename().replace_extension("").string(), nShader);
+			}
 			else throw std::exception("Invalid shaders found!\n");
 
 			stre.close();
@@ -190,9 +226,18 @@ Material* Renderer::LoadMaterialByName(String name)
 		return BaseMaterials.find(name)->second;
 	}
 	else {
-		Material* nMat = new Material(Shaders.find("shader_001")->second);
-		BaseMaterials.emplace(name, nMat);
-		return BaseMaterials.find(name)->second;;
+		namespace fs = std::filesystem;
+		if (fs::exists(name + ".mater")) {
+			auto stream = std::ifstream(name + ".mater", std::ios_base::in);
+			String shaderName;
+			std::getline(stream, shaderName);
+			if (Shaders.find(shaderName) != Shaders.end()) {
+				Material* nMat = new Material(Shaders[shaderName]);
+				BaseMaterials.emplace(name, nMat);
+				return BaseMaterials.find(name)->second;
+			}
+		}
+		return nullptr;
 	}
 }
 
@@ -202,30 +247,19 @@ void Renderer::Update()
 	if (glfwWindowShouldClose(Window)) Exit();
 }
 
-void Renderer::Render()
+void Renderer::Deferred(int width, int height)
 {
-	int width, height;
-
 	Buffer->Bind();
-
-	glfwGetFramebufferSize(Window, &width, &height);
-
-	// Setup the opengl wiewport (i.e specify area to draw)
-	glViewport(0, 0, width, height);
-	// Set color to be used when clearing the screen
-	glClearColor(0.1f, 0.1f, 0.1f, 0.f);
+	glClearColor(0.f, 0.f, 0.f, 0.f);
 	// Clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	if (ActiveCamera == nullptr) return;
+	glDisable(GL_BLEND);
 
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LEQUAL);
-	glEnable(GL_CULL_FACE);
-
-	for (auto const& map : Shaders)
+	for (auto const& [name, s] : Shaders)
 	{
-		Shader* s = map.second;
+		if (s->Pass != 0) continue;
+
 		if (s == nullptr) throw std::exception("Shader error!");
 		s->Bind();
 
@@ -265,18 +299,81 @@ void Renderer::Render()
 
 	glfwGetFramebufferSize(Window, &width, &height);
 
-	glViewport(0, 0, width, height);
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	Buffer->BindTextures();
-	Shaders["Master"]->Bind();
-	Shaders["Master"]->SetUniform("gPosition", 0);
-	Shaders["Master"]->SetUniform("gNormal", 1);
-	Shaders["Master"]->SetUniform("gAlbedoSpec", 2);
+	DeferredMaster->Bind();
+	DeferredMaster->SetUniform("gPosition", 0);
+	DeferredMaster->SetUniform("gNormal", 1);
+	DeferredMaster->SetUniform("gAlbedoSpec", 2);
 
 	glBindVertexArray(ScreenVao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
+
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, Buffer->GetBuffer());
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBlitFramebuffer(
+		0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST
+	);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void Renderer::Forward(int width, int height)
+{
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	for (auto const& [name, s] : Shaders)
+	{
+		if (s == nullptr) throw std::exception("Shader error!");
+		if (s->Pass != 1) continue;
+		if (s->GetUsers().size() == 0) continue;
+		s->Bind();
+
+		s->SetUniform("VP", ActiveCamera->GetProjectionMatrix() * glm::inverse(ActiveCamera->GetViewMatrix()));
+
+		for (Material* m : s->GetUsers())
+		{
+			for (auto const& param : m->GetVectorParameters()) {
+				s->SetUniform(param.first, param.second);
+			}
+
+			for (auto const& param : m->GetScalarParameters()) {
+				s->SetUniform(param.first, param.second);
+			}
+
+			int round = 0;
+			for (auto const& param : m->GetTextures()) {
+				if (param.second > 0) {
+					s->SetUniform(param.first, static_cast<float>(param.second->GetTextureID()));
+					glActiveTexture(GL_TEXTURE0 + round);
+					glBindTexture(GL_TEXTURE_2D, param.second->GetTextureID());
+					round++;
+				}
+			}
+
+			Batcher->begin();
+
+			for (Section* o : m->GetObjects())
+			{
+				Batcher->add(o);
+			}
+			Batcher->end(ActiveCamera->GetViewMatrix(), ActiveCamera->GetProjectionMatrix());
+		}
+	}
+}
+
+void Renderer::Render()
+{
+	int width, height;
+
+	if (ActiveCamera == nullptr) return;
+
+	glfwGetFramebufferSize(Window, &width, &height);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	Deferred(width, height);
+
+	Forward(width, height);
 
 	glfwSwapBuffers(Window);
 }
@@ -292,21 +389,6 @@ GLMesh::~GLMesh()
 		i.second->close();
 	}
 	ModelStreams.clear();
-}
-
-template <typename Out>
-void split(const String& s, char delim, Out result) {
-	std::istringstream iss(s);
-	String item;
-	while (std::getline(iss, item, delim)) {
-		*result++ = item;
-	}
-}
-
-std::vector<String> split(const String& s, char delim) {
-	std::vector<String> elems;
-	split(s, delim, std::back_inserter(elems));
-	return elems;
 }
 
 RenderMesh* GLMesh::LoadData(VisibleObject* parent, String name)
@@ -388,7 +470,7 @@ RenderMesh* GLMesh::LoadData(VisibleObject* parent, String name)
 
 			memcpy(hold->indices, faces.data(), faces.size() * sizeof(uint32));
 
-			hold->Instance = RI->LoadMaterialByName("test");
+			hold->Instance = RI->LoadMaterialByName("Shaders/test");
 		}
 		RenderObject* obj = new RenderObject(mesh);
 		obj->SetParent(parent);

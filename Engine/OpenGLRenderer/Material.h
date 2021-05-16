@@ -30,6 +30,8 @@ public:
 
 	int Success;
 
+	uint8 Pass;
+
 private:
 	GLint ShaderProgram;
 	std::list<Material*> Users;

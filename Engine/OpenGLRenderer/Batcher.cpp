@@ -109,12 +109,11 @@ void RenderBatch::drawSprite(const Section* obj, const glm::mat4& viewMatrix, co
 	glm::mat3 normalMat = glm::mat3(transpose(inverse(obj->Parent->GetModelMatrix())));
 
 	const Vertex* vert_array = obj->GetVertices();
-	Vertex next;
 	for (uint32 i = 0; i < obj->GetVertexCount(); i++) {
+		Vertex& next = verts[i];
 		next.position = transform * glm::vec4(vert_array[i].position, 1.f);
 		next.normal = normalMat * vert_array[i].normal;
 		next.uv = vert_array[i].uv;
-		verts[i] = next;
 	}
 	vertex_index += obj->GetVertexCount();
 
@@ -127,7 +126,6 @@ void RenderBatch::render()
 {
 	glBindVertexArray(m_vao);
 	glDrawElements(GL_TRIANGLES, face_count * 3, GL_UNSIGNED_INT, 0);
-	//glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
 
 	vertex_index = 0;

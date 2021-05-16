@@ -55,12 +55,17 @@ public:
 class BaseObject : public Data
 {
 public:
-	BaseObject() : Data() {}
+	BaseObject() : Data() { Parent = nullptr; }
 	//void operator delete(void* ptr);
 
 	virtual void BeginPlay() = 0;
 	virtual void DestroyObject() override;
+	void SetParent(BaseObject* obj) { Parent = obj; }
+
 protected:
+
+	BaseObject* Parent;
+
 	virtual ~BaseObject() {};
 
 };

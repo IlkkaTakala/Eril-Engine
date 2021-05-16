@@ -1,9 +1,11 @@
 #include "IRender.h"
+#include "LightData.h"
 #include "TestPlayer.h"
 
 TestPlayer::TestPlayer() : Player()
 {
 	mouseSens = 0.5f;
+	Speed = 5.f;
 	//GetCamera()->SetLocation(INI->GetValue("Player", "Start"));
 	//GetCamera()->SetRotation(INI->GetValue("Player", "Direction"));
 
@@ -18,38 +20,39 @@ TestPlayer::TestPlayer() : Player()
 	II->RegisterMouseInput(0, &TestPlayer::MouseMoved, this);
 }
 
-void TestPlayer::RunInputW(bool KeyDown)
+void TestPlayer::RunInputW(float delta, bool KeyDown)
 {
-	GetCamera()->SetLocation(GetCamera()->GetLocation() - GetCamera()->GetForwardVector() * 0.1f);
+	GetCamera()->SetLocation(GetCamera()->GetLocation() - GetCamera()->GetForwardVector() * delta * Speed);
 }
 
-void TestPlayer::RunInputA(bool KeyDown)
+void TestPlayer::RunInputA(float delta, bool KeyDown)
 {
-	GetCamera()->SetLocation(GetCamera()->GetLocation() - GetCamera()->GetRightVector() * 0.1f);
+	GetCamera()->SetLocation(GetCamera()->GetLocation() - GetCamera()->GetRightVector() * delta * Speed);
 }
 
-void TestPlayer::RunInputD(bool KeyDown)
+void TestPlayer::RunInputD(float delta, bool KeyDown)
 {
-	GetCamera()->SetLocation(GetCamera()->GetLocation() + GetCamera()->GetRightVector() * 0.1f);
+	GetCamera()->SetLocation(GetCamera()->GetLocation() + GetCamera()->GetRightVector() * delta * Speed);
 }
 
-void TestPlayer::RunInputS(bool KeyDown)
+void TestPlayer::RunInputS(float delta, bool KeyDown)
 {
-	GetCamera()->SetLocation(GetCamera()->GetLocation() + GetCamera()->GetForwardVector() * 0.1f);
+	GetCamera()->SetLocation(GetCamera()->GetLocation() + GetCamera()->GetForwardVector() * delta * Speed);
 }
 
-void TestPlayer::RunInputSpace(bool KeyDown)
-{
-	
-}
-
-void TestPlayer::RunInputShift(bool KeyDown)
+void TestPlayer::RunInputSpace(float delta, bool KeyDown)
 {
 	
 }
 
+void TestPlayer::RunInputShift(float delta, bool KeyDown)
+{
+	if (KeyDown) Speed = 10.f;
+	else Speed = 5.f;
+}
 
-void TestPlayer::LeftMouseDown(bool)
+
+void TestPlayer::LeftMouseDown(float delta, bool)
 {
 	/*Vector Start(CameraPoint);
 	Vector End(CameraPoint + CameraDirection * 100);
@@ -74,7 +77,7 @@ void TestPlayer::Tick(float)
 
 void TestPlayer::BeginPlay()
 {
-
+	SpawnObject<LightData>();
 	Domain = SpawnObject<Actor>();
 	Domain->SetModel("Buildings");
 	Domain->SetScale(Vector(0.5, 0.5, 0.5));
@@ -86,7 +89,8 @@ void TestPlayer::BeginPlay()
 	Domain->SetLocation(Vector(0.5, -1.0, 0.5));
 
 	Domain = SpawnObject<Actor>();
-	Domain->SetModel("Buildings");
+	Domain->SetModel("sphere");
+	Domain->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/for"));
 	Domain->SetScale(Vector(0.5, 0.5, 0.5));
 	Domain->SetLocation(Vector(0.5, 0.0, 0.0));
 

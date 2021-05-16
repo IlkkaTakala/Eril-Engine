@@ -324,12 +324,14 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D:\Ilkka\Documents\Visual Studio 2019\Game\Engine\Launch.cpp" />
+    <ClCompile Include="Engine\BasicTypes.cpp" />
     <ClCompile Include="Engine\Core.cpp" />
     <ClCompile Include="Engine\GameLoop.cpp" />
     <ClCompile Include="Engine\Gameplay\GameState.cpp" />
     <ClCompile Include="Engine\Gameplay\PlayerController.cpp" />
     <ClCompile Include="Engine\GarbageCollector.cpp" />
     <ClCompile Include="Engine\IRender.cpp" />
+    <ClCompile Include="Engine\LightData.cpp" />
     <ClCompile Include="Engine\Objects\Actor.cpp" />
     <ClCompile Include="Engine\Objects\BaseObject.cpp" />
     <ClCompile Include="Engine\Objects\VisibleObject.cpp" />
@@ -356,6 +358,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="Engine\Gameplay\PlayerController.h" />
     <ClInclude Include="Engine\GarbageCollector.h" />
     <ClInclude Include="Engine\IRender.h" />
+    <ClInclude Include="Engine\LightData.h" />
     <ClInclude Include="Engine\Objects\Actor.h" />
     <ClInclude Include="Engine\Objects\BaseObject.h" />
     <ClInclude Include="Engine\Objects\VisibleObject.h" />

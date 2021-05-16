@@ -1,10 +1,12 @@
 #pragma once
 #include <list>
+#include <LightData.cpp>
 
 class Shader;
 class RenderBatch;
 class GLCamera;
 class RenderBuffer;
+class LightData;
 
 struct GLFWwindow;
 
@@ -14,11 +16,13 @@ public:
 	Renderer();
 	virtual ~Renderer();
 
-	virtual int SetupWindow() override;
+	virtual int SetupWindow(int width, int height) override;
 	virtual void CleanRenderer() override;
 
 	virtual Camera* CreateCamera(VisibleObject* parent = nullptr) override;
 	virtual void SetActiveCamera(Camera*) override;
+	virtual void CreateLight(const LightData*) override;
+	virtual void RemoveLight(const LightData*) override;
 
 	virtual void LoadShaders() override;
 	virtual Material* GetMaterialByName(String name) const override;
@@ -30,9 +34,14 @@ public:
 private:
 	friend class GLInput;
 
+	void Deferred(int width, int height);
+	void Forward(int width, int height);
+
 	std::map<String, Shader*> Shaders;
 	std::map<String, Material*> BaseMaterials;
+	std::list<const LightData*> Lights;
 
+	Shader* DeferredMaster;
 	GLFWwindow* Window;
 	RenderBatch* Batcher;
 	RenderBuffer* Buffer;

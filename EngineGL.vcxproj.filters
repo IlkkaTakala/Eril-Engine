@@ -72,6 +72,12 @@
     <ClCompile Include="Engine\OpenGLRenderer\InputControl.cpp">
       <Filter>Engine\OpenGLRenderer</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\BasicTypes.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\LightData.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\TestPlayer.h" />
@@ -144,6 +150,9 @@
     </ClInclude>
     <ClInclude Include="Engine\OpenGLRenderer\InputControl.h">
       <Filter>Engine\OpenGLRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\LightData.h">
+      <Filter>Engine\Public</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

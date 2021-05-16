@@ -30,11 +30,13 @@ public:
 class IRender
 {
 public: 
-	virtual int SetupWindow() = 0;
+	virtual int SetupWindow(int width, int height) = 0;
 	virtual void CleanRenderer() = 0;
 
 	virtual Camera* CreateCamera(VisibleObject* parent = nullptr) = 0;
 	virtual void SetActiveCamera(Camera*) = 0;
+	virtual void CreateLight(const LightData*) = 0;
+	virtual void RemoveLight(const LightData*) = 0;
 
 	virtual void LoadShaders() = 0;
 	virtual Material* GetMaterialByName(String name) const = 0;
@@ -51,11 +53,12 @@ public:
 	virtual void ProcessInputs(float delta) = 0;
 
 	template <class UserClass>
-	void RegisterKeyInput(int Key, void (UserClass::* Callback)(bool), UserClass* Caller)
+	void RegisterKeyInput(int Key, void (UserClass::* Callback)(float, bool), UserClass* Caller)
 	{
 		using std::placeholders::_1;
-		std::function<void(bool)> f = std::bind(Callback, Caller, _1);
-		KeyCallers.insert(std::pair<int, std::function<void(bool)>>(Key, f));
+		using std::placeholders::_2;
+		std::function<void(float, bool)> f = std::bind(Callback, Caller, _1, _2);
+		KeyCallers.insert(std::pair<int, std::function<void(float, bool)>>(Key, f));
 	}
 
 	template <class UserClass>
@@ -68,7 +71,7 @@ public:
 	}
 
 protected:
-	std::multimap<int, std::function<void(bool)>> KeyCallers;
+	std::multimap<int, std::function<void(float, bool)>> KeyCallers;
 	std::multimap<int, std::function<void(float, float)>> MouseCallers;
 
 	double MouseX;
@@ -79,6 +82,8 @@ class RenderMesh
 {
 public:
 	virtual void ApplyTransform() = 0;
+	virtual void SetMaterial(uint section, Material* nextMat) = 0;
+	virtual Material* GetMaterial(uint section) const = 0;
 };
 
 class IMesh

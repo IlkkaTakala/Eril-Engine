@@ -11,6 +11,7 @@ public:
 
 	void Bind();
 	void Unbind();
+	uint GetBuffer() const { return FrameBuffer; }
 
 	void BindTextures();
 

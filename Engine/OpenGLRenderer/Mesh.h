@@ -68,8 +68,8 @@ public:
 	RenderObject(LoadedMesh* mesh);
 	virtual ~RenderObject();
 
-	void SetMaterial(uint section, Material* nextMat);
-	Material* GetMaterial(uint section) const { if (section < SectionCount) return Sections[section].Instance; }
+	virtual void SetMaterial(uint section, Material* nextMat) override;
+	virtual Material* GetMaterial(uint section) const override { if (section < SectionCount) return Sections[section].Instance; else return nullptr; }
 	const glm::mat4& GetModelMatrix();
 	virtual void ApplyTransform() override;
 

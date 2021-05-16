@@ -35,7 +35,7 @@ void GLInput::ProcessInputs(float delta)
 	for (auto const& [key, value] : Hold) {
 		auto t = KeyCallers.find(key);
 		if (t != KeyCallers.end()) {
-			t->second(true);
+			t->second(delta, true);
 		}
 	}
 	while (!Inputs.empty()) {
@@ -46,7 +46,7 @@ void GLInput::ProcessInputs(float delta)
 			if (Hold.find(key.key) == Hold.end()) {
 				auto t = KeyCallers.find(key.key);
 				if (t != KeyCallers.end()) {
-					t->second(true);
+					t->second(delta, true);
 				}
 				Hold[key.key] = key;
 			}
@@ -55,7 +55,7 @@ void GLInput::ProcessInputs(float delta)
 			if (Hold.find(key.key) != Hold.end()) {
 				auto t = KeyCallers.find(key.key);
 				if (t != KeyCallers.end()) {
-					t->second(false);
+					t->second(delta, false);
 				}
 				Hold.erase(key.key);
 			}

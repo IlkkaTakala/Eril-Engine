@@ -1,4 +1,4 @@
-0;
+1;
 ###Vertex###
 #version 330 core
 layout (location = 0) in vec3 in_position;
@@ -20,20 +20,15 @@ void main()
 }
 			
 ###Fragment###
-
 #version 330 core
-layout (location = 0) out vec3 PositionBuffer;
-layout (location = 1) out vec3 NormalBuffer;
-layout (location = 2) out vec4 ColorBuffer;
-layout (location = 3) out vec4 DataBuffer;
 
 in vec2 TexCoords;
 in vec3 FragPos;
 in vec3 Normal;
 
+out vec4 FragColor;
+
 void main()
 {
-	PositionBuffer = FragPos;
-    NormalBuffer = normalize(Normal);
-    ColorBuffer = vec4(1.0, 1.0, 0.0, 1.0);
+    FragColor = vec4(1.0, 1.0, 0.0, 0.5);
 }

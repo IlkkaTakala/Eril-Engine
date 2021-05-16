@@ -1,6 +1,7 @@
 #pragma once
 #include <math.h>
 #include <string>
+#include <vector>
 #define PI 3.14159265359f
 
 typedef unsigned int uint;
@@ -16,6 +17,8 @@ typedef long		int32;
 typedef long long	int64;
 
 typedef std::string	String;
+std::vector<String> split(const String& s, char delim);
+
 
 struct Vector
 {

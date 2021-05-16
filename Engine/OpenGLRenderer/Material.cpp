@@ -6,6 +6,7 @@
 Shader::Shader(const char* const vertexShaderString, const char* const fragmentShaderString) 
 {
 	Success = false;
+	Pass = 0;
 
 	int vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertexShaderString, NULL);

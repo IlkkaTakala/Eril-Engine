@@ -14,17 +14,18 @@ public:
 	virtual void BeginPlay() override;
 private:
 	float mouseSens;
+	float Speed;
 
-	void RunInputW(bool KeyDown);
-	void RunInputA(bool KeyDown);
-	void RunInputD(bool KeyDown);
-	void RunInputS(bool KeyDown);
-	void RunInputSpace(bool KeyDown);
-	void RunInputShift(bool KeyDown);
-	void LeftMouseDown(bool KeyDown);
+	void RunInputW(float delta, bool KeyDown);
+	void RunInputA(float delta, bool KeyDown);
+	void RunInputD(float delta, bool KeyDown);
+	void RunInputS(float delta, bool KeyDown);
+	void RunInputSpace(float delta, bool KeyDown);
+	void RunInputShift(float delta, bool KeyDown);
+	void LeftMouseDown(float delta, bool KeyDown);
 	void MouseMoved(float X, float Y);
 
-	void InputExit(bool) { Exit(); }
+	void InputExit(float delta, bool) { Exit(); }
 
 	Ref<Actor> Domain;
 	std::vector<Ref<VisibleObject>> cubes;
