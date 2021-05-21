@@ -11,23 +11,23 @@ VisibleObject::VisibleObject() : BaseObject()
 void VisibleObject::SetLocation(Vector NewLocation)
 {
 	Location = NewLocation;
-	RenderData->ApplyTransform();
+	if (RenderData != nullptr) RenderData->ApplyTransform();
 }
 
 void VisibleObject::SetRotation(Vector NewRotation)
 {
 	Rotation = NewRotation;
-	RenderData->ApplyTransform();
+	if (RenderData != nullptr) RenderData->ApplyTransform();
 }
 
 void VisibleObject::SetScale(Vector NewScale)
 {
 	Scale = NewScale;
-	RenderData->ApplyTransform();
+	if (RenderData != nullptr) RenderData->ApplyTransform();
 }
 
 void VisibleObject::SetModel(std::string Name)
 {
 	RenderData = MI->LoadData(this, Name);
-	RenderData->ApplyTransform();
+	if (RenderData != nullptr) RenderData->ApplyTransform();
 }

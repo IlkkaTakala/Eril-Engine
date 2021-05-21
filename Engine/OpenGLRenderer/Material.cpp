@@ -45,6 +45,95 @@ Shader::Shader(const char* const vertexShaderString, const char* const fragmentS
 	glDeleteShader(fragmentShader);
 }
 
+Shader::Shader(int type, const char* const ShaderString)
+{
+	char infoLog[512];
+	switch (type)
+	{
+	case 0:
+	{
+		GLuint compute;
+		Pass = 3;
+		// Compute shader
+		compute = glCreateShader(GL_COMPUTE_SHADER);
+		glShaderSource(compute, 1, &ShaderString, NULL);
+		glCompileShader(compute);
+		glGetShaderiv(compute, GL_COMPILE_STATUS, &Success);
+		if (!Success) {
+			glGetShaderInfoLog(compute, 512, NULL, infoLog);
+			printf("ERROR: Shader compile failed: \"%s\"\n", infoLog);
+			return;
+		}
+		// Create the shader program
+		ShaderProgram = glCreateProgram();
+		glAttachShader(ShaderProgram, compute);
+		glLinkProgram(ShaderProgram);
+
+		glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &Success);
+		if (!Success) {
+			glGetProgramInfoLog(ShaderProgram, 512, NULL, infoLog);
+			printf("ERROR: Shader link failed: \"%s\"\n", infoLog);
+			return;
+		}
+		// No longer need the shaders, delete them
+		glDeleteShader(compute);
+	} break;
+
+	case 1:
+	{
+		int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+		glShaderSource(vertexShader, 1, &ShaderString, NULL);
+		glCompileShader(vertexShader);
+
+		char infoLog[512];
+		glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &Success);
+		if (!Success) {
+			glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+			printf("ERROR: Shader compilation failed: \"%s\"\n", infoLog);
+			return;
+		}
+
+		ShaderProgram = glCreateProgram();
+		glAttachShader(ShaderProgram, vertexShader);
+		glLinkProgram(ShaderProgram);
+		glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &Success);
+		if (!Success) {
+			glGetProgramInfoLog(ShaderProgram, 512, NULL, infoLog);
+			printf("ERROR: Shader link failed: \"%s\"\n", infoLog);
+			return;
+		}
+
+		glDeleteShader(vertexShader);
+	} break;
+
+	case 2:
+	{
+		int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+		glShaderSource(fragmentShader, 1, &ShaderString, NULL);
+		glCompileShader(fragmentShader);
+		glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &Success);
+		if (!Success) {
+			glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+			printf("ERROR: Shader compilation failed: \"%s\"\n", infoLog);
+			return;
+		}
+
+		ShaderProgram = glCreateProgram();
+		glAttachShader(ShaderProgram, fragmentShader);
+		glLinkProgram(ShaderProgram);
+		glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &Success);
+		if (!Success) {
+			glGetProgramInfoLog(ShaderProgram, 512, NULL, infoLog);
+			printf("ERROR: Shader link failed: \"%s\"\n", infoLog);
+			return;
+		}
+
+		glDeleteShader(fragmentShader);
+	} break;
+	}
+	
+}
+
 Shader::~Shader()
 {
 	glDeleteProgram(ShaderProgram);
@@ -67,6 +156,13 @@ void Shader::SetUniform(const String& name, const Vector& m)
 	GLint loc = glGetUniformLocation(ShaderProgram, name.c_str());
 	if (loc < 0) return;
 	glUniform3fv(loc, 3, &m[0]);
+}
+
+void Shader::SetUniform(const String& name, const int x, const int y)
+{
+	GLint loc = glGetUniformLocation(ShaderProgram, name.c_str());
+	if (loc < 0) return;
+	glUniform2i(loc, x, y);
 }
 
 void Shader::SetUniform(const String& name, const float m)

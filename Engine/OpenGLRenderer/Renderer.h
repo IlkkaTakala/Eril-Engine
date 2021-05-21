@@ -1,14 +1,15 @@
 #pragma once
 #include <list>
-#include <LightData.cpp>
 
 class Shader;
 class RenderBatch;
 class GLCamera;
 class RenderBuffer;
-class LightData;
+struct LightData;
 
 struct GLFWwindow;
+
+struct Globals;
 
 class Renderer : public IRender
 {
@@ -23,6 +24,7 @@ public:
 	virtual void SetActiveCamera(Camera*) override;
 	virtual void CreateLight(const LightData*) override;
 	virtual void RemoveLight(const LightData*) override;
+	void UpdateLights();
 
 	virtual void LoadShaders() override;
 	virtual Material* GetMaterialByName(String name) const override;
@@ -36,20 +38,31 @@ private:
 
 	void Deferred(int width, int height);
 	void Forward(int width, int height);
+	void LightCulling(int width, int height);
+	void DeferredLighting(int width, int height);
 
 	std::map<String, Shader*> Shaders;
 	std::map<String, Material*> BaseMaterials;
-	std::list<const LightData*> Lights;
+	std::vector<const LightData*> Lights;
 
+	Shader* LightCullingShader;
 	Shader* DeferredMaster;
 	GLFWwindow* Window;
 	RenderBatch* Batcher;
 	RenderBuffer* Buffer;
 	GLCamera* ActiveCamera;
-	uint ScreenPlane;
+
 	uint ScreenVao;
 	uint ScreenVbo;
 	uint ScreenTexVbo;
+
+	uint LightBuffer;
+	uint VisibleLightIndicesBuffer;
+	uint GlobalUniforms;
+
+	uint MaxLightCount;
+	uint WorkGroupsX;
+	uint WorkGroupsY;
 };
 
 class GLMesh : public IMesh

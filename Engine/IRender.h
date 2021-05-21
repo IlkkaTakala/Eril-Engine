@@ -8,6 +8,7 @@ class Material;
 class RenderObject;
 class VisibleObject;
 class LoadedMesh;
+struct LightData;
 
 class Camera
 {

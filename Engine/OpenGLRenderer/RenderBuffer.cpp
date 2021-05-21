@@ -1,8 +1,10 @@
 #include "RenderBuffer.h"
 #include <glad/gl.h>
+#include "LightData.h"
 
 RenderBuffer::RenderBuffer(int width, int height)
 {
+
 	glGenFramebuffers(1, &FrameBuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, FrameBuffer);
 
@@ -43,10 +45,12 @@ RenderBuffer::RenderBuffer(int width, int height)
 
 	glGenTextures(1, &DepthBuffer);
 	glBindTexture(GL_TEXTURE_2D, DepthBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH32F_STENCIL8, width, height, 0, GL_DEPTH_STENCIL, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, DepthBuffer, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, DepthBuffer, 0);
 
 	if (GL_FRAMEBUFFER_COMPLETE != glCheckFramebufferStatus(GL_FRAMEBUFFER))
 	{
@@ -63,7 +67,6 @@ RenderBuffer::~RenderBuffer()
 	glDeleteTextures(1, &ColorBuffer);
 	glDeleteTextures(1, &DataBuffer);
 	glDeleteTextures(1, &DepthBuffer);
-
 	glDeleteFramebuffers(1, &FrameBuffer);
 }
 
@@ -83,6 +86,8 @@ void RenderBuffer::Unbind()
 
 void RenderBuffer::BindTextures()
 {
+	unsigned int attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+	glDrawBuffers(4, attachments);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, PositionBuffer);
 	glActiveTexture(GL_TEXTURE1);

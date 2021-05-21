@@ -1,26 +1,31 @@
 #include "LightData.h"
 
-LightData::LightData() : BaseObject()
+LightData::LightData()
 {
 	Type = 0;
 	Intensity = 10.f;
-	Size = 10.f;
+	Size = 1.f;
 	Distance = 0.f;
 	Falloff = 1.f;
-	Color = Vector(1.f, 0.f, 0.f);
+	Color = Vector(1.f, 1.f, 1.f);
 
-	Location = Vector(0.f, 0.f, 0.f);
+	Location = Vector(0.f, 0.f, 10.f);
 	Rotation = Vector(0.f, 0.f, 0.f);
-
-	RI->CreateLight(this);
 }
 
-LightData::~LightData()
+Light::Light() : BaseObject()
 {
-	RI->RemoveLight(this);
+	Data = LightData();
+
+	RI->CreateLight(&Data);
 }
 
-void LightData::DestroyObject()
+Light::~Light()
 {
-	RI->RemoveLight(this);
+	RI->RemoveLight(&Data);
+}
+
+void Light::DestroyObject()
+{
+	RI->RemoveLight(&Data);
 }

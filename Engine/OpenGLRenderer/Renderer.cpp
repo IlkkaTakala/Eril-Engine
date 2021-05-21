@@ -13,6 +13,20 @@
 #include "Settings.h"
 #include <filesystem>
 #include <stdexcept>
+#include <iostream>
+
+struct Globals
+{
+	glm::mat4 Projection;
+	glm::mat4 View;
+	glm::vec4 ViewPoint;
+};
+
+struct GLM_Light
+{
+	glm::vec4 location;
+	float size;
+};
 
 Renderer::Renderer()
 {
@@ -21,8 +35,9 @@ Renderer::Renderer()
 	Window = nullptr;
 	ActiveCamera = nullptr;
 	DeferredMaster = nullptr;
+	LightCullingShader = nullptr;
+	MaxLightCount = 1024;
 
-	ScreenPlane = 0;
 	ScreenVao = 0;
 	ScreenVbo = 0;
 	ScreenTexVbo = 0;
@@ -42,12 +57,19 @@ int Renderer::SetupWindow(int width, int height)
 	if (!glfwInit()) {
 		return -1;
 	}
+
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
+	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+	glfwWindowHint(GLFW_SAMPLES, 4);
+
 	Window = glfwCreateWindow(width, height, "OpenGL window", NULL, NULL);
 	if (!Window) {
 		glfwTerminate();
 		return -1;
 	}
-	glfwSetWindowAttrib(Window, GLFW_RESIZABLE, GLFW_FALSE);
 	glfwSetWindowAttrib(Window, GLFW_DECORATED, GLFW_FALSE);
 	glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetInputMode(Window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
@@ -58,7 +80,7 @@ int Renderer::SetupWindow(int width, int height)
 	if (INI->GetValue("Render", "VSync") == "false") glfwSwapInterval(0);
 	if (!gladLoadGL(glfwGetProcAddress)) exit(100);
 
-	Batcher = new RenderBatch(262144);
+	Batcher = new RenderBatch(/*262144*/524288);
 	Buffer = new RenderBuffer(width, height);
 
 
@@ -80,7 +102,7 @@ int Renderer::SetupWindow(int width, int height)
 		0.0f, 1.0f
 	};
 
-	glGenVertexArrays(1, &ScreenPlane);
+	glGenVertexArrays(1, &ScreenVao);
 	glGenBuffers(1, &ScreenVbo);
 	glGenBuffers(1, &ScreenTexVbo);
 
@@ -104,12 +126,44 @@ int Renderer::SetupWindow(int width, int height)
 
 	glBindVertexArray(0);
 
+	WorkGroupsX = (width + (width % 16)) / 16;
+	WorkGroupsY = (height + (height % 16)) / 16;
+	size_t numberOfTiles = WorkGroupsX * WorkGroupsY;
+
+	glGenBuffers(1, &LightBuffer);
+	glGenBuffers(1, &VisibleLightIndicesBuffer);
+
+	// Bind light buffer
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, LightBuffer);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, MaxLightCount * sizeof(GLM_Light), 0, GL_DYNAMIC_DRAW);
+
+	// Bind visible light indices buffer
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, VisibleLightIndicesBuffer);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, numberOfTiles * sizeof(int) * 1024, 0, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+	glGenBuffers(1, &GlobalUniforms);
+	glBindBuffer(GL_UNIFORM_BUFFER, GlobalUniforms);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(Globals), NULL, GL_STATIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LEQUAL);
+	glDepthFunc(GL_EQUAL);
 	glEnable(GL_CULL_FACE);
 
 	glViewport(0, 0, width, height);
-	glClearColor(0.f, 0.f, 0.f, 1.0f);
+	glClearColor(0.f, 0.f, 0.f, 0.f);
+
+	LoadShaders();
+
+	if (LightCullingShader == nullptr || DeferredMaster == nullptr) throw std::exception("Shaders not found!\n");
+
+	LightCullingShader->Bind();
+	LightCullingShader->SetUniform("screenSize", width, height);
+	LightCullingShader->SetUniform("lightCount", (int)Lights.size());
+	DeferredMaster->Bind();
+	DeferredMaster->SetUniform("numberOfTilesX", (int)WorkGroupsX);
 
 	return 0;
 }
@@ -127,6 +181,11 @@ void Renderer::CleanRenderer()
 	delete Batcher;
 	delete Buffer;
 	delete DeferredMaster;
+	delete LightCullingShader;
+
+	glDeleteBuffers(1, &LightBuffer);
+	glDeleteBuffers(1, &VisibleLightIndicesBuffer);
+	glDeleteBuffers(1, &GlobalUniforms);
 
 	glDeleteBuffers(1, &ScreenVbo);
 	glDeleteBuffers(1, &ScreenTexVbo);
@@ -150,7 +209,8 @@ void Renderer::SetActiveCamera(Camera* cam)
 void Renderer::CreateLight(const LightData* light)
 {
 	Lights.push_back(light);
-}
+	LightCullingShader->SetUniform("lightCount", (int)Lights.size());
+}	
 
 void Renderer::RemoveLight(const LightData* light)
 {
@@ -161,6 +221,90 @@ void Renderer::RemoveLight(const LightData* light)
 			break;
 		}
 	}
+	LightCullingShader->SetUniform("lightCount", (int)Lights.size());
+}
+
+void Renderer::UpdateLights()
+{
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, LightBuffer);
+	GLM_Light* mapped = reinterpret_cast<GLM_Light*>(glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, MaxLightCount * sizeof(GLM_Light), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
+	for (int i = 0; i < Lights.size(); i++) {
+		GLM_Light& light = mapped[i];
+		light.location = glm::vec4(Lights[i]->Location.X, Lights[i]->Location.Y, Lights[i]->Location.Z, 1.f);
+		light.size = Lights[i]->Size;
+	}
+	int result = glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+	if (result == GL_FALSE) exit(99);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+}
+
+bool LoadVertex(std::ifstream& s, String& vertex)
+{
+	String in_line;
+	bool found = false;
+	while (std::getline(s, in_line)) {
+		if (in_line == "###VERTEX###") {
+			found = true;
+			break;
+		}
+	}
+	if (found) {
+		while (std::getline(s, in_line))
+		{
+			if (in_line != "###END_VERTEX###") {
+				vertex += in_line + '\n';
+			}
+			else break;
+		}
+		return true;
+	}
+	return false;
+}
+
+bool LoadFragment(std::ifstream& s, String& fragment)
+{
+	String in_line;
+	bool found = false;
+	while (std::getline(s, in_line)) {
+		if (in_line == "###FRAGMENT###") {
+			found = true;
+			break;
+		}
+	}
+	if (found) {
+		while (std::getline(s, in_line))
+		{
+			if (in_line != "###END_FRAGMENT###") {
+				fragment += in_line + '\n';
+			}
+			else break;
+		}
+		return true;
+	}
+	return false;
+}
+
+bool LoadCompute(std::ifstream& s, String& compute)
+{
+	String in_line;
+	bool found = false;
+	while (std::getline(s, in_line)) {
+		if (in_line == "###COMPUTE###") {
+			found = true;
+			break;
+		}
+	}
+	if (found) {
+		while (std::getline(s, in_line))
+		{
+			if (in_line != "###END_COMPUTE###") {
+				compute += in_line + '\n';
+			}
+			else break;
+		}
+		return true;
+	}
+	return false;
 }
 
 void Renderer::LoadShaders()
@@ -171,38 +315,81 @@ void Renderer::LoadShaders()
 		if (f.path().extension() == ".shader") {
 			std::ifstream stre = std::ifstream(f.path(), std::ios_base::in);
 
-			String vertex;
-			String fragment;
+			
 			String in_line;
 
 			std::getline(stre, in_line);
 
 			std::vector<String> params = split(in_line, ';');
+			if (params.size() < 1) throw std::exception("Invalid Shader");
 
-			do {
-				std::getline(stre, in_line);
-			} while (in_line != "###Vertex###");
+			switch (std::atoi(params[0].c_str()))
+			{
+			case 0:
+			{
+				String vertex;
+				if (LoadVertex(stre, vertex)) {
+					Shader* nShader = new Shader(1, vertex.c_str());
+					nShader->Pass = std::atoi(params[1].c_str());
+					if (!nShader->Success) nShader = nullptr;
+					if (nShader != nullptr) {
+						if (f.path().filename() == "LightCullingShader.shader") LightCullingShader = nShader;
+						else Shaders.emplace(f.path().filename().replace_extension("").string(), nShader);
+					}
+					else throw std::exception(("Invalid shaders found! : " + f.path().string() + '\n').c_str());
+				}
+			} break;
 
-			while (std::getline(stre, in_line)) {
-				if (in_line != "###Fragment###")
-					vertex += in_line + '\n';
-				else break;
+			case 1: 
+			{
+				String fragment;
+				if (LoadFragment(stre, fragment)) {
+					Shader* nShader = new Shader(2, fragment.c_str());
+					nShader->Pass = std::atoi(params[1].c_str());
+					if (!nShader->Success) nShader = nullptr;
+					if (nShader != nullptr) {
+						Shaders.emplace(f.path().filename().replace_extension("").string(), nShader);
+					}
+					else throw std::exception(("Invalid shaders found! : " + f.path().string() + '\n').c_str());
+				}
+			} break;
+
+			case 2:
+			{
+				String vertex;
+				String fragment;
+				if (LoadVertex(stre, vertex) && LoadFragment(stre, fragment)) {
+					Shader* nShader = new Shader(vertex.c_str(), fragment.c_str());
+					nShader->Pass = std::atoi(params[1].c_str());
+					if (!nShader->Success) nShader = nullptr;
+					if (nShader != nullptr) {
+						if (f.path().filename() == "Master.shader") DeferredMaster = nShader;
+						else Shaders.emplace(f.path().filename().replace_extension("").string(), nShader);
+					}
+					else throw std::exception(("Invalid shaders found! : " + f.path().string() + '\n').c_str());
+				}
 			}
+			break;
 
-			while (std::getline(stre, in_line)) {
-				if (in_line != "###Fragment###")
-					fragment += in_line + '\n';
-				else break;
+			case 4:
+			{
+				String compute;
+				if (LoadCompute(stre, compute)) {
+					Shader* nShader = new Shader(0, compute.c_str());
+					nShader->Pass = std::atoi(params[1].c_str());
+					if (!nShader->Success) nShader = nullptr;
+					if (nShader != nullptr) {
+						if (f.path().filename() == "LightCullingShader.shader") LightCullingShader = nShader;
+						else Shaders.emplace(f.path().filename().replace_extension("").string(), nShader);
+					}
+					else throw std::exception(("Invalid shaders found! : " + f.path().string() + '\n').c_str());
+				}
 			}
+			break;
 
-			Shader* nShader = new Shader(vertex.c_str(), fragment.c_str());
-			nShader->Pass = std::atoi(params[0].c_str());
- 			if (!nShader->Success) nShader = nullptr;
-			if (nShader != nullptr) {
-				if (f.path().filename() == "Master.shader") DeferredMaster = nShader;
-				else Shaders.emplace(f.path().filename().replace_extension("").string(), nShader);
+			default:
+				break;
 			}
-			else throw std::exception("Invalid shaders found!\n");
 
 			stre.close();
 		}
@@ -250,11 +437,11 @@ void Renderer::Update()
 void Renderer::Deferred(int width, int height)
 {
 	Buffer->Bind();
-	glClearColor(0.f, 0.f, 0.f, 0.f);
 	// Clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glDisable(GL_BLEND);
+	glDepthFunc(GL_LESS);
 
 	for (auto const& [name, s] : Shaders)
 	{
@@ -263,7 +450,7 @@ void Renderer::Deferred(int width, int height)
 		if (s == nullptr) throw std::exception("Shader error!");
 		s->Bind();
 
-		s->SetUniform("VP", ActiveCamera->GetProjectionMatrix() * glm::inverse(ActiveCamera->GetViewMatrix()));
+		//s->SetUniform("VP", ActiveCamera->GetProjectionMatrix() * glm::inverse(ActiveCamera->GetViewMatrix()));
 
 		for (Material* m : s->GetUsers())
 		{
@@ -296,29 +483,11 @@ void Renderer::Deferred(int width, int height)
 	}
 
 	Buffer->Unbind();
-
-	glfwGetFramebufferSize(Window, &width, &height);
-
-	Buffer->BindTextures();
-	DeferredMaster->Bind();
-	DeferredMaster->SetUniform("gPosition", 0);
-	DeferredMaster->SetUniform("gNormal", 1);
-	DeferredMaster->SetUniform("gAlbedoSpec", 2);
-
-	glBindVertexArray(ScreenVao);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glBindVertexArray(0);
-
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, Buffer->GetBuffer());
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-	glBlitFramebuffer(
-		0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST
-	);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Renderer::Forward(int width, int height)
 {
+	glDepthFunc(GL_LESS);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	for (auto const& [name, s] : Shaders)
@@ -361,6 +530,75 @@ void Renderer::Forward(int width, int height)
 	}
 }
 
+void Renderer::LightCulling(int width, int height)
+{
+	glDepthFunc(GL_EQUAL);
+	LightCullingShader->Bind();
+
+	glActiveTexture(GL_TEXTURE4);
+	LightCullingShader->SetUniform("depthMap", 4);
+	glBindTexture(GL_TEXTURE_2D, Buffer->GetDepth());
+
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, LightBuffer);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, VisibleLightIndicesBuffer);
+	LightCullingShader->SetUniform("lightCount", (int)Lights.size());
+
+	glDispatchCompute(WorkGroupsX, WorkGroupsY, 1);
+	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+void LightStencilPass(int i) 
+{
+	glDrawBuffer(GL_NONE);
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+	glClear(GL_STENCIL_BUFFER_BIT);
+	glStencilFunc(GL_ALWAYS, 0, 0);
+	glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
+	glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
+	glEnable(GL_STENCIL_TEST);
+
+
+}
+
+void LightPointPass(int i)
+{
+	glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
+
+	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendEquation(GL_FUNC_ADD);
+	glBlendFunc(GL_ONE, GL_ONE);
+
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_FRONT);
+
+
+
+	glCullFace(GL_BACK);
+
+	glDisable(GL_BLEND);
+}
+
+void LightDirectionalPass()
+{
+
+}
+
+void Renderer::DeferredLighting(int width, int height)
+{
+	for (unsigned int i = 0; i < Lights.size(); i++) {
+		LightStencilPass(i);
+		LightPointPass(i);
+	}
+
+	glDisable(GL_STENCIL_TEST);
+
+	LightDirectionalPass();
+}
+
 void Renderer::Render()
 {
 	int width, height;
@@ -371,9 +609,48 @@ void Renderer::Render()
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	Globals g;
+	g.Projection = ActiveCamera->GetProjectionMatrix();
+	g.View = glm::inverse(ActiveCamera->GetViewMatrix());
+	const Vector& loc = ActiveCamera->GetLocation();
+	g.ViewPoint = glm::vec4(loc.X, loc.Y, loc.Z, 1.f);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, GlobalUniforms);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Globals), &g);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 0, GlobalUniforms);
+
+	if (Lights.size() != 0) UpdateLights();
 	Deferred(width, height);
 
+	LightCulling(width, height);
+	DeferredLighting(width, height);
+
+	Buffer->Unbind();
+	Buffer->BindTextures();
+	DeferredMaster->Bind();
+	//DeferredMaster->SetUniform("numberOfTilesX", (int)WorkGroupsX);
+	DeferredMaster->SetUniform("gPosition", 0);
+	DeferredMaster->SetUniform("gNormal", 1);
+	DeferredMaster->SetUniform("gAlbedoSpec", 2);
+	//DeferredMaster->SetUniform("totalLightCount", (int)Lights.size());
+
+	glBindVertexArray(ScreenVao);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
+
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, Buffer->GetBuffer());
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBlitFramebuffer(
+		0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST
+	);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, 0);
+
 	Forward(width, height);
+
+	glBindBufferBase(GL_UNIFORM_BUFFER, 0, 0);
 
 	glfwSwapBuffers(Window);
 }

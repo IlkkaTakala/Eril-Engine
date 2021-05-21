@@ -6,6 +6,26 @@
 
 class Shader;
 class Section;
+struct Vertex;
+
+class BufferPart
+{
+public:
+	BufferPart();
+	~BufferPart();
+	void Initialize(int size);
+	void Bind();
+	void Unbind();
+	int Size;
+
+	uint32* indices;
+	Vertex* verts;
+
+	/* Buffers */
+	GLuint m_vao;
+	GLuint m_vbo;
+	GLuint m_ebo;
+};
 
 class RenderBatch
 {
@@ -36,10 +56,9 @@ private:
 	uint32 vertex_index;
 	uint32 face_count;
 
-	/* Buffers */
-	GLuint m_vao;
-	GLuint m_vbo;
-	GLuint m_ebo;
+	uint8 ActiveBuffer;
+
+	BufferPart* Buffers;
 
 	/* Store and sort the sprites until we want to draw them into batches */
 	std::vector<const Section*> spriteMap;

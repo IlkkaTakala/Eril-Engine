@@ -77,8 +77,46 @@ void TestPlayer::Tick(float)
 
 void TestPlayer::BeginPlay()
 {
-	SpawnObject<LightData>();
+
+	for (int i = 0; i < 1; i++) {
+		Light* next = SpawnObject<Light>();
+		next->Data.Location = Vector(i * 1.5f, 9.f, 0.f);
+	}
 	Domain = SpawnObject<Actor>();
+	Domain->SetModel("sphere");
+	Domain->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/for"));
+	Domain->SetScale(Vector(0.5, 0.5, 0.5));
+	Domain->SetLocation(Vector(1.5, 9.0, 0.f));
+
+	/*for (int i = 0; i < 50; i++) {
+		Light* next = SpawnObject<Light>();
+		next->Data.Location = Vector(i * 1.5f, 30.f, 4.f);
+	}
+
+	for (int i = 0; i < 50; i++) {
+		Light* next = SpawnObject<Light>();
+		next->Data.Location = Vector(i * 1.5f, 10.f, 4.f);
+	}*/
+
+	for (int i = 0; i < 50; i++) {
+		Actor* next = SpawnObject<Actor>();
+		next->SetModel("sphere");
+		next->SetLocation(Vector(i * 1.5f, 10.f, 0.f));
+	}
+
+	for (int i = 0; i < 50; i++) {
+		Actor* next = SpawnObject<Actor>();
+		next->SetModel("sphere");
+		next->SetLocation(Vector(i * 1.5f, 20.f, 0.f));
+	}
+
+	for (int i = 0; i < 50; i++) {
+		Actor* next = SpawnObject<Actor>();
+		next->SetModel("sphere");
+		next->SetLocation(Vector(i * 1.5f, -10.f, 0.f));
+	}
+
+	/*Domain = SpawnObject<Actor>();
 	Domain->SetModel("Buildings");
 	Domain->SetScale(Vector(0.5, 0.5, 0.5));
 	Domain->SetLocation(Vector(-0.5, 0.0, 0.0));

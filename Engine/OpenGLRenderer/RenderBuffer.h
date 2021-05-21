@@ -12,6 +12,7 @@ public:
 	void Bind();
 	void Unbind();
 	uint GetBuffer() const { return FrameBuffer; }
+	uint GetDepth() const { return DepthBuffer; }
 
 	void BindTextures();
 

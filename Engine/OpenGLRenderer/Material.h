@@ -14,12 +14,14 @@ class Shader
 {
 public:
 	Shader(const char* const vertexShaderString, const char* const fragmentShaderString);
+	Shader(int type, const char* const ShaderString);
 	~Shader();
 
 	void Bind();
 
 	void SetUniform(const String& name, const glm::mat4& m);
 	void SetUniform(const String& name, const Vector& m);
+	void SetUniform(const String& name, const int x, const int y);
 	void SetUniform(const String& name, const float m);
 	void SetUniform(const String& name, const int m);
 

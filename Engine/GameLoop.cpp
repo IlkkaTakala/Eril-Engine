@@ -38,8 +38,7 @@ int GameLoop::Start()
 
 	try
 	{
-		RI->SetupWindow(640, 480);
-		RI->LoadShaders();
+		RI->SetupWindow(800, 600);
 		II->SetInputHandler();
 		MI->StartLoading();
 	}

@@ -1,15 +1,12 @@
 #pragma once
 #include "Core.h"
+#include "IRender.h"
 
-class LightData : public BaseObject
+struct LightData 
 {
-public:
 	LightData();
-	~LightData();
 
-	virtual void DestroyObject() override;
-
-	uint8 Type;
+	int Type;
 
 	float Intensity;
 	float Size;
@@ -19,6 +16,19 @@ public:
 
 	Vector Location;
 	Vector Rotation;
+};
+
+class Light : public BaseObject
+{
+public:
+	Light();
+	~Light();
+
+	virtual void DestroyObject() override;
+	virtual void BeginPlay() override {};
+
+	LightData Data;
+	
 private:
 	
 };
