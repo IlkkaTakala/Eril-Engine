@@ -24,8 +24,8 @@ RenderObject::RenderObject(LoadedMesh* mesh)
 	SectionCount = mesh->HolderCount;
 	Sections = new Section[SectionCount]();
 	for (uint32 i = 0; i < mesh->HolderCount; i++) {
-		Sections[i].Holder = &mesh->Holders[i];
-		SetMaterial(i, mesh->Holders[i].Instance);
+		Sections[i].Holder = mesh->Holders[i];
+		SetMaterial(i, mesh->Holders[i]->Instance);
 		Sections[i].Parent = this;
 	}
 }
@@ -84,10 +84,10 @@ LoadedMesh::LoadedMesh()
 {
 	Users = 0;
 	HolderCount = 0;
-	Holders = nullptr;
 }
 
 LoadedMesh::~LoadedMesh()
 {
-	delete[] Holders;
+	for (const auto sec : Holders)
+		delete sec;
 }

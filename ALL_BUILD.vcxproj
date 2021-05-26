@@ -62,14 +62,11 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">EngineGL.dir\$(Configuration)\$(ProjectName)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
-    <OutDir>$(SolutionDir)Builds\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Midl>
-      <AdditionalIncludeDirectories>D:\Ilkka\Documents\Visual Studio 2019\Game\Engine\OpenGLRenderer\ext\glfw-3.3.2\deps;D:\Ilkka\Documents\Visual Studio 2019\Game\Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Ilkka\Documents\Visual Studio 2019\Game\Engine\OpenGLRenderer\ext\glfw-3.3.2\deps;D:\Ilkka\Documents\Visual Studio 2019\Game\Engine;D:\Ilkka\Documents\Visual Studio 2019\Game\ext\stb-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -79,7 +76,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Midl>
-      <AdditionalIncludeDirectories>D:\Ilkka\Documents\Visual Studio 2019\Game\Engine\OpenGLRenderer\ext\glfw-3.3.2\deps;D:\Ilkka\Documents\Visual Studio 2019\Game\Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Ilkka\Documents\Visual Studio 2019\Game\Engine\OpenGLRenderer\ext\glfw-3.3.2\deps;D:\Ilkka\Documents\Visual Studio 2019\Game\Engine;D:\Ilkka\Documents\Visual Studio 2019\Game\ext\stb-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -89,7 +86,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <Midl>
-      <AdditionalIncludeDirectories>D:\Ilkka\Documents\Visual Studio 2019\Game\Engine\OpenGLRenderer\ext\glfw-3.3.2\deps;D:\Ilkka\Documents\Visual Studio 2019\Game\Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Ilkka\Documents\Visual Studio 2019\Game\Engine\OpenGLRenderer\ext\glfw-3.3.2\deps;D:\Ilkka\Documents\Visual Studio 2019\Game\Engine;D:\Ilkka\Documents\Visual Studio 2019\Game\ext\stb-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -99,7 +96,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <Midl>
-      <AdditionalIncludeDirectories>D:\Ilkka\Documents\Visual Studio 2019\Game\Engine\OpenGLRenderer\ext\glfw-3.3.2\deps;D:\Ilkka\Documents\Visual Studio 2019\Game\Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Ilkka\Documents\Visual Studio 2019\Game\Engine\OpenGLRenderer\ext\glfw-3.3.2\deps;D:\Ilkka\Documents\Visual Studio 2019\Game\Engine;D:\Ilkka\Documents\Visual Studio 2019\Game\ext\stb-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -109,6 +106,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <CustomBuild Include="D:\Ilkka\Documents\Visual Studio 2019\Game\CMakeLists.txt">
+      <StdOutEncoding>UTF-8</StdOutEncoding>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule D:/Ilkka/Documents/Visual Studio 2019/Game/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 D:\ProgramFiles\CMake\bin\cmake.exe "-SD:/Ilkka/Documents/Visual Studio 2019/Game" "-BD:/Ilkka/Documents/Visual Studio 2019/Game" --check-stamp-file "D:/Ilkka/Documents/Visual Studio 2019/Game/CMakeFiles/generate.stamp"
@@ -172,9 +170,33 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </ProjectReference>
+    <ProjectReference Include="D:\Ilkka\Documents\Visual Studio 2019\Game\EngineGL.vcxproj">
+      <Project>{880477ED-C35F-3748-933A-98914BC0BB0D}</Project>
+      <Name>EngineGL</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Ilkka\Documents\Visual Studio 2019\Game\ext\assimp-5.0.1\contrib\irrXML\IrrXML.vcxproj">
+      <Project>{4B92503F-AEFC-380E-BB69-51F05F7C22AB}</Project>
+      <Name>IrrXML</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Ilkka\Documents\Visual Studio 2019\Game\ext\assimp-5.0.1\code\assimp.vcxproj">
+      <Project>{895EF9A5-28B1-37C3-A8C8-88AA166028F8}</Project>
+      <Name>assimp</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Ilkka\Documents\Visual Studio 2019\Game\ext\assimp-5.0.1\tools\assimp_cmd\assimp_cmd.vcxproj">
+      <Project>{8DCB29B7-CFEC-3864-A10E-817F7BD2B598}</Project>
+      <Name>assimp_cmd</Name>
+    </ProjectReference>
     <ProjectReference Include="D:\Ilkka\Documents\Visual Studio 2019\Game\Engine\OpenGLRenderer\ext\glfw-3.3.2\src\glfw.vcxproj">
       <Project>{A995613F-9A3F-366B-8F57-C50B8FC0599D}</Project>
       <Name>glfw</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Ilkka\Documents\Visual Studio 2019\Game\ext\assimp-5.0.1\contrib\zlib\zlib.vcxproj">
+      <Project>{2C72A234-FFE7-3F98-B2CD-B281D8D615AC}</Project>
+      <Name>zlib</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Ilkka\Documents\Visual Studio 2019\Game\ext\assimp-5.0.1\contrib\zlib\zlibstatic.vcxproj">
+      <Project>{D79F20B9-F3D5-3A27-9736-B7CBAC5274D0}</Project>
+      <Name>zlibstatic</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

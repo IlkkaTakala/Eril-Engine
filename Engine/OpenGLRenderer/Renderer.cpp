@@ -14,28 +14,60 @@
 #include <filesystem>
 #include <stdexcept>
 #include <iostream>
+#include <random>
+
+#include <glm/gtx/transform.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
 struct Globals
 {
 	glm::mat4 Projection;
 	glm::mat4 View;
 	glm::vec4 ViewPoint;
+	glm::ivec2 ScreenSize;
+	int SceneLightCount;
 };
+
+Globals GlobalVariables;
+glm::mat4 ShadowProj;
+glm::mat4 ShadowOrtho;
 
 struct GLM_Light
 {
-	glm::vec4 location;
-	float size;
+	glm::vec4 color;
+	glm::vec4 locationAndSize;
+	glm::vec4 rotation;
+	glm::ivec4 type;
+	glm::mat4 transforms[6];
+
+	GLM_Light() {
+		color = glm::vec4(0.0);
+		locationAndSize = glm::vec4(0.0);
+		rotation = glm::vec4(0.0);
+		type = glm::ivec4(1);
+		transforms[0] = { glm::mat4(1.0) };
+	}
 };
 
 Renderer::Renderer()
 {
 	Batcher = nullptr;
 	Buffer = nullptr;
+	BlurRender = nullptr;
 	Window = nullptr;
 	ActiveCamera = nullptr;
 	DeferredMaster = nullptr;
 	LightCullingShader = nullptr;
+	SSAOShader = nullptr;
+	SSAOBlurShader = nullptr;
+	ShadowShader = nullptr;
+
 	MaxLightCount = 1024;
 
 	ScreenVao = 0;
@@ -46,6 +78,11 @@ Renderer::Renderer()
 Renderer::~Renderer()
 {
 	if (Batcher != nullptr) delete Batcher;
+}
+
+inline float lerp(float a, float b, float f)
+{
+	return a + f * (b - a);
 }
 
 int Renderer::SetupWindow(int width, int height)
@@ -82,7 +119,8 @@ int Renderer::SetupWindow(int width, int height)
 
 	Batcher = new RenderBatch(/*262144*/524288);
 	Buffer = new RenderBuffer(width, height);
-
+	PostProcess = new PostBuffer(width, height);
+	SSAORender = new SSAOBuffer(width, height);
 
 	float vertices[] = {
 		-1.f, -1.f, 1.f,
@@ -149,7 +187,7 @@ int Renderer::SetupWindow(int width, int height)
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_EQUAL);
+	glDepthFunc(GL_LEQUAL);
 	glEnable(GL_CULL_FACE);
 
 	glViewport(0, 0, width, height);
@@ -157,13 +195,62 @@ int Renderer::SetupWindow(int width, int height)
 
 	LoadShaders();
 
-	if (LightCullingShader == nullptr || DeferredMaster == nullptr) throw std::exception("Shaders not found!\n");
+	if (LightCullingShader == nullptr || DeferredMaster == nullptr) throw std::exception("Important shaders not found!\n");
 
-	LightCullingShader->Bind();
-	LightCullingShader->SetUniform("screenSize", width, height);
-	LightCullingShader->SetUniform("lightCount", (int)Lights.size());
-	DeferredMaster->Bind();
-	DeferredMaster->SetUniform("numberOfTilesX", (int)WorkGroupsX);
+	Shader* blur = Shaders.find("BlurCompute") == Shaders.end() ? nullptr : Shaders.find("BlurCompute")->second;
+	BlurRender = new BlurBuffer(width, height, blur);
+
+	if (SSAOShader != nullptr && SSAOBlurShader != nullptr) {
+		std::uniform_real_distribution<float> randomFloats(0.0, 1.0); // random floats between [0.0, 1.0]
+		std::default_random_engine generator;
+		std::vector<glm::vec3> ssaoKernel;
+		for (unsigned int i = 0; i < 64; ++i)
+		{
+			glm::vec3 sample(
+				randomFloats(generator) * 2.0 - 1.0,
+				randomFloats(generator) * 2.0 - 1.0,
+				randomFloats(generator)
+			);
+			sample = glm::normalize(sample);
+			sample *= randomFloats(generator);
+			float scale = (float)i / 64.f;
+			scale = lerp(0.1f, 1.0f, scale * scale);
+			sample *= scale;
+			ssaoKernel.push_back(sample);
+		}
+
+		glGenBuffers(1, &SSAOKernelBuffer);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSAOKernelBuffer);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, ssaoKernel.size() * sizeof(glm::vec3), &ssaoKernel[0], GL_STATIC_DRAW);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+		std::vector<glm::vec3> ssaoNoise;
+		for (unsigned int i = 0; i < 16; i++)
+		{
+			glm::vec3 noise(
+				randomFloats(generator) * 2.0 - 1.0,
+				randomFloats(generator) * 2.0 - 1.0,
+				0.0f);
+			ssaoNoise.push_back(noise);
+		}
+
+		glGenTextures(1, &SSAONoise);
+		glBindTexture(GL_TEXTURE_2D, SSAONoise);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, 4, 4, 0, GL_RGB, GL_FLOAT, ssaoNoise.data());
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	}
+	
+	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+	ShadowRender = new ShadowBuffer(SHADOW_WIDTH, SHADOW_HEIGHT);
+
+	float aspect = (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT;
+	float near = 0.1f;
+	float far = 100.0f;
+	ShadowProj = glm::perspective(glm::radians(90.0f), aspect, near, far);
+	ShadowOrtho = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near, far);
 
 	return 0;
 }
@@ -178,14 +265,26 @@ void Renderer::CleanRenderer()
 		delete s.second;
 	}
 
+	for (auto const& t : LoadedTextures) {
+		delete t.second;
+	}
+
 	delete Batcher;
 	delete Buffer;
+	delete PostProcess;
+	delete BlurRender;
 	delete DeferredMaster;
+	delete PostProcessMaster;
 	delete LightCullingShader;
+	delete SSAOShader;
+	delete ShadowShader;
+	delete ShadowRender;
 
 	glDeleteBuffers(1, &LightBuffer);
 	glDeleteBuffers(1, &VisibleLightIndicesBuffer);
 	glDeleteBuffers(1, &GlobalUniforms);
+	glDeleteBuffers(1, &SSAOKernelBuffer);
+	glDeleteTextures(1, &SSAONoise);
 
 	glDeleteBuffers(1, &ScreenVbo);
 	glDeleteBuffers(1, &ScreenTexVbo);
@@ -229,9 +328,19 @@ void Renderer::UpdateLights()
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, LightBuffer);
 	GLM_Light* mapped = reinterpret_cast<GLM_Light*>(glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, MaxLightCount * sizeof(GLM_Light), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 	for (int i = 0; i < Lights.size(); i++) {
-		GLM_Light& light = mapped[i];
-		light.location = glm::vec4(Lights[i]->Location.X, Lights[i]->Location.Y, Lights[i]->Location.Z, 1.f);
-		light.size = Lights[i]->Size;
+		GLM_Light light;
+		light.locationAndSize = glm::vec4(Lights[i]->Location.X, Lights[i]->Location.Z, Lights[i]->Location.Y, Lights[i]->Size);
+		glm::mat4 rot = glm::mat4(1.0) * glm::toMat4(glm::quat(glm::vec3(glm::radians(Lights[i]->Rotation.X), glm::radians(Lights[i]->Rotation.Y), glm::radians(Lights[i]->Rotation.Z))));
+		light.rotation = rot * glm::vec4(0.0, -1.0, 0.0, 0.0);
+		light.color = glm::vec4(Lights[i]->Color.X, Lights[i]->Color.Y, Lights[i]->Color.Z, 1.0);
+		light.type.x = Lights[i]->Type;
+		light.transforms[0] = ShadowProj * glm::lookAt(glm::vec3(light.locationAndSize), glm::vec3(light.locationAndSize) + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+		light.transforms[1] = ShadowProj * glm::lookAt(glm::vec3(light.locationAndSize), glm::vec3(light.locationAndSize) + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+		light.transforms[2] = ShadowProj * glm::lookAt(glm::vec3(light.locationAndSize), glm::vec3(light.locationAndSize) + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 1.0, 1.0));
+		light.transforms[3] = ShadowProj * glm::lookAt(glm::vec3(light.locationAndSize), glm::vec3(light.locationAndSize) + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 1.0, -1.0));
+		light.transforms[4] = ShadowProj * glm::lookAt(glm::vec3(light.locationAndSize), glm::vec3(light.locationAndSize) + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
+		light.transforms[5] = ShadowProj * glm::lookAt(glm::vec3(light.locationAndSize), glm::vec3(light.locationAndSize) + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
+		mapped[i] = light;
 	}
 	int result = glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 	if (result == GL_FALSE) exit(99);
@@ -240,6 +349,8 @@ void Renderer::UpdateLights()
 
 bool LoadVertex(std::ifstream& s, String& vertex)
 {
+	s.clear();
+	s.seekg(0);
 	String in_line;
 	bool found = false;
 	while (std::getline(s, in_line)) {
@@ -261,8 +372,35 @@ bool LoadVertex(std::ifstream& s, String& vertex)
 	return false;
 }
 
+bool LoadGeometry(std::ifstream& s, String& geom)
+{
+	s.clear();
+	s.seekg(0);
+	String in_line;
+	bool found = false;
+	while (std::getline(s, in_line)) {
+		if (in_line == "###GEOMETRY###") {
+			found = true;
+			break;
+		}
+	}
+	if (found) {
+		while (std::getline(s, in_line))
+		{
+			if (in_line != "###END_GEOMETRY###") {
+				geom += in_line + '\n';
+			}
+			else break;
+		}
+		return true;
+	}
+	return false;
+}
+
 bool LoadFragment(std::ifstream& s, String& fragment)
 {
+	s.clear();
+	s.seekg(0);
 	String in_line;
 	bool found = false;
 	while (std::getline(s, in_line)) {
@@ -286,6 +424,8 @@ bool LoadFragment(std::ifstream& s, String& fragment)
 
 bool LoadCompute(std::ifstream& s, String& compute)
 {
+	s.clear();
+	s.seekg(0);
 	String in_line;
 	bool found = false;
 	while (std::getline(s, in_line)) {
@@ -364,6 +504,27 @@ void Renderer::LoadShaders()
 					if (!nShader->Success) nShader = nullptr;
 					if (nShader != nullptr) {
 						if (f.path().filename() == "Master.shader") DeferredMaster = nShader;
+						else if (f.path().filename() == "PostProcessMaster.shader") PostProcessMaster = nShader;
+						else if (f.path().filename() == "SSAO.shader") SSAOShader = nShader;
+						else if (f.path().filename() == "SSAOBlur.shader") SSAOBlurShader = nShader;
+						else Shaders.emplace(f.path().filename().replace_extension("").string(), nShader);
+					}
+					else throw std::exception(("Invalid shaders found! : " + f.path().string() + '\n').c_str());
+				}
+			}
+			break;
+
+			case 3:
+			{
+				String vertex;
+				String fragment;
+				String geom;
+				if (LoadVertex(stre, vertex) && LoadFragment(stre, fragment) && LoadGeometry(stre, geom)) {
+					Shader* nShader = new Shader(vertex.c_str(), geom.c_str(), fragment.c_str());
+					nShader->Pass = std::atoi(params[1].c_str());
+					if (!nShader->Success) nShader = nullptr;
+					if (nShader != nullptr) {
+						if (f.path().filename() == "Shadow.shader") ShadowShader = nShader;
 						else Shaders.emplace(f.path().filename().replace_extension("").string(), nShader);
 					}
 					else throw std::exception(("Invalid shaders found! : " + f.path().string() + '\n').c_str());
@@ -415,16 +576,46 @@ Material* Renderer::LoadMaterialByName(String name)
 	else {
 		namespace fs = std::filesystem;
 		if (fs::exists(name + ".mater")) {
-			auto stream = std::ifstream(name + ".mater", std::ios_base::in);
-			String shaderName;
-			std::getline(stream, shaderName);
+			//auto stream = std::ifstream(name + ".mater", std::ios_base::in);
+			INISettings params(name + ".mater");
+			String shaderName = params.GetValue("Shader", "name");
+			//std::getline(stream, shaderName);
 			if (Shaders.find(shaderName) != Shaders.end()) {
 				Material* nMat = new Material(Shaders[shaderName]);
+				auto const& textures = params.GetSection("Textures");
+				for (auto& [name, tex] : textures) {
+					nMat->Textures.emplace(name, LoadTextureByName(tex));
+				}
+				auto const& scalars = params.GetSection("Scalars");
+				for (auto const& [name, sca] : scalars) {
+					nMat->ScalarParameters.emplace(name, std::stof(sca.c_str()));
+				}
+				auto const& vectors = params.GetSection("Vectors");
+				for (auto const& [name, vec] : vectors) {
+					nMat->VectorParameters.emplace(name, Vector(vec));
+				}
 				BaseMaterials.emplace(name, nMat);
 				return BaseMaterials.find(name)->second;
 			}
 		}
 		return nullptr;
+	}
+}
+
+Texture* Renderer::LoadTextureByName(String name)
+{
+	if (LoadedTextures.find(name) != LoadedTextures.end()) {
+		return LoadedTextures.find(name)->second;
+	}
+	else {
+		int width, height, nrChannels;
+		float* data = stbi_loadf(name.c_str(), &width, &height, &nrChannels, 0);
+		if (data == nullptr) return nullptr;
+		int type = name.rbegin()[4] == 'd' ? 0 : name.rbegin()[4] == 'n' ? 1 : 2;
+		Texture* next = new Texture(width, height, nrChannels, data, type);
+		stbi_image_free(data);
+		LoadedTextures.emplace(name, next);
+		return next;
 	}
 }
 
@@ -434,18 +625,48 @@ void Renderer::Update()
 	if (glfwWindowShouldClose(Window)) Exit();
 }
 
-void Renderer::Deferred(int width, int height)
+void Renderer::Shadows(int width, int height)
 {
-	Buffer->Bind();
-	// Clear the screen
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glDisable(GL_BLEND);
-	glDepthFunc(GL_LESS);
+	glViewport(0, 0, width, height);
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+	ShadowShader->Bind();
 
 	for (auto const& [name, s] : Shaders)
 	{
-		if (s->Pass != 0) continue;
+		if (s != nullptr && s->Pass != 0) continue;
+
+		if (s == nullptr) throw std::exception("Shader error!");
+
+		for (Material* m : s->GetUsers())
+		{
+
+			Batcher->begin();
+
+			for (Section* o : m->GetObjects())
+			{
+				Batcher->add(o);
+			}
+			Batcher->end(ActiveCamera->GetViewMatrix(), ActiveCamera->GetProjectionMatrix());
+		}
+	}
+}
+
+void Renderer::Deferred(int width, int height)
+{
+	// Clear the screen
+	glClearColor(0.f, 0.f, 0.f, 0.f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glDisable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+	glEnable(GL_CULL_FACE);
+
+	for (auto const& [name, s] : Shaders)
+	{
+		if (s != nullptr && s->Pass != 0) continue;
 
 		if (s == nullptr) throw std::exception("Shader error!");
 		s->Bind();
@@ -465,7 +686,7 @@ void Renderer::Deferred(int width, int height)
 			int round = 0;
 			for (auto const& param : m->GetTextures()) {
 				if (param.second > 0) {
-					s->SetUniform(param.first, static_cast<float>(param.second->GetTextureID()));
+					s->SetUniform(param.first, round);
 					glActiveTexture(GL_TEXTURE0 + round);
 					glBindTexture(GL_TEXTURE_2D, param.second->GetTextureID());
 					round++;
@@ -481,8 +702,39 @@ void Renderer::Deferred(int width, int height)
 			Batcher->end(ActiveCamera->GetViewMatrix(), ActiveCamera->GetProjectionMatrix());
 		}
 	}
+}
 
-	Buffer->Unbind();
+void Renderer::SSAO(int width, int height)
+{
+	glClearColor(0.f, 0.f, 0.f, 0.f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glActiveTexture(GL_TEXTURE5);
+	glBindTexture(GL_TEXTURE_2D, SSAONoise);
+
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, SSAOKernelBuffer);
+
+	SSAOShader->Bind();
+	SSAOShader->SetUniform("gPosition", 0);
+	SSAOShader->SetUniform("gNormal", 1);
+	SSAOShader->SetUniform("texNoise", 5);
+
+	glDepthFunc(GL_ALWAYS);
+	glBindVertexArray(ScreenVao);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
+
+	SSAORender->BindBlur();
+	glActiveTexture(GL_TEXTURE5);
+	glBindTexture(GL_TEXTURE_2D, SSAORender->GetSSAO());
+	SSAOBlurShader->Bind();
+	SSAOBlurShader->SetUniform("ssaoInput", 5);
+
+	glDepthFunc(GL_ALWAYS);
+	glBindVertexArray(ScreenVao);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
+
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
 }
 
 void Renderer::Forward(int width, int height)
@@ -532,71 +784,15 @@ void Renderer::Forward(int width, int height)
 
 void Renderer::LightCulling(int width, int height)
 {
-	glDepthFunc(GL_EQUAL);
 	LightCullingShader->Bind();
 
-	glActiveTexture(GL_TEXTURE4);
 	LightCullingShader->SetUniform("depthMap", 4);
-	glBindTexture(GL_TEXTURE_2D, Buffer->GetDepth());
 
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, LightBuffer);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, VisibleLightIndicesBuffer);
-	LightCullingShader->SetUniform("lightCount", (int)Lights.size());
+	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, LightBuffer);
+	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, VisibleLightIndicesBuffer);
 
 	glDispatchCompute(WorkGroupsX, WorkGroupsY, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-
-	glActiveTexture(GL_TEXTURE4);
-	glBindTexture(GL_TEXTURE_2D, 0);
-}
-void LightStencilPass(int i) 
-{
-	glDrawBuffer(GL_NONE);
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
-	glClear(GL_STENCIL_BUFFER_BIT);
-	glStencilFunc(GL_ALWAYS, 0, 0);
-	glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
-	glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
-	glEnable(GL_STENCIL_TEST);
-
-
-}
-
-void LightPointPass(int i)
-{
-	glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
-
-	glDisable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
-	glBlendEquation(GL_FUNC_ADD);
-	glBlendFunc(GL_ONE, GL_ONE);
-
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
-
-
-
-	glCullFace(GL_BACK);
-
-	glDisable(GL_BLEND);
-}
-
-void LightDirectionalPass()
-{
-
-}
-
-void Renderer::DeferredLighting(int width, int height)
-{
-	for (unsigned int i = 0; i < Lights.size(); i++) {
-		LightStencilPass(i);
-		LightPointPass(i);
-	}
-
-	glDisable(GL_STENCIL_TEST);
-
-	LightDirectionalPass();
 }
 
 void Renderer::Render()
@@ -607,40 +803,61 @@ void Renderer::Render()
 
 	glfwGetFramebufferSize(Window, &width, &height);
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	Globals g;
-	g.Projection = ActiveCamera->GetProjectionMatrix();
-	g.View = glm::inverse(ActiveCamera->GetViewMatrix());
+	GlobalVariables.Projection = ActiveCamera->GetProjectionMatrix();
+	GlobalVariables.View = glm::inverse(ActiveCamera->GetViewMatrix());
 	const Vector& loc = ActiveCamera->GetLocation();
-	g.ViewPoint = glm::vec4(loc.X, loc.Y, loc.Z, 1.f);
+	GlobalVariables.ViewPoint = glm::vec4(loc.X, loc.Y, loc.Z, 1.f);
+	GlobalVariables.ScreenSize = glm::ivec2(width, height);
+	GlobalVariables.SceneLightCount = (int)Lights.size();
 
 	glBindBuffer(GL_UNIFORM_BUFFER, GlobalUniforms);
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Globals), &g);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Globals), &GlobalVariables);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, GlobalUniforms);
 
 	if (Lights.size() != 0) UpdateLights();
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, LightBuffer);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, VisibleLightIndicesBuffer);
+
+	/*ShadowRender->Bind();
+	Shadows(1024, 1024);*/
+
+	glViewport(0, 0, width, height);
+	Buffer->Bind();
+
 	Deferred(width, height);
-
-	LightCulling(width, height);
-	DeferredLighting(width, height);
-
-	Buffer->Unbind();
 	Buffer->BindTextures();
+	SSAORender->Bind();
+	SSAO(width, height);
+
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, LightBuffer);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, VisibleLightIndicesBuffer);
+	glActiveTexture(GL_TEXTURE5);
+	glBindTexture(GL_TEXTURE_2D, SSAORender->GetSSAOBlur());
+	LightCulling(width, height);
+
+	PostProcess->Bind();
+	glClearColor(0.f, 0.f, 0.f, 0.f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	ShadowRender->BindTextures();
+
 	DeferredMaster->Bind();
-	//DeferredMaster->SetUniform("numberOfTilesX", (int)WorkGroupsX);
+	DeferredMaster->SetUniform("numberOfTilesX", (int)WorkGroupsX);
 	DeferredMaster->SetUniform("gPosition", 0);
 	DeferredMaster->SetUniform("gNormal", 1);
 	DeferredMaster->SetUniform("gAlbedoSpec", 2);
-	//DeferredMaster->SetUniform("totalLightCount", (int)Lights.size());
+	DeferredMaster->SetUniform("gData", 3);
+	DeferredMaster->SetUniform("gDepth", 4);
+	DeferredMaster->SetUniform("gSSAO", 5);
+	DeferredMaster->SetUniform("gShadow", 0);
 
+	glDepthFunc(GL_ALWAYS);
 	glBindVertexArray(ScreenVao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
 
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, Buffer->GetBuffer());
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, PostProcess->GetBuffer());
 	glBlitFramebuffer(
 		0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST
 	);
@@ -648,7 +865,20 @@ void Renderer::Render()
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, 0);
 
-	Forward(width, height);
+	//Forward(width, height);
+
+	PostProcess->Unbind();
+	BlurRender->Blur(PostProcess->GetBloom(), 5);
+	PostProcess->BindTextures();
+
+	PostProcessMaster->Bind();
+	PostProcessMaster->SetUniform("Color", 0);
+	PostProcessMaster->SetUniform("Bloom", 1);
+
+	glDepthFunc(GL_ALWAYS);
+	glBindVertexArray(ScreenVao);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, 0);
 
@@ -662,10 +892,103 @@ GLMesh::GLMesh()
 
 GLMesh::~GLMesh()
 {
-	for (auto const& i : ModelStreams) {
+	/*for (auto const& i : ModelStreams) {
 		i.second->close();
-	}
+	}*/
 	ModelStreams.clear();
+}
+
+void processMesh(LoadedMesh* meshHolder, aiMesh* mesh)
+{
+	std::vector<Vertex> vertices;
+	std::vector<unsigned> indices;
+
+	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+	{
+		Vertex vertex;
+		vertex.position.x = mesh->mVertices[i].x;
+		vertex.position.y = mesh->mVertices[i].y;
+		vertex.position.z = mesh->mVertices[i].z;
+
+		vertex.normal.x = mesh->mNormals[i].x;
+		vertex.normal.y = mesh->mNormals[i].y;
+		vertex.normal.z = mesh->mNormals[i].z;
+
+		vertex.tangent.x = mesh->mTangents[i].x;
+		vertex.tangent.y = mesh->mTangents[i].y;
+		vertex.tangent.z = mesh->mTangents[i].z;
+
+		if (mesh->HasTextureCoords(0))
+		{
+			vertex.uv.x = mesh->mTextureCoords[0][i].x;
+			vertex.uv.y = mesh->mTextureCoords[0][i].y;
+		}
+		else {
+			vertex.uv.x = 0;
+			vertex.uv.y = 0;
+		}
+
+		vertices.push_back(vertex);
+	}
+	//Now retrieve the corresponding vertex indices
+	for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+	{
+		aiFace face = mesh->mFaces[i];
+		for (unsigned int j = 0; j < face.mNumIndices; j++)
+		{
+			indices.push_back(face.mIndices[j]);
+		}
+	}
+	MeshDataHolder* section = new MeshDataHolder();
+	section->FaceCount = indices.size() / 3;
+	section->VertexCount = vertices.size();
+	section->indices = new uint32[indices.size() * sizeof(uint32)];
+	memcpy(section->indices, indices.data(), indices.size() * sizeof(uint32));
+
+	section->vertices = new Vertex[vertices.size() * sizeof(Vertex)];
+	memcpy(section->vertices, vertices.data(), vertices.size() * sizeof(Vertex));
+
+	section->Instance = RI->LoadMaterialByName("Shaders/test");
+
+	meshHolder->HolderCount++;
+	meshHolder->Holders.push_back(section);
+}
+
+void processNode(LoadedMesh* mesh, aiNode* node, const aiScene* scene)
+{
+	// process each mesh located at the current node
+	for (unsigned int i = 0; i < node->mNumMeshes; i++)
+	{
+		// the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
+		// the node object only contains indices to index the actual objects in the scene.
+		aiMesh* meshed = scene->mMeshes[node->mMeshes[i]];
+		processMesh(mesh, meshed);
+	}
+	// after we've processed all of the meshes (if any) we then recursively process each of the children nodes
+	for (unsigned int i = 0; i < node->mNumChildren; i++)
+	{
+		processNode(mesh, node->mChildren[i], scene);
+	}
+}
+
+LoadedMesh* loadMeshes(const std::string& path)
+{
+	LoadedMesh* mesh = new LoadedMesh();
+	//read file with Assimp
+	Assimp::Importer importer;
+	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+	//Check for errors
+	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+	{
+		printf("Error loading model file \"%s\": \"%s\" ", path.c_str(), importer.GetErrorString());
+		return mesh;
+	}
+	// retrieve the directory path of the filepath
+	std::string dir = path.substr(0, path.find_last_of('/'));
+
+	processNode(mesh, scene->mRootNode, scene);
+
+	return mesh;
 }
 
 RenderMesh* GLMesh::LoadData(VisibleObject* parent, String name)
@@ -675,10 +998,10 @@ RenderMesh* GLMesh::LoadData(VisibleObject* parent, String name)
 		auto r = ModelStreams.find(name);
 		if (r == ModelStreams.end()) return nullptr;
 
-		LoadedMesh* mesh = new LoadedMesh();
+		LoadedMesh* mesh = loadMeshes(r->second);
 		LoadedMeshes.emplace(name, mesh);
 
-		mesh->HolderCount = 1;
+		/*mesh->HolderCount = 1;
 		mesh->Holders = new MeshDataHolder[mesh->HolderCount]();
 		std::ifstream* s = r->second;
 		s->seekg(0);
@@ -748,7 +1071,9 @@ RenderMesh* GLMesh::LoadData(VisibleObject* parent, String name)
 			memcpy(hold->indices, faces.data(), faces.size() * sizeof(uint32));
 
 			hold->Instance = RI->LoadMaterialByName("Shaders/test");
-		}
+		}*/
+
+
 		RenderObject* obj = new RenderObject(mesh);
 		obj->SetParent(parent);
 		return obj;
@@ -768,7 +1093,8 @@ void GLMesh::StartLoading()
 	for (const auto& f : fs::recursive_directory_iterator(ActiveDir)) {
 		if (f.path().extension() == ".obj") {
 			std::ifstream* stre = new std::ifstream(f.path(), std::ios_base::in);
-			ModelStreams[f.path().filename().replace_extension("").string()] = stre;
+			//ModelStreams[f.path().filename().replace_extension("").string()] = stre;
+			ModelStreams[f.path().filename().replace_extension("").string()] = f.path().string();
 		}
 	}
 }

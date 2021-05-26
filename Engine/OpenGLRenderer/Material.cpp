@@ -45,6 +45,60 @@ Shader::Shader(const char* const vertexShaderString, const char* const fragmentS
 	glDeleteShader(fragmentShader);
 }
 
+Shader::Shader(const char* const vertexShaderString, const char* geomShaderString, const char* const fragmentShaderString)
+{
+	Success = false;
+	Pass = 0;
+
+	int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertexShader, 1, &vertexShaderString, NULL);
+	glCompileShader(vertexShader);
+
+	char infoLog[512];
+	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &Success);
+	if (!Success) {
+		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+		printf("ERROR: Shader compilation failed: \"%s\"\n", infoLog);
+		return;
+	}
+
+	int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader, 1, &fragmentShaderString, NULL);
+	glCompileShader(fragmentShader);
+	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &Success);
+	if (!Success) {
+		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+		printf("ERROR: Shader compilation failed: \"%s\"\n", infoLog);
+		return;
+	}
+
+	int geomShader = glCreateShader(GL_GEOMETRY_SHADER);
+	glShaderSource(geomShader, 1, &geomShaderString, NULL);
+	glCompileShader(geomShader);
+	glGetShaderiv(geomShader, GL_COMPILE_STATUS, &Success);
+	if (!Success) {
+		glGetShaderInfoLog(geomShader, 512, NULL, infoLog);
+		printf("ERROR: Shader compilation failed: \"%s\"\n", infoLog);
+		return;
+	}
+
+	ShaderProgram = glCreateProgram();
+	glAttachShader(ShaderProgram, vertexShader);
+	glAttachShader(ShaderProgram, fragmentShader);
+	glAttachShader(ShaderProgram, geomShader);
+	glLinkProgram(ShaderProgram);
+	glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &Success);
+	if (!Success) {
+		glGetProgramInfoLog(ShaderProgram, 512, NULL, infoLog);
+		printf("ERROR: Shader link failed: \"%s\"\n", infoLog);
+		return;
+	}
+
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
+	glDeleteShader(geomShader);
+}
+
 Shader::Shader(int type, const char* const ShaderString)
 {
 	char infoLog[512];
@@ -162,7 +216,7 @@ void Shader::SetUniform(const String& name, const int x, const int y)
 {
 	GLint loc = glGetUniformLocation(ShaderProgram, name.c_str());
 	if (loc < 0) return;
-	glUniform2i(loc, x, y);
+	glUniform2iv(loc, 1, &glm::ivec2(x, y)[0]);
 }
 
 void Shader::SetUniform(const String& name, const float m)
@@ -177,6 +231,13 @@ void Shader::SetUniform(const String& name, const int m)
 	GLint loc = glGetUniformLocation(ShaderProgram, name.c_str());
 	if (loc < 0) return;
 	glUniform1i(loc, m);
+}
+
+void Shader::SetUniform(const String& name, const uint m)
+{
+	GLint loc = glGetUniformLocation(ShaderProgram, name.c_str());
+	if (loc < 0) return;
+	glUniform1ui(loc, m);
 }
 
 void Shader::AddUser(Material* m)

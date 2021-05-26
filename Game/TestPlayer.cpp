@@ -78,50 +78,35 @@ void TestPlayer::Tick(float)
 void TestPlayer::BeginPlay()
 {
 
-	for (int i = 0; i < 1; i++) {
-		Light* next = SpawnObject<Light>();
-		next->Data.Location = Vector(i * 1.5f, 9.f, 0.f);
-	}
-	Domain = SpawnObject<Actor>();
+	Light* nexta = SpawnObject<Light>();
+	nexta->Data.Location = Vector(1.5f, 1.5f, 1.f);
+	nexta->Data.Type = 1;
+	
+	/*nexta = SpawnObject<Light>();
+	nexta->Data.Location = Vector(-1.5f, -1.5f, 3.f);
+	nexta->Data.Type = 1;
+
+	Light* nexta = SpawnObject<Light>();
+	nexta->Data.Location = Vector(-1.5f, -1.5f, 3.f);
+	nexta->Data.Rotation = Vector(45.0, 45.0, 0.0);
+	nexta->Data.Type = 0;*/
+
+	/*Domain = SpawnObject<Actor>();
 	Domain->SetModel("sphere");
 	Domain->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/for"));
 	Domain->SetScale(Vector(0.5, 0.5, 0.5));
-	Domain->SetLocation(Vector(1.5, 9.0, 0.f));
+	Domain->SetLocation(Vector(0, 9.0, 0.f));*/
 
-	/*for (int i = 0; i < 50; i++) {
-		Light* next = SpawnObject<Light>();
-		next->Data.Location = Vector(i * 1.5f, 30.f, 4.f);
-	}
-
-	for (int i = 0; i < 50; i++) {
-		Light* next = SpawnObject<Light>();
-		next->Data.Location = Vector(i * 1.5f, 10.f, 4.f);
-	}*/
-
-	for (int i = 0; i < 50; i++) {
-		Actor* next = SpawnObject<Actor>();
-		next->SetModel("sphere");
-		next->SetLocation(Vector(i * 1.5f, 10.f, 0.f));
-	}
-
-	for (int i = 0; i < 50; i++) {
-		Actor* next = SpawnObject<Actor>();
-		next->SetModel("sphere");
-		next->SetLocation(Vector(i * 1.5f, 20.f, 0.f));
-	}
-
-	for (int i = 0; i < 50; i++) {
-		Actor* next = SpawnObject<Actor>();
-		next->SetModel("sphere");
-		next->SetLocation(Vector(i * 1.5f, -10.f, 0.f));
-	}
-
-	/*Domain = SpawnObject<Actor>();
-	Domain->SetModel("Buildings");
-	Domain->SetScale(Vector(0.5, 0.5, 0.5));
-	Domain->SetLocation(Vector(-0.5, 0.0, 0.0));
+	Actor* next = SpawnObject<Actor>();
+	next->SetModel("sphere");
+	next->SetLocation(Vector(1.5f, 0.5f, 1.f));
 
 	Domain = SpawnObject<Actor>();
+	Domain->SetModel("room");
+	//Domain->SetScale(Vector(0.5, 0.5, 0.5));
+	Domain->SetLocation(Vector(0.0, 0.0, 0.0));
+
+	/*Domain = SpawnObject<Actor>();
 	Domain->SetModel("Buildings");
 	Domain->SetScale(Vector(0.5, 0.5, 0.5));
 	Domain->SetLocation(Vector(0.5, -1.0, 0.5));

@@ -4,7 +4,7 @@
 class Texture
 {
 public:
-	Texture(int width, int height, int nrChannels, const uint8* data);
+	Texture(int width, int height, int nrChannels, const float* data, int type);
 	Texture(int width, int height, bool isDepthTexture);
 	~Texture();
 
@@ -12,4 +12,5 @@ public:
 
 private:
 	uint ID;
+	int Type;
 };

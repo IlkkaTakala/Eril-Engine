@@ -80,7 +80,8 @@ void RenderBatch::drawSprite(const Section* obj, const glm::mat4& viewMatrix, co
 	for (uint32 i = 0; i < obj->GetVertexCount(); i++) {
 		Vertex& next = Buffers[ActiveBuffer].verts[i + vertex_index];
 		next.position = transform * glm::vec4(vert_array[i].position, 1.f);
-		next.normal = normalMat * glm::vec4(vert_array[i].normal, 1.f);
+		next.normal = normalize(glm::mat3(transform) * vert_array[i].normal);
+		next.tangent = normalize(glm::mat3(transform) * vert_array[i].tangent);
 		next.uv = vert_array[i].uv;
 	}
 	vertex_index += obj->GetVertexCount();
@@ -147,6 +148,9 @@ void BufferPart::Initialize(int size)
 
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 	glEnableVertexAttribArray(2);
+
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tangent));
+	glEnableVertexAttribArray(3);
 
 	glBindVertexArray(0);
 }

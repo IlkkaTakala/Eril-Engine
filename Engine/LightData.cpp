@@ -4,12 +4,12 @@ LightData::LightData()
 {
 	Type = 0;
 	Intensity = 10.f;
-	Size = 1.f;
+	Size = 3.f;
 	Distance = 0.f;
 	Falloff = 1.f;
 	Color = Vector(1.f, 1.f, 1.f);
 
-	Location = Vector(0.f, 0.f, 10.f);
+	Location = Vector(0.f, 0.f, 0.f);
 	Rotation = Vector(0.f, 0.f, 0.f);
 }
 

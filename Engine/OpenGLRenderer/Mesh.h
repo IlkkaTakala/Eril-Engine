@@ -14,6 +14,7 @@ struct Vertex
 	glm::vec3 position;
 	glm::vec3 normal;
 	glm::vec3 uv;
+	glm::vec3 tangent;
 };
 
 class MeshDataHolder
@@ -36,7 +37,7 @@ public:
 	LoadedMesh();
 	~LoadedMesh();
 
-	MeshDataHolder* Holders;
+	std::vector<MeshDataHolder*> Holders;
 	uint32 HolderCount;
 	uint32 Users;
 };
@@ -76,7 +77,7 @@ public:
 	void SetParent(VisibleObject* parent);
 
 private:
-
+	friend class Renderer;
 	VisibleObject* Parent;
 	Section* Sections;
 	LoadedMesh* Mesh;

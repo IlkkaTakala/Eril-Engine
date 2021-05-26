@@ -5,3 +5,10 @@ CMakeFiles/
 PackedGame/
 *.zip
 Engine/OpenGLRenderer/ext/
+*.jpg
+*.obj
+*.mtl
+ext/
+bin/
+lib/
+x64/

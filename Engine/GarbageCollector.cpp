@@ -8,15 +8,18 @@ std::map<String, Data*> GC::Pointers;
 GC::GC()
 {
 	bQuitting = false;
-	Cleaner = std::thread(&GC::CleanRunner, this);
+	//Cleaner = std::thread(&GC::CleanRunner, this);
 }
 
 GC::~GC()
 {
-	for (auto i : Pointers) {
-		delete i.second;
+	if (Pointers.size() > 0) {
+		for (auto const& i : Pointers) {
+			delete i.second;
+		}
 	}
-	Pointers.clear();
+	
+	//Pointers.clear();
 }
 
 void GC::AddObject(BaseObject* obj)

@@ -5,6 +5,7 @@
 #define OPENGL
 
 class Material;
+class Texture;
 class RenderObject;
 class VisibleObject;
 class LoadedMesh;
@@ -42,6 +43,7 @@ public:
 	virtual void LoadShaders() = 0;
 	virtual Material* GetMaterialByName(String name) const = 0;
 	virtual Material* LoadMaterialByName(String name) = 0;
+	virtual Texture* LoadTextureByName(String name) = 0;
 
 	virtual void Update() = 0;
 	virtual void Render() = 0;

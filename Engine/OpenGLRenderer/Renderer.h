@@ -2,9 +2,14 @@
 #include <list>
 
 class Shader;
+class Texture;
 class RenderBatch;
 class GLCamera;
 class RenderBuffer;
+class PostBuffer;
+class BlurBuffer;
+class SSAOBuffer;
+class ShadowBuffer;
 struct LightData;
 
 struct GLFWwindow;
@@ -29,6 +34,7 @@ public:
 	virtual void LoadShaders() override;
 	virtual Material* GetMaterialByName(String name) const override;
 	virtual Material* LoadMaterialByName(String name) override;
+	virtual Texture* LoadTextureByName(String name) override;
 
 	virtual void Update() override;
 	virtual void Render() override;
@@ -36,20 +42,30 @@ public:
 private:
 	friend class GLInput;
 
+	void Shadows(int width, int height);
 	void Deferred(int width, int height);
+	void SSAO(int width, int height);
 	void Forward(int width, int height);
 	void LightCulling(int width, int height);
-	void DeferredLighting(int width, int height);
 
 	std::map<String, Shader*> Shaders;
 	std::map<String, Material*> BaseMaterials;
+	std::map<String, Texture*> LoadedTextures;
 	std::vector<const LightData*> Lights;
 
 	Shader* LightCullingShader;
 	Shader* DeferredMaster;
+	Shader* PostProcessMaster;
+	Shader* SSAOShader;
+	Shader* SSAOBlurShader;
+	Shader* ShadowShader;
 	GLFWwindow* Window;
 	RenderBatch* Batcher;
 	RenderBuffer* Buffer;
+	PostBuffer* PostProcess;
+	BlurBuffer* BlurRender;
+	SSAOBuffer* SSAORender;
+	ShadowBuffer* ShadowRender;
 	GLCamera* ActiveCamera;
 
 	uint ScreenVao;
@@ -59,6 +75,8 @@ private:
 	uint LightBuffer;
 	uint VisibleLightIndicesBuffer;
 	uint GlobalUniforms;
+	uint SSAOKernelBuffer;
+	uint SSAONoise;
 
 	uint MaxLightCount;
 	uint WorkGroupsX;
@@ -74,6 +92,7 @@ public:
 	virtual void StartLoading() override;
 
 private:
-	std::map<std::string, std::ifstream*> ModelStreams;
+	//std::map<std::string, std::ifstream*> ModelStreams;
+	std::map<String, String> ModelStreams;
 	String ActiveDir;
 };

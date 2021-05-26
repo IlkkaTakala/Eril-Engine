@@ -25,7 +25,6 @@ private:
 	static std::list<Tickable*> TickList;
 	static std::list<Tickable*> TickListRemoval;
 
-	Input* InputHandler;
 	GC* Collector;
 	std::mutex TickListMutex;
 	static Ref<GameState> State;

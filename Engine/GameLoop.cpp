@@ -15,15 +15,13 @@ GameLoop::GameLoop()
 {
 	bQuit = false;
 	bQuitStarted = false;
-	InputHandler = nullptr;
-	Collector = nullptr;
 	fps = 0.f;
 }
 
 GameLoop::~GameLoop()
 {
 	if (State != nullptr) State == nullptr;
-	if (Collector != nullptr) delete Collector;
+	delete Collector;
 	delete INI;
 	delete RI;
 	delete MI;
@@ -38,9 +36,9 @@ int GameLoop::Start()
 
 	try
 	{
+		MI->StartLoading();
 		RI->SetupWindow(800, 600);
 		II->SetInputHandler();
-		MI->StartLoading();
 	}
 	catch (const std::exception& e)
 	{
@@ -48,7 +46,7 @@ int GameLoop::Start()
 		return 11;
 	}
 	
-	//Collector = new GC();
+	Collector = new GC();
 	State = EngineInterface::CreateDefaults();
 
 	return MainLoop();
@@ -57,8 +55,8 @@ int GameLoop::Start()
 void GameLoop::Quit()
 {
 	bQuitStarted = true;
-	if (Collector != nullptr) Collector->Quit();
 	bQuit = true;
+	Collector->Quit();
 }
 
 int GameLoop::MainLoop()

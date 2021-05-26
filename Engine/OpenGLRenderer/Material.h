@@ -9,11 +9,13 @@ class VisibleObject;
 class Material;
 class Section;
 class Texture;
+class Renderer;
 
 class Shader
 {
 public:
 	Shader(const char* const vertexShaderString, const char* const fragmentShaderString);
+	Shader(const char* const vertexShaderString, const char* geomShaderString, const char* const fragmentShaderString);
 	Shader(int type, const char* const ShaderString);
 	~Shader();
 
@@ -24,6 +26,7 @@ public:
 	void SetUniform(const String& name, const int x, const int y);
 	void SetUniform(const String& name, const float m);
 	void SetUniform(const String& name, const int m);
+	void SetUniform(const String& name, const uint m);
 
 	void AddUser(Material*);
 	void RemoveUser(Material*);
@@ -54,6 +57,7 @@ public:
 	void RemoveSection(Section*);
 
 private:
+	friend class Renderer;
 	Shader* const Shade;
 
 	std::map<String, Vector> VectorParameters;

@@ -36,6 +36,7 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("D:/Ilkka/Documents/Visual Studio 2019/Game/Engine/OpenGLRenderer/ext/glfw-3.3.2/cmake_install.cmake")
   include("D:/Ilkka/Documents/Visual Studio 2019/Game/Engine/OpenGLRenderer/ext/glm-0.9.9.7/cmake_install.cmake")
+  include("D:/Ilkka/Documents/Visual Studio 2019/Game/ext/assimp-5.0.1/cmake_install.cmake")
 
 endif()
 
