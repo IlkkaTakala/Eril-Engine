@@ -60,18 +60,45 @@ out vec4 FragColor;
   
 in vec2 TexCoords;
 
-float attenuate(vec3 lightDirection, float radius) {
-	float cutoff = 0.5;
-	float attenuation = dot(lightDirection, lightDirection) / (100.0 * radius);
-	attenuation = 1.0 / (attenuation * 15.0 + 1.0);
-	attenuation = (attenuation - cutoff) / (1.0 - cutoff);
+const float PI = 3.14159265359;
 
-	return clamp(attenuation, 0.0, 1.0);
+vec3 fresnelSchlick(float cosTheta, vec3 F0)
+{
+    return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
+}  
+
+float DistributionGGX(vec3 N, vec3 H, float roughness)
+{
+    float a      = roughness*roughness;
+    float a2     = a*a;
+    float NdotH  = max(dot(N, H), 0.0);
+    float NdotH2 = NdotH*NdotH;
+	
+    float num   = a2;
+    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+    denom = PI * denom * denom;
+	
+    return num / denom;
 }
 
-float LinearizeDepth(float depth) {
-	float z = depth * 2.0 - 1.0;
-	return (2.0 * 0.1 * 100.0) / (100.0 + 0.1 - z * (100.0 - 0.1));
+float GeometrySchlickGGX(float NdotV, float roughness)
+{
+    float r = (roughness + 1.0);
+    float k = (r*r) / 8.0;
+
+    float num   = NdotV;
+    float denom = NdotV * (1.0 - k) + k;
+	
+    return num / denom;
+}
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
+{
+    float NdotV = max(dot(N, V), 0.0);
+    float NdotL = max(dot(N, L), 0.0);
+    float ggx2  = GeometrySchlickGGX(NdotV, roughness);
+    float ggx1  = GeometrySchlickGGX(NdotL, roughness);
+	
+    return ggx1 * ggx2;
 }
 
 void main()
@@ -81,51 +108,79 @@ void main()
 	uint index = tileID.y * numberOfTilesX + tileID.x;
 
 	// Get color and normal components from texture maps
-	vec4 Albedo = texture(gAlbedoSpec, TexCoords);
-	vec4 FragPos = texture(gPosition, TexCoords);
+	vec3 FragPos = texture(gPosition, TexCoords).xyz;
 	vec3 normal = texture(gNormal, TexCoords).rgb;
 	vec4 data = texture(gData, TexCoords);
-	float Ambient = texture(gSSAO, TexCoords).r;
-	vec4 color = Albedo * 0.1 * Ambient * data.b;
+	
+	vec3 albedo = texture(gAlbedoSpec, TexCoords).rgb;
+	float metallic = data.r;
+	float roughness = data.g;
+	float AO = data.b;
+	
+	float SSAO = texture(gSSAO, TexCoords).r;
+	
+	vec3 ambient = vec3(0.03) * albedo * AO * SSAO;
+	
+	vec3 Lo = vec3(0.0);
 
-	vec3 viewDirection = normalize(viewPos - FragPos).xyz;
+	vec3 N = normalize(normal); 
+    vec3 V = normalize(viewPos.xyz - FragPos).xyz;
 
 	uint offset = index * 1024;
+	
 	uint i;
-	float closestDepth = 0.0;
 	for (i = 0; i < 1024 && visibleLightIndicesBuffer.data[offset + i].index != -1; i++) {
 		uint lightIndex = visibleLightIndicesBuffer.data[offset + i].index;
 		LightData light = lightBuffer.data[lightIndex];
 
-		
+		vec3 L = vec3(0.0);
+		vec3 H = vec3(0.0);
+		vec3 radiance = vec3(0.0);
 
 		switch (light.type.x)
 		{
 			case 0:
 			{
-				closestDepth = texture(gShadow, light.rotation.xyz).r;
-				vec3 direction = normalize(-light.rotation.xyz);
-				float diffuseFactor = max(dot(direction, normal), 0.0f);
-				color += vec4(light.color.xyz, 0.0f) * Albedo * diffuseFactor * 4.0;
+				L = normalize(-light.rotation.xyz);
+				H = normalize(V + L);
+
+				radiance = light.color.rgb;
 			} break;
 			
 			case 1:
 			{
-				vec3 direction = light.positionAndSize.xyz - FragPos.xyz;
-				vec3 fragToLight = FragPos.xyz - light.positionAndSize.xyz;
-				// use the light to fragment vector to sample from the depth map    
-				closestDepth = texture(gShadow, fragToLight).r;
-				if(length(direction) <= light.positionAndSize.w) {
-					float attenuation = 1.0f - length(direction) / (light.positionAndSize.w);
-					//float attenuation = attenuate(direction, light.size.w);
-					direction = normalize(direction);
-					float diffuseFactor = max(dot(direction, normal), 0.0f);
-					color += vec4(light.color.xyz, 0.0f) * Albedo * diffuseFactor * 1.0 * attenuation;
-				}
+				L = normalize(light.positionAndSize.xyz - FragPos);
+				H = normalize(V + L);
+			  
+				float distance    = length(light.positionAndSize.xyz - FragPos);
+				float attenuation = 1.0 / (distance * distance);
+				radiance = light.color.rgb * attenuation;
+				
 			} break;
 		}
 		
+		vec3 F0 = vec3(0.04); 
+		F0      = mix(F0, albedo, metallic);
+		vec3 F  = fresnelSchlick(max(dot(H, V), 0.0), F0);
+		
+		float NDF = DistributionGGX(N, H, roughness);       
+		float G   = GeometrySmith(N, V, L, roughness);
+		
+		vec3 numerator    = NDF * G * F;
+		float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0);
+		vec3 specular     = numerator / max(denominator, 0.001);
+		
+		vec3 kS = F;
+		vec3 kD = vec3(1.0) - kS;
+		  
+		kD *= 1.0 - metallic;
+
+		float NdotL = max(dot(N, L), 0.0);        
+		Lo += (kD * albedo / PI + specular) * radiance * NdotL;
+		
 	}
+	
+	vec4 color = vec4(ambient + Lo, 1.0);
 	
 	// Height fog
 	//float depth = LinearizeDepth(texture(gDepth, TexCoords).r) / 100.0;

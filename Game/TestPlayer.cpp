@@ -80,8 +80,9 @@ void TestPlayer::BeginPlay()
 
 	Light* nexta = SpawnObject<Light>();
 	nexta->Data.Location = Vector(1.5f, 1.5f, 1.f);
-	nexta->Data.Type = 1;
-	
+	nexta->Data.Type = 0;
+	nexta->Data.Rotation = Vector(45.0, 45.0, 0.0);
+
 	/*nexta = SpawnObject<Light>();
 	nexta->Data.Location = Vector(-1.5f, -1.5f, 3.f);
 	nexta->Data.Type = 1;

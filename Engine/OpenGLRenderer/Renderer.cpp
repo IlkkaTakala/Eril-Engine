@@ -332,7 +332,7 @@ void Renderer::UpdateLights()
 		light.locationAndSize = glm::vec4(Lights[i]->Location.X, Lights[i]->Location.Z, Lights[i]->Location.Y, Lights[i]->Size);
 		glm::mat4 rot = glm::mat4(1.0) * glm::toMat4(glm::quat(glm::vec3(glm::radians(Lights[i]->Rotation.X), glm::radians(Lights[i]->Rotation.Y), glm::radians(Lights[i]->Rotation.Z))));
 		light.rotation = rot * glm::vec4(0.0, -1.0, 0.0, 0.0);
-		light.color = glm::vec4(Lights[i]->Color.X, Lights[i]->Color.Y, Lights[i]->Color.Z, 1.0);
+		light.color = glm::vec4(Lights[i]->Color.X, Lights[i]->Color.Y, Lights[i]->Color.Z, 1.0) * Lights[i]->Intensity;
 		light.type.x = Lights[i]->Type;
 		light.transforms[0] = ShadowProj * glm::lookAt(glm::vec3(light.locationAndSize), glm::vec3(light.locationAndSize) + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
 		light.transforms[1] = ShadowProj * glm::lookAt(glm::vec3(light.locationAndSize), glm::vec3(light.locationAndSize) + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
@@ -819,8 +819,8 @@ void Renderer::Render()
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, LightBuffer);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, VisibleLightIndicesBuffer);
 
-	/*ShadowRender->Bind();
-	Shadows(1024, 1024);*/
+	ShadowRender->Bind();
+	Shadows(1024, 1024);
 
 	glViewport(0, 0, width, height);
 	Buffer->Bind();

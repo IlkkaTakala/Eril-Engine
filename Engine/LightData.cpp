@@ -3,7 +3,7 @@
 LightData::LightData()
 {
 	Type = 0;
-	Intensity = 10.f;
+	Intensity = 2.f;
 	Size = 3.f;
 	Distance = 0.f;
 	Falloff = 1.f;
