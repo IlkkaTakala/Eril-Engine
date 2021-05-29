@@ -17,9 +17,7 @@ public:
 	void Quit();
 	static std::map<String, Data*> Pointers;
 private:
-
-	std::string ActiveDir;
-	std::thread Cleaner;
+	//std::thread Cleaner;
 	bool bQuitting;
 	void CleanRunner();
 };

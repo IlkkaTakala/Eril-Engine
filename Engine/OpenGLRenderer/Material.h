@@ -46,7 +46,7 @@ class Material
 {
 public:
 	Material(Shader* s) : Shade(s) { if (s != nullptr) s->AddUser(this); };
-	~Material() { Shade->RemoveUser(this); }
+	~Material();
 
 	std::list<Section*>& GetObjects();
 	std::map<String, Vector>& GetVectorParameters() { return VectorParameters; }

@@ -13,7 +13,7 @@ Section::Section()
 
 Section::~Section()
 {
-	Instance->RemoveSection(this);
+	if (Instance != nullptr) Instance->RemoveSection(this);
 }
 
 RenderObject::RenderObject(LoadedMesh* mesh)
@@ -88,6 +88,6 @@ LoadedMesh::LoadedMesh()
 
 LoadedMesh::~LoadedMesh()
 {
-	for (const auto sec : Holders)
+	for (auto const& sec : Holders)
 		delete sec;
 }

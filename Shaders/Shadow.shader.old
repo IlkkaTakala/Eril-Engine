@@ -1,0 +1,223 @@
+3;3;
+###VERTEX###
+#version 430 core
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec2 in_texCoord;
+layout (location = 2) in vec3 in_normal;
+layout (location = 3) in vec3 in_tangent;
+
+layout (std140, binding = 0) uniform Globals
+{
+    mat4 projection;
+    mat4 view;
+	vec4 viewPos;
+	ivec2 screenSize;
+	int sceneLightCount;
+};
+
+out vec3 VPosition;
+
+void main()
+{
+    VPosition = (view * vec4(aPos, 1.0)).xyz;
+} 
+###END_VERTEX###
+###GEOMETRY###
+#version 430 core
+
+layout( triangles_adjacency ) in;
+layout( triangle_strip, max_vertices = 18 ) out;
+
+in vec3 VPosition[];
+
+layout (std140, binding = 0) uniform Globals
+{
+    mat4 projection;
+    mat4 view;
+	vec4 viewPos;
+	ivec2 screenSize;
+	int sceneLightCount;
+};
+
+struct PointLight {
+	vec4 color;
+	vec4 positionAndSize;
+	vec4 rotation;
+	ivec4 type;
+	mat4 transforms[6];
+};
+
+layout(std430, binding = 1) readonly buffer LightBuffer {
+	PointLight data[];
+} lightBuffer;
+
+float EPSILON = 0.01;
+
+bool facesLight(vec3 light, vec3 a, vec3 b, vec3 c )
+{
+  vec3 n = cross( b - a, c - a );
+  vec3 da = light - a;
+  vec3 db = light - b;
+  vec3 dc = light - c;
+
+  return dot(n, da) > 0 || dot(n, db) > 0 || dot(n, dc) > 0; 
+}
+
+bool facesLightDir(vec3 lightDir, vec3 a, vec3 b, vec3 c )
+{
+  vec3 n = cross( b - a, c - a );
+  vec3 da = -lightDir;
+  vec3 db = -lightDir;
+  vec3 dc = -lightDir;
+
+  return dot(n, da) > 0 || dot(n, db) > 0 || dot(n, dc) > 0; 
+}
+
+void emitEdgeQuad(vec3 light, vec3 a, vec3 b ) {
+  vec3 LightDir = normalize(a - light); 
+  vec3 deviation = LightDir * EPSILON;
+  gl_Position = projection * vec4(a + deviation, 1);
+  EmitVertex();
+  
+  gl_Position = projection * vec4(LightDir, 0);
+  EmitVertex();
+
+  LightDir = normalize(b - light); 
+  deviation = LightDir * EPSILON;
+  gl_Position = projection * vec4(b + deviation, 1);
+  EmitVertex();
+
+  gl_Position = projection * vec4(LightDir, 0);
+  EmitVertex();
+  EndPrimitive();
+}
+
+const mat4 dirProj = {vec4(1.0, 0.0, 0.0, 0.0), vec4(0.0, 1.0, 0.0, 0.0), vec4(0.0, 0.0, 1.0, 0.0), vec4(0.0, 0.0, 0.0, 1.0)};
+
+void emitEdgeQuadDir(vec3 light, vec3 a, vec3 b ) {
+  vec3 LightDir = normalize(a - light); 
+  vec3 deviation = LightDir * EPSILON;
+  gl_Position = dirProj * vec4(a + deviation, 1);
+  EmitVertex();
+  
+  gl_Position = dirProj * vec4(LightDir, 0);
+  EmitVertex();
+
+  LightDir = normalize(b - light); 
+  deviation = LightDir * EPSILON;
+  gl_Position = dirProj * vec4(b + deviation, 1);
+  EmitVertex();
+
+  gl_Position = dirProj * vec4(LightDir, 0);
+  EmitVertex();
+  EndPrimitive();
+}
+
+void main()
+{
+	uint i;
+	for (i = 0; i < 1 && i < sceneLightCount; i++) {
+		PointLight lightData = lightBuffer.data[i];
+		
+		switch (lightData.type.x) {
+			case 0: 
+			{
+				vec3 light = lightData.rotation.xyz;
+				if( facesLightDir(light, VPosition[0], VPosition[2], VPosition[4]) ) {
+					if( ! facesLightDir(light, VPosition[0],VPosition[1],VPosition[2]) ) 
+					  emitEdgeQuadDir(light, VPosition[0],VPosition[2]);
+					if( ! facesLightDir(light, VPosition[2],VPosition[3],VPosition[4]) ) 
+					  emitEdgeQuadDir(light, VPosition[2],VPosition[4]);
+					if( ! facesLightDir(light, VPosition[4],VPosition[5],VPosition[0]) ) 
+					  emitEdgeQuadDir(light, VPosition[4],VPosition[0]);
+
+					//FRONT CAP
+					vec3 LightDir = light; 
+					vec3 deviation = LightDir * EPSILON;
+					gl_Position = projection * vec4(VPosition[0] + deviation, 1);
+					EmitVertex();
+
+					LightDir = light; 
+					deviation = LightDir * EPSILON;
+					gl_Position =  projection * vec4(VPosition[2] + deviation, 1);
+					EmitVertex();
+
+					LightDir = light; 
+					deviation = LightDir * EPSILON;
+					gl_Position =  projection * vec4(VPosition[4] + deviation, 1);
+					EmitVertex();
+					EndPrimitive();
+					
+					//BACK CAP
+					LightDir = light; 
+					gl_Position = projection * vec4(LightDir, 0);
+					EmitVertex();
+
+					LightDir = light; 
+					gl_Position =  projection * vec4(LightDir, 0);
+					EmitVertex();
+
+					LightDir = light; 
+					gl_Position =  projection * vec4(LightDir, 0);
+					EmitVertex();
+					EndPrimitive();
+				}
+			} break;
+			
+			case 1:
+			{
+				vec3 light = (view * vec4(lightData.positionAndSize.xyz, 1.0)).xyz;
+				if( facesLight(light, VPosition[0], VPosition[2], VPosition[4]) ) {
+					if( ! facesLight(light, VPosition[0],VPosition[1],VPosition[2]) ) 
+					  emitEdgeQuad(light, VPosition[0],VPosition[2]);
+					if( ! facesLight(light, VPosition[2],VPosition[3],VPosition[4]) ) 
+					  emitEdgeQuad(light, VPosition[2],VPosition[4]);
+					if( ! facesLight(light, VPosition[4],VPosition[5],VPosition[0]) ) 
+					  emitEdgeQuad(light, VPosition[4],VPosition[0]);
+
+					//FRONT CAP
+					vec3 LightDir = normalize(VPosition[0] - light); 
+					vec3 deviation = LightDir * EPSILON;
+					gl_Position = projection * vec4(VPosition[0] + deviation, 1);
+					EmitVertex();
+
+					LightDir = normalize(VPosition[2] - light); 
+					deviation = LightDir * EPSILON;
+					gl_Position =  projection * vec4(VPosition[2] + deviation, 1);
+					EmitVertex();
+
+					LightDir = normalize(VPosition[4] - light); 
+					deviation = LightDir * EPSILON;
+					gl_Position =  projection * vec4(VPosition[4] + deviation, 1);
+					EmitVertex();
+					EndPrimitive();
+					
+					//BACK CAP
+					LightDir = normalize(VPosition[0] - light); 
+					gl_Position = projection * vec4(LightDir, 0);
+					EmitVertex();
+
+					LightDir = normalize(VPosition[4] - light); 
+					gl_Position =  projection * vec4(LightDir, 0);
+					EmitVertex();
+
+					LightDir = normalize(VPosition[2] - light); 
+					gl_Position =  projection * vec4(LightDir, 0);
+					EmitVertex();
+					EndPrimitive();
+				}
+			}
+		
+		}
+	}
+}
+###END_GEOMETRY###
+###FRAGMENT###
+#version 430
+
+layout (location = 0) out float color;
+
+void main() {
+	color = 1.0;
+}
+###END_FRAGMENT###

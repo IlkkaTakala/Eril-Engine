@@ -89,13 +89,13 @@ public:
 	BlurBuffer(int width, int height, Shader* compute);
 	~BlurBuffer();
 
-	void Blur(uint texture, int samples);
+	void Blur(uint texture, uint samples, uint quad);
 
 private:
 	Shader* BlurCompute;
 
-	uint First;
-	uint Second;
+	uint pingpongFBO;
+	uint pingpongBuffer[2];
 
 	int Width;
 	int Height;
@@ -113,15 +113,62 @@ public:
 	void Bind();
 	void Unbind();
 	uint GetBuffer() const { return FrameBuffer; }
-	uint GetShadows() const { return DepthBuffer; }
+	uint GetShadows() const { return Shadow; }
 
 	void BindTextures();
 
 private:
 	uint FrameBuffer;
 
+	uint Shadow;
 	uint DepthBuffer;
 
 	ShadowBuffer(const ShadowBuffer&);
 	ShadowBuffer& operator=(const ShadowBuffer&);
+};
+
+class ShadowMapBuffer
+{
+public:
+	ShadowMapBuffer(int width, int height);
+	~ShadowMapBuffer();
+
+	void Bind();
+	void Unbind();
+	uint GetBuffer() const { return FrameBuffer; }
+	uint GetShadows() const { return DepthBuffer; }
+
+private:
+	uint FrameBuffer;
+
+	uint DepthBuffer;
+
+	ShadowMapBuffer(const ShadowMapBuffer&);
+	ShadowMapBuffer& operator=(const ShadowMapBuffer&);
+};
+
+class ReflectionBuffer
+{
+public:
+	ReflectionBuffer(int width, int height);
+	~ReflectionBuffer();
+
+	void Bind();
+	void BindFilter();
+	void Unbind();
+	uint GetBuffer() const { return FrameBuffer; }
+	uint GetEnvironment() const { return Env; }
+	uint GetFilterEnvironment() const { return Filter; }
+
+	void BindTextures();
+
+private:
+	uint FrameBuffer;
+	uint FrameBufferFilter;
+
+	uint Env;
+	uint Filter;
+
+	ReflectionBuffer(const ReflectionBuffer&);
+	ReflectionBuffer& operator=(const ReflectionBuffer&);
 };

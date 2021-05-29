@@ -25,6 +25,7 @@ struct Vector
 	float X, Y, Z;
 
 	Vector() { X = 0.f, Y = 0.f, Z = 0.f; }
+	Vector(float a) { X = a, Y = a, Z = a; }
 	Vector(float X, float Y, float Z) : X(X), Y(Y), Z(Z) {};
 	Vector(String in) { 
 		size_t off = 0;

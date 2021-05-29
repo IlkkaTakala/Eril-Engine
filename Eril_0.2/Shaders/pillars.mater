@@ -1,0 +1,6 @@
+[Shader]
+name=shader_001
+[Textures]
+Albedo=Textures/pillars/diffuse_d.jpg
+Normal=Textures/pillars/normal_n.jpg
+Roughness=Textures/pillars/gloss.jpg

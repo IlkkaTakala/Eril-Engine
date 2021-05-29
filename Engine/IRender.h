@@ -32,6 +32,7 @@ public:
 class IRender
 {
 public: 
+	virtual ~IRender() {}
 	virtual int SetupWindow(int width, int height) = 0;
 	virtual void CleanRenderer() = 0;
 
@@ -46,7 +47,8 @@ public:
 	virtual Texture* LoadTextureByName(String name) = 0;
 
 	virtual void Update() = 0;
-	virtual void Render() = 0;
+	virtual void Render(float delta) = 0;
+	virtual void GameStart() = 0;
 };
 
 class IInput
@@ -84,6 +86,7 @@ protected:
 class RenderMesh
 {
 public:
+	virtual ~RenderMesh() {}
 	virtual void ApplyTransform() = 0;
 	virtual void SetMaterial(uint section, Material* nextMat) = 0;
 	virtual Material* GetMaterial(uint section) const = 0;
@@ -92,6 +95,7 @@ public:
 class IMesh
 {
 public:
+	virtual ~IMesh() {}
 	virtual RenderMesh* LoadData(VisibleObject* parent, String name) = 0;
 	virtual void StartLoading() = 0;
 

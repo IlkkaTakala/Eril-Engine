@@ -4,6 +4,7 @@
 #include "Gameplay/PlayerController.h"
 
 class Actor;
+class Light;
 
 class TestPlayer : public Player
 {
@@ -21,12 +22,23 @@ private:
 	void RunInputD(float delta, bool KeyDown);
 	void RunInputS(float delta, bool KeyDown);
 	void RunInputSpace(float delta, bool KeyDown);
+	void InputOne(float delta, bool KeyDown);
+	void InputTwo(float delta, bool KeyDown);
 	void RunInputShift(float delta, bool KeyDown);
 	void LeftMouseDown(float delta, bool KeyDown);
+	void RightMouseDown(float delta, bool KeyDown);
 	void MouseMoved(float X, float Y);
 
 	void InputExit(float delta, bool) { Exit(); }
 
 	Ref<Actor> Domain;
-	std::vector<Ref<VisibleObject>> cubes;
+	Ref<Actor> Pillars;
+
+	bool LightMode;
+	Ref<Light> DirLight;
+	std::vector<Ref<Light>> Lights;
+	Ref<Actor> Reflecting;
+	std::vector<Ref<Actor>> Spheres;
+
+	Ref<Actor> LastSphere;
 };

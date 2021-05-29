@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include "Objects/VisibleObject.h"
 #include "Material.h"
+#include "Mesh.h"
 
 Shader::Shader(const char* const vertexShaderString, const char* const fragmentShaderString) 
 {
@@ -258,6 +259,12 @@ std::list<Material*>& Shader::GetUsers()
 std::list<Section*>& Material::GetObjects()
 {
 	return Objects;
+}
+
+Material::~Material()
+{
+	Shade->RemoveUser(this); 
+	for (auto const& s : Objects) s->Instance = nullptr;
 }
 
 void Material::AddSection(Section* o)

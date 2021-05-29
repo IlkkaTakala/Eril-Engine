@@ -44,14 +44,14 @@ struct GLM_Light
 	glm::vec4 locationAndSize;
 	glm::vec4 rotation;
 	glm::ivec4 type;
-	glm::mat4 transforms[6];
+	glm::mat4 transform;
 
 	GLM_Light() {
 		color = glm::vec4(0.0);
 		locationAndSize = glm::vec4(0.0);
 		rotation = glm::vec4(0.0);
 		type = glm::ivec4(1);
-		transforms[0] = { glm::mat4(1.0) };
+		transform = glm::mat4(1.0);
 	}
 };
 
@@ -66,18 +66,26 @@ Renderer::Renderer()
 	LightCullingShader = nullptr;
 	SSAOShader = nullptr;
 	SSAOBlurShader = nullptr;
+	SSAORender = nullptr;
+	PostProcess = nullptr;
+	PostProcessMaster = nullptr;
 	ShadowShader = nullptr;
+	ShadowMapping = nullptr;
+	ShadowColorShader = nullptr;
+	EnvironmentRender = nullptr;
 
 	MaxLightCount = 1024;
 
 	ScreenVao = 0;
 	ScreenVbo = 0;
 	ScreenTexVbo = 0;
+
+	EnvSizeX = 1024;
+	EnvSizeY = 1024;
 }
 
 Renderer::~Renderer()
 {
-	if (Batcher != nullptr) delete Batcher;
 }
 
 inline float lerp(float a, float b, float f)
@@ -87,13 +95,12 @@ inline float lerp(float a, float b, float f)
 
 int Renderer::SetupWindow(int width, int height)
 {
-	//glfwSetErrorCallback([](int error, const char* description) {
-	//	fprintf(stderr, "Error %d: %s\n", error, description);
-	//});
+	if (width < 640 || width > 2048 || height < 480 || height > 2048) throw std::exception("Unsupported resolution!\n");
 
 	if (!glfwInit()) {
 		return -1;
 	}
+	fpsCounter = INI->GetValue("Engine", "ShowFps") == "true";
 
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -102,12 +109,13 @@ int Renderer::SetupWindow(int width, int height)
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
 
-	Window = glfwCreateWindow(width, height, "OpenGL window", NULL, NULL);
+	Window = glfwCreateWindow(width, height, "Eril Engine Demo | Loading...", NULL, NULL);
 	if (!Window) {
 		glfwTerminate();
 		return -1;
 	}
-	glfwSetWindowAttrib(Window, GLFW_DECORATED, GLFW_FALSE);
+	if (INI->GetValue("Render", "ResolutionY").c_str() == "false")
+		glfwSetWindowAttrib(Window, GLFW_DECORATED, GLFW_FALSE);
 	glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetInputMode(Window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
 	if (glfwRawMouseMotionSupported())
@@ -121,6 +129,8 @@ int Renderer::SetupWindow(int width, int height)
 	Buffer = new RenderBuffer(width, height);
 	PostProcess = new PostBuffer(width, height);
 	SSAORender = new SSAOBuffer(width, height);
+	ShadowMapping = new ShadowMapBuffer(width, height);
+	EnvironmentRender = new ReflectionBuffer(EnvSizeX, EnvSizeY);
 
 	float vertices[] = {
 		-1.f, -1.f, 1.f,
@@ -244,13 +254,73 @@ int Renderer::SetupWindow(int width, int height)
 	}
 	
 	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
-	ShadowRender = new ShadowBuffer(SHADOW_WIDTH, SHADOW_HEIGHT);
 
 	float aspect = (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT;
 	float near = 0.1f;
-	float far = 100.0f;
+	float far = 200.0f;
 	ShadowProj = glm::perspective(glm::radians(90.0f), aspect, near, far);
-	ShadowOrtho = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near, far);
+	ShadowOrtho = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near, far);
+
+	float envmap[] = {
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		-1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f
+	};
+
+	glGenVertexArrays(1, &EnvironmentVAO);
+	glGenBuffers(1, &EnvironmentVBO);
+
+	glBindVertexArray(EnvironmentVAO);
+
+	// Set buffer data to m_vbo-object (bind buffer first and then set the data)
+	glBindBuffer(GL_ARRAY_BUFFER, EnvironmentVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(envmap), envmap, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glBindVertexArray(0);
+
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 	return 0;
 }
@@ -273,12 +343,16 @@ void Renderer::CleanRenderer()
 	delete Buffer;
 	delete PostProcess;
 	delete BlurRender;
+	delete SSAORender;
+	delete EnvironmentRender;
 	delete DeferredMaster;
 	delete PostProcessMaster;
 	delete LightCullingShader;
 	delete SSAOShader;
 	delete ShadowShader;
-	delete ShadowRender;
+	delete ShadowMapping;
+	delete SkyDomeShader;
+	delete SkyBoxShader;
 
 	glDeleteBuffers(1, &LightBuffer);
 	glDeleteBuffers(1, &VisibleLightIndicesBuffer);
@@ -288,7 +362,9 @@ void Renderer::CleanRenderer()
 
 	glDeleteBuffers(1, &ScreenVbo);
 	glDeleteBuffers(1, &ScreenTexVbo);
+	glDeleteBuffers(1, &EnvironmentVBO);
 	glDeleteVertexArrays(1, &ScreenVao);
+	glDeleteVertexArrays(1, &EnvironmentVAO);
 
 	glfwDestroyWindow(Window);
 	glfwTerminate();
@@ -334,12 +410,10 @@ void Renderer::UpdateLights()
 		light.rotation = rot * glm::vec4(0.0, -1.0, 0.0, 0.0);
 		light.color = glm::vec4(Lights[i]->Color.X, Lights[i]->Color.Y, Lights[i]->Color.Z, 1.0) * Lights[i]->Intensity;
 		light.type.x = Lights[i]->Type;
-		light.transforms[0] = ShadowProj * glm::lookAt(glm::vec3(light.locationAndSize), glm::vec3(light.locationAndSize) + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
-		light.transforms[1] = ShadowProj * glm::lookAt(glm::vec3(light.locationAndSize), glm::vec3(light.locationAndSize) + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
-		light.transforms[2] = ShadowProj * glm::lookAt(glm::vec3(light.locationAndSize), glm::vec3(light.locationAndSize) + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 1.0, 1.0));
-		light.transforms[3] = ShadowProj * glm::lookAt(glm::vec3(light.locationAndSize), glm::vec3(light.locationAndSize) + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 1.0, -1.0));
-		light.transforms[4] = ShadowProj * glm::lookAt(glm::vec3(light.locationAndSize), glm::vec3(light.locationAndSize) + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
-		light.transforms[5] = ShadowProj * glm::lookAt(glm::vec3(light.locationAndSize), glm::vec3(light.locationAndSize) + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
+		glm::vec3 loc = glm::vec3(ActiveCamera->GetLocation().X, ActiveCamera->GetLocation().Z, ActiveCamera->GetLocation().Y);
+		glm::vec3 up = glm::toMat4(glm::quat(glm::vec3(glm::radians(Lights[i]->Rotation.X), glm::radians(Lights[i]->Rotation.Y), glm::radians(Lights[i]->Rotation.Z)))) * glm::vec4(1.0, 0.0, 0.0, 0.0);
+		glm::vec3 newLoc = loc + glm::vec3(-light.rotation * 70.f);
+		light.transform = ShadowOrtho * glm::lookAt(newLoc, newLoc + glm::vec3(light.rotation), up);
 		mapped[i] = light;
 	}
 	int result = glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
@@ -507,9 +581,14 @@ void Renderer::LoadShaders()
 						else if (f.path().filename() == "PostProcessMaster.shader") PostProcessMaster = nShader;
 						else if (f.path().filename() == "SSAO.shader") SSAOShader = nShader;
 						else if (f.path().filename() == "SSAOBlur.shader") SSAOBlurShader = nShader;
+						else if (f.path().filename() == "ShadowColor.shader") ShadowColorShader = nShader;
+						else if (f.path().filename() == "SkyBox.shader") SkyBoxShader = nShader;
 						else Shaders.emplace(f.path().filename().replace_extension("").string(), nShader);
 					}
-					else throw std::exception(("Invalid shaders found! : " + f.path().string() + '\n').c_str());
+					else {
+						throw std::exception(("Invalid shaders found! : " + f.path().string() + '\n').c_str());
+						delete nShader;
+					}
 				}
 			}
 			break;
@@ -525,6 +604,8 @@ void Renderer::LoadShaders()
 					if (!nShader->Success) nShader = nullptr;
 					if (nShader != nullptr) {
 						if (f.path().filename() == "Shadow.shader") ShadowShader = nShader;
+						else if (f.path().filename() == "SkyDome.shader") SkyDomeShader = nShader;
+						else if (f.path().filename() == "SkyFilter.shader") SkyFilterShader = nShader;
 						else Shaders.emplace(f.path().filename().replace_extension("").string(), nShader);
 					}
 					else throw std::exception(("Invalid shaders found! : " + f.path().string() + '\n').c_str());
@@ -611,7 +692,9 @@ Texture* Renderer::LoadTextureByName(String name)
 		int width, height, nrChannels;
 		float* data = stbi_loadf(name.c_str(), &width, &height, &nrChannels, 0);
 		if (data == nullptr) return nullptr;
-		int type = name.rbegin()[4] == 'd' ? 0 : name.rbegin()[4] == 'n' ? 1 : 2;
+		int type = 0;
+		if (name.rbegin()[4] == 'd' || name.rbegin()[5] == 'd') type = 0;
+		else if (name.rbegin()[4] == 'n' || name.rbegin()[5] == 'n') type = 1;
 		Texture* next = new Texture(width, height, nrChannels, data, type);
 		stbi_image_free(data);
 		LoadedTextures.emplace(name, next);
@@ -625,22 +708,72 @@ void Renderer::Update()
 	if (glfwWindowShouldClose(Window)) Exit();
 }
 
+void Renderer::EnvReflection(int width, int height)
+{
+	glViewport(0, 0, EnvSizeX, EnvSizeY);
+	EnvironmentRender->Bind();
+	glClear(GL_COLOR_BUFFER_BIT);
+	glm::mat3(glm::vec3(1.0), glm::vec3(1.0), glm::vec3(1.0));
+	SkyDomeShader->Bind();
+	SkyDomeShader->SetUniform("P", ShadowProj);
+	SkyDomeShader->SetUniform("time", (float)glfwGetTime() * 1.f);
+	//SkyDomeShader->SetUniform("V", glm::inverse(ActiveCamera->GetViewMatrix()));
+	glBindVertexArray(ScreenVao);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, EnvironmentRender->GetEnvironment());
+	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+
+	EnvironmentRender->BindFilter();
+	SkyFilterShader->Bind();
+	SkyFilterShader->SetUniform("env", 0);
+
+	for (int i = 0; i < 1; i++) {
+		SkyFilterShader->SetUniform("mip", i);
+		glBindVertexArray(ScreenVao);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBindVertexArray(0);
+	}
+
+	glViewport(0, 0, width, height);
+}
+
+void Renderer::EnvCube(int width, int height)
+{
+	glDepthFunc(GL_LEQUAL);
+	SkyBoxShader->Bind();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, EnvironmentRender->GetEnvironment());
+	glBindVertexArray(EnvironmentVAO);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
+}
+
 void Renderer::Shadows(int width, int height)
 {
-	glViewport(0, 0, width, height);
-	glClear(GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LEQUAL);
+	/*//glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+	glDepthMask(GL_FALSE);
+	glEnable(GL_DEPTH_CLAMP);
+
+	glDepthFunc(GL_LESS);
+	glDisable(GL_CULL_FACE);
+	glClear(GL_STENCIL_BUFFER_BIT);
+	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_ALWAYS, 0, 0xff);
+	glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
+	glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
+
 	ShadowShader->Bind();
 
 	for (auto const& [name, s] : Shaders)
 	{
 		if (s != nullptr && s->Pass != 0) continue;
 
-		if (s == nullptr) throw std::exception("Shader error!");
-
 		for (Material* m : s->GetUsers())
 		{
+			if (m->GetObjects().size() < 1) continue;
 
 			Batcher->begin();
 
@@ -648,9 +781,66 @@ void Renderer::Shadows(int width, int height)
 			{
 				Batcher->add(o);
 			}
-			Batcher->end(ActiveCamera->GetViewMatrix(), ActiveCamera->GetProjectionMatrix());
+			Batcher->end(1);
 		}
 	}
+	glDisable(GL_DEPTH_CLAMP);
+	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	glDisable(GL_DEPTH_TEST);
+
+	glStencilFunc(GL_EQUAL, 1, 0xffff);
+	glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_KEEP);
+
+	ShadowColorShader->Bind();
+	ShadowColorShader->SetUniform("Position", 0);
+	ShadowColorShader->SetUniform("numberOfTilesX", (int)WorkGroupsX);
+
+	glBindVertexArray(ScreenVao);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
+
+	glDisable(GL_STENCIL_TEST);
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);*/
+	glViewport(0, 0, 2048, 2048);
+	std::list<Section*> renders;
+	for (auto const& [name, s] : Shaders)
+	{
+		if (s == nullptr) continue;
+
+		for (Material* m : s->GetUsers())
+		{
+			if (m->GetObjects().size() < 1) continue;
+
+
+			for (Section* o : m->GetObjects())
+			{
+				renders.push_back(o);
+			}
+		}
+	}
+
+	ShadowMapping->Bind();
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glDepthFunc(GL_LESS);
+	ShadowColorShader->Bind();
+	for (const LightData* l : Lights) {
+		if (l->Type != 0) continue;
+		glm::vec3 loc = glm::vec3(ActiveCamera->GetLocation().X, ActiveCamera->GetLocation().Z, ActiveCamera->GetLocation().Y);
+		glm::vec3 dir = glm::toMat4(glm::quat(glm::vec3(glm::radians(l->Rotation.X), glm::radians(l->Rotation.Y), glm::radians(l->Rotation.Z)))) * glm::vec4(0.0, -1.0, 0.0, 0.0);
+		glm::vec3 up = glm::toMat4(glm::quat(glm::vec3(glm::radians(l->Rotation.X), glm::radians(l->Rotation.Y), glm::radians(l->Rotation.Z)))) * glm::vec4(1.0, 0.0, 0.0, 0.0);
+		glm::vec3 newLoc = loc + (-dir * 70.f);
+		glm::mat4 view = glm::lookAt(newLoc, newLoc + dir, up);
+
+		ShadowColorShader->SetUniform("lSpace", ShadowOrtho * view);
+
+		Batcher->begin();
+		for (auto const& s : renders) {
+			Batcher->add(s);
+		}
+		Batcher->end();
+	}
+	glViewport(0, 0, width, height);
 }
 
 void Renderer::Deferred(int width, int height)
@@ -659,8 +849,11 @@ void Renderer::Deferred(int width, int height)
 	glClearColor(0.f, 0.f, 0.f, 0.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glDisable(GL_BLEND);
+	glDepthMask(GL_TRUE);
+	glDisable(GL_STENCIL_TEST);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_MULTISAMPLE);
+	glDisable(GL_BLEND);
 	glDepthFunc(GL_LEQUAL);
 	glEnable(GL_CULL_FACE);
 
@@ -699,7 +892,7 @@ void Renderer::Deferred(int width, int height)
 			{
 				Batcher->add(o);
 			}
-			Batcher->end(ActiveCamera->GetViewMatrix(), ActiveCamera->GetProjectionMatrix());
+			Batcher->end();
 		}
 	}
 }
@@ -777,7 +970,7 @@ void Renderer::Forward(int width, int height)
 			{
 				Batcher->add(o);
 			}
-			Batcher->end(ActiveCamera->GetViewMatrix(), ActiveCamera->GetProjectionMatrix());
+			Batcher->end();
 		}
 	}
 }
@@ -795,7 +988,7 @@ void Renderer::LightCulling(int width, int height)
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
 
-void Renderer::Render()
+void Renderer::Render(float delta)
 {
 	int width, height;
 
@@ -815,12 +1008,12 @@ void Renderer::Render()
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, GlobalUniforms);
 
+
 	if (Lights.size() != 0) UpdateLights();
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, LightBuffer);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, VisibleLightIndicesBuffer);
 
-	ShadowRender->Bind();
-	Shadows(1024, 1024);
+	EnvReflection(width, height);
 
 	glViewport(0, 0, width, height);
 	Buffer->Bind();
@@ -836,10 +1029,21 @@ void Renderer::Render()
 	glBindTexture(GL_TEXTURE_2D, SSAORender->GetSSAOBlur());
 	LightCulling(width, height);
 
+
+	Shadows(width, height);
+	/*glBindFramebuffer(GL_READ_FRAMEBUFFER, Buffer->GetBuffer());
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, ShadowRender->GetBuffer());
+	glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+	Shadows(width, height);
+	BlurRender->Blur(ShadowRender->GetShadows(), 8, ScreenVao);*/
+
 	PostProcess->Bind();
 	glClearColor(0.f, 0.f, 0.f, 0.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	ShadowRender->BindTextures();
+	glActiveTexture(GL_TEXTURE6);
+	glBindTexture(GL_TEXTURE_2D, ShadowMapping->GetShadows());
+	Buffer->BindTextures();
+	EnvironmentRender->BindTextures();
 
 	DeferredMaster->Bind();
 	DeferredMaster->SetUniform("numberOfTilesX", (int)WorkGroupsX);
@@ -849,7 +1053,8 @@ void Renderer::Render()
 	DeferredMaster->SetUniform("gData", 3);
 	DeferredMaster->SetUniform("gDepth", 4);
 	DeferredMaster->SetUniform("gSSAO", 5);
-	DeferredMaster->SetUniform("gShadow", 0);
+	DeferredMaster->SetUniform("gShadow", 6);
+	DeferredMaster->SetUniform("gEnv", 0);
 
 	glDepthFunc(GL_ALWAYS);
 	glBindVertexArray(ScreenVao);
@@ -857,18 +1062,21 @@ void Renderer::Render()
 	glBindVertexArray(0);
 
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, Buffer->GetBuffer());
+	//glReadBuffer(GL_COLOR_ATTACHMENT2);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, PostProcess->GetBuffer());
 	glBlitFramebuffer(
 		0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST
 	);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, 0);
 
 	//Forward(width, height);
 
+	EnvCube(width, height);
+
 	PostProcess->Unbind();
-	BlurRender->Blur(PostProcess->GetBloom(), 5);
+	BlurRender->Blur(PostProcess->GetBloom(), 4, ScreenVao);
 	PostProcess->BindTextures();
 
 	PostProcessMaster->Bind();
@@ -882,7 +1090,18 @@ void Renderer::Render()
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, 0);
 
+	float fps = 1.f / delta;
+	char sbuffer[32];
+	if (fpsCounter) {
+		sprintf_s(sbuffer, 32, "Eril Engine Demo | FPS: %.1f", fps);
+		glfwSetWindowTitle(Window, sbuffer);
+	}
 	glfwSwapBuffers(Window);
+}
+
+void Renderer::GameStart()
+{
+	glfwSetWindowTitle(Window, "Eril Engine Demo");
 }
 
 GLMesh::GLMesh()
@@ -892,9 +1111,9 @@ GLMesh::GLMesh()
 
 GLMesh::~GLMesh()
 {
-	/*for (auto const& i : ModelStreams) {
-		i.second->close();
-	}*/
+	for (auto const& i : LoadedMeshes) {
+		delete i.second;
+	}
 	ModelStreams.clear();
 }
 
@@ -939,9 +1158,12 @@ void processMesh(LoadedMesh* meshHolder, aiMesh* mesh)
 			indices.push_back(face.mIndices[j]);
 		}
 	}
+	std::vector<uint> adjacent;
 	MeshDataHolder* section = new MeshDataHolder();
 	section->FaceCount = indices.size() / 3;
 	section->VertexCount = vertices.size();
+
+
 	section->indices = new uint32[indices.size() * sizeof(uint32)];
 	memcpy(section->indices, indices.data(), indices.size() * sizeof(uint32));
 
@@ -976,12 +1198,13 @@ LoadedMesh* loadMeshes(const std::string& path)
 	LoadedMesh* mesh = new LoadedMesh();
 	//read file with Assimp
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals);
 	//Check for errors
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
 		printf("Error loading model file \"%s\": \"%s\" ", path.c_str(), importer.GetErrorString());
-		return mesh;
+		delete mesh;
+		return nullptr;
 	}
 	// retrieve the directory path of the filepath
 	std::string dir = path.substr(0, path.find_last_of('/'));
@@ -1092,8 +1315,6 @@ void GLMesh::StartLoading()
 	ActiveDir = INI->GetValue("Engine", "DataFolder");
 	for (const auto& f : fs::recursive_directory_iterator(ActiveDir)) {
 		if (f.path().extension() == ".obj") {
-			std::ifstream* stre = new std::ifstream(f.path(), std::ios_base::in);
-			//ModelStreams[f.path().filename().replace_extension("").string()] = stre;
 			ModelStreams[f.path().filename().replace_extension("").string()] = f.path().string();
 		}
 	}

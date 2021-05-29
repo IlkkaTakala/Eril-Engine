@@ -23,5 +23,7 @@ int main()
 	default:
 		break;
 	}
+	printf("\nGame closed, press enter to continue\n");
+	std::cin.get();
 	return retur;
 }

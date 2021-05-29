@@ -7,7 +7,7 @@ struct PointLight {
 	vec4 positionAndSize;
 	vec4 Rotation;
 	ivec4 type;
-	mat4 transforms[6];
+	mat4 transform;
 };
 
 struct VisibleIndex {
@@ -85,7 +85,7 @@ void main() {
 		float minDepthZ = uintBitsToFloat(minDepthInt);
 		float maxDepthZ = uintBitsToFloat(maxDepthInt);
 
-		vec2 tileScale = vec2(800, 600) * (1.0f / float(2*TILE_SIZE));
+		vec2 tileScale = vec2(screenSize) * (1.0f / float(2*TILE_SIZE));
 		vec2 tileBias = tileScale - vec2(gl_WorkGroupID.xy);
 
 		vec4 c1 = vec4(-projection[0][0] * tileScale.x, 0.0f, tileBias.x, 0.0f);

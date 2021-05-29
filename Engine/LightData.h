@@ -27,7 +27,11 @@ public:
 	virtual void DestroyObject() override;
 	virtual void BeginPlay() override {};
 
+	void Enable();
+	void Disable();
+
 	LightData Data;
+	bool Enabled;
 	
 private:
 	

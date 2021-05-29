@@ -4,6 +4,8 @@
 #include "Settings.h"
 #include "IRender.h"
 #include "GameLoop.h"
+#define	WIN32_LEAN_AND_MEAN
+#include <Windows.h>
 
 using namespace std;
 
@@ -21,11 +23,16 @@ GameLoop::GameLoop()
 GameLoop::~GameLoop()
 {
 	if (State != nullptr) State == nullptr;
-	delete Collector;
+	if (GC::Pointers.size() > 0) {
+		for (auto const& i : GC::Pointers) {
+			delete i.second;
+		}
+	}
+	GC::Pointers.clear();
 	delete INI;
-	delete RI;
-	delete MI;
 	delete II;
+	delete MI;
+	delete RI;
 }
 
 int GameLoop::Start()
@@ -36,8 +43,11 @@ int GameLoop::Start()
 
 	try
 	{
+		if (INI->GetValue("Engine", "Console").c_str() == "true") AllocConsole();
 		MI->StartLoading();
-		RI->SetupWindow(800, 600);
+		int x = std::atoi(INI->GetValue("Render", "ResolutionX").c_str());
+		int y = std::atoi(INI->GetValue("Render", "ResolutionY").c_str());
+		RI->SetupWindow(x, y);
 		II->SetInputHandler();
 	}
 	catch (const std::exception& e)
@@ -46,7 +56,6 @@ int GameLoop::Start()
 		return 11;
 	}
 	
-	Collector = new GC();
 	State = EngineInterface::CreateDefaults();
 
 	return MainLoop();
@@ -56,7 +65,6 @@ void GameLoop::Quit()
 {
 	bQuitStarted = true;
 	bQuit = true;
-	Collector->Quit();
 }
 
 int GameLoop::MainLoop()
@@ -64,10 +72,9 @@ int GameLoop::MainLoop()
 	std::chrono::duration<float> duration = std::chrono::milliseconds(0);
 	auto begin = std::chrono::steady_clock::now();
 	auto time = std::chrono::milliseconds(10);
+	RI->GameStart();
 	while (!bQuit) {
 		auto start = std::chrono::steady_clock::now();
-
-		//std::this_thread::sleep_until(start + time);
 
 		RI->Update();
 
@@ -84,7 +91,7 @@ int GameLoop::MainLoop()
 			t->Tick(duration.count());
 		}
 
-		RI->Render();
+		RI->Render(duration.count());
 
 		std::unique_lock<std::mutex> lock(TickListMutex);
 		for (Tickable* t : TickListRemoval) {
@@ -92,10 +99,10 @@ int GameLoop::MainLoop()
 		}
 		lock.unlock();
 		duration = std::chrono::steady_clock::now() - start;
-		fps = 1.f / duration.count();
-		printf("\r%c[2K", 27);
-		printf("FPS: %.2f", fps);
+		//fps = 1.f / duration.count();
 	}
+
+	TickList.clear();
 	
 	RI->CleanRenderer();
 

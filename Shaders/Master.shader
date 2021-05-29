@@ -20,7 +20,7 @@ struct LightData {
 	vec4 positionAndSize;
 	vec4 rotation;
 	ivec4 type;
-	mat4 transforms[6];
+	mat4 transform;
 };
 
 struct VisibleIndex {
@@ -54,7 +54,8 @@ uniform sampler2D gAlbedoSpec;
 uniform sampler2D gDepth;
 uniform sampler2D gData;
 uniform sampler2D gSSAO;
-uniform samplerCube gShadow;
+uniform sampler2D gShadow;
+uniform samplerCube gEnv;
 uniform int numberOfTilesX;
 out vec4 FragColor;
   
@@ -101,6 +102,43 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
     return ggx1 * ggx2;
 }
 
+const vec3 sampleOffsetDirections[20] = vec3[]
+(
+   vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1), 
+   vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
+   vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
+   vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
+   vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
+); 
+
+float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightDir, vec3 normal)
+{
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+	projCoords = projCoords * 0.5 + 0.5;
+    float closestDepth = texture(gShadow, projCoords.xy).r; 
+    float currentDepth = projCoords.z;
+	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005); 
+	float shadow = 0.0;
+	vec2 texelSize = 1.0 / textureSize(gShadow, 0);
+	for(int x = -1; x <= 1; ++x)
+	{
+		for(int y = -1; y <= 1; ++y)
+		{
+			float pcfDepth = texture(gShadow, projCoords.xy + vec2(x, y) * texelSize).r; 
+			shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
+		}    
+	}
+	shadow /= 9.0;
+	if(projCoords.z > 1.0)
+        shadow = 0.0;
+    return shadow;
+}
+
+float LinearizeDepth(float depth) {
+	float z = depth * 2.0 - 1.0;
+	return (2.0 * 0.1 * 100.0) / (100.0 + 0.1 - z * (100.0 - 0.1));
+}
+
 void main()
 {     
 	ivec2 location = ivec2(gl_FragCoord.xy);
@@ -117,9 +155,10 @@ void main()
 	float roughness = data.g;
 	float AO = data.b;
 	
+	float shadow = 0;
 	float SSAO = texture(gSSAO, TexCoords).r;
 	
-	vec3 ambient = vec3(0.03) * albedo * AO * SSAO;
+	vec3 ambient = vec3(0.01, 0.02, 0.06) * albedo * AO * SSAO;
 	
 	vec3 Lo = vec3(0.0);
 
@@ -144,7 +183,12 @@ void main()
 				L = normalize(-light.rotation.xyz);
 				H = normalize(V + L);
 
-				radiance = light.color.rgb;
+				float distance 	= 1.0;
+				float radius 	= 10000000.0;
+				float b 		= 1.0 / (radius * radius * 0.01);
+				float attenuation = 1.0 / (1.0 + 0.1 * distance + b * distance * distance);//1.0 / (distance * distance);
+				radiance = light.color.rgb * attenuation;
+				shadow = ShadowCalculation(light.transform * vec4(FragPos, 1.0), L, N);
 			} break;
 			
 			case 1:
@@ -152,8 +196,10 @@ void main()
 				L = normalize(light.positionAndSize.xyz - FragPos);
 				H = normalize(V + L);
 			  
-				float distance    = length(light.positionAndSize.xyz - FragPos);
-				float attenuation = 1.0 / (distance * distance);
+				float distance 	= length(light.positionAndSize.xyz - FragPos);
+				float radius 	= light.positionAndSize.w;
+				float b 		= 1.0 / (radius * radius * 0.01);
+				float attenuation = 1.0 / (1.0 + 0.1 * distance + b * distance * distance);//1.0 / (distance * distance);
 				radiance = light.color.rgb * attenuation;
 				
 			} break;
@@ -176,15 +222,15 @@ void main()
 		kD *= 1.0 - metallic;
 
 		float NdotL = max(dot(N, L), 0.0);        
-		Lo += (kD * albedo / PI + specular) * radiance * NdotL;
+		Lo += (kD * albedo / PI + specular) * radiance * NdotL * (1.0 - shadow);
 		
 	}
 	
 	vec4 color = vec4(ambient + Lo, 1.0);
 	
 	// Height fog
-	//float depth = LinearizeDepth(texture(gDepth, TexCoords).r) / 100.0;
-	//color += clamp(depth * 2 - 0.5, 0.0, 8.0);
+	float depth = LinearizeDepth(texture(gDepth, TexCoords).r) / 100.0;
+	color += clamp(depth - 0.5, 0.0, 8.0);
 	
 	const float gamma = 2.2;
 	const float exposure = 1.0;
@@ -193,8 +239,8 @@ void main()
     // also gamma correct while we're at it       
     result = pow(result, vec4(1.0 / gamma));
 	
-	ColorBuffer = result;
+	ColorBuffer = color;
 	//if (brightness > 1.0)
-	BloomBuffer = clamp(result - 1.0, 0.0, 100.0);
+	BloomBuffer = clamp(color - exposure, 0.0, 100.0);
 }
 ###END_FRAGMENT###

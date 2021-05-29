@@ -35,7 +35,7 @@ void RenderBatch::begin()
 	}
 }
 
-void RenderBatch::end(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix)
+void RenderBatch::end()
 {
 	if (spriteMap.size() == 0 || !drawing) return;
 
@@ -45,9 +45,10 @@ void RenderBatch::end(const glm::mat4& viewMatrix, const glm::mat4& projectionMa
 		if ((i->GetFaceCount() + face_count) * 3 >= max_index || i->GetVertexCount() + vertex_index >= max_index)
 			render();
 
-		drawSprite(i, viewMatrix, projectionMatrix);
+		drawSprite(i);
 
 	}
+
 	if (face_count > 0) render();
 	spriteMap.clear();
 	drawing = false;
@@ -59,7 +60,7 @@ void RenderBatch::add(const Section* obj)
 	spriteMap.push_back(obj);
 }
 
-void RenderBatch::drawSprite(const Section* obj, const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix)
+void RenderBatch::drawSprite(const Section* obj)
 {
 	if (!drawing) return;
 
@@ -157,10 +158,6 @@ void BufferPart::Initialize(int size)
 
 void BufferPart::Bind()
 {
-	/*glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-	indices = reinterpret_cast<uint32*>(glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY));
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	verts = reinterpret_cast<Vertex*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));*/
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
 	indices = reinterpret_cast<uint32*>(glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, Size * sizeof(uint32), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);

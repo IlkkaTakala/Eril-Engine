@@ -9,7 +9,8 @@ class RenderBuffer;
 class PostBuffer;
 class BlurBuffer;
 class SSAOBuffer;
-class ShadowBuffer;
+class ShadowMapBuffer;
+class ReflectionBuffer;
 struct LightData;
 
 struct GLFWwindow;
@@ -37,11 +38,14 @@ public:
 	virtual Texture* LoadTextureByName(String name) override;
 
 	virtual void Update() override;
-	virtual void Render() override;
+	virtual void Render(float delta) override;
+	virtual void GameStart() override;
 
 private:
 	friend class GLInput;
 
+	void EnvReflection(int width, int height);
+	void EnvCube(int width, int height);
 	void Shadows(int width, int height);
 	void Deferred(int width, int height);
 	void SSAO(int width, int height);
@@ -59,13 +63,18 @@ private:
 	Shader* SSAOShader;
 	Shader* SSAOBlurShader;
 	Shader* ShadowShader;
+	Shader* ShadowColorShader;
+	Shader* SkyDomeShader;
+	Shader* SkyFilterShader;
+	Shader* SkyBoxShader;
 	GLFWwindow* Window;
 	RenderBatch* Batcher;
 	RenderBuffer* Buffer;
 	PostBuffer* PostProcess;
 	BlurBuffer* BlurRender;
 	SSAOBuffer* SSAORender;
-	ShadowBuffer* ShadowRender;
+	ShadowMapBuffer* ShadowMapping;
+	ReflectionBuffer* EnvironmentRender;
 	GLCamera* ActiveCamera;
 
 	uint ScreenVao;
@@ -78,9 +87,17 @@ private:
 	uint SSAOKernelBuffer;
 	uint SSAONoise;
 
+	uint EnvironmentVAO;
+	uint EnvironmentVBO;
+
+	uint EnvSizeX;
+	uint EnvSizeY;
+
 	uint MaxLightCount;
 	uint WorkGroupsX;
 	uint WorkGroupsY;
+
+	bool fpsCounter;
 };
 
 class GLMesh : public IMesh

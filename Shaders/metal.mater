@@ -1,0 +1,7 @@
+[Shader]
+name=shader_002
+[Textures]
+Albedo=Textures/metalball/albedo_d.png
+Normal=Textures/metalball/normal_n.png
+Roughness=Textures/metalball/rough.png
+Metallic=Textures/metalball/metallic.png

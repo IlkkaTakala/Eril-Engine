@@ -16,6 +16,8 @@ TestPlayer::TestPlayer() : Player()
 	II->RegisterKeyInput(32, &TestPlayer::RunInputSpace, this);
 	II->RegisterKeyInput(340, &TestPlayer::RunInputShift, this);
 	II->RegisterKeyInput(0x01, &TestPlayer::LeftMouseDown, this);
+	II->RegisterKeyInput(49, &TestPlayer::InputOne, this);
+	II->RegisterKeyInput(50, &TestPlayer::InputTwo, this);
 	II->RegisterKeyInput(256, &TestPlayer::InputExit, this);
 	II->RegisterMouseInput(0, &TestPlayer::MouseMoved, this);
 }
@@ -45,6 +47,30 @@ void TestPlayer::RunInputSpace(float delta, bool KeyDown)
 	
 }
 
+void TestPlayer::InputOne(float delta, bool KeyDown)
+{
+	if (LightMode == true) return;
+
+	DirLight->Enable();
+
+	for (auto const& l : Lights) {
+		l->Disable();
+	}
+	LightMode = true;
+}
+
+void TestPlayer::InputTwo(float delta, bool KeyDown)
+{
+	if (LightMode == false) return;
+
+	DirLight->Disable();
+
+	for (auto const& l : Lights) {
+		l->Enable();
+	}
+	LightMode = false;
+}
+
 void TestPlayer::RunInputShift(float delta, bool KeyDown)
 {
 	if (KeyDown) Speed = 10.f;
@@ -54,12 +80,12 @@ void TestPlayer::RunInputShift(float delta, bool KeyDown)
 
 void TestPlayer::LeftMouseDown(float delta, bool)
 {
-	/*Vector Start(CameraPoint);
-	Vector End(CameraPoint + CameraDirection * 100);
-	Vector Out;
-	VisibleObject* Hit = nullptr;
-	Trace(Start, End, Out, &Hit);
-	if (Hit != nullptr) Hit->DestroyObject();*/
+
+}
+
+void TestPlayer::RightMouseDown(float delta, bool KeyDown)
+{
+
 }
 
 void TestPlayer::MouseMoved(float X, float Y)
@@ -77,50 +103,62 @@ void TestPlayer::Tick(float)
 
 void TestPlayer::BeginPlay()
 {
+	LightMode = true;
 
-	Light* nexta = SpawnObject<Light>();
-	nexta->Data.Location = Vector(1.5f, 1.5f, 1.f);
-	nexta->Data.Type = 0;
-	nexta->Data.Rotation = Vector(45.0, 45.0, 0.0);
+	DirLight = SpawnObject<Light>();
+	DirLight->Data.Location = Vector(2.5f, 2.5f, 60.f);
+	DirLight->Data.Type = 0;
+	DirLight->Data.Size = 7.0;
+	DirLight->Data.Intensity = 3.0;
+	DirLight->Data.Rotation = Vector(45.0, 0.0, 0.0);
 
-	/*nexta = SpawnObject<Light>();
-	nexta->Data.Location = Vector(-1.5f, -1.5f, 3.f);
-	nexta->Data.Type = 1;
-
-	Light* nexta = SpawnObject<Light>();
-	nexta->Data.Location = Vector(-1.5f, -1.5f, 3.f);
-	nexta->Data.Rotation = Vector(45.0, 45.0, 0.0);
-	nexta->Data.Type = 0;*/
-
-	/*Domain = SpawnObject<Actor>();
-	Domain->SetModel("sphere");
-	Domain->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/for"));
-	Domain->SetScale(Vector(0.5, 0.5, 0.5));
-	Domain->SetLocation(Vector(0, 9.0, 0.f));*/
-
-	Actor* next = SpawnObject<Actor>();
-	next->SetModel("sphere");
-	next->SetLocation(Vector(1.5f, 0.5f, 1.f));
+	Reflecting = SpawnObject<Actor>();
+	Reflecting->SetModel("sphere");
+	Reflecting->SetLocation(Vector(1.5f, 0.5f, 0.0f));
+	Reflecting->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/metal"));
 
 	Domain = SpawnObject<Actor>();
-	Domain->SetModel("room");
-	//Domain->SetScale(Vector(0.5, 0.5, 0.5));
-	Domain->SetLocation(Vector(0.0, 0.0, 0.0));
+	Domain->SetModel("ground");
+	Domain->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/ground"));
+	Domain->SetLocation(Vector(0.0, 0.0, 4.5));
 
-	/*Domain = SpawnObject<Actor>();
-	Domain->SetModel("Buildings");
-	Domain->SetScale(Vector(0.5, 0.5, 0.5));
-	Domain->SetLocation(Vector(0.5, -1.0, 0.5));
+	Pillars = SpawnObject<Actor>();
+	Pillars->SetModel("pillars");
+	Pillars->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/pillars"));
+	Pillars->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Shaders/rocks"));
+	Pillars->SetLocation(Vector(0.0, 0.0, -3.0));
+	Pillars->SetScale(Vector(3.f));
 
-	Domain = SpawnObject<Actor>();
-	Domain->SetModel("sphere");
-	Domain->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/for"));
-	Domain->SetScale(Vector(0.5, 0.5, 0.5));
-	Domain->SetLocation(Vector(0.5, 0.0, 0.0));
+	float size = 80.f;
 
-	/*Domain = SpawnObject<VisibleObject>();
-	Domain->SetModel("sphere");
-	Domain->SetScale(Vector(0.5, 0.5, 0.5));
-	Domain->SetLocation(Vector(0.5, -1.0, 0.0));*/
+	for (int x = 0; x < 10; x++) {
+		for (int y = 0; y < 10; y++) {
+			Actor* next = SpawnObject<Actor>();
+			next->SetModel("sphere");
+			float rx = (float)rand() / (float)RAND_MAX - 0.5f;
+			float ry = (float)rand() / (float)RAND_MAX - 0.5f;
+			float rz = (float)rand() / (float)RAND_MAX;
+			float scale = (float)rand() / (float)RAND_MAX * 2.f;
+			next->SetScale(Vector(scale));
+			Domain->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/test"));
+			next->SetLocation(Vector(rx * size, ry * size, rz * size / 3));
+			Spheres.push_back(next);
+		}
+	}
 
+	for (int x = 0; x < 20; x++) {
+		for (int y = 0; y < 20; y++) {
+			Light* next = SpawnObject<Light>();
+			next->Data.Type = 1;
+			float rx = (float)rand() / (float)RAND_MAX - 0.5f;
+			float ry = (float)rand() / (float)RAND_MAX - 0.5f;
+			float rz = (float)rand() / (float)RAND_MAX;
+			float scale = (float)rand() / (float)RAND_MAX * 2.f;
+			next->Data.Size = 4.f;
+			next->Data.Intensity = 20.f;
+			next->Data.Location = Vector(rx * size, ry * size, rz * size / 3);
+			next->Disable();
+			Lights.push_back(next);
+		}
+	}
 }

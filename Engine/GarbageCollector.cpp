@@ -19,14 +19,14 @@ GC::~GC()
 		}
 	}
 	
-	//Pointers.clear();
+	Pointers.clear();
 }
 
 void GC::AddObject(BaseObject* obj)
 {
 	String name;
 	do {
-		name = "Object_" + rand();
+		name = "Object_"  + std::to_string(rand());
 	} while (Pointers.find(name) != Pointers.end());
 	Pointers.emplace(name, obj);
 	Tickable* t = dynamic_cast<Tickable*>(obj);
@@ -43,7 +43,7 @@ void GC::RemoveObject(BaseObject* obj)
 void GC::Quit()
 {
 	bQuitting = true;
-	if (Cleaner.joinable()) Cleaner.join();
+	//if (Cleaner.joinable()) Cleaner.join();
 }
 
 void GC::CleanRunner()

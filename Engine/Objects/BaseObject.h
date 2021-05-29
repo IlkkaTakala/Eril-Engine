@@ -10,6 +10,7 @@ protected:
 	 bool bMarked;
 private:
 	friend class GC;
+	friend class GameLoop;
 	template <class T>
 	friend class Ref;
 	int ReferenceCount;

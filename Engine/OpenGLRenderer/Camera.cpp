@@ -1,7 +1,9 @@
+#include "Core.h"
 #include "Camera.h"
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include "Settings.h"
 
 GLCamera::GLCamera(RenderObject* parent)
 {
@@ -14,24 +16,31 @@ GLCamera::GLCamera(RenderObject* parent)
 
 	ApplyTransformation();
 
-	Projection = glm::perspectiveFov(glm::radians(Fov), 640.f, 480.f, 0.1f, 100.f);
+	int x = std::atoi(INI->GetValue("Render", "ResolutionX").c_str());
+	int y = std::atoi(INI->GetValue("Render", "ResolutionY").c_str());
+
+	Projection = glm::perspectiveFov(glm::radians(Fov), (float)x, (float)y, 0.1f, 100.f);
 }
 
 void GLCamera::SetFov(float fov)
 {
+	int x = std::atoi(INI->GetValue("Render", "ResolutionX").c_str());
+	int y = std::atoi(INI->GetValue("Render", "ResolutionY").c_str());
 	Fov = fov;
-	if (Perspective) Projection = glm::perspectiveFov(glm::radians(Fov), 640.f, 480.f, 0.1f, 100.f);
+	if (Perspective) Projection = glm::perspectiveFov(glm::radians(Fov), (float)x, (float)y, 0.1f, 100.f);
 }
 
 void GLCamera::SetPerspective(bool perspective)
 {
 	Perspective = perspective;
+	int x = std::atoi(INI->GetValue("Render", "ResolutionX").c_str());
+	int y = std::atoi(INI->GetValue("Render", "ResolutionY").c_str());
 	if (perspective) {
-		Projection = glm::perspectiveFov(glm::radians(Fov), 640.f, 480.f, 0.1f, 100.f);
+		Projection = glm::perspectiveFov(glm::radians(Fov), (float)x, (float)y, 0.1f, 100.f);
 	}
 	else
 	{
-		Projection = glm::ortho(0.f, 640.f, 0.f, 480.f, 0.1f, 100.f);
+		Projection = glm::ortho(0.f, (float)x, 0.f, (float)y, 0.1f, 100.f);
 	}
 }
 

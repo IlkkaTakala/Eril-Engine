@@ -32,6 +32,6 @@ void main()
     vec3 result = vec3(1.0) - exp(-hdrColor * exposure);
     // also gamma correct while we're at it       
     result = pow(result, vec3(1.0 / gamma));
-    FragColor = vec4(hdrColor + bloomColor, 1.0);//vec4(result, 1.0);
+    FragColor = vec4(result, 1.0);
 }
 ###END_FRAGMENT###

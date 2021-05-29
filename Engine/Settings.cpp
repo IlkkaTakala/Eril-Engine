@@ -13,9 +13,9 @@ INISettings::INISettings(const String& File)
 
 // From stackoverflow https://codereview.stackexchange.com/questions/127819/ini-file-parser-in-c
 void INISettings::parse(std::istream& in) {
-	static const std::regex comment_regex{ R"x(\s*[;#])x" };
-	static const std::regex section_regex{ R"x(\s*\[([^\]]+)\])x" };
-	static const std::regex value_regex{ R"x(\s*(\S[^ \t=]*)\s*=\s*((\s?\S+)+)\s*$)x" };
+	const std::regex comment_regex{ R"x(\s*[;#])x" };
+	const std::regex section_regex{ R"x(\s*\[([^\]]+)\])x" };
+	const std::regex value_regex{ R"x(\s*(\S[^ \t=]*)\s*=\s*((\s?\S+)+)\s*$)x" };
 	String current_section;
 	std::smatch pieces;
 	for (String line; std::getline(in, line);)

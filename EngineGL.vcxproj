@@ -65,7 +65,7 @@
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Ilkka\Documents\Visual Studio 2019\Game\Release\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Ilkka\Documents\Visual Studio 2019\Game\Builds\Release\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">EngineGL.dir\Release\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">EngineGL</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.exe</TargetExt>
@@ -129,7 +129,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Ilkka\Documents\Visual Studio 2019\Game\Engine\OpenGLRenderer\ext\glfw-3.3.2\deps;D:\Ilkka\Documents\Visual Studio 2019\Game\Engine;D:\Ilkka\Documents\Visual Studio 2019\Game\ext\stb-master;D:\Ilkka\Documents\Visual Studio 2019\Game\Engine\OpenGLRenderer\ext\glfw-3.3.2\include;D:\Ilkka\Documents\Visual Studio 2019\Game\Engine\OpenGLRenderer\ext\glm-0.9.9.7\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Ilkka\Documents\Visual Studio 2019\Game\ext\assimp-5.0.1\include;D:\Ilkka\Documents\Visual Studio 2019\Game\Engine\OpenGLRenderer\ext\glfw-3.3.2\deps;D:\Ilkka\Documents\Visual Studio 2019\Game\Engine;D:\Ilkka\Documents\Visual Studio 2019\Game\ext\stb-master;D:\Ilkka\Documents\Visual Studio 2019\Game\Engine\OpenGLRenderer\ext\glfw-3.3.2\include;D:\Ilkka\Documents\Visual Studio 2019\Game\Engine\OpenGLRenderer\ext\glm-0.9.9.7\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ExceptionHandling>Sync</ExceptionHandling>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -139,10 +139,12 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLM_FORCE_XYZW_ONLY;WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <StringPooling>true</StringPooling>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -157,14 +159,15 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>Engine\OpenGLRenderer\ext\glfw-3.3.2\src\Release\glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc142-mt.lib;zlibstatic.lib;IrrXML.lib;Engine\OpenGLRenderer\ext\glfw-3.3.2\src\Release\glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImportLibrary>D:/Ilkka/Documents/Visual Studio 2019/Game/Release/EngineGL.lib</ImportLibrary>
       <ProgramDataBaseFile>D:/Ilkka/Documents/Visual Studio 2019/Game/Release/EngineGL.pdb</ProgramDataBaseFile>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
+      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -215,7 +218,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Ilkka\Documents\Visual Studio 2019\Game\Engine\OpenGLRenderer\ext\glfw-3.3.2\deps;D:\Ilkka\Documents\Visual Studio 2019\Game\Engine;D:\Ilkka\Documents\Visual Studio 2019\Game\ext\assimp-5.0.1\include;D:\Ilkka\Documents\Visual Studio 2019\Game\ext\stb-master;D:\Ilkka\Documents\Visual Studio 2019\Game\Engine\OpenGLRenderer\ext\glfw-3.3.2\include;D:\Ilkka\Documents\Visual Studio 2019\Game\Engine\OpenGLRenderer\ext\glm-0.9.9.7\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Ilkka\Documents\Visual Studio 2019\Game\ext\assimp-5.0.1\include;D:\Ilkka\Documents\Visual Studio 2019\Game\Engine\OpenGLRenderer\ext\glfw-3.3.2\deps;D:\Ilkka\Documents\Visual Studio 2019\Game\Engine;D:\Ilkka\Documents\Visual Studio 2019\Game\ext\stb-master;D:\Ilkka\Documents\Visual Studio 2019\Game\Engine\OpenGLRenderer\ext\glfw-3.3.2\include;D:\Ilkka\Documents\Visual Studio 2019\Game\Engine\OpenGLRenderer\ext\glm-0.9.9.7\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -243,12 +246,12 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>IrrXML.lib;zlibstatic.lib;assimp-vc142-mt.lib;Engine\OpenGLRenderer\ext\glfw-3.3.2\src\RelWithDebInfo\glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>lib\RelWithDebInfo\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc142-mt.lib;IrrXML.lib;zlibstatic.lib;Engine\OpenGLRenderer\ext\glfw-3.3.2\src\RelWithDebInfo\glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\Ilkka\Documents\Visual Studio 2019\Game\lib\RelWithDebInfo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>D:/Ilkka/Documents/Visual Studio 2019/Game/RelWithDebInfo/EngineGL.lib</ImportLibrary>
+      <ImportLibrary>D:/Ilkka/Documents/Visual Studio 2019/Game/Builds/RelWithDebInfo/EngineGL.lib</ImportLibrary>
       <ProgramDataBaseFile>D:/Ilkka/Documents/Visual Studio 2019/Game/Builds/RelWithDebInfo/EngineGL.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -379,6 +382,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <Project>{A995613F-9A3F-366B-8F57-C50B8FC0599D}</Project>
       <Name>glfw</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

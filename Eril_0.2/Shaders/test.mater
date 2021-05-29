@@ -1,0 +1,8 @@
+[Shader]
+name=shader_001
+[Textures]
+Albedo=Textures/GroundAsphaltBroken001_COL_3K_d.jpg
+Normal=Textures/GroundAsphaltBroken001_NRM_3K_n.jpg
+Roughness=Textures/GroundAsphaltBroken001_GLOSS_3K.jpg
+AO=Textures/GroundAsphaltBroken001_AO_3K.jpg
+Displacement=Textures/GroundAsphaltBroken001_DISP_3K.jpg

@@ -7,7 +7,7 @@ class VisibleObject : public BaseObject
 {
 public:
 	VisibleObject();
-	virtual ~VisibleObject() { }
+	virtual ~VisibleObject() { delete RenderData; }
 
 	void SetLocation(Vector NewLocation);
 	void SetRotation(Vector NewRotation);

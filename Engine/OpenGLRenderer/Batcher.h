@@ -37,7 +37,7 @@ public:
 	void begin();
 
 	/* End the processing, sort and render the batches */
-	void end(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix);
+	void end();
 
 	/* Add new point to be rendered as a sprite */
 	void add(const Section* obj);
@@ -47,7 +47,7 @@ private:
 	void render();
 
 	/* Draw sprite to the current batch */
-	void drawSprite(const Section* obj, const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix);
+	void drawSprite(const Section* obj);
 
 	bool drawing;
 
