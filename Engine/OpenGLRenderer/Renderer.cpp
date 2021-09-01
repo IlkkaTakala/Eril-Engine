@@ -109,6 +109,7 @@ int Renderer::SetupWindow(int width, int height)
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
 
+	printf("Creating window...\n");
 	Window = glfwCreateWindow(width, height, "Eril Engine Demo | Loading...", NULL, NULL);
 	if (!Window) {
 		glfwTerminate();
@@ -125,6 +126,7 @@ int Renderer::SetupWindow(int width, int height)
 	if (INI->GetValue("Render", "VSync") == "false") glfwSwapInterval(0);
 	if (!gladLoadGL(glfwGetProcAddress)) exit(100);
 
+	printf("Allocating buffers...\n");
 	Batcher = new RenderBatch(/*262144*/524288);
 	Buffer = new RenderBuffer(width, height);
 	PostProcess = new PostBuffer(width, height);
@@ -154,17 +156,13 @@ int Renderer::SetupWindow(int width, int height)
 	glGenBuffers(1, &ScreenVbo);
 	glGenBuffers(1, &ScreenTexVbo);
 
-	// bind the Vertex Array Object first, then bind and set vertex buffer(s), and then 
-	// configure vertex attributes(s).
 	glBindVertexArray(ScreenVao);
 
-	// Set buffer data to m_vbo-object (bind buffer first and then set the data)
 	glBindBuffer(GL_ARRAY_BUFFER, ScreenVbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	// Set buffer data to m_texCoordsVbo-object (bind buffer first and then set the data)
 	glBindBuffer(GL_ARRAY_BUFFER, ScreenTexVbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(texCoords), texCoords, GL_STATIC_DRAW);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
@@ -203,6 +201,7 @@ int Renderer::SetupWindow(int width, int height)
 	glViewport(0, 0, width, height);
 	glClearColor(0.f, 0.f, 0.f, 0.f);
 
+	printf("Loading shaders...\n");
 	LoadShaders();
 
 	if (LightCullingShader == nullptr || DeferredMaster == nullptr) throw std::exception("Important shaders not found!\n");
@@ -633,6 +632,7 @@ void Renderer::LoadShaders()
 				break;
 			}
 
+			printf("Shader loaded: %s\n", f.path().string().c_str());
 			stre.close();
 		}
 	}
@@ -657,10 +657,8 @@ Material* Renderer::LoadMaterialByName(String name)
 	else {
 		namespace fs = std::filesystem;
 		if (fs::exists(name + ".mater")) {
-			//auto stream = std::ifstream(name + ".mater", std::ios_base::in);
 			INISettings params(name + ".mater");
 			String shaderName = params.GetValue("Shader", "name");
-			//std::getline(stream, shaderName);
 			if (Shaders.find(shaderName) != Shaders.end()) {
 				Material* nMat = new Material(Shaders[shaderName]);
 				auto const& textures = params.GetSection("Textures");
@@ -676,6 +674,7 @@ Material* Renderer::LoadMaterialByName(String name)
 					nMat->VectorParameters.emplace(name, Vector(vec));
 				}
 				BaseMaterials.emplace(name, nMat);
+				printf("Material loaded: %s\n", name.c_str());
 				return BaseMaterials.find(name)->second;
 			}
 		}
@@ -698,6 +697,7 @@ Texture* Renderer::LoadTextureByName(String name)
 		Texture* next = new Texture(width, height, nrChannels, data, type);
 		stbi_image_free(data);
 		LoadedTextures.emplace(name, next);
+		printf("Texture loaded: %s\n", name.c_str());
 		return next;
 	}
 }
@@ -717,7 +717,6 @@ void Renderer::EnvReflection(int width, int height)
 	SkyDomeShader->Bind();
 	SkyDomeShader->SetUniform("P", ShadowProj);
 	SkyDomeShader->SetUniform("time", (float)glfwGetTime() * 1.f);
-	//SkyDomeShader->SetUniform("V", glm::inverse(ActiveCamera->GetViewMatrix()));
 	glBindVertexArray(ScreenVao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);

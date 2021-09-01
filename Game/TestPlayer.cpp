@@ -119,7 +119,7 @@ void TestPlayer::BeginPlay()
 
 	Domain = SpawnObject<Actor>();
 	Domain->SetModel("ground");
-	Domain->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/ground"));
+	Domain->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/test"));
 	Domain->SetLocation(Vector(0.0, 0.0, 4.5));
 
 	Pillars = SpawnObject<Actor>();
@@ -140,7 +140,7 @@ void TestPlayer::BeginPlay()
 			float rz = (float)rand() / (float)RAND_MAX;
 			float scale = (float)rand() / (float)RAND_MAX * 2.f;
 			next->SetScale(Vector(scale));
-			Domain->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/test"));
+			next->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/ground"));
 			next->SetLocation(Vector(rx * size, ry * size, rz * size / 3));
 			Spheres.push_back(next);
 		}

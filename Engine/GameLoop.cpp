@@ -4,8 +4,7 @@
 #include "Settings.h"
 #include "IRender.h"
 #include "GameLoop.h"
-#define	WIN32_LEAN_AND_MEAN
-#include <Windows.h>
+#include "WinConsole.h"
 
 using namespace std;
 
@@ -37,13 +36,15 @@ GameLoop::~GameLoop()
 
 int GameLoop::Start()
 {
+	printf("Starting game...\n");
 	Loop = this;
 	INI = new INISettings("Settings.ini");
 	if (!INI->IsValid()) return 10;
 
 	try
 	{
-		if (INI->GetValue("Engine", "Console").c_str() == "true") AllocConsole();
+		if (INI->GetValue("Engine", "Console") == "true") 
+			AddConsole();
 		MI->StartLoading();
 		int x = std::atoi(INI->GetValue("Render", "ResolutionX").c_str());
 		int y = std::atoi(INI->GetValue("Render", "ResolutionY").c_str());
@@ -56,8 +57,10 @@ int GameLoop::Start()
 		return 11;
 	}
 	
+	printf("Creating defaults...\n");
 	State = EngineInterface::CreateDefaults();
 
+	printf("Loading finished\n");
 	return MainLoop();
 }
 

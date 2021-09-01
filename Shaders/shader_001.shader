@@ -69,7 +69,7 @@ void main()
 {
 	//vec2 texCoords = ParallaxMapping(fs_in.TexCoords, normalize(viewPos.xyz - fs_in.FragPos).xyz);
 	PositionBuffer = vec4(fs_in.FragPos, 1.0);
-	vec3 normal = texture(Normal, fs_in.TexCoords).rgb;
+	vec3 normal = texture(Normal, fs_in.TexCoords).rgb * 2.0;
     NormalBuffer = vec4(normalize(fs_in.TBN * normal), 1.0);
     ColorBuffer = texture(Albedo, fs_in.TexCoords);
 	DataBuffer = vec4(0.0, 1.0 - texture(Roughness, fs_in.TexCoords).r, texture(AO, fs_in.TexCoords).r, 1.0);
