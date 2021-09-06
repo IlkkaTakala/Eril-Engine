@@ -1,0 +1,9 @@
+# CMake generation dependency list for this directory.
+A:/Delion/Git/erilengine/Engine/ext/assimp/contrib/zlib/CMakeLists.txt
+A:/Delion/Git/erilengine/Engine/ext/assimp/contrib/zlib/zconf.h.cmakein
+A:/Delion/Git/erilengine/Engine/ext/assimp/contrib/zlib/zlib.pc.cmakein
+A:/Program Files/CMake/share/cmake-3.21/Modules/CheckCSourceCompiles.cmake
+A:/Program Files/CMake/share/cmake-3.21/Modules/CheckFunctionExists.cmake
+A:/Program Files/CMake/share/cmake-3.21/Modules/CheckIncludeFile.cmake
+A:/Program Files/CMake/share/cmake-3.21/Modules/CheckIncludeFileCXX.cmake
+A:/Program Files/CMake/share/cmake-3.21/Modules/CheckTypeSize.cmake

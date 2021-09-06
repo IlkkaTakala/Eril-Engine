@@ -1,0 +1,263 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{DF8A169D-CFAF-3489-81C0-C738D49C0823}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>Eril</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)\build\intermediate\Eril.dir\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Eril</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)\build\intermediate\Eril.dir\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Eril</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(SolutionDir)\build\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(SolutionDir)\build\intermediate\Eril.dir\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Eril</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>Engine\ext\assimp\include;Engine\ext\stb-image;Engine;Engine\OpenGLRenderer\include;Engine\OpenGLRenderer\ext\glfw\include;Engine\OpenGLRenderer\ext\glfw\deps;Engine\OpenGLRenderer\ext\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Engine\OpenGLRenderer\ext\glfw\deps;$(SolutionDir)\ext\stb-image;$(SolutionDir)\Engine\OpenGLRenderer\ext\glfw\include;$(SolutionDir)\Engine\OpenGLRenderer\ext\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Engine\OpenGLRenderer\ext\glfw\deps;$(SolutionDir)\ext\stb-image;$(SolutionDir)\Engine\OpenGLRenderer\ext\glfw\include;$(SolutionDir)\Engine\OpenGLRenderer\ext\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\build\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>$(SolutionDir)/build/Debug/Eril.lib</ImportLibrary>
+      <ProgramDataBaseFile>$(SolutionDir)/build/Debug/Eril.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>Engine\ext\assimp\include;Engine\ext\stb-image;Engine;Engine\OpenGLRenderer\include;Engine\OpenGLRenderer\ext\glfw\include;Engine\OpenGLRenderer\ext\glfw\deps;Engine\OpenGLRenderer\ext\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Engine\OpenGLRenderer\ext\glfw\deps;$(SolutionDir)\ext\stb-image;$(SolutionDir)\Engine\OpenGLRenderer\ext\glfw\include;$(SolutionDir)\Engine\OpenGLRenderer\ext\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Engine\OpenGLRenderer\ext\glfw\deps;$(SolutionDir)\ext\stb-image;$(SolutionDir)\Engine\OpenGLRenderer\ext\glfw\include;$(SolutionDir)\Engine\OpenGLRenderer\ext\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>Engine\OpenGLRenderer\ext\glfw\src\Release\glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\build\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>$(SolutionDir)/build/Release/Eril.lib</ImportLibrary>
+      <ProgramDataBaseFile>$(SolutionDir)/build/Release/Eril.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>Engine\ext\assimp\include;Engine\ext\stb-image;Engine;Engine\OpenGLRenderer\include;Engine\OpenGLRenderer\ext\glfw\include;Engine\OpenGLRenderer\ext\glfw\deps;Engine\OpenGLRenderer\ext\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Engine\OpenGLRenderer\ext\glfw\deps;$(SolutionDir)\ext\stb-image;$(SolutionDir)\Engine\OpenGLRenderer\ext\glfw\include;$(SolutionDir)\Engine\OpenGLRenderer\ext\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Engine\OpenGLRenderer\ext\glfw\deps;$(SolutionDir)\ext\stb-image;$(SolutionDir)\Engine\OpenGLRenderer\ext\glfw\include;$(SolutionDir)\Engine\OpenGLRenderer\ext\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>assimp-vc140-mt.lib;zlibstatic.lib;IrrXML.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\build\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>$(SolutionDir)/build/RelWithDebInfo/Eril.lib</ImportLibrary>
+      <ProgramDataBaseFile>$(SolutionDir)/build/RelWithDebInfo/Eril.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="$(SolutionDir)\Engine\Launch.cpp" />
+    <ClCompile Include="Engine\BasicTypes.cpp" />
+    <ClCompile Include="Engine\Core.cpp" />
+    <ClCompile Include="Engine\GameLoop.cpp" />
+    <ClCompile Include="Engine\Gameplay\GameState.cpp" />
+    <ClCompile Include="Engine\Gameplay\PlayerController.cpp" />
+    <ClCompile Include="Engine\GarbageCollector.cpp" />
+    <ClCompile Include="Engine\IRender.cpp" />
+    <ClCompile Include="Engine\LightData.cpp" />
+    <ClCompile Include="Engine\Objects\Actor.cpp" />
+    <ClCompile Include="Engine\Objects\BaseObject.cpp" />
+    <ClCompile Include="Engine\Objects\VisibleObject.cpp" />
+    <ClCompile Include="Engine\OpenGLRenderer\Batcher.cpp" />
+    <ClCompile Include="Engine\OpenGLRenderer\Camera.cpp" />
+    <ClCompile Include="Engine\OpenGLRenderer\InputControl.cpp" />
+    <ClCompile Include="Engine\OpenGLRenderer\Material.cpp" />
+    <ClCompile Include="Engine\OpenGLRenderer\Mesh.cpp" />
+    <ClCompile Include="Engine\OpenGLRenderer\RenderBuffer.cpp" />
+    <ClCompile Include="Engine\OpenGLRenderer\Renderer.cpp" />
+    <ClCompile Include="Engine\OpenGLRenderer\Texture.cpp" />
+    <ClCompile Include="Engine\Settings.cpp" />
+    <ClCompile Include="Engine\UI\UIElements.cpp" />
+    <ClCompile Include="Engine\UI\UIHolder.cpp" />
+    <ClCompile Include="Engine\WinConsole.cpp" />
+    <ClCompile Include="Game\EngineInterface.cpp" />
+    <ClCompile Include="Game\TestPlayer.cpp" />
+    <ClCompile Include="Game\TestUI.cpp" />
+    <ClCompile Include="$(SolutionDir)\Engine\OpenGLRenderer\ext\glfw\deps\glad_gl.c" />
+    <ClInclude Include="Engine\BasicTypes.h" />
+    <ClInclude Include="Engine\Core.h" />
+    <ClInclude Include="Engine\GameLoop.h" />
+    <ClInclude Include="Engine\Gameplay\GameState.h" />
+    <ClInclude Include="Engine\Gameplay\PlayerController.h" />
+    <ClInclude Include="Engine\GarbageCollector.h" />
+    <ClInclude Include="Engine\IRender.h" />
+    <ClInclude Include="Engine\LightData.h" />
+    <ClInclude Include="Engine\Objects\Actor.h" />
+    <ClInclude Include="Engine\Objects\BaseObject.h" />
+    <ClInclude Include="Engine\Objects\VisibleObject.h" />
+    <ClInclude Include="Engine\OpenGLRenderer\ext\glfw\deps\glad\gl.h" />
+    <ClInclude Include="Engine\OpenGLRenderer\include\Batcher.h" />
+    <ClInclude Include="Engine\OpenGLRenderer\include\Camera.h" />
+    <ClInclude Include="Engine\OpenGLRenderer\include\InputControl.h" />
+    <ClInclude Include="Engine\OpenGLRenderer\include\Material.h" />
+    <ClInclude Include="Engine\OpenGLRenderer\include\Mesh.h" />
+    <ClInclude Include="Engine\OpenGLRenderer\include\RenderBuffer.h" />
+    <ClInclude Include="Engine\OpenGLRenderer\include\Renderer.h" />
+    <ClInclude Include="Engine\OpenGLRenderer\include\Texture.h" />
+    <ClInclude Include="Engine\Settings.h" />
+    <ClInclude Include="Engine\UI\UIElements.h" />
+    <ClInclude Include="Engine\UI\UIHolder.h" />
+    <ClInclude Include="Engine\WinConsole.h" />
+    <ClInclude Include="Game\EngineInterface.h" />
+    <ClInclude Include="Game\TestPlayer.h" />
+    <ClInclude Include="Game\TestUI.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

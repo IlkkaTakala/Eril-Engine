@@ -117,7 +117,7 @@ void TestPlayer::BeginPlay()
 	Reflecting->SetLocation(Vector(1.5f, 0.5f, 0.0f));
 	Reflecting->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/metal"));
 
-	Domain = SpawnObject<Actor>();
+	/*Domain = SpawnObject<Actor>();
 	Domain->SetModel("ground");
 	Domain->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/test"));
 	Domain->SetLocation(Vector(0.0, 0.0, 4.5));
@@ -127,7 +127,7 @@ void TestPlayer::BeginPlay()
 	Pillars->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/pillars"));
 	Pillars->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Shaders/rocks"));
 	Pillars->SetLocation(Vector(0.0, 0.0, -3.0));
-	Pillars->SetScale(Vector(3.f));
+	Pillars->SetScale(Vector(3.f));*/
 
 	float size = 80.f;
 

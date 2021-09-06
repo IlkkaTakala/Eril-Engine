@@ -1,0 +1,364 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{660D239A-D78F-3899-BCA0-A35F2DB00CAF}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>UpdateAssimpLibsDebugSymbolsAndDLLs</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Engine\ext\assimp\.;$(SolutionDir)\Engine\ext\assimp\include;$(SolutionDir)\Engine\ext\assimp;$(SolutionDir)\Engine\ext\assimp\contrib\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message>
+      </Message>
+      <Command>setlocal
+"A:\Program Files\CMake\bin\cmake.exe" -E copy A:/Delion/Git/erilengine/code/Release/assimp-vc140-mt.dll A:/Delion/Git/erilengine/Engine/ext/assimp/bin64/assimp-vc140-mt.dll
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"A:\Program Files\CMake\bin\cmake.exe" -E copy A:/Delion/Git/erilengine/code/Release/assimp-vc140-mt.exp A:/Delion/Git/erilengine/Engine/ext/assimp/lib64/assimp-vc140-mt.exp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"A:\Program Files\CMake\bin\cmake.exe" -E copy A:/Delion/Git/erilengine/code/Release/assimp-vc140-mt.lib A:/Delion/Git/erilengine/Engine/ext/assimp/lib64/assimp-vc140-mt.lib
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"A:\Program Files\CMake\bin\cmake.exe" -E copy A:/Delion/Git/erilengine/code/Debug/assimp-vc140-mtd.dll A:/Delion/Git/erilengine/Engine/ext/assimp/bin64/assimp-vc140-mtd.dll
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"A:\Program Files\CMake\bin\cmake.exe" -E copy A:/Delion/Git/erilengine/code/Debug/assimp-vc140-mtd.exp A:/Delion/Git/erilengine/Engine/ext/assimp/lib64/assimp-vc140-mtd.exp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"A:\Program Files\CMake\bin\cmake.exe" -E copy A:/Delion/Git/erilengine/code/Debug/assimp-vc140-mtd.ilk A:/Delion/Git/erilengine/Engine/ext/assimp/lib64/assimp-vc140-mtd.ilk
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"A:\Program Files\CMake\bin\cmake.exe" -E copy A:/Delion/Git/erilengine/code/Debug/assimp-vc140-mtd.lib A:/Delion/Git/erilengine/Engine/ext/assimp/lib64/assimp-vc140-mtd.lib
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"A:\Program Files\CMake\bin\cmake.exe" -E copy A:/Delion/Git/erilengine/code/Debug/assimp-vc140-mtd.pdb A:/Delion/Git/erilengine/Engine/ext/assimp/lib64/assimp-vc140-mtd.pdb
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Engine\ext\assimp\.;$(SolutionDir)\Engine\ext\assimp\include;$(SolutionDir)\Engine\ext\assimp;$(SolutionDir)\Engine\ext\assimp\contrib\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message>
+      </Message>
+      <Command>setlocal
+"A:\Program Files\CMake\bin\cmake.exe" -E copy A:/Delion/Git/erilengine/code/Release/assimp-vc140-mt.dll A:/Delion/Git/erilengine/Engine/ext/assimp/bin64/assimp-vc140-mt.dll
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"A:\Program Files\CMake\bin\cmake.exe" -E copy A:/Delion/Git/erilengine/code/Release/assimp-vc140-mt.exp A:/Delion/Git/erilengine/Engine/ext/assimp/lib64/assimp-vc140-mt.exp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"A:\Program Files\CMake\bin\cmake.exe" -E copy A:/Delion/Git/erilengine/code/Release/assimp-vc140-mt.lib A:/Delion/Git/erilengine/Engine/ext/assimp/lib64/assimp-vc140-mt.lib
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"A:\Program Files\CMake\bin\cmake.exe" -E copy A:/Delion/Git/erilengine/code/Debug/assimp-vc140-mtd.dll A:/Delion/Git/erilengine/Engine/ext/assimp/bin64/assimp-vc140-mtd.dll
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"A:\Program Files\CMake\bin\cmake.exe" -E copy A:/Delion/Git/erilengine/code/Debug/assimp-vc140-mtd.exp A:/Delion/Git/erilengine/Engine/ext/assimp/lib64/assimp-vc140-mtd.exp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"A:\Program Files\CMake\bin\cmake.exe" -E copy A:/Delion/Git/erilengine/code/Debug/assimp-vc140-mtd.ilk A:/Delion/Git/erilengine/Engine/ext/assimp/lib64/assimp-vc140-mtd.ilk
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"A:\Program Files\CMake\bin\cmake.exe" -E copy A:/Delion/Git/erilengine/code/Debug/assimp-vc140-mtd.lib A:/Delion/Git/erilengine/Engine/ext/assimp/lib64/assimp-vc140-mtd.lib
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"A:\Program Files\CMake\bin\cmake.exe" -E copy A:/Delion/Git/erilengine/code/Debug/assimp-vc140-mtd.pdb A:/Delion/Git/erilengine/Engine/ext/assimp/lib64/assimp-vc140-mtd.pdb
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Engine\ext\assimp\.;$(SolutionDir)\Engine\ext\assimp\include;$(SolutionDir)\Engine\ext\assimp;$(SolutionDir)\Engine\ext\assimp\contrib\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message>
+      </Message>
+      <Command>setlocal
+"A:\Program Files\CMake\bin\cmake.exe" -E copy A:/Delion/Git/erilengine/code/Release/assimp-vc140-mt.dll A:/Delion/Git/erilengine/Engine/ext/assimp/bin64/assimp-vc140-mt.dll
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"A:\Program Files\CMake\bin\cmake.exe" -E copy A:/Delion/Git/erilengine/code/Release/assimp-vc140-mt.exp A:/Delion/Git/erilengine/Engine/ext/assimp/lib64/assimp-vc140-mt.exp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"A:\Program Files\CMake\bin\cmake.exe" -E copy A:/Delion/Git/erilengine/code/Release/assimp-vc140-mt.lib A:/Delion/Git/erilengine/Engine/ext/assimp/lib64/assimp-vc140-mt.lib
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"A:\Program Files\CMake\bin\cmake.exe" -E copy A:/Delion/Git/erilengine/code/Debug/assimp-vc140-mtd.dll A:/Delion/Git/erilengine/Engine/ext/assimp/bin64/assimp-vc140-mtd.dll
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"A:\Program Files\CMake\bin\cmake.exe" -E copy A:/Delion/Git/erilengine/code/Debug/assimp-vc140-mtd.exp A:/Delion/Git/erilengine/Engine/ext/assimp/lib64/assimp-vc140-mtd.exp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"A:\Program Files\CMake\bin\cmake.exe" -E copy A:/Delion/Git/erilengine/code/Debug/assimp-vc140-mtd.ilk A:/Delion/Git/erilengine/Engine/ext/assimp/lib64/assimp-vc140-mtd.ilk
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"A:\Program Files\CMake\bin\cmake.exe" -E copy A:/Delion/Git/erilengine/code/Debug/assimp-vc140-mtd.lib A:/Delion/Git/erilengine/Engine/ext/assimp/lib64/assimp-vc140-mtd.lib
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"A:\Program Files\CMake\bin\cmake.exe" -E copy A:/Delion/Git/erilengine/code/Debug/assimp-vc140-mtd.pdb A:/Delion/Git/erilengine/Engine/ext/assimp/lib64/assimp-vc140-mtd.pdb
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="$(SolutionDir)\Engine\ext\assimp\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule A:/Delion/Git/erilengine/Engine/ext/assimp/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"A:\Program Files\CMake\bin\cmake.exe" -SA:/Delion/Git/erilengine -BA:/Delion/Git/erilengine --check-stamp-file A:/Delion/Git/erilengine/Engine/ext/assimp/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)\Engine\ext\assimp\assimp-config-version.cmake.in;$(SolutionDir)\Engine\ext\assimp\assimp-config.cmake.in;$(SolutionDir)\Engine\ext\assimp\assimp.pc.in;$(SolutionDir)\Engine\ext\assimp\cmake-modules\FindDirectX.cmake;$(SolutionDir)\Engine\ext\assimp\cmake-modules\FindPkgMacros.cmake;$(SolutionDir)\Engine\ext\assimp\cmake-modules\FindZLIB.cmake;$(SolutionDir)\Engine\ext\assimp\cmake-modules\PrecompiledHeader.cmake;$(SolutionDir)\Engine\ext\assimp\cmake-modules\cmake_uninstall.cmake.in;$(SolutionDir)\Engine\ext\assimp\include\assimp\config.h.in;$(SolutionDir)\Engine\ext\assimp\revision.h.in;A:\Program Files\CMake\share\cmake-3.21\Modules\CheckFunctionExists.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\CheckIncludeFile.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\CheckIncludeFileCXX.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\CheckTypeSize.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\FindPackageHandleStandardArgs.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\FindPackageMessage.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\FindPkgConfig.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)\Engine\ext\assimp\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule A:/Delion/Git/erilengine/Engine/ext/assimp/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"A:\Program Files\CMake\bin\cmake.exe" -SA:/Delion/Git/erilengine -BA:/Delion/Git/erilengine --check-stamp-file A:/Delion/Git/erilengine/Engine/ext/assimp/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)\Engine\ext\assimp\assimp-config-version.cmake.in;$(SolutionDir)\Engine\ext\assimp\assimp-config.cmake.in;$(SolutionDir)\Engine\ext\assimp\assimp.pc.in;$(SolutionDir)\Engine\ext\assimp\cmake-modules\FindDirectX.cmake;$(SolutionDir)\Engine\ext\assimp\cmake-modules\FindPkgMacros.cmake;$(SolutionDir)\Engine\ext\assimp\cmake-modules\FindZLIB.cmake;$(SolutionDir)\Engine\ext\assimp\cmake-modules\PrecompiledHeader.cmake;$(SolutionDir)\Engine\ext\assimp\cmake-modules\cmake_uninstall.cmake.in;$(SolutionDir)\Engine\ext\assimp\include\assimp\config.h.in;$(SolutionDir)\Engine\ext\assimp\revision.h.in;A:\Program Files\CMake\share\cmake-3.21\Modules\CheckFunctionExists.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\CheckIncludeFile.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\CheckIncludeFileCXX.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\CheckTypeSize.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\FindPackageHandleStandardArgs.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\FindPackageMessage.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\FindPkgConfig.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)\Engine\ext\assimp\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule A:/Delion/Git/erilengine/Engine/ext/assimp/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"A:\Program Files\CMake\bin\cmake.exe" -SA:/Delion/Git/erilengine -BA:/Delion/Git/erilengine --check-stamp-file A:/Delion/Git/erilengine/Engine/ext/assimp/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(SolutionDir)\Engine\ext\assimp\assimp-config-version.cmake.in;$(SolutionDir)\Engine\ext\assimp\assimp-config.cmake.in;$(SolutionDir)\Engine\ext\assimp\assimp.pc.in;$(SolutionDir)\Engine\ext\assimp\cmake-modules\FindDirectX.cmake;$(SolutionDir)\Engine\ext\assimp\cmake-modules\FindPkgMacros.cmake;$(SolutionDir)\Engine\ext\assimp\cmake-modules\FindZLIB.cmake;$(SolutionDir)\Engine\ext\assimp\cmake-modules\PrecompiledHeader.cmake;$(SolutionDir)\Engine\ext\assimp\cmake-modules\cmake_uninstall.cmake.in;$(SolutionDir)\Engine\ext\assimp\include\assimp\config.h.in;$(SolutionDir)\Engine\ext\assimp\revision.h.in;A:\Program Files\CMake\share\cmake-3.21\Modules\CheckFunctionExists.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\CheckIncludeFile.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\CheckIncludeFileCXX.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\CheckTypeSize.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\FindPackageHandleStandardArgs.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\FindPackageMessage.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\FindPkgConfig.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(SolutionDir)\Engine\ext\assimp\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,5 @@
+# CMake generation dependency list for this directory.
+A:/Delion/Git/erilengine/Engine/ext/assimp/cmake-modules/FindRT.cmake
+A:/Delion/Git/erilengine/Engine/ext/assimp/code/CMakeLists.txt
+A:/Program Files/CMake/share/cmake-3.21/Modules/FindPackageHandleStandardArgs.cmake
+A:/Program Files/CMake/share/cmake-3.21/Modules/FindPackageMessage.cmake

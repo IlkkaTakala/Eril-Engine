@@ -1,8 +1,8 @@
 #include "IRender.h"
 
 #ifdef OPENGL
-#include "OpenGLRenderer/Renderer.h"
-#include "OpenGLRenderer/InputControl.h"
+#include "Renderer.h"
+#include "InputControl.h"
 #endif // OPENGL
 
 

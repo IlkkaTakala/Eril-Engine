@@ -1,0 +1,198 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="$(SolutionDir)\Engine\OpenGLRenderer\ext\glfw\deps\glad_gl.c">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SolutionDir)\Engine\Launch.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\UI\UIElements.cpp">
+      <Filter>Engine\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\UI\UIHolder.cpp">
+      <Filter>Engine\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\OpenGLRenderer\Batcher.cpp">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\OpenGLRenderer\Texture.cpp">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\OpenGLRenderer\Renderer.cpp">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\OpenGLRenderer\RenderBuffer.cpp">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\OpenGLRenderer\Mesh.cpp">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\OpenGLRenderer\Material.cpp">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Objects\Actor.cpp">
+      <Filter>Engine\GamePlay</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Gameplay\PlayerController.cpp">
+      <Filter>Engine\GamePlay</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Gameplay\GameState.cpp">
+      <Filter>Engine\GamePlay</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\BasicTypes.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\EngineInterface.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GameLoop.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GarbageCollector.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Settings.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\OpenGLRenderer\InputControl.cpp">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\LightData.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\IRender.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Objects\VisibleObject.cpp">
+      <Filter>Engine\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Objects\BaseObject.cpp">
+      <Filter>Engine\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\WinConsole.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\OpenGLRenderer\Camera.cpp">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\TestPlayer.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\TestUI.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{7342fc3c-6d01-494a-a680-080c5267f5be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\OpenGLRenderer">
+      <UniqueIdentifier>{1a8dd4f1-9c5c-40d8-8a15-89a92e8920dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Public">
+      <UniqueIdentifier>{8edf9179-3f4e-4d90-8608-b5cafe1caf30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\GamePlay">
+      <UniqueIdentifier>{e29abf93-90c0-4074-9f16-9dbe2439f940}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\UI">
+      <UniqueIdentifier>{b865335b-fcd6-4165-a7ae-ae54e9eb89e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Private">
+      <UniqueIdentifier>{d29e673c-6876-44f2-8a94-2f97f6779534}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Objects">
+      <UniqueIdentifier>{e8f6e111-d278-4fea-b63e-e883ad8de87a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{a3bd1c7f-6d77-46fc-a244-25d7f744f2c9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Engine\UI\UIHolder.h">
+      <Filter>Engine\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\UI\UIElements.h">
+      <Filter>Engine\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\OpenGLRenderer\include\Batcher.h">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\OpenGLRenderer\include\Texture.h">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\OpenGLRenderer\include\Renderer.h">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\OpenGLRenderer\include\RenderBuffer.h">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\OpenGLRenderer\include\Mesh.h">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\OpenGLRenderer\include\Material.h">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Objects\Actor.h">
+      <Filter>Engine\GamePlay</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Gameplay\PlayerController.h">
+      <Filter>Engine\GamePlay</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Gameplay\GameState.h">
+      <Filter>Engine\GamePlay</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\BasicTypes.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GameLoop.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\EngineInterface.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GarbageCollector.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Settings.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\OpenGLRenderer\include\InputControl.h">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\LightData.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\IRender.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Objects\VisibleObject.h">
+      <Filter>Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Objects\BaseObject.h">
+      <Filter>Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\WinConsole.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\OpenGLRenderer\include\Camera.h">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\TestUI.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\TestPlayer.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\OpenGLRenderer\ext\glfw\deps\glad\gl.h">
+      <Filter>Engine\OpenGLRenderer</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

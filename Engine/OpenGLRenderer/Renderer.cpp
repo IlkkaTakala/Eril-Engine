@@ -124,7 +124,10 @@ int Renderer::SetupWindow(int width, int height)
 
 	glfwMakeContextCurrent(Window);
 	if (INI->GetValue("Render", "VSync") == "false") glfwSwapInterval(0);
-	if (!gladLoadGL(glfwGetProcAddress)) exit(100);
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+		std::cout << "Failed to initialize OpenGL context" << std::endl;
+		return -1;
+	}
 
 	printf("Allocating buffers...\n");
 	Batcher = new RenderBatch(/*262144*/524288);

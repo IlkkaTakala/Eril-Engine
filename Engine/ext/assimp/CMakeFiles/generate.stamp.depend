@@ -1,0 +1,19 @@
+# CMake generation dependency list for this directory.
+A:/Delion/Git/erilengine/Engine/ext/assimp/CMakeLists.txt
+A:/Delion/Git/erilengine/Engine/ext/assimp/assimp-config-version.cmake.in
+A:/Delion/Git/erilengine/Engine/ext/assimp/assimp-config.cmake.in
+A:/Delion/Git/erilengine/Engine/ext/assimp/assimp.pc.in
+A:/Delion/Git/erilengine/Engine/ext/assimp/cmake-modules/FindDirectX.cmake
+A:/Delion/Git/erilengine/Engine/ext/assimp/cmake-modules/FindPkgMacros.cmake
+A:/Delion/Git/erilengine/Engine/ext/assimp/cmake-modules/FindZLIB.cmake
+A:/Delion/Git/erilengine/Engine/ext/assimp/cmake-modules/PrecompiledHeader.cmake
+A:/Delion/Git/erilengine/Engine/ext/assimp/cmake-modules/cmake_uninstall.cmake.in
+A:/Delion/Git/erilengine/Engine/ext/assimp/include/assimp/config.h.in
+A:/Delion/Git/erilengine/Engine/ext/assimp/revision.h.in
+A:/Program Files/CMake/share/cmake-3.21/Modules/CheckFunctionExists.cmake
+A:/Program Files/CMake/share/cmake-3.21/Modules/CheckIncludeFile.cmake
+A:/Program Files/CMake/share/cmake-3.21/Modules/CheckIncludeFileCXX.cmake
+A:/Program Files/CMake/share/cmake-3.21/Modules/CheckTypeSize.cmake
+A:/Program Files/CMake/share/cmake-3.21/Modules/FindPackageHandleStandardArgs.cmake
+A:/Program Files/CMake/share/cmake-3.21/Modules/FindPackageMessage.cmake
+A:/Program Files/CMake/share/cmake-3.21/Modules/FindPkgConfig.cmake

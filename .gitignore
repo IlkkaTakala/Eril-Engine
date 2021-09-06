@@ -1,14 +1,4 @@
 .vs/
-Builds/
-EngineGL.dir/
-CMakeFiles/
-PackedGame/
+build/
 *.zip
-Engine/OpenGLRenderer/ext/
-*.jpg
-*.obj
 *.mtl
-ext/
-bin/
-lib/
-x64/
