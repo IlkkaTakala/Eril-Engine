@@ -210,6 +210,7 @@
     <ClCompile Include="Engine\GarbageCollector.cpp" />
     <ClCompile Include="Engine\IRender.cpp" />
     <ClCompile Include="Engine\LightData.cpp" />
+    <ClCompile Include="Engine\ObjectManager.cpp" />
     <ClCompile Include="Engine\Objects\Actor.cpp" />
     <ClCompile Include="Engine\Objects\BaseObject.cpp" />
     <ClCompile Include="Engine\Objects\VisibleObject.cpp" />
@@ -222,12 +223,9 @@
     <ClCompile Include="Engine\OpenGLRenderer\Renderer.cpp" />
     <ClCompile Include="Engine\OpenGLRenderer\Texture.cpp" />
     <ClCompile Include="Engine\Settings.cpp" />
-    <ClCompile Include="Engine\UI\UIElements.cpp" />
-    <ClCompile Include="Engine\UI\UIHolder.cpp" />
     <ClCompile Include="Engine\WinConsole.cpp" />
     <ClCompile Include="Game\EngineInterface.cpp" />
     <ClCompile Include="Game\TestPlayer.cpp" />
-    <ClCompile Include="Game\TestUI.cpp" />
     <ClCompile Include="$(SolutionDir)\Engine\OpenGLRenderer\ext\glfw\deps\glad_gl.c" />
     <ClInclude Include="Engine\BasicTypes.h" />
     <ClInclude Include="Engine\Core.h" />
@@ -237,6 +235,7 @@
     <ClInclude Include="Engine\GarbageCollector.h" />
     <ClInclude Include="Engine\IRender.h" />
     <ClInclude Include="Engine\LightData.h" />
+    <ClInclude Include="Engine\ObjectManager.h" />
     <ClInclude Include="Engine\Objects\Actor.h" />
     <ClInclude Include="Engine\Objects\BaseObject.h" />
     <ClInclude Include="Engine\Objects\VisibleObject.h" />
@@ -250,12 +249,9 @@
     <ClInclude Include="Engine\OpenGLRenderer\include\Renderer.h" />
     <ClInclude Include="Engine\OpenGLRenderer\include\Texture.h" />
     <ClInclude Include="Engine\Settings.h" />
-    <ClInclude Include="Engine\UI\UIElements.h" />
-    <ClInclude Include="Engine\UI\UIHolder.h" />
     <ClInclude Include="Engine\WinConsole.h" />
     <ClInclude Include="Game\EngineInterface.h" />
     <ClInclude Include="Game\TestPlayer.h" />
-    <ClInclude Include="Game\TestUI.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

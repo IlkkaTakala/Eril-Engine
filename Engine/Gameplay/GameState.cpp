@@ -1,5 +1,4 @@
 #include "Gameplay/PlayerController.h"
-#include "UI/UIHolder.h"
 #include "GameState.h"
 
 GameState::GameState()

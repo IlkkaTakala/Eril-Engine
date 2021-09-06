@@ -56,7 +56,7 @@ void GC::CleanRunner()
 
 		std::vector<String> removal;
 		for (auto d : Pointers) {
-			if (d.second->ReferenceCount < 1) {
+			if (d.second->GetRecord() < 1) {
 				if (d.second->bMarked) {
 					VisibleObject* v = dynamic_cast<VisibleObject*>(d.second);
 					if (v != nullptr) {

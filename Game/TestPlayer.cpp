@@ -140,7 +140,7 @@ void TestPlayer::BeginPlay()
 			float rz = (float)rand() / (float)RAND_MAX;
 			float scale = (float)rand() / (float)RAND_MAX * 2.f;
 			next->SetScale(Vector(scale));
-			next->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/ground"));
+			next->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/metal"));
 			next->SetLocation(Vector(rx * size, ry * size, rz * size / 3));
 			Spheres.push_back(next);
 		}
