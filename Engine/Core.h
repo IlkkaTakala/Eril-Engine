@@ -19,15 +19,26 @@ template <class T>
 class Ref
 {
 	T* Pointer;
-	Data* DataPtr;
 public:
-	Ref() { Pointer = nullptr; DataPtr = nullptr; }
-	Ref(T* ptr) {  }
-	~Ref() {  }
-	Ref(const Ref& old) {  }
+	Ref() { Pointer = nullptr; }
+	Ref(T* ptr) : Pointer(ptr) { 
+		Data* DataPtr = dynamic_cast<Data*>(ptr);
+		if (DataPtr == nullptr) {
+			Pointer = nullptr;
+			return;
+		}
+		if (DataPtr->GetRecord() == 0) ObjectManager::CreateRecord(DataPtr);
+		ObjectManager::AddRef(&Pointer);
+	}
+	~Ref() { ObjectManager::RemoveRef(&Pointer); }
+	Ref(const Ref& old) { 
+		Pointer = old.Pointer;
+	}
 
 	Ref& operator=(const Ref& old) {
 		
+		ObjectManager::RemoveRef(&Pointer);
+		Pointer = old.Pointer;
 		return *this;
 	}
 	T* operator->() const { return Pointer; }

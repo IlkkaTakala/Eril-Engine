@@ -5,20 +5,19 @@ class Data
 public:
 	Data() { RecordNumber = 0; bMarked = false; }
 	virtual void DestroyObject() = 0;
-	int GetRecord() { return RecordNumber; }
+	long GetRecord() { return RecordNumber; }
+	void SetRecord(long record) { RecordNumber = record; }
 protected:
 	 virtual ~Data() {}
 	 bool bMarked;
 private:
 	friend class GC;
 	friend class GameLoop;
-	int RecordNumber;
+	long RecordNumber;
 };
 
 class Tickable
 {
-protected:
-	virtual ~Tickable() {};
 public:
 	virtual void Tick(float Delta) = 0;
 };
