@@ -24,7 +24,7 @@ public:
 	Light();
 	~Light();
 
-	virtual void DestroyObject() override;
+	virtual void OnDestroyed() override;
 	virtual void BeginPlay() override {};
 
 	void Enable();

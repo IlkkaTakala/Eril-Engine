@@ -26,7 +26,7 @@ Light::~Light()
 	RI->RemoveLight(&Data);
 }
 
-void Light::DestroyObject()
+void Light::OnDestroyed()
 {
 	RI->RemoveLight(&Data);
 }

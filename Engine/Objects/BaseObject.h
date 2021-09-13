@@ -1,15 +1,30 @@
 #pragma once
 
+class ObjectManager;
+struct Record;
+
+class RefHold
+{
+public:
+	virtual const void NullThis() const = 0;
+	virtual const long GetRecord() const = 0;
+protected:
+};
+
 class Data
 {
 public:
-	Data() { RecordNumber = 0; bMarked = false; }
-	virtual void DestroyObject() = 0;
+	Data();
+	void DestroyObject();
+	virtual void OnDestroyed() = 0;
 	long GetRecord() { return RecordNumber; }
 	void SetRecord(long record) { RecordNumber = record; }
+	void AddToRoot();
+	void RemoveFromRoot();
 protected:
-	 virtual ~Data() {}
-	 bool bMarked;
+	friend struct Record;
+	virtual ~Data();
+	bool bMarked;
 private:
 	friend class GC;
 	friend class GameLoop;
@@ -29,7 +44,7 @@ public:
 	//void operator delete(void* ptr);
 
 	virtual void BeginPlay() = 0;
-	virtual void DestroyObject() override;
+	virtual void OnDestroyed() {};
 	void SetParent(BaseObject* obj) { Parent = obj; }
 
 protected:

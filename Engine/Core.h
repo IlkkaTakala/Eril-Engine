@@ -3,6 +3,7 @@
 #include "Objects/BaseObject.h"
 #include "ObjectManager.h"
 #include "GarbageCollector.h"
+#include <typeinfo>
 
 #define REN_UI 0x20
 #define REN_REQUIRESBUILD 0x21
@@ -16,31 +17,49 @@ extern INISettings* INI;
 void Exit();
 
 template <class T>
-class Ref
+class Ref : public RefHold
 {
-	T* Pointer;
+	mutable T* Pointer;
+	mutable Data* DataPtr;
 public:
-	Ref() { Pointer = nullptr; }
+	Ref() { Pointer = nullptr; DataPtr = nullptr; }
 	Ref(T* ptr) : Pointer(ptr) { 
-		Data* DataPtr = dynamic_cast<Data*>(ptr);
+		DataPtr = dynamic_cast<Data*>(ptr);
 		if (DataPtr == nullptr) {
 			Pointer = nullptr;
 			return;
 		}
-		if (DataPtr->GetRecord() == 0) ObjectManager::CreateRecord(DataPtr);
-		ObjectManager::AddRef(&Pointer);
+		ObjectManager::AddRef(dynamic_cast<RefHold*>(this));
 	}
-	~Ref() { ObjectManager::RemoveRef(&Pointer); }
+
+	~Ref() {
+		if(Pointer != nullptr) ObjectManager::RemoveRef(dynamic_cast<RefHold*>(this));
+	}
+
+	virtual const void NullThis() const {
+		Pointer = nullptr;
+		DataPtr = nullptr;
+	}
+
+	virtual const long GetRecord() const override {
+		return DataPtr->GetRecord();
+	}
+	
 	Ref(const Ref& old) { 
 		Pointer = old.Pointer;
+		DataPtr = dynamic_cast<Data*>(Pointer);
+		ObjectManager::AddRef(dynamic_cast<const RefHold*>(this));
+		ObjectManager::RemoveRef(dynamic_cast<const RefHold*>(&old));
 	}
 
 	Ref& operator=(const Ref& old) {
-		
-		ObjectManager::RemoveRef(&Pointer);
 		Pointer = old.Pointer;
+		DataPtr = dynamic_cast<Data*>(Pointer);
+		ObjectManager::AddRef(dynamic_cast<const RefHold*>(this));
+		ObjectManager::RemoveRef(dynamic_cast<const RefHold*>(&old));
 		return *this;
 	}
+
 	T* operator->() const { return Pointer; }
 	operator T* () const { return Pointer; }
 
@@ -59,7 +78,6 @@ Ref<T> SpawnObject()
 		delete next;
 		return nullptr;
 	}
-	GC::AddObject(base);
 	base->BeginPlay();
 	return Ref<T>(next);
 }
