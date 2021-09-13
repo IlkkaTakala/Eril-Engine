@@ -114,9 +114,14 @@ void TestPlayer::BeginPlay()
 	DirLight->Data.Rotation = Vector(45.0, 0.0, 0.0);
 
 	Reflecting = SpawnObject<Actor>();
-	Reflecting->SetModel("sphere");
+	Reflecting->SetModel("Cube");
 	Reflecting->SetLocation(Vector(1.5f, 0.5f, 0.0f));
 	Reflecting->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/metal"));
+
+	/*Reflecting = SpawnObject<Actor>();
+	Reflecting->SetModel("Cube");
+	Reflecting->SetLocation(Vector(2.5f, 0.5f, 0.0f));
+	Reflecting->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/metal"));*/
 
 	/*Domain = SpawnObject<Actor>();
 	Domain->SetModel("ground");

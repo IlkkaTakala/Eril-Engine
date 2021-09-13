@@ -5,6 +5,7 @@
 #include "IRender.h"
 #include "GameLoop.h"
 #include "WinConsole.h"
+#include "GarbageCollector.h"
 
 using namespace std;
 
@@ -17,22 +18,18 @@ GameLoop::GameLoop()
 	bQuit = false;
 	bQuitStarted = false;
 	fps = 0.f;
+	Collector = new GC();
 }
 
 GameLoop::~GameLoop()
 {
 	if (State != nullptr) State == nullptr;
-	/*if (GC::Pointers.size() > 0) {
-		for (auto const& i : GC::Pointers) {
-			i.second->DestroyObject();
-		}
-	}*/
 	ObjectManager::CleanObjects();
-	GC::Pointers.clear();
 	delete INI;
 	delete II;
 	delete MI;
 	delete RI;
+	delete Collector;
 }
 
 int GameLoop::Start()
@@ -69,6 +66,7 @@ void GameLoop::Quit()
 {
 	bQuitStarted = true;
 	bQuit = true;
+	Collector->Quit();
 }
 
 int GameLoop::MainLoop()

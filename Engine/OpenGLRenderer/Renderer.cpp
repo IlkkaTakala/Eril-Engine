@@ -855,7 +855,7 @@ void Renderer::Deferred(int width, int height)
 	glDisable(GL_STENCIL_TEST);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE);
-	glDisable(GL_BLEND);
+	glEnable(GL_BLEND);
 	glDepthFunc(GL_LEQUAL);
 	glEnable(GL_CULL_FACE);
 
@@ -888,13 +888,10 @@ void Renderer::Deferred(int width, int height)
 				}
 			}
 
-			Batcher->begin();
-
 			for (Section* o : m->GetObjects())
 			{
-				Batcher->add(o);
+				o->Render();
 			}
-			Batcher->end();
 		}
 	}
 }
@@ -1015,7 +1012,7 @@ void Renderer::Render(float delta)
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, LightBuffer);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, VisibleLightIndicesBuffer);
 
-	EnvReflection(width, height);
+	//EnvReflection(width, height);
 
 	glViewport(0, 0, width, height);
 	Buffer->Bind();
@@ -1032,7 +1029,7 @@ void Renderer::Render(float delta)
 	LightCulling(width, height);
 
 
-	Shadows(width, height);
+	//Shadows(width, height);
 	/*glBindFramebuffer(GL_READ_FRAMEBUFFER, Buffer->GetBuffer());
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, ShadowRender->GetBuffer());
 	glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
@@ -1075,7 +1072,7 @@ void Renderer::Render(float delta)
 
 	//Forward(width, height);
 
-	EnvCube(width, height);
+	//EnvCube(width, height);
 
 	PostProcess->Unbind();
 	BlurRender->Blur(PostProcess->GetBloom(), 4, ScreenVao);
@@ -1122,7 +1119,7 @@ GLMesh::~GLMesh()
 void processMesh(LoadedMesh* meshHolder, aiMesh* mesh)
 {
 	std::vector<Vertex> vertices;
-	std::vector<unsigned> indices;
+	std::vector<uint32> indices;
 
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 	{
@@ -1161,8 +1158,8 @@ void processMesh(LoadedMesh* meshHolder, aiMesh* mesh)
 		}
 	}
 	std::vector<uint> adjacent;
-	MeshDataHolder* section = new MeshDataHolder();
-	section->FaceCount = indices.size() / 3;
+	MeshDataHolder* section = new MeshDataHolder(vertices.data(), vertices.size(), indices.data(), indices.size());
+	/*section->FaceCount = indices.size() / 3;
 	section->VertexCount = vertices.size();
 
 
@@ -1170,7 +1167,7 @@ void processMesh(LoadedMesh* meshHolder, aiMesh* mesh)
 	memcpy(section->indices, indices.data(), indices.size() * sizeof(uint32));
 
 	section->vertices = new Vertex[vertices.size() * sizeof(Vertex)];
-	memcpy(section->vertices, vertices.data(), vertices.size() * sizeof(Vertex));
+	memcpy(section->vertices, vertices.data(), vertices.size() * sizeof(Vertex));*/
 
 	section->Instance = RI->LoadMaterialByName("Shaders/test");
 

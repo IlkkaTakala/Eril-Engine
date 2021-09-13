@@ -20,12 +20,14 @@ struct Vertex
 class MeshDataHolder
 {
 public:
-	MeshDataHolder();
+	MeshDataHolder(Vertex* verts, uint32 vertCount, uint32* indices, uint32 indexCount);
 	~MeshDataHolder();
 
+	uint VAO;
+	uint VBO;
+	uint EBO;
+
 	Material* Instance;
-	Vertex* vertices;
-	uint32* indices;
 	uint32 VertexCount;
 	uint32 FaceCount;
 };
@@ -50,11 +52,10 @@ public:
 	Material* Instance;
 	RenderObject* Parent;
 
-	const Vertex* GetVertices() const { return Holder->vertices; }
-	const uint32* GetIndices() const { return Holder->indices; }
+	void Render();
+
 	const uint32 GetVertexCount() const { return Holder->VertexCount; }
 	const uint32 GetFaceCount() const { return Holder->FaceCount; }
-
 
 private:
 	friend class RenderObject;

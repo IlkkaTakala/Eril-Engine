@@ -2,8 +2,7 @@
 #include "BasicTypes.h"
 #include "Objects/BaseObject.h"
 #include "ObjectManager.h"
-#include "GarbageCollector.h"
-#include <typeinfo>
+#include "IRender.h"
 
 #define REN_UI 0x20
 #define REN_REQUIRESBUILD 0x21
@@ -46,17 +45,17 @@ public:
 	}
 	
 	Ref(const Ref& old) { 
+		if (DataPtr != nullptr) ObjectManager::RemoveRef(dynamic_cast<const RefHold*>(this));
 		Pointer = old.Pointer;
 		DataPtr = dynamic_cast<Data*>(Pointer);
 		ObjectManager::AddRef(dynamic_cast<const RefHold*>(this));
-		ObjectManager::RemoveRef(dynamic_cast<const RefHold*>(&old));
 	}
 
 	Ref& operator=(const Ref& old) {
+		if (DataPtr != nullptr) ObjectManager::RemoveRef(dynamic_cast<const RefHold*>(this));
 		Pointer = old.Pointer;
 		DataPtr = dynamic_cast<Data*>(Pointer);
 		ObjectManager::AddRef(dynamic_cast<const RefHold*>(this));
-		ObjectManager::RemoveRef(dynamic_cast<const RefHold*>(&old));
 		return *this;
 	}
 
@@ -79,6 +78,8 @@ Ref<T> SpawnObject()
 		return nullptr;
 	}
 	base->BeginPlay();
+	auto t = dynamic_cast<Tickable*>(next);
+	ObjectManager::AddTick(t);
 	return Ref<T>(next);
 }
 

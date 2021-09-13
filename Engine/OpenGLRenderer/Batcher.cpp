@@ -64,28 +64,28 @@ void RenderBatch::drawSprite(const Section* obj)
 {
 	if (!drawing) return;
 
-	glm::mat4 transform = obj->Parent->GetModelMatrix();
+	//glm::mat4 transform = obj->Parent->GetModelMatrix();
 
-	const uint32* objIdx = obj->GetIndices();
-	/* Transform the vertices */
-	for (uint32 i = 0; i < obj->GetFaceCount(); i++) {
-		Buffers[ActiveBuffer].indices[face_count * 3 + i * 3 + 0] = objIdx[i * 3 + 0] + vertex_index;
-		Buffers[ActiveBuffer].indices[face_count * 3 + i * 3 + 1] = objIdx[i * 3 + 1] + vertex_index;
-		Buffers[ActiveBuffer].indices[face_count * 3 + i * 3 + 2] = objIdx[i * 3 + 2] + vertex_index;
-	}
-	face_count += obj->GetFaceCount();
+	//const uint32* objIdx = obj->GetIndices();
+	///* Transform the vertices */
+	//for (uint32 i = 0; i < obj->GetFaceCount(); i++) {
+	//	Buffers[ActiveBuffer].indices[face_count * 3 + i * 3 + 0] = objIdx[i * 3 + 0] + vertex_index;
+	//	Buffers[ActiveBuffer].indices[face_count * 3 + i * 3 + 1] = objIdx[i * 3 + 1] + vertex_index;
+	//	Buffers[ActiveBuffer].indices[face_count * 3 + i * 3 + 2] = objIdx[i * 3 + 2] + vertex_index;
+	//}
+	//face_count += obj->GetFaceCount();
 
-	const glm::mat4 normalMat = transpose(inverse(obj->Parent->GetModelMatrix()));
+	//const glm::mat4 normalMat = transpose(inverse(obj->Parent->GetModelMatrix()));
 
-	const Vertex* vert_array = obj->GetVertices();
-	for (uint32 i = 0; i < obj->GetVertexCount(); i++) {
-		Vertex& next = Buffers[ActiveBuffer].verts[i + vertex_index];
-		next.position = transform * glm::vec4(vert_array[i].position, 1.f);
-		next.normal = normalize(glm::mat3(transform) * vert_array[i].normal);
-		next.tangent = normalize(glm::mat3(transform) * vert_array[i].tangent);
-		next.uv = vert_array[i].uv;
-	}
-	vertex_index += obj->GetVertexCount();
+	//const Vertex* vert_array = obj->GetVertices();
+	//for (uint32 i = 0; i < obj->GetVertexCount(); i++) {
+	//	Vertex& next = Buffers[ActiveBuffer].verts[i + vertex_index];
+	//	next.position = transform * glm::vec4(vert_array[i].position, 1.f);
+	//	next.normal = normalize(glm::mat3(transform) * vert_array[i].normal);
+	//	next.tangent = normalize(glm::mat3(transform) * vert_array[i].tangent);
+	//	next.uv = vert_array[i].uv;
+	//}
+	//vertex_index += obj->GetVertexCount();
 }
 
 void RenderBatch::render()

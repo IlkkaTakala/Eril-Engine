@@ -2,6 +2,7 @@
 #include <glad/gl.h>
 #include "LightData.h"
 #include "Material.h"
+#include <stdexcept>
 
 RenderBuffer::RenderBuffer(int width, int height)
 {
