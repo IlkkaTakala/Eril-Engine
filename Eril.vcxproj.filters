@@ -7,12 +7,6 @@
     <ClCompile Include="$(SolutionDir)\Engine\Launch.cpp">
       <Filter>Engine\Private</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\UI\UIElements.cpp">
-      <Filter>Engine\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\UI\UIHolder.cpp">
-      <Filter>Engine\UI</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\OpenGLRenderer\Batcher.cpp">
       <Filter>Engine\OpenGLRenderer</Filter>
     </ClCompile>
@@ -82,8 +76,8 @@
     <ClCompile Include="Game\TestPlayer.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="Game\TestUI.cpp">
-      <Filter>Game</Filter>
+    <ClCompile Include="Engine\ObjectManager.cpp">
+      <Filter>Engine\Private</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -113,12 +107,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Engine\UI\UIHolder.h">
-      <Filter>Engine\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\UI\UIElements.h">
-      <Filter>Engine\UI</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\OpenGLRenderer\include\Batcher.h">
       <Filter>Engine\OpenGLRenderer</Filter>
     </ClInclude>
@@ -185,14 +173,14 @@
     <ClInclude Include="Engine\OpenGLRenderer\include\Camera.h">
       <Filter>Engine\OpenGLRenderer</Filter>
     </ClInclude>
-    <ClInclude Include="Game\TestUI.h">
-      <Filter>Game</Filter>
-    </ClInclude>
     <ClInclude Include="Game\TestPlayer.h">
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Engine\OpenGLRenderer\ext\glfw\deps\glad\gl.h">
       <Filter>Engine\OpenGLRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\ObjectManager.h">
+      <Filter>Engine\Public</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

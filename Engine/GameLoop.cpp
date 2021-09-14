@@ -22,11 +22,12 @@ GameLoop::GameLoop()
 GameLoop::~GameLoop()
 {
 	if (State != nullptr) State == nullptr;
-	if (GC::Pointers.size() > 0) {
+	/*if (GC::Pointers.size() > 0) {
 		for (auto const& i : GC::Pointers) {
-			delete i.second;
+			i.second->DestroyObject();
 		}
-	}
+	}*/
+	ObjectManager::CleanObjects();
 	GC::Pointers.clear();
 	delete INI;
 	delete II;

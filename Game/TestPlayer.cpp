@@ -6,6 +6,7 @@ TestPlayer::TestPlayer() : Player()
 {
 	mouseSens = 0.5f;
 	Speed = 5.f;
+	LightMode = false;
 	//GetCamera()->SetLocation(INI->GetValue("Player", "Start"));
 	//GetCamera()->SetRotation(INI->GetValue("Player", "Direction"));
 
@@ -131,7 +132,7 @@ void TestPlayer::BeginPlay()
 
 	float size = 80.f;
 
-	for (int x = 0; x < 10; x++) {
+	/*for (int x = 0; x < 10; x++) {
 		for (int y = 0; y < 10; y++) {
 			Actor* next = SpawnObject<Actor>();
 			next->SetModel("sphere");
@@ -140,13 +141,13 @@ void TestPlayer::BeginPlay()
 			float rz = (float)rand() / (float)RAND_MAX;
 			float scale = (float)rand() / (float)RAND_MAX * 2.f;
 			next->SetScale(Vector(scale));
-			next->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/ground"));
+			next->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/metal"));
 			next->SetLocation(Vector(rx * size, ry * size, rz * size / 3));
 			Spheres.push_back(next);
 		}
-	}
+	}*/
 
-	for (int x = 0; x < 20; x++) {
+	/*for (int x = 0; x < 20; x++) {
 		for (int y = 0; y < 20; y++) {
 			Light* next = SpawnObject<Light>();
 			next->Data.Type = 1;
@@ -160,5 +161,5 @@ void TestPlayer::BeginPlay()
 			next->Disable();
 			Lights.push_back(next);
 		}
-	}
+	}*/
 }
