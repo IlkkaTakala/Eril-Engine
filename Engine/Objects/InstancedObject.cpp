@@ -1,9 +1,11 @@
 #include "InstancedObject.h"
 
-InstancedObject::InstancedObject()
+InstancedObject::InstancedObject() : VisibleObject()
 {
+
 }
 
-void InstancedObject::BeginPlay()
+void InstancedObject::AddInstances(int count, Transformation* dispArray)
 {
+	if (RenderData != nullptr) RenderData->SetInstances(count, dispArray);
 }

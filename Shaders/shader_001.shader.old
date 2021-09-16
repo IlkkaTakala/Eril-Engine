@@ -21,10 +21,13 @@ out VS_OUT {
 	mat3 TBN;
 } vs_out;
 
+uniform mat4 Model;
+
 void main()
 {
-	gl_Position = projection * view * vec4(in_position.x, in_position.y, in_position.z, 1.0);
-	vs_out.FragPos = vec3(in_position.x, in_position.y, in_position.z);
+	vec4 pos = Model * vec4(in_position, 1.0);
+	gl_Position = projection * view * pos;
+	vs_out.FragPos = pos.xyz;
 	vs_out.TexCoords = in_texCoord;
 	
 	vec3 T = in_tangent;

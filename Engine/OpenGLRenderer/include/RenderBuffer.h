@@ -4,17 +4,16 @@
 class Texture;
 class Shader;
 
-class RenderBuffer
+class PreDepthBuffer
 {
 public:
-	RenderBuffer(int width, int height);
-	~RenderBuffer();
+	PreDepthBuffer(int width, int height);
+	~PreDepthBuffer();
 
 	void Bind();
 	void Unbind();
 	uint GetBuffer() const { return FrameBuffer; }
 	uint GetDepth() const { return DepthBuffer; }
-	uint GetColor() const { return ColorBuffer; }
 
 	void BindTextures();
 	void BindTexturesReading();
@@ -22,15 +21,11 @@ public:
 private:
 	uint FrameBuffer;
 
-	uint PositionBuffer;
 	uint NormalBuffer;
-	uint ColorBuffer;
 	uint DepthBuffer;
-	uint DataBuffer;
-	uint SSAOBuffer;
 
-	RenderBuffer(const RenderBuffer&);
-	RenderBuffer& operator=(const RenderBuffer&);
+	PreDepthBuffer(const PreDepthBuffer&);
+	PreDepthBuffer& operator=(const PreDepthBuffer&);
 };
 
 class PostBuffer

@@ -90,6 +90,7 @@ public:
 	virtual void ApplyTransform() = 0;
 	virtual void SetMaterial(uint section, Material* nextMat) = 0;
 	virtual Material* GetMaterial(uint section) const = 0;
+	virtual void SetInstances(int count, Transformation* dispArray) = 0;
 };
 
 class IMesh

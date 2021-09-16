@@ -6,6 +6,7 @@
 #include "GameLoop.h"
 #include "WinConsole.h"
 #include "GarbageCollector.h"
+#include <Windows.h>
 
 using namespace std;
 
@@ -18,7 +19,7 @@ GameLoop::GameLoop()
 	bQuit = false;
 	bQuitStarted = false;
 	fps = 0.f;
-	Collector = new GC();
+	Collector = nullptr;
 }
 
 GameLoop::~GameLoop()
@@ -48,6 +49,7 @@ int GameLoop::Start()
 		int y = std::atoi(INI->GetValue("Render", "ResolutionY").c_str());
 		RI->SetupWindow(x, y);
 		II->SetInputHandler();
+		Collector = new GC();
 	}
 	catch (const std::exception& e)
 	{

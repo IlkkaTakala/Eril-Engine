@@ -1,11 +1,12 @@
 #pragma once
-#include "Objects/BaseObject.h"
+#include "Core.h"
+#include "Objects/VisibleObject.h"
 
-class InstancedObject : public BaseObject
+class InstancedObject : public VisibleObject
 {
 public:
 	InstancedObject();
 
-	virtual void BeginPlay() override;
+	void AddInstances(int count, Transformation* dispArray);
 };
 

@@ -100,23 +100,33 @@ void TestPlayer::Tick(float)
 		
 }
 
-#include "Objects/Actor.h"
+#include "Objects/InstancedObject.h"
 
 void TestPlayer::BeginPlay()
 {
 	LightMode = true;
 
 	DirLight = SpawnObject<Light>();
-	DirLight->Data.Location = Vector(2.5f, 2.5f, 60.f);
-	DirLight->Data.Type = 0;
-	DirLight->Data.Size = 7.0;
-	DirLight->Data.Intensity = 3.0;
+	DirLight->Data.Location = Vector(2.5f, 2.5f, 10.f);
+	DirLight->Data.Type = LIGHT_DIRECTIONAL;
+	DirLight->Data.Size = 20.0;
+	DirLight->Data.Intensity = 5.0;
 	DirLight->Data.Rotation = Vector(45.0, 0.0, 0.0);
 
-	Reflecting = SpawnObject<Actor>();
+	Reflecting = SpawnObject<InstancedObject>();
 	Reflecting->SetModel("Cube");
-	Reflecting->SetLocation(Vector(1.5f, 0.5f, 0.0f));
+	Reflecting->SetLocation(Vector(2.5f, 0.5f, 0.0f));
 	Reflecting->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/metal"));
+
+	constexpr int count = 2000;
+	Transformation arr[count];
+	for (int i = 0; i < count; i++)
+	{
+		arr[i].Location = Vector(rand() % 200 - 100.f, rand() % 200 - 100.f, rand() % 200 - 100.f);
+		arr[i].Scale = Vector(1.f, 1.f, 1.f);
+	}
+
+	Reflecting->AddInstances(count, arr);
 
 	/*Reflecting = SpawnObject<Actor>();
 	Reflecting->SetModel("Cube");

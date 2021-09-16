@@ -2,7 +2,7 @@
 #include <math.h>
 #include <string>
 #include <vector>
-#define PI 3.14159265359f
+constexpr auto PI = 3.14159265359f;
 
 typedef unsigned int uint;
 
@@ -149,4 +149,11 @@ struct Vector2D
 	Vector2D operator/(const Vector2D& obj) { return Vector2D(X / obj.X, Y / obj.Y); }
 
 	friend bool operator==(const Vector2D& obj, const Vector2D& obj2) { return obj2.X == obj.X && obj2.Y == obj.Y; }
+};
+
+struct Transformation 
+{
+	Vector Location;
+	Vector Rotation;
+	Vector Scale;
 };

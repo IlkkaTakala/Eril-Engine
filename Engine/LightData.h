@@ -18,6 +18,9 @@ struct LightData
 	Vector Rotation;
 };
 
+constexpr int LIGHT_DIRECTIONAL = 0;
+constexpr int LIGHT_POINT = 1;
+
 class Light : public BaseObject
 {
 public:

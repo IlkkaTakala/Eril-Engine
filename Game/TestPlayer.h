@@ -4,6 +4,7 @@
 #include "Gameplay/PlayerController.h"
 
 class Actor;
+class InstancedObject;
 class Light;
 
 class TestPlayer : public Player
@@ -37,7 +38,7 @@ private:
 	bool LightMode;
 	Ref<Light> DirLight;
 	std::vector<Ref<Light>> Lights;
-	Ref<Actor> Reflecting;
+	Ref<InstancedObject> Reflecting;
 	std::vector<Ref<Actor>> Spheres;
 
 	Ref<Actor> LastSphere;
