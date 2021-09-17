@@ -83,9 +83,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="$(SolutionDir)\Engine\ext\assimp\contrib\zlib\CMakeLists.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <Filter Include="Header Files">
       <UniqueIdentifier>{9F710466-F5C1-3EAB-8B58-9C73BCF716B8}</UniqueIdentifier>
     </Filter>

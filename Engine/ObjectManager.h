@@ -1,8 +1,8 @@
 #pragma once
 #include <map>
 #include <list>
+#include "BasicTypes.h"
 #include <Objects/BaseObject.h>
-#include <memory>
 
 struct Record
 {
@@ -19,7 +19,7 @@ class ObjectManager
 {
 public:
 	template <class T>
-	static T* GetByRecord(long record) {
+	static T* GetByRecord(RecordInt record) {
 		return dynamic_cast<T>(ObjectRecords.find(record)->second.object);
 	}
 
@@ -37,15 +37,15 @@ public:
 		counter++;
 	}
 
-	static void Protect(long record) {
+	static void Protect(RecordInt record) {
 		ObjectRecords.find(record)->second->protection = 1;
 	}
 
-	static void Unprotect(long record) {
+	static void Unprotect(RecordInt record) {
 		ObjectRecords.find(record)->second->protection = 0;
 	}
 
-	static void DeleteRecord(long record) {
+	static void DeleteRecord(RecordInt record) {
 		auto p = ObjectRecords.find(record);
 		if (p != ObjectRecords.end()) {
 			delete p->second;
@@ -65,6 +65,6 @@ public:
 private:
 	friend class GC;
 	static long counter;
-	static std::map<long, Record*> ObjectRecords;
+	static std::map<RecordInt, Record*> ObjectRecords;
 };
 

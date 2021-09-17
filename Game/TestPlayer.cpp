@@ -117,6 +117,9 @@ void TestPlayer::BeginPlay()
 	Reflecting->SetModel("Cube");
 	Reflecting->SetLocation(Vector(2.5f, 0.5f, 0.0f));
 	Reflecting->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/metal"));
+	RecordInt r = 0x0010000000001111u;
+
+	printf("Record: %i\n", r.GetModID());
 
 	constexpr int count = 2000;
 	Transformation arr[count];
