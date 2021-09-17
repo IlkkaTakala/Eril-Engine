@@ -201,50 +201,6 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CustomBuild Include="$(SolutionDir)\Engine\ext\assimp\contrib\zlib\CMakeLists.txt">
-      <UseUtf8Encoding>Always</UseUtf8Encoding>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule A:/Delion/Git/erilengine/Engine/ext/assimp/contrib/zlib/CMakeLists.txt</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
-"A:\Program Files\CMake\bin\cmake.exe" -SA:/Delion/Git/erilengine -BA:/Delion/Git/erilengine --check-stamp-file A:/Delion/Git/erilengine/Engine/ext/assimp/contrib/zlib/CMakeFiles/generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)\Engine\ext\assimp\contrib\zlib\zconf.h.cmakein;$(SolutionDir)\Engine\ext\assimp\contrib\zlib\zlib.pc.cmakein;A:\Program Files\CMake\share\cmake-3.21\Modules\CheckCSourceCompiles.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\CheckFunctionExists.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\CheckIncludeFile.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\CheckIncludeFileCXX.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\CheckTypeSize.cmake;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)\Engine\ext\assimp\contrib\zlib\CMakeFiles\generate.stamp</Outputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule A:/Delion/Git/erilengine/Engine/ext/assimp/contrib/zlib/CMakeLists.txt</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
-"A:\Program Files\CMake\bin\cmake.exe" -SA:/Delion/Git/erilengine -BA:/Delion/Git/erilengine --check-stamp-file A:/Delion/Git/erilengine/Engine/ext/assimp/contrib/zlib/CMakeFiles/generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)\Engine\ext\assimp\contrib\zlib\zconf.h.cmakein;$(SolutionDir)\Engine\ext\assimp\contrib\zlib\zlib.pc.cmakein;A:\Program Files\CMake\share\cmake-3.21\Modules\CheckCSourceCompiles.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\CheckFunctionExists.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\CheckIncludeFile.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\CheckIncludeFileCXX.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\CheckTypeSize.cmake;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)\Engine\ext\assimp\contrib\zlib\CMakeFiles\generate.stamp</Outputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule A:/Delion/Git/erilengine/Engine/ext/assimp/contrib/zlib/CMakeLists.txt</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
-"A:\Program Files\CMake\bin\cmake.exe" -SA:/Delion/Git/erilengine -BA:/Delion/Git/erilengine --check-stamp-file A:/Delion/Git/erilengine/Engine/ext/assimp/contrib/zlib/CMakeFiles/generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(SolutionDir)\Engine\ext\assimp\contrib\zlib\zconf.h.cmakein;$(SolutionDir)\Engine\ext\assimp\contrib\zlib\zlib.pc.cmakein;A:\Program Files\CMake\share\cmake-3.21\Modules\CheckCSourceCompiles.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\CheckFunctionExists.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\CheckIncludeFile.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\CheckIncludeFileCXX.cmake;A:\Program Files\CMake\share\cmake-3.21\Modules\CheckTypeSize.cmake;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(SolutionDir)\Engine\ext\assimp\contrib\zlib\CMakeFiles\generate.stamp</Outputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
-    </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="$(SolutionDir)\Engine\ext\assimp\contrib\zlib\adler32.c" />
     <ClCompile Include="$(SolutionDir)\Engine\ext\assimp\contrib\zlib\compress.c" />
     <ClCompile Include="$(SolutionDir)\Engine\ext\assimp\contrib\zlib\crc32.c" />

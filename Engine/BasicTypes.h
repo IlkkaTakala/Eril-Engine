@@ -7,18 +7,56 @@
 typedef unsigned int uint;
 
 typedef unsigned char		uint8;
-typedef unsigned short		uint16;
-typedef unsigned long		uint32;
-typedef unsigned long long	uint64;
+typedef unsigned __int16	uint16;
+typedef unsigned __int32	uint32;
+typedef unsigned __int64	uint64;
 
 typedef char		int8;
-typedef short		int16;
-typedef long		int32;
-typedef long long	int64;
+typedef __int16		int16;
+typedef __int32		int32;
+typedef __int64		int64;
 
 typedef std::string	String;
 std::vector<String> split(const String& s, char delim);
 
+struct RecordInt {
+	uint64 record;
+
+	operator uint64() const {
+		return record;
+	}
+
+	RecordInt& operator=(uint64 i) {
+		record = i;
+		return *this;
+	}
+
+	RecordInt(uint64 i) {
+		record = i;
+	}
+
+	unsigned int GetModID() const {
+		return record >> 51;
+	}
+
+	inline bool operator==(const RecordInt& rhs) {
+		return record == rhs.record;
+	}
+
+	inline bool operator!=(const RecordInt& rhs) {
+		return !(record == rhs.record);
+	}
+
+	template <typename T>
+	inline bool operator==(const T& rhs) {
+		return record == rhs;
+	}
+
+	template <typename T>
+	inline bool operator!=(const T& rhs) {
+		return !(record == rhs);
+	}
+};
 
 struct Vector
 {

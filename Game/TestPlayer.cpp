@@ -117,6 +117,9 @@ void TestPlayer::BeginPlay()
 	Reflecting->SetModel("sphere");
 	Reflecting->SetLocation(Vector(1.5f, 0.5f, 0.0f));
 	Reflecting->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/metal"));
+	RecordInt r = 0x0010000000001111u;
+
+	printf("Record: %i\n", r.GetModID());
 
 	/*Domain = SpawnObject<Actor>();
 	Domain->SetModel("ground");
