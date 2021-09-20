@@ -103,6 +103,7 @@ void TestPlayer::Tick(float)
 #include "Objects/InstancedObject.h"
 #include "Objects/Actor.h"
 
+
 void TestPlayer::BeginPlay()
 {
 	LightMode = true;
@@ -151,20 +152,20 @@ void TestPlayer::BeginPlay()
 
 	float size = 80.f;
 
-	for (int x = 0; x < 10; x++) {
-		for (int y = 0; y < 10; y++) {
-			Actor* next = SpawnObject<Actor>();
-			next->SetModel("sphere");
-			float rx = (float)rand() / (float)RAND_MAX - 0.5f;
-			float ry = (float)rand() / (float)RAND_MAX - 0.5f;
-			float rz = (float)rand() / (float)RAND_MAX;
-			float scale = (float)rand() / (float)RAND_MAX * 2.f;
-			next->SetScale(Vector(scale));
-			next->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/rocks"));
-			next->SetLocation(Vector(rx * size, ry * size, rz * size / 3));
-			Spheres[x * y + y] = next;
-		}
+	for (int x = 0; x < 100; x++) {
+		Actor* next = SpawnObject<Actor>();
+		next->SetModel("Cube");
+		float rx = (float)rand() / (float)RAND_MAX - 0.5f;
+		float ry = (float)rand() / (float)RAND_MAX - 0.5f;
+		float rz = (float)rand() / (float)RAND_MAX;
+		//float scale = (float)rand() / (float)RAND_MAX * 2.f;
+		//next->SetScale(Vector(scale));
+		next->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/rocks"));
+		next->SetLocation(Vector(rx * size, ry * size, rz * size / 3));
+		Spheres[x] = next;
 	}
+
+	Spheres[10]->SetScale(2.f);
 
 	/*for (int x = 0; x < 20; x++) {
 		for (int y = 0; y < 20; y++) {
