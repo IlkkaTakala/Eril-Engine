@@ -54,8 +54,9 @@ public:
 	bool Instanced;
 	int InstanceCount;
 	uint InstanceDisp;
+	float Radius;
 
-	void Render();
+	void Render(Vector direction, Vector location);
 	void MakeInstanced(int count, const glm::mat4* modelM);
 
 	const uint32 GetVertexCount() const { return Holder->VertexCount; }

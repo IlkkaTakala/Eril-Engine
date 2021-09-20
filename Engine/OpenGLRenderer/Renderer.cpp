@@ -845,58 +845,6 @@ void Renderer::Shadows(int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-void Renderer::Deferred(int width, int height)
-{
-	// Clear the screen
-	glClearColor(0.f, 0.f, 0.f, 0.f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glDepthMask(GL_TRUE);
-	glDisable(GL_STENCIL_TEST);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_MULTISAMPLE);
-	glEnable(GL_BLEND);
-	glDepthFunc(GL_LEQUAL);
-	glEnable(GL_CULL_FACE);
-
-	for (auto const& [name, s] : Shaders)
-	{
-		if (s != nullptr && s->Pass != 0) continue;
-
-		if (s == nullptr) throw std::exception("Shader error!");
-		s->Bind();
-
-		//s->SetUniform("VP", ActiveCamera->GetProjectionMatrix() * glm::inverse(ActiveCamera->GetViewMatrix()));
-
-		for (Material* m : s->GetUsers())
-		{
-			for (auto const& param : m->GetVectorParameters()) {
-				s->SetUniform(param.first, param.second);
-			}
-
-			for (auto const& param : m->GetScalarParameters()) {
-				s->SetUniform(param.first, param.second);
-			}
-
-			int round = 0;
-			for (auto const& param : m->GetTextures()) {
-				if (param.second > 0) {
-					s->SetUniform(param.first, round);
-					glActiveTexture(GL_TEXTURE0 + round);
-					glBindTexture(GL_TEXTURE_2D, param.second->GetTextureID());
-					round++;
-				}
-			}
-
-			for (Section* o : m->GetObjects())
-			{
-				s->SetUniform("Model", o->Parent->GetModelMatrix());
-				o->Render();
-			}
-		}
-	}
-}
-
 void Renderer::SSAO(int width, int height)
 {
 	glClearColor(0.f, 0.f, 0.f, 0.f);
@@ -973,7 +921,8 @@ void Renderer::Forward(int width, int height)
 			for (Section* o : m->GetObjects())
 			{
 				s->SetUniform("Model", o->Parent->GetModelMatrix());
-				o->Render();
+				o->Render(ActiveCamera->GetForwardVector(), ActiveCamera->GetLocation());
+				
 			}
 		}
 	}

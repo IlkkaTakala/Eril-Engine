@@ -12,6 +12,7 @@ Section::Section()
 	Instanced = false;
 	InstanceCount = 1;
 	InstanceDisp = 0;
+	Radius = 0.f;
 }
 
 Section::~Section()
@@ -20,8 +21,18 @@ Section::~Section()
 	glDeleteBuffers(1, &InstanceDisp);
 }
 
-void Section::Render()
+void Section::Render(Vector direction, Vector location)
 {
+	glm::vec3 pos = Parent->GetModelMatrix()[3];
+	glm::vec3 loc = glm::vec3(location.X, location.Z, location.Y);
+	glm::vec3 dir = glm::vec3(direction.X, direction.Z, direction.Y);
+	if ((pos - loc).length() > Radius)
+	{
+		if (glm::dot(dir, glm::normalize(loc - pos)) < 0.75f)
+		{
+			return;
+		}
+	}
 	glBindVertexArray(Holder->VAO);
 	if (Instanced) glDrawElementsInstanced(GL_TRIANGLES, Holder->IndexCount, GL_UNSIGNED_INT, 0, InstanceCount);
 	else glDrawElements(GL_TRIANGLES, Holder->IndexCount, GL_UNSIGNED_INT, 0);
@@ -29,7 +40,7 @@ void Section::Render()
 
 void Section::MakeInstanced(int count, const glm::mat4* modelM)
 {
-	if (Instanced) glDeleteBuffers(1, &InstanceDisp);
+	if (InstanceDisp != 0) glDeleteBuffers(1, &InstanceDisp);
 	InstanceCount = count;
 	Instanced = true;
 
@@ -65,6 +76,29 @@ RenderObject::RenderObject(LoadedMesh* mesh)
 	Sections = new Section[SectionCount]();
 	for (uint32 i = 0; i < mesh->HolderCount; i++) {
 		Sections[i].Holder = mesh->Holders[i];
+
+		glm::mat4 trans(1.f);
+
+		glBindVertexArray(Sections[i].Holder->VAO);
+
+		glGenBuffers(1, &Sections[i].InstanceDisp);
+		glBindBuffer(GL_ARRAY_BUFFER, Sections[i].InstanceDisp);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4), &trans, GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(4);
+		glEnableVertexAttribArray(5);
+		glEnableVertexAttribArray(6);
+		glEnableVertexAttribArray(7);
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(0));
+		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 4));
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 8));
+		glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 12));
+		glVertexAttribDivisor(4, 1);
+		glVertexAttribDivisor(5, 1);
+		glVertexAttribDivisor(6, 1);
+		glVertexAttribDivisor(7, 1);
+
+		glBindVertexArray(0);
 		SetMaterial(i, mesh->Holders[i]->Instance);
 		Sections[i].Parent = this;
 	}

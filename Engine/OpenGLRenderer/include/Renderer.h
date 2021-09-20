@@ -47,7 +47,6 @@ private:
 	void EnvReflection(int width, int height);
 	void EnvCube(int width, int height);
 	void Shadows(int width, int height);
-	void Deferred(int width, int height);
 	void SSAO(int width, int height);
 	void Forward(int width, int height);
 	void PreDepth(int width, int height);

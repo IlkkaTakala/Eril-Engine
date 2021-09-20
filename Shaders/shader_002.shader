@@ -257,7 +257,7 @@ void main()
 		
 	}
 	
-	vec4 color = vec4(radiance, 1.0);
+	vec4 color = vec4(ambient + Lo, 1.0);
 	
 	// Height fog
 	float depth = LinearizeDepth(fs_in.FragPos.z) / 100.0;

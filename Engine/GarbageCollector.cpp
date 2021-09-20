@@ -26,7 +26,7 @@ void GC::CleanRunner()
 	std::chrono::duration<float> duration = std::chrono::milliseconds(0);
 	while (!bQuitting) {
 		auto start = std::chrono::steady_clock::now();
-		auto time = std::chrono::milliseconds(2500) - duration;
+		auto time = std::chrono::milliseconds(5000) - duration;
 		if (time.count() > 0) std::this_thread::sleep_for(time);
 
 		std::vector<long> removal;
