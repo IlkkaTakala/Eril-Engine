@@ -83,7 +83,7 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);GLM_FORCE_XYZW_ONLY;WIN32;_WINDOWS;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -125,7 +125,7 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);GLM_FORCE_XYZW_ONLY;WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
@@ -170,7 +170,7 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);GLM_FORCE_XYZW_ONLY;WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -213,6 +213,7 @@
     <ClCompile Include="Engine\ObjectManager.cpp" />
     <ClCompile Include="Engine\Objects\Actor.cpp" />
     <ClCompile Include="Engine\Objects\BaseObject.cpp" />
+    <ClCompile Include="Engine\Objects\InstancedObject.cpp" />
     <ClCompile Include="Engine\Objects\VisibleObject.cpp" />
     <ClCompile Include="Engine\OpenGLRenderer\Batcher.cpp" />
     <ClCompile Include="Engine\OpenGLRenderer\Camera.cpp" />
@@ -238,6 +239,7 @@
     <ClInclude Include="Engine\ObjectManager.h" />
     <ClInclude Include="Engine\Objects\Actor.h" />
     <ClInclude Include="Engine\Objects\BaseObject.h" />
+    <ClInclude Include="Engine\Objects\InstancedObject.h" />
     <ClInclude Include="Engine\Objects\VisibleObject.h" />
     <ClInclude Include="Engine\OpenGLRenderer\ext\glfw\deps\glad\gl.h" />
     <ClInclude Include="Engine\OpenGLRenderer\include\Batcher.h" />

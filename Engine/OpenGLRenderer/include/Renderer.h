@@ -5,7 +5,7 @@ class Shader;
 class Texture;
 class RenderBatch;
 class GLCamera;
-class RenderBuffer;
+class PreDepthBuffer;
 class PostBuffer;
 class BlurBuffer;
 class SSAOBuffer;
@@ -50,6 +50,7 @@ private:
 	void Deferred(int width, int height);
 	void SSAO(int width, int height);
 	void Forward(int width, int height);
+	void PreDepth(int width, int height);
 	void LightCulling(int width, int height);
 
 	std::map<String, Shader*> Shaders;
@@ -69,7 +70,7 @@ private:
 	Shader* SkyBoxShader;
 	GLFWwindow* Window;
 	RenderBatch* Batcher;
-	RenderBuffer* Buffer;
+	PreDepthBuffer* DepthBuffer;
 	PostBuffer* PostProcess;
 	BlurBuffer* BlurRender;
 	SSAOBuffer* SSAORender;

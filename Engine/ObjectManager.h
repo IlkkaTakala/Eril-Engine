@@ -1,21 +1,17 @@
 #pragma once
 #include <map>
 #include <list>
+#include "BasicTypes.h"
 #include <Objects/BaseObject.h>
-#include <memory>
 
 struct Record
 {
-	Record(Data* o) : object(o), protection(0) {}
-	Record(Data* o, short p) : object(o), protection(p) {}
-	~Record() {
-		for (const auto& p : pointerRefs) {
-			p->NullThis();
-		}
-		delete object;
-	}
+	Record(Data* o) : object(o), protection(0), checkCount(0) {}
+	Record(Data* o, short p) : object(o), protection(p), checkCount(0) {}
+	~Record();
 	std::list<const RefHold*> pointerRefs;
 	short protection;
+	short checkCount;
 	Data* object;
 };
 
@@ -23,7 +19,7 @@ class ObjectManager
 {
 public:
 	template <class T>
-	static T* GetByRecord(long record) {
+	static T* GetByRecord(RecordInt record) {
 		return dynamic_cast<T>(ObjectRecords.find(record)->second.object);
 	}
 
@@ -31,7 +27,7 @@ public:
 		ObjectRecords[obj->GetRecord()]->pointerRefs.push_back(obj);
 	}
 
-	static void RemoveRef( const RefHold* obj) {
+	static void RemoveRef(const RefHold* obj) {
 		ObjectRecords.find(obj->GetRecord())->second->pointerRefs.remove(obj);
 	}
 
@@ -41,15 +37,15 @@ public:
 		counter++;
 	}
 
-	static void Protect(long record) {
+	static void Protect(RecordInt record) {
 		ObjectRecords.find(record)->second->protection = 1;
 	}
 
-	static void Unprotect(long record) {
+	static void Unprotect(RecordInt record) {
 		ObjectRecords.find(record)->second->protection = 0;
 	}
 
-	static void DeleteRecord(long record) {
+	static void DeleteRecord(RecordInt record) {
 		auto p = ObjectRecords.find(record);
 		if (p != ObjectRecords.end()) {
 			delete p->second;
@@ -64,8 +60,11 @@ public:
 		}
 	}
 
+	static void AddTick(Tickable*);
+
 private:
+	friend class GC;
 	static long counter;
-	static std::map<long, Record*> ObjectRecords;
+	static std::map<RecordInt, Record*> ObjectRecords;
 };
 

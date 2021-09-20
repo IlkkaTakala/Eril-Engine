@@ -2,22 +2,13 @@
 #include <glad/gl.h>
 #include "LightData.h"
 #include "Material.h"
+#include <stdexcept>
 
-RenderBuffer::RenderBuffer(int width, int height)
+PreDepthBuffer::PreDepthBuffer(int width, int height)
 {
 
 	glGenFramebuffers(1, &FrameBuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, FrameBuffer);
-
-	// - position color buffer
-	glGenTextures(1, &PositionBuffer);
-	glBindTexture(GL_TEXTURE_2D, PositionBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, PositionBuffer, 0);
 
 	// - normal color buffer
 	glGenTextures(1, &NormalBuffer);
@@ -27,26 +18,11 @@ RenderBuffer::RenderBuffer(int width, int height)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, NormalBuffer, 0);
-
-	// - color + specular color buffer
-	glGenTextures(1, &ColorBuffer);
-	glBindTexture(GL_TEXTURE_2D, ColorBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, ColorBuffer, 0);
-
-	glGenTextures(1, &DataBuffer);
-	glBindTexture(GL_TEXTURE_2D, DataBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, DataBuffer, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, NormalBuffer, 0);
 
 	// - tell OpenGL which color attachments we'll use (of this framebuffer) for rendering 
-	unsigned int attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-	glDrawBuffers(4, attachments);
+	unsigned int attachments[1] = { GL_COLOR_ATTACHMENT0 };
+	glDrawBuffers(1, attachments);
 
 	glGenTextures(1, &DepthBuffer);
 	glBindTexture(GL_TEXTURE_2D, DepthBuffer);
@@ -67,47 +43,36 @@ RenderBuffer::RenderBuffer(int width, int height)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-RenderBuffer::~RenderBuffer()
+PreDepthBuffer::~PreDepthBuffer()
 {
-	glDeleteTextures(1, &PositionBuffer);
 	glDeleteTextures(1, &NormalBuffer);
-	glDeleteTextures(1, &ColorBuffer);
-	glDeleteTextures(1, &DataBuffer);
 	glDeleteTextures(1, &DepthBuffer);
 	glDeleteFramebuffers(1, &FrameBuffer);
 }
 
-void RenderBuffer::Bind()
+void PreDepthBuffer::Bind()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, FrameBuffer);
 }
 
-void RenderBuffer::Unbind()
+void PreDepthBuffer::Unbind()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void RenderBuffer::BindTextures()
+void PreDepthBuffer::BindTextures()
 {
 	//unsigned int attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
 	//glDrawBuffers(4, attachments);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, PositionBuffer);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, NormalBuffer);
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, ColorBuffer);
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, DataBuffer);
-	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, DepthBuffer);
 }
 
-void RenderBuffer::BindTexturesReading()
+void PreDepthBuffer::BindTexturesReading()
 {
-	uint textures[4] = { PositionBuffer, NormalBuffer, ColorBuffer, DataBuffer };
-	glBindImageTextures(0, 4, textures);
+	uint textures[1] = { NormalBuffer };
+	glBindImageTextures(0, 1, textures);
 }
 
 BlurBuffer::BlurBuffer(int width, int height, Shader* compute)

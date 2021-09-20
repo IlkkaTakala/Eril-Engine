@@ -20,14 +20,16 @@ struct Vertex
 class MeshDataHolder
 {
 public:
-	MeshDataHolder();
+	MeshDataHolder(Vertex* verts, uint32 vertCount, uint32* indices, uint32 indexCount);
 	~MeshDataHolder();
 
+	uint VAO;
+	uint VBO;
+	uint EBO;
+
 	Material* Instance;
-	Vertex* vertices;
-	uint32* indices;
 	uint32 VertexCount;
-	uint32 FaceCount;
+	uint32 IndexCount;
 };
 
 
@@ -49,12 +51,15 @@ public:
 	~Section();
 	Material* Instance;
 	RenderObject* Parent;
+	bool Instanced;
+	int InstanceCount;
+	uint InstanceDisp;
 
-	const Vertex* GetVertices() const { return Holder->vertices; }
-	const uint32* GetIndices() const { return Holder->indices; }
+	void Render();
+	void MakeInstanced(int count, const glm::mat4* modelM);
+
 	const uint32 GetVertexCount() const { return Holder->VertexCount; }
-	const uint32 GetFaceCount() const { return Holder->FaceCount; }
-
+	const uint32 GetFaceCount() const { return Holder->IndexCount / 3; }
 
 private:
 	friend class RenderObject;
@@ -73,6 +78,7 @@ public:
 	virtual Material* GetMaterial(uint section) const override { if (section < SectionCount) return Sections[section].Instance; else return nullptr; }
 	const glm::mat4& GetModelMatrix();
 	virtual void ApplyTransform() override;
+	virtual void SetInstances(int count, Transformation* dispArray);
 
 	void SetParent(VisibleObject* parent);
 

@@ -5,6 +5,8 @@
 #include "IRender.h"
 #include "GameLoop.h"
 #include "WinConsole.h"
+#include "GarbageCollector.h"
+#include <Windows.h>
 
 using namespace std;
 
@@ -17,22 +19,18 @@ GameLoop::GameLoop()
 	bQuit = false;
 	bQuitStarted = false;
 	fps = 0.f;
+	Collector = nullptr;
 }
 
 GameLoop::~GameLoop()
 {
 	if (State != nullptr) State == nullptr;
-	/*if (GC::Pointers.size() > 0) {
-		for (auto const& i : GC::Pointers) {
-			i.second->DestroyObject();
-		}
-	}*/
 	ObjectManager::CleanObjects();
-	GC::Pointers.clear();
 	delete INI;
 	delete II;
 	delete MI;
 	delete RI;
+	delete Collector;
 }
 
 int GameLoop::Start()
@@ -51,6 +49,7 @@ int GameLoop::Start()
 		int y = std::atoi(INI->GetValue("Render", "ResolutionY").c_str());
 		RI->SetupWindow(x, y);
 		II->SetInputHandler();
+		Collector = new GC();
 	}
 	catch (const std::exception& e)
 	{
@@ -69,6 +68,7 @@ void GameLoop::Quit()
 {
 	bQuitStarted = true;
 	bQuit = true;
+	Collector->Quit();
 }
 
 int GameLoop::MainLoop()

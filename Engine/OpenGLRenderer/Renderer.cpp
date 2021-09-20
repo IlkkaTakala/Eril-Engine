@@ -58,7 +58,7 @@ struct GLM_Light
 Renderer::Renderer()
 {
 	Batcher = nullptr;
-	Buffer = nullptr;
+	DepthBuffer = nullptr;
 	BlurRender = nullptr;
 	Window = nullptr;
 	ActiveCamera = nullptr;
@@ -131,7 +131,7 @@ int Renderer::SetupWindow(int width, int height)
 
 	printf("Allocating buffers...\n");
 	Batcher = new RenderBatch(/*262144*/524288);
-	Buffer = new RenderBuffer(width, height);
+	DepthBuffer = new PreDepthBuffer(width, height);
 	PostProcess = new PostBuffer(width, height);
 	SSAORender = new SSAOBuffer(width, height);
 	ShadowMapping = new ShadowMapBuffer(width, height);
@@ -342,7 +342,7 @@ void Renderer::CleanRenderer()
 	}
 
 	delete Batcher;
-	delete Buffer;
+	delete DepthBuffer;
 	delete PostProcess;
 	delete BlurRender;
 	delete SSAORender;
@@ -855,7 +855,7 @@ void Renderer::Deferred(int width, int height)
 	glDisable(GL_STENCIL_TEST);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE);
-	glDisable(GL_BLEND);
+	glEnable(GL_BLEND);
 	glDepthFunc(GL_LEQUAL);
 	glEnable(GL_CULL_FACE);
 
@@ -888,13 +888,11 @@ void Renderer::Deferred(int width, int height)
 				}
 			}
 
-			Batcher->begin();
-
 			for (Section* o : m->GetObjects())
 			{
-				Batcher->add(o);
+				s->SetUniform("Model", o->Parent->GetModelMatrix());
+				o->Render();
 			}
-			Batcher->end();
 		}
 	}
 }
@@ -937,14 +935,20 @@ void Renderer::Forward(int width, int height)
 	glDepthFunc(GL_LESS);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// Clear the screen
+	glClearColor(0.f, 0.f, 0.f, 0.f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glEnable(GL_MULTISAMPLE);
+	glEnable(GL_CULL_FACE);
+
 	for (auto const& [name, s] : Shaders)
 	{
-		if (s == nullptr) throw std::exception("Shader error!");
-		if (s->Pass != 1) continue;
-		if (s->GetUsers().size() == 0) continue;
+		if (s == nullptr) continue;
+
 		s->Bind();
 
-		s->SetUniform("VP", ActiveCamera->GetProjectionMatrix() * glm::inverse(ActiveCamera->GetViewMatrix()));
+		//s->SetUniform("VP", ActiveCamera->GetProjectionMatrix() * glm::inverse(ActiveCamera->GetViewMatrix()));
 
 		for (Material* m : s->GetUsers())
 		{
@@ -959,22 +963,24 @@ void Renderer::Forward(int width, int height)
 			int round = 0;
 			for (auto const& param : m->GetTextures()) {
 				if (param.second > 0) {
-					s->SetUniform(param.first, static_cast<float>(param.second->GetTextureID()));
+					s->SetUniform(param.first, round);
 					glActiveTexture(GL_TEXTURE0 + round);
 					glBindTexture(GL_TEXTURE_2D, param.second->GetTextureID());
 					round++;
 				}
 			}
 
-			Batcher->begin();
-
 			for (Section* o : m->GetObjects())
 			{
-				Batcher->add(o);
+				s->SetUniform("Model", o->Parent->GetModelMatrix());
+				o->Render();
 			}
-			Batcher->end();
 		}
 	}
+}
+
+void Renderer::PreDepth(int width, int height)
+{
 }
 
 void Renderer::LightCulling(int width, int height)
@@ -1015,56 +1021,31 @@ void Renderer::Render(float delta)
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, LightBuffer);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, VisibleLightIndicesBuffer);
 
-	EnvReflection(width, height);
+	//EnvReflection(width, height);
 
 	glViewport(0, 0, width, height);
-	Buffer->Bind();
+	DepthBuffer->Bind();
 
-	Deferred(width, height);
-	Buffer->BindTextures();
-	SSAORender->Bind();
-	SSAO(width, height);
+	PreDepth(width, height);
 
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, LightBuffer);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, VisibleLightIndicesBuffer);
-	glActiveTexture(GL_TEXTURE5);
-	glBindTexture(GL_TEXTURE_2D, SSAORender->GetSSAOBlur());
+	DepthBuffer->BindTextures();
 	LightCulling(width, height);
 
-
-	Shadows(width, height);
-	/*glBindFramebuffer(GL_READ_FRAMEBUFFER, Buffer->GetBuffer());
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, ShadowRender->GetBuffer());
-	glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-	Shadows(width, height);
-	BlurRender->Blur(ShadowRender->GetShadows(), 8, ScreenVao);*/
-
 	PostProcess->Bind();
+	Forward(width, height);
+	PostProcess->Unbind();
+
 	glClearColor(0.f, 0.f, 0.f, 0.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glActiveTexture(GL_TEXTURE6);
-	glBindTexture(GL_TEXTURE_2D, ShadowMapping->GetShadows());
-	Buffer->BindTextures();
+	DepthBuffer->BindTextures();
 	EnvironmentRender->BindTextures();
-
-	DeferredMaster->Bind();
-	DeferredMaster->SetUniform("numberOfTilesX", (int)WorkGroupsX);
-	DeferredMaster->SetUniform("gPosition", 0);
-	DeferredMaster->SetUniform("gNormal", 1);
-	DeferredMaster->SetUniform("gAlbedoSpec", 2);
-	DeferredMaster->SetUniform("gData", 3);
-	DeferredMaster->SetUniform("gDepth", 4);
-	DeferredMaster->SetUniform("gSSAO", 5);
-	DeferredMaster->SetUniform("gShadow", 6);
-	DeferredMaster->SetUniform("gEnv", 0);
 
 	glDepthFunc(GL_ALWAYS);
 	glBindVertexArray(ScreenVao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
 
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, Buffer->GetBuffer());
-	//glReadBuffer(GL_COLOR_ATTACHMENT2);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, DepthBuffer->GetBuffer());
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, PostProcess->GetBuffer());
 	glBlitFramebuffer(
 		0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST
@@ -1073,11 +1054,8 @@ void Renderer::Render(float delta)
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, 0);
 
-	//Forward(width, height);
+	//EnvCube(width, height);
 
-	EnvCube(width, height);
-
-	PostProcess->Unbind();
 	BlurRender->Blur(PostProcess->GetBloom(), 4, ScreenVao);
 	PostProcess->BindTextures();
 
@@ -1122,7 +1100,7 @@ GLMesh::~GLMesh()
 void processMesh(LoadedMesh* meshHolder, aiMesh* mesh)
 {
 	std::vector<Vertex> vertices;
-	std::vector<unsigned> indices;
+	std::vector<uint32> indices;
 
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 	{
@@ -1161,8 +1139,8 @@ void processMesh(LoadedMesh* meshHolder, aiMesh* mesh)
 		}
 	}
 	std::vector<uint> adjacent;
-	MeshDataHolder* section = new MeshDataHolder();
-	section->FaceCount = indices.size() / 3;
+	MeshDataHolder* section = new MeshDataHolder(vertices.data(), vertices.size(), indices.data(), indices.size());
+	/*section->FaceCount = indices.size() / 3;
 	section->VertexCount = vertices.size();
 
 
@@ -1170,7 +1148,7 @@ void processMesh(LoadedMesh* meshHolder, aiMesh* mesh)
 	memcpy(section->indices, indices.data(), indices.size() * sizeof(uint32));
 
 	section->vertices = new Vertex[vertices.size() * sizeof(Vertex)];
-	memcpy(section->vertices, vertices.data(), vertices.size() * sizeof(Vertex));
+	memcpy(section->vertices, vertices.data(), vertices.size() * sizeof(Vertex));*/
 
 	section->Instance = RI->LoadMaterialByName("Shaders/test");
 

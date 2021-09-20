@@ -83,9 +83,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="$(SolutionDir)\Engine\ext\assimp\contrib\zlib\CMakeLists.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="$(SolutionDir)\Engine\ext\assimp\contrib\zlib\win32\zlib1.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>
