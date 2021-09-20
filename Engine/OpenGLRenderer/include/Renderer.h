@@ -58,7 +58,7 @@ private:
 	std::vector<const LightData*> Lights;
 
 	Shader* LightCullingShader;
-	Shader* DeferredMaster;
+	Shader* PreDepthShader;
 	Shader* PostProcessMaster;
 	Shader* SSAOShader;
 	Shader* SSAOBlurShader;

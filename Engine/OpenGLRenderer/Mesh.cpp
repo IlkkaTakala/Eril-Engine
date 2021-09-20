@@ -12,7 +12,6 @@ Section::Section()
 	Instanced = false;
 	InstanceCount = 1;
 	InstanceDisp = 0;
-	Radius = 0.f;
 }
 
 Section::~Section()
@@ -21,22 +20,14 @@ Section::~Section()
 	glDeleteBuffers(1, &InstanceDisp);
 }
 
-void Section::Render(Vector direction, Vector location)
+//#pragma optimize("", off)
+void Section::Render()
 {
-	glm::vec3 pos = Parent->GetModelMatrix()[3];
-	glm::vec3 loc = glm::vec3(location.X, location.Z, location.Y);
-	glm::vec3 dir = glm::vec3(direction.X, direction.Z, direction.Y);
-	if ((pos - loc).length() > Radius)
-	{
-		if (glm::dot(dir, glm::normalize(loc - pos)) < 0.75f)
-		{
-			return;
-		}
-	}
 	glBindVertexArray(Holder->VAO);
 	if (Instanced) glDrawElementsInstanced(GL_TRIANGLES, Holder->IndexCount, GL_UNSIGNED_INT, 0, InstanceCount);
 	else glDrawElements(GL_TRIANGLES, Holder->IndexCount, GL_UNSIGNED_INT, 0);
 }
+//#pragma optimize("", on)
 
 void Section::MakeInstanced(int count, const glm::mat4* modelM)
 {
@@ -160,6 +151,7 @@ MeshDataHolder::MeshDataHolder(Vertex* verts, uint32 vertCount, uint32* indices,
 	VertexCount = vertCount;
 	IndexCount = indexCount;
 	Instance = nullptr;
+	Radius = 0.f;
 
 	glGenVertexArrays(1, &VAO);
 

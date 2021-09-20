@@ -62,7 +62,7 @@ Renderer::Renderer()
 	BlurRender = nullptr;
 	Window = nullptr;
 	ActiveCamera = nullptr;
-	DeferredMaster = nullptr;
+	PreDepthShader = nullptr;
 	LightCullingShader = nullptr;
 	SSAOShader = nullptr;
 	SSAOBlurShader = nullptr;
@@ -207,7 +207,7 @@ int Renderer::SetupWindow(int width, int height)
 	printf("Loading shaders...\n");
 	LoadShaders();
 
-	if (LightCullingShader == nullptr || DeferredMaster == nullptr) throw std::exception("Important shaders not found!\n");
+	if (LightCullingShader == nullptr || PreDepthShader == nullptr) throw std::exception("Important shaders not found!\n");
 
 	Shader* blur = Shaders.find("BlurCompute") == Shaders.end() ? nullptr : Shaders.find("BlurCompute")->second;
 	BlurRender = new BlurBuffer(width, height, blur);
@@ -347,7 +347,7 @@ void Renderer::CleanRenderer()
 	delete BlurRender;
 	delete SSAORender;
 	delete EnvironmentRender;
-	delete DeferredMaster;
+	delete PreDepthShader;
 	delete PostProcessMaster;
 	delete LightCullingShader;
 	delete SSAOShader;
@@ -579,7 +579,7 @@ void Renderer::LoadShaders()
 					nShader->Pass = std::atoi(params[1].c_str());
 					if (!nShader->Success) nShader = nullptr;
 					if (nShader != nullptr) {
-						if (f.path().filename() == "Master.shader") DeferredMaster = nShader;
+						if (f.path().filename() == "PreDepth.shader") PreDepthShader = nShader;
 						else if (f.path().filename() == "PostProcessMaster.shader") PostProcessMaster = nShader;
 						else if (f.path().filename() == "SSAO.shader") SSAOShader = nShader;
 						else if (f.path().filename() == "SSAOBlur.shader") SSAOBlurShader = nShader;
@@ -920,8 +920,23 @@ void Renderer::Forward(int width, int height)
 
 			for (Section* o : m->GetObjects())
 			{
-				s->SetUniform("Model", o->Parent->GetModelMatrix());
-				o->Render(ActiveCamera->GetForwardVector(), ActiveCamera->GetLocation());
+				glm::mat4 mm = o->Parent->GetModelMatrix();
+				Vector direction = ActiveCamera->GetForwardVector();
+				Vector location = ActiveCamera->GetLocation();
+				glm::vec3 pos = mm[3];
+				glm::vec3 rad = glm::vec3(o->GetRadius()) * glm::mat3(mm);
+				float radii = glm::max(rad.x, glm::max(rad.y, rad.z));
+				glm::vec3 loc = glm::vec3(location.X, location.Z, location.Y);
+				glm::vec3 dir = glm::vec3(direction.X, direction.Z, direction.Y);
+				if ((loc - pos).length() > 2.f && (loc - pos).length() > radii)
+				{
+					if (glm::dot(dir, glm::normalize(loc - pos)) < 0.65f)
+					{
+						continue;
+					}
+				}
+				s->SetUniform("Model", mm);
+				o->Render();
 				
 			}
 		}
@@ -930,6 +945,42 @@ void Renderer::Forward(int width, int height)
 
 void Renderer::PreDepth(int width, int height)
 {
+	//glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	// Clear the screen
+	glClearColor(0.f, 0.f, 0.f, 0.f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//glEnable(GL_CULL_FACE);
+
+	PreDepthShader->Bind();
+	for (auto const& [name, s] : Shaders)
+	{
+		for (Material* m : s->GetUsers())
+		{
+			for (Section* o : m->GetObjects())
+			{
+				glm::mat4 mm = o->Parent->GetModelMatrix();
+				Vector direction = ActiveCamera->GetForwardVector();
+				Vector location = ActiveCamera->GetLocation();
+				glm::vec3 pos = mm[3];
+				glm::vec3 rad = glm::vec3(o->GetRadius()) * glm::mat3(mm);
+				float radii = glm::max(rad.x, glm::max(rad.y, rad.z));
+				glm::vec3 loc = glm::vec3(location.X, location.Z, location.Y);
+				glm::vec3 dir = glm::vec3(direction.X, direction.Z, direction.Y);
+				if ((loc - pos).length() > 2.f && (loc - pos).length() > radii)
+				{
+					if (glm::dot(dir, glm::normalize(loc - pos)) < 0.65f)
+					{
+						continue;
+					}
+				}
+				PreDepthShader->SetUniform("Model", mm);
+				o->Render();
+
+			}
+		}
+	}
 }
 
 void Renderer::LightCulling(int width, int height)
@@ -1050,13 +1101,14 @@ void processMesh(LoadedMesh* meshHolder, aiMesh* mesh)
 {
 	std::vector<Vertex> vertices;
 	std::vector<uint32> indices;
-
+	float radius = 0.f;
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 	{
 		Vertex vertex;
 		vertex.position.x = mesh->mVertices[i].x;
 		vertex.position.y = mesh->mVertices[i].y;
 		vertex.position.z = mesh->mVertices[i].z;
+		if (radius < mesh->mVertices[i].Length()) radius = mesh->mVertices[i].Length();
 
 		vertex.normal.x = mesh->mNormals[i].x;
 		vertex.normal.y = mesh->mNormals[i].y;
@@ -1089,6 +1141,7 @@ void processMesh(LoadedMesh* meshHolder, aiMesh* mesh)
 	}
 	std::vector<uint> adjacent;
 	MeshDataHolder* section = new MeshDataHolder(vertices.data(), vertices.size(), indices.data(), indices.size());
+	section->Radius = radius * 1.5f;
 	/*section->FaceCount = indices.size() / 3;
 	section->VertexCount = vertices.size();
 
