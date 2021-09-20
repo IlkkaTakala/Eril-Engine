@@ -30,6 +30,7 @@ public:
 	Material* Instance;
 	uint32 VertexCount;
 	uint32 IndexCount;
+	float Radius;
 };
 
 
@@ -54,10 +55,10 @@ public:
 	bool Instanced;
 	int InstanceCount;
 	uint InstanceDisp;
-	float Radius;
 
-	void Render(Vector direction, Vector location);
+	void Render();
 	void MakeInstanced(int count, const glm::mat4* modelM);
+	float GetRadius() const { return Holder->Radius; }
 
 	const uint32 GetVertexCount() const { return Holder->VertexCount; }
 	const uint32 GetFaceCount() const { return Holder->IndexCount / 3; }
