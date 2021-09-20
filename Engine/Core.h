@@ -28,11 +28,12 @@ public:
 			Pointer = nullptr;
 			return;
 		}
-		ObjectManager::AddRef(dynamic_cast<RefHold*>(this));
+		ObjectManager::AddRef(GetRecord(), this);
 	}
 
 	~Ref() {
-		if(Pointer != nullptr) ObjectManager::RemoveRef(dynamic_cast<RefHold*>(this));
+		if(Pointer != nullptr) ObjectManager::RemoveRef(GetRecord(), this);
+		NullThis();
 	}
 
 	virtual const void NullThis() const {
@@ -41,21 +42,21 @@ public:
 	}
 
 	virtual const long GetRecord() const override {
-		return DataPtr->GetRecord();
+		return DataPtr ? DataPtr->GetRecord() : 0;
 	}
 	
 	Ref(const Ref& old) { 
-		if (DataPtr != nullptr) ObjectManager::RemoveRef(dynamic_cast<const RefHold*>(this));
+		ObjectManager::AddRef(old->GetRecord(), this);
+		if (DataPtr != nullptr) ObjectManager::RemoveRef(GetRecord(), this);
 		Pointer = old.Pointer;
-		DataPtr = dynamic_cast<Data*>(Pointer);
-		ObjectManager::AddRef(dynamic_cast<const RefHold*>(this));
+		DataPtr = old.DataPtr;
 	}
 
 	Ref& operator=(const Ref& old) {
-		if (DataPtr != nullptr) ObjectManager::RemoveRef(dynamic_cast<const RefHold*>(this));
+		ObjectManager::AddRef(old->GetRecord(), this);
+		if (DataPtr != nullptr) ObjectManager::RemoveRef(GetRecord(), this);
 		Pointer = old.Pointer;
-		DataPtr = dynamic_cast<Data*>(Pointer);
-		ObjectManager::AddRef(dynamic_cast<const RefHold*>(this));
+		DataPtr = old.DataPtr;
 		return *this;
 	}
 

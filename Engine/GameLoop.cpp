@@ -49,7 +49,6 @@ int GameLoop::Start()
 		int y = std::atoi(INI->GetValue("Render", "ResolutionY").c_str());
 		RI->SetupWindow(x, y);
 		II->SetInputHandler();
-		Collector = new GC();
 	}
 	catch (const std::exception& e)
 	{
@@ -59,6 +58,7 @@ int GameLoop::Start()
 	
 	printf("Creating defaults...\n");
 	State = EngineInterface::CreateDefaults();
+	Collector = new GC();
 
 	printf("Loading finished\n");
 	return MainLoop();

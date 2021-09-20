@@ -23,12 +23,12 @@ public:
 		return dynamic_cast<T>(ObjectRecords.find(record)->second.object);
 	}
 
-	static void AddRef(const RefHold* obj) {
-		ObjectRecords[obj->GetRecord()]->pointerRefs.push_back(obj);
+	static void AddRef(const uint64 record, const RefHold* obj) {
+		ObjectRecords[record]->pointerRefs.push_back(obj);
 	}
 
-	static void RemoveRef(const RefHold* obj) {
-		ObjectRecords.find(obj->GetRecord())->second->pointerRefs.remove(obj);
+	static void RemoveRef(const uint64 record, const RefHold* obj) {
+		ObjectRecords.find(record)->second->pointerRefs.remove(obj);
 	}
 
 	static void CreateRecord(Data* object, short protection = 0) {
