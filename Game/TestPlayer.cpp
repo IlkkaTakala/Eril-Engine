@@ -101,6 +101,7 @@ void TestPlayer::Tick(float)
 }
 
 #include "Objects/InstancedObject.h"
+#include "Objects/Actor.h"
 
 void TestPlayer::BeginPlay()
 {
@@ -113,7 +114,7 @@ void TestPlayer::BeginPlay()
 	DirLight->Data.Intensity = 5.0;
 	DirLight->Data.Rotation = Vector(45.0, 0.0, 0.0);
 
-	Reflecting = SpawnObject<InstancedObject>();
+	/*Reflecting = SpawnObject<InstancedObject>();
 	Reflecting->SetModel("Cube");
 	Reflecting->SetLocation(Vector(2.5f, 0.5f, 0.0f));
 	Reflecting->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/metal"));
@@ -129,7 +130,7 @@ void TestPlayer::BeginPlay()
 		arr[i].Scale = Vector(1.f, 1.f, 1.f);
 	}
 
-	Reflecting->AddInstances(count, arr);
+	Reflecting->AddInstances(count, arr);*/
 
 	/*Reflecting = SpawnObject<Actor>();
 	Reflecting->SetModel("Cube");
@@ -150,7 +151,7 @@ void TestPlayer::BeginPlay()
 
 	float size = 80.f;
 
-	/*for (int x = 0; x < 10; x++) {
+	for (int x = 0; x < 10; x++) {
 		for (int y = 0; y < 10; y++) {
 			Actor* next = SpawnObject<Actor>();
 			next->SetModel("sphere");
@@ -159,11 +160,11 @@ void TestPlayer::BeginPlay()
 			float rz = (float)rand() / (float)RAND_MAX;
 			float scale = (float)rand() / (float)RAND_MAX * 2.f;
 			next->SetScale(Vector(scale));
-			next->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/metal"));
+			next->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/rocks"));
 			next->SetLocation(Vector(rx * size, ry * size, rz * size / 3));
-			Spheres.push_back(next);
+			Spheres[x * y + y] = next;
 		}
-	}*/
+	}
 
 	/*for (int x = 0; x < 20; x++) {
 		for (int y = 0; y < 20; y++) {

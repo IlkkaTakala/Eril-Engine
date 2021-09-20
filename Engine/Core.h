@@ -33,6 +33,7 @@ public:
 
 	~Ref() {
 		if(Pointer != nullptr) ObjectManager::RemoveRef(dynamic_cast<RefHold*>(this));
+		NullThis();
 	}
 
 	virtual const void NullThis() const {

@@ -39,7 +39,7 @@ private:
 	Ref<Light> DirLight;
 	std::vector<Ref<Light>> Lights;
 	Ref<InstancedObject> Reflecting;
-	std::vector<Ref<Actor>> Spheres;
+	Ref<Actor> Spheres[100];
 
 	Ref<Actor> LastSphere;
 };

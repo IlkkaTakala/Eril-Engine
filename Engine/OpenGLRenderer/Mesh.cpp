@@ -20,8 +20,15 @@ Section::~Section()
 	glDeleteBuffers(1, &InstanceDisp);
 }
 
-void Section::Render()
+void Section::Render(Vector direction, Vector location)
 {
+	glm::vec3 pos = Parent->GetModelMatrix()[3];
+	glm::vec3 loc = glm::vec3(location.X, location.Z, location.Y);
+	glm::vec3 dir = glm::vec3(direction.X, direction.Z, direction.Y);
+	if ((pos - loc).length() > Radius)
+	{
+		if (glm::dot(dir, pos - loc) < 0) return;
+	}
 	glBindVertexArray(Holder->VAO);
 	if (Instanced) glDrawElementsInstanced(GL_TRIANGLES, Holder->IndexCount, GL_UNSIGNED_INT, 0, InstanceCount);
 	else glDrawElements(GL_TRIANGLES, Holder->IndexCount, GL_UNSIGNED_INT, 0);
