@@ -19,7 +19,6 @@ layout (std140, binding = 0) uniform Globals
 out VS_OUT {
 	vec2 TexCoords;
 	vec4 FragPos;
-	vec3 normal;
 	mat3 TBN;
 } vs_out;
 
@@ -32,13 +31,14 @@ void main()
 	vs_out.FragPos = pos;
 	vs_out.TexCoords = in_texCoord;
 	
-	vec3 T = in_tangent;
-	vec3 N = in_normal;
+	vec3 T = normalize(mat3(Model * in_disp) * in_tangent).xyz;
+	vec3 N = normalize(mat3(Model * in_disp) * in_normal).xyz;
 	T = normalize(T - dot(T, N) * N);
 	vec3 B = cross(N, T);
 
 	mat3 TBN = mat3(T, B, N);
 	vs_out.TBN = TBN;
+	//vs_out.normal = normalize(mat3(Model * in_disp) * in_normal).xyz;
 }
 ###END_VERTEX###
 ###FRAGMENT###
@@ -81,7 +81,7 @@ layout (location = 1) out vec4 BloomBuffer;
 in VS_OUT {
 	vec2 TexCoords;
 	vec4 FragPos;
-	vec3 normal;
+	//vec3 normal;
 	mat3 TBN;
 } fs_in;
 
@@ -178,13 +178,13 @@ void main()
 
 	// Get color and normal components from texture maps
 	//vec3 FragPos = texture(gPosition, TexCoords).xyz;
-	//vec3 normal = texture(gNormal, TexCoords).rgb;
 	//vec4 data = texture(gData, TexCoords);
 	
 	vec3 albedo = texture(Albedo, fs_in.TexCoords).rgb;
-	float metallic = texture(Metallic, fs_in.TexCoords).r;
+	float metallic = 0.0;//texture(Metallic, fs_in.TexCoords).r;
 	float AO = 1.0;
 	float roughness = texture(Roughness, fs_in.TexCoords).r;
+	vec3 normal = texture(Normal, fs_in.TexCoords).rgb;
 	
 	float shadow = 0;
 	//float SSAO = texture(gSSAO, TexCoords).r;
@@ -193,7 +193,7 @@ void main()
 	
 	vec3 Lo = vec3(0.0);
 
-	vec3 N = normalize(fs_in.normal); 
+	vec3 N = normalize(fs_in.TBN * normal); 
     vec3 V = normalize(viewPos - fs_in.FragPos).xyz;
 
 	uint offset = index * 1024;
@@ -257,7 +257,7 @@ void main()
 		
 	}
 	
-	vec4 color = vec4(radiance, 1.0);
+	vec4 color = vec4(ambient + Lo, 1.0);
 	
 	// Height fog
 	float depth = LinearizeDepth(fs_in.FragPos.z) / 100.0;
@@ -272,6 +272,6 @@ void main()
 	
 	ColorBuffer = color;
 	//if (brightness > 1.0)
-	BloomBuffer = clamp(color - exposure, 0.0, 100.0);
+	BloomBuffer = vec4(0);//clamp(color - exposure, 0.0, 100.0);
 }
 ###END_FRAGMENT###

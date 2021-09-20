@@ -1,5 +1,5 @@
 [Shader]
-name=shader_001
+name=shader_002
 [Textures]
 Albedo=Textures/ground/diffuse_d.jpg
 Normal=Textures/ground/normal_n.jpg
