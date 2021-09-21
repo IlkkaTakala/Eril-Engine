@@ -29,7 +29,7 @@ void GC::CleanRunner()
 		auto time = std::chrono::milliseconds(5000) - duration;
 		if (time.count() > 0) std::this_thread::sleep_for(time);
 
-		std::vector<long> removal;
+		std::vector<RecordInt> removal;
 		for (auto const& d : ObjectManager::ObjectRecords) {
 			if (d.second->pointerRefs.size() < 1 && !d.second->protection) {
 				if (d.second->checkCount > 3) {
@@ -43,9 +43,9 @@ void GC::CleanRunner()
 				d.second->checkCount = 0;
 			}
 		}
-		for (long d : removal) {
+		for (RecordInt d : removal) {
 			ObjectManager::DeleteRecord(d);
-			printf("Removed record: %x. No active references\n", d);
+			printf("Removed record: %llu. No active references\n", (uint64)d);
 		}
 
 		duration = std::chrono::steady_clock::now() - start;
