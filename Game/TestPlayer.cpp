@@ -110,17 +110,17 @@ void TestPlayer::BeginPlay()
 
 	DirLight = SpawnObject<Light>();
 	DirLight->Data.Location = Vector(0.f);
-	DirLight->Data.Type = LIGHT_DIRECTIONAL;
+	DirLight->Data.Type = LIGHT_POINT;
 	DirLight->Data.Size = 20.0;
 	DirLight->Data.Intensity = 5.0;
-	DirLight->Data.Rotation = Vector(0.0, 0.0, 0.0);
+	DirLight->Data.Rotation = Vector(45.0, 0.0, 0.0);
 
-	/*Reflecting = SpawnObject<InstancedObject>();
-	Reflecting->SetModel("Cube");
-	Reflecting->SetLocation(Vector(2.5f, 0.5f, 0.0f));
+	Reflecting = SpawnObject<InstancedObject>();
+	Reflecting->SetModel("sphere");
+	Reflecting->SetLocation(Vector(1.5f, 0.0f, 0.0f));
 	Reflecting->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/ground"));
 
-	int count = 2000;
+	/*int count = 2000;
 	Transformation* arr = new Transformation[count]();
 	for (int i = 0; i < count; i++)
 	{

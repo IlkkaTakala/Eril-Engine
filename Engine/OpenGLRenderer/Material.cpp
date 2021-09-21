@@ -3,12 +3,28 @@
 #include "Objects/VisibleObject.h"
 #include "Material.h"
 #include "Mesh.h"
+#include <regex>
+#pragma optimize("", off)
+
+void Shader::AddUniforms(const char* const string) {
+	const std::regex uniform_regex{ R"xx((?:\s*uniform ){1}(?:\w+ ){1}\K\w+)xx" };
+	String data(string);
+	std::smatch matches;	
+	std::regex_search(data, matches, uniform_regex);
+	for (const auto& name : matches) {
+		int loc = glGetUniformLocation(ShaderProgram, name.str().c_str());
+		if (loc < 0) continue;
+		UniformLocs.emplace(name.str(), loc);
+
+	}
+}
+#pragma optimize("", on)
 
 Shader::Shader(const char* const vertexShaderString, const char* const fragmentShaderString) 
 {
 	Success = false;
 	Pass = 0;
-
+	
 	int vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertexShaderString, NULL);
 	glCompileShader(vertexShader);
@@ -41,6 +57,9 @@ Shader::Shader(const char* const vertexShaderString, const char* const fragmentS
 		printf("ERROR: Shader link failed: \"%s\"\n", infoLog);
 		return;
 	}
+
+	AddUniforms(vertexShaderString);
+	AddUniforms(fragmentShaderString);
 
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
@@ -201,44 +220,38 @@ void Shader::Bind()
 
 void Shader::SetUniform(const String& name, const glm::mat4& m)
 {
-	GLint loc = glGetUniformLocation(ShaderProgram, name.c_str());
-	if (loc < 0) return;
-	glUniformMatrix4fv(loc, 1, GL_FALSE, &m[0][0]);
+	if (UniformLocs[name] < 0) return;
+	glUniformMatrix4fv(UniformLocs[name], 1, GL_FALSE, &m[0][0]);
 }
 
 void Shader::SetUniform(const String& name, const Vector& m)
 {
-	GLint loc = glGetUniformLocation(ShaderProgram, name.c_str());
-	if (loc < 0) return;
-	glUniform3fv(loc, 3, &m[0]);
+	if (UniformLocs[name] < 0) return;
+	glUniform3fv(UniformLocs[name], 3, &m[0]);
 }
 
 void Shader::SetUniform(const String& name, const int x, const int y)
 {
-	GLint loc = glGetUniformLocation(ShaderProgram, name.c_str());
-	if (loc < 0) return;
-	glUniform2iv(loc, 1, &glm::ivec2(x, y)[0]);
+	if (UniformLocs[name] < 0) return;
+	glUniform2iv(UniformLocs[name], 1, &glm::ivec2(x, y)[0]);
 }
 
 void Shader::SetUniform(const String& name, const float m)
 {
-	GLint loc = glGetUniformLocation(ShaderProgram, name.c_str());
-	if (loc < 0) return;
-	glUniform1fv(loc, 1, &m);
+	if (UniformLocs[name] < 0) return;
+	glUniform1fv(UniformLocs[name], 1, &m);
 }
 
 void Shader::SetUniform(const String& name, const int m)
 {
-	GLint loc = glGetUniformLocation(ShaderProgram, name.c_str());
-	if (loc < 0) return;
-	glUniform1i(loc, m);
+	if (UniformLocs[name] < 0) return;
+	glUniform1i(UniformLocs[name], m);
 }
 
 void Shader::SetUniform(const String& name, const uint m)
 {
-	GLint loc = glGetUniformLocation(ShaderProgram, name.c_str());
-	if (loc < 0) return;
-	glUniform1ui(loc, m);
+	if (UniformLocs[name] < 0) return;
+	glUniform1ui(UniformLocs[name], m);
 }
 
 void Shader::AddUser(Material* m)

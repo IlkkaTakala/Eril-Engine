@@ -260,18 +260,13 @@ void main()
 	vec4 color = vec4(ambient + Lo, 1.0);
 	
 	// Height fog
-	float depth = LinearizeDepth(fs_in.FragPos.z) / 100.0;
-	color += clamp(depth - 0.5, 0.0, 8.0);
+	//float depth = LinearizeDepth(fs_in.FragPos.z) / 100.0;
+	//color += clamp(depth - 0.5, 0.0, 8.0);
 	
-	const float gamma = 2.2;
+	//const float gamma = 2.2;
 	const float exposure = 1.0;
 	
-	vec4 result = vec4(1.0) - exp(-color * exposure);
-    // also gamma correct while we're at it       
-    result = pow(result, vec4(1.0 / gamma));
-	
 	ColorBuffer = color;
-	//if (brightness > 1.0)
-	BloomBuffer = vec4(0);//clamp(color - exposure, 0.0, 100.0);
+	BloomBuffer = clamp(color - exposure, 0.0, 100.0);
 }
 ###END_FRAGMENT###
