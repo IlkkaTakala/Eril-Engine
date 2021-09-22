@@ -1084,6 +1084,11 @@ void Renderer::GameStart()
 	glfwSetWindowTitle(Window, "Eril Engine Demo");
 }
 
+void Renderer::DestroyWindow()
+{
+	glfwDestroyWindow(Window);
+}
+
 GLMesh::GLMesh()
 {
 	ActiveDir = "";

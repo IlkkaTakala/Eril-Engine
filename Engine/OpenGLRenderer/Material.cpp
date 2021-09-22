@@ -4,21 +4,28 @@
 #include "Material.h"
 #include "Mesh.h"
 #include <regex>
-#pragma optimize("", off)
 
 void Shader::AddUniforms(const char* const string) {
-	const std::regex uniform_regex{ R"xx((?:\s*uniform ){1}(?:\w+ ){1}\K\w+)xx" };
-	String data(string);
-	std::smatch matches;	
-	std::regex_search(data, matches, uniform_regex);
-	for (const auto& name : matches) {
-		int loc = glGetUniformLocation(ShaderProgram, name.str().c_str());
-		if (loc < 0) continue;
-		UniformLocs.emplace(name.str(), loc);
-
+	try
+	{
+		const std::regex uniform_regex{ R"xx((?:uniform \w+ )(\w+))xx", std::regex::ECMAScript | std::regex::icase };
+		String data(string);
+		std::smatch match;
+		String::const_iterator searchStart(data.cbegin());
+		while (regex_search(searchStart, data.cend(), match, uniform_regex)) {
+			int loc = glGetUniformLocation(ShaderProgram, match[1].str().c_str());
+			searchStart = match.suffix().first;
+			if (loc < 0) continue;
+			UniformLocs.emplace(match[1].str(), loc);
+		}
 	}
+	catch (const std::regex_error& e)
+	{
+		printf("Regex error: %u; %s\n", e.code(), e.what());
+		throw(std::exception("Regex broke again\n"));
+	}
+	
 }
-#pragma optimize("", on)
 
 Shader::Shader(const char* const vertexShaderString, const char* const fragmentShaderString) 
 {
@@ -114,6 +121,10 @@ Shader::Shader(const char* const vertexShaderString, const char* geomShaderStrin
 		return;
 	}
 
+	AddUniforms(vertexShaderString);
+	AddUniforms(geomShaderString);
+	AddUniforms(fragmentShaderString);
+
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 	glDeleteShader(geomShader);
@@ -149,6 +160,8 @@ Shader::Shader(int type, const char* const ShaderString)
 			printf("ERROR: Shader link failed: \"%s\"\n", infoLog);
 			return;
 		}
+		AddUniforms(ShaderString);
+
 		// No longer need the shaders, delete them
 		glDeleteShader(compute);
 	} break;
@@ -176,6 +189,7 @@ Shader::Shader(int type, const char* const ShaderString)
 			printf("ERROR: Shader link failed: \"%s\"\n", infoLog);
 			return;
 		}
+		AddUniforms(ShaderString);
 
 		glDeleteShader(vertexShader);
 	} break;
@@ -201,6 +215,7 @@ Shader::Shader(int type, const char* const ShaderString)
 			printf("ERROR: Shader link failed: \"%s\"\n", infoLog);
 			return;
 		}
+		AddUniforms(ShaderString);
 
 		glDeleteShader(fragmentShader);
 	} break;
@@ -220,37 +235,43 @@ void Shader::Bind()
 
 void Shader::SetUniform(const String& name, const glm::mat4& m)
 {
-	if (UniformLocs[name] < 0) return;
+	auto const& locs = UniformLocs.find(name);
+	if (locs == UniformLocs.end() || locs->second < 0) return;
 	glUniformMatrix4fv(UniformLocs[name], 1, GL_FALSE, &m[0][0]);
 }
 
 void Shader::SetUniform(const String& name, const Vector& m)
 {
-	if (UniformLocs[name] < 0) return;
+	auto const& locs = UniformLocs.find(name);
+	if (locs == UniformLocs.end() || locs->second < 0) return;
 	glUniform3fv(UniformLocs[name], 3, &m[0]);
 }
 
 void Shader::SetUniform(const String& name, const int x, const int y)
 {
-	if (UniformLocs[name] < 0) return;
+	auto const& locs = UniformLocs.find(name);
+	if (locs == UniformLocs.end() || locs->second < 0) return;
 	glUniform2iv(UniformLocs[name], 1, &glm::ivec2(x, y)[0]);
 }
 
 void Shader::SetUniform(const String& name, const float m)
 {
-	if (UniformLocs[name] < 0) return;
+	auto const& locs = UniformLocs.find(name);
+	if (locs == UniformLocs.end() || locs->second < 0) return;
 	glUniform1fv(UniformLocs[name], 1, &m);
 }
 
 void Shader::SetUniform(const String& name, const int m)
 {
-	if (UniformLocs[name] < 0) return;
+	auto const& locs = UniformLocs.find(name);
+	if (locs == UniformLocs.end() || locs->second < 0) return;
 	glUniform1i(UniformLocs[name], m);
 }
 
 void Shader::SetUniform(const String& name, const uint m)
 {
-	if (UniformLocs[name] < 0) return;
+	auto const& locs = UniformLocs.find(name);
+	if (locs == UniformLocs.end() || locs->second < 0) return;
 	glUniform1ui(UniformLocs[name], m);
 }
 

@@ -40,6 +40,7 @@ public:
 	virtual void Update() override;
 	virtual void Render(float delta) override;
 	virtual void GameStart() override;
+	virtual void DestroyWindow() override;
 
 private:
 	friend class GLInput;
