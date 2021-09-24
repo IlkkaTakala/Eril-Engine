@@ -1,5 +1,5 @@
 [Shader]
-name=shader_002
+name=shader_001
 [Textures]
 Albedo=Textures/metalball/albedo_d.png
 Normal=Textures/metalball/normal_n.png

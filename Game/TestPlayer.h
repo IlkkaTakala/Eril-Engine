@@ -42,4 +42,5 @@ private:
 	Ref<Actor> Spheres[100];
 
 	Ref<Actor> LastSphere;
+	Ref<Actor> LastSphere2;
 };

@@ -111,14 +111,19 @@ void TestPlayer::BeginPlay()
 	DirLight = SpawnObject<Light>();
 	DirLight->Data.Location = Vector(0.f);
 	DirLight->Data.Type = LIGHT_POINT;
-	DirLight->Data.Size = 20.0;
-	DirLight->Data.Intensity = 5.0;
+	DirLight->Data.Size = 7.0;
+	DirLight->Data.Intensity = 50.0;
 	DirLight->Data.Rotation = Vector(45.0, 0.0, 0.0);
 
-	Reflecting = SpawnObject<InstancedObject>();
-	Reflecting->SetModel("sphere");
-	Reflecting->SetLocation(Vector(1.5f, 0.0f, 0.0f));
-	Reflecting->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/ground"));
+	LastSphere = SpawnObject<Actor>();
+	LastSphere->SetModel("sphere");
+	LastSphere->SetLocation(Vector(1.5f, 0.0f, 0.0f));
+	LastSphere->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/metal"));
+
+	LastSphere2 = SpawnObject<Actor>();
+	LastSphere2->SetModel("sphere");
+	LastSphere2->SetLocation(Vector(3.f, 0.0f, 0.0f));
+	LastSphere2->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/metal"));
 
 	/*int count = 2000;
 	Transformation* arr = new Transformation[count]();

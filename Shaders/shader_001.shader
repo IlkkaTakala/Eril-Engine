@@ -1,4 +1,4 @@
-2;0;
+2;1;
 ###VERTEX###
 #version 430 core
 layout (location = 0) in vec3 in_position;
@@ -74,10 +74,8 @@ layout(std430, binding = 2) readonly buffer VisibleLightIndicesBuffer {
 	VisibleIndex data[];
 } visibleLightIndicesBuffer;
 
-layout (location = 0) out vec4 ColorBuffer;
-layout (location = 1) out vec4 BloomBuffer;
-layout (location = 2) out vec4 accum;
-layout (location = 3) out float reveal;
+layout (location = 0) out vec4 accum;
+layout (location = 1) out float reveal;
 
 in VS_OUT {
 	vec2 TexCoords;
@@ -258,7 +256,7 @@ void main()
 		
 	}
 	
-	vec4 color = vec4(ambient + Lo, 1.0);
+	vec4 color = vec4(ambient + Lo, 0.3);
 	
 	// Height fog
 	//float depth = LinearizeDepth(fs_in.FragPos.z) / 100.0;
@@ -267,7 +265,16 @@ void main()
 	//const float gamma = 2.2;
 	const float exposure = 1.0;
 	
-	ColorBuffer = color;
-	BloomBuffer = clamp(color - exposure, 0.0, 100.0);
+	float weight = clamp(pow(min(1.0, color.a * 10.0) + 0.01, 3.0) * 1e8 * 
+                         pow(1.0 - gl_FragCoord.z * 0.9, 3.0), 1e-2, 3e3);
+
+    // store pixel color accumulation
+    accum = vec4(color.rgb * color.a, color.a) * weight;
+
+    // store pixel revealage threshold
+    reveal = 0.3;
+	
+	//ColorBuffer = vec4(0.0);
+	//BloomBuffer = clamp(color - exposure, 0.0, 100.0);
 }
 ###END_FRAGMENT###
