@@ -15,8 +15,8 @@ void main()
 ###FRAGMENT###
 #version 430 core
 
-uniform sampler2D Color;
-uniform sampler2D Bloom;
+layout (binding = 0) uniform sampler2D Color;
+layout (binding = 1) uniform sampler2D Bloom;
 
 in vec2 TexCoords;
 out vec4 FragColor;

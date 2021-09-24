@@ -53,6 +53,8 @@ int GameLoop::Start()
 	catch (const std::exception& e)
 	{
 		printf(e.what());
+		printf("\n");
+		RI->DestroyWindow();
 		return 11;
 	}
 	

@@ -7,6 +7,7 @@ class RenderBatch;
 class GLCamera;
 class PreDepthBuffer;
 class PostBuffer;
+class TransparencyBuffer;
 class BlurBuffer;
 class SSAOBuffer;
 class ShadowMapBuffer;
@@ -40,6 +41,7 @@ public:
 	virtual void Update() override;
 	virtual void Render(float delta) override;
 	virtual void GameStart() override;
+	virtual void DestroyWindow() override;
 
 private:
 	friend class GLInput;
@@ -60,6 +62,7 @@ private:
 	Shader* LightCullingShader;
 	Shader* PreDepthShader;
 	Shader* PostProcessMaster;
+	Shader* CompositeShader;
 	Shader* SSAOShader;
 	Shader* SSAOBlurShader;
 	Shader* ShadowShader;
@@ -68,9 +71,9 @@ private:
 	Shader* SkyFilterShader;
 	Shader* SkyBoxShader;
 	GLFWwindow* Window;
-	RenderBatch* Batcher;
 	PreDepthBuffer* DepthBuffer;
 	PostBuffer* PostProcess;
+	TransparencyBuffer* Transparency;
 	BlurBuffer* BlurRender;
 	SSAOBuffer* SSAORender;
 	ShadowMapBuffer* ShadowMapping;

@@ -158,7 +158,7 @@ PostBuffer::PostBuffer(int width, int height)
 	glGenFramebuffers(1, &FrameBuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, FrameBuffer);
 
-	// - position color buffer
+	// - color buffer
 	glGenTextures(1, &ColorBuffer);
 	glBindTexture(GL_TEXTURE_2D, ColorBuffer);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
@@ -166,7 +166,7 @@ PostBuffer::PostBuffer(int width, int height)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ColorBuffer, 0);
 
-	// - normal color buffer
+	// - bloom color buffer
 	glGenTextures(1, &BloomBuffer);
 	glBindTexture(GL_TEXTURE_2D, BloomBuffer);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
@@ -175,7 +175,7 @@ PostBuffer::PostBuffer(int width, int height)
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, BloomBuffer, 0);
 
 	// - tell OpenGL which color attachments we'll use (of this framebuffer) for rendering 
-	unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+	unsigned int attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 	glDrawBuffers(2, attachments);
 
 	glGenTextures(1, &DepthBuffer);
@@ -208,8 +208,8 @@ PostBuffer::~PostBuffer()
 void PostBuffer::Bind()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, FrameBuffer);
-	unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-	glDrawBuffers(2, attachments);
+	//unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+	//glDrawBuffers(2, attachments);
 }
 
 void PostBuffer::Unbind()
@@ -223,8 +223,69 @@ void PostBuffer::BindTextures()
 	glBindTexture(GL_TEXTURE_2D, ColorBuffer);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, BloomBuffer);
-	glActiveTexture(GL_TEXTURE2);
+
+	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, DepthBuffer);
+}
+
+TransparencyBuffer::TransparencyBuffer(int width, int height)
+{
+	glGenFramebuffers(1, &FrameBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, FrameBuffer);
+
+	// - accumulation color buffer
+	glGenTextures(1, &AccumBuffer);
+	glBindTexture(GL_TEXTURE_2D, AccumBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, AccumBuffer, 0);
+
+	// - revealage color buffer
+	glGenTextures(1, &RevealageBuffer);
+	glBindTexture(GL_TEXTURE_2D, RevealageBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, RevealageBuffer, 0);
+
+	// - tell OpenGL which color attachments we'll use (of this framebuffer) for rendering 
+	unsigned int attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+	glDrawBuffers(2, attachments);
+
+	if (GL_FRAMEBUFFER_COMPLETE != glCheckFramebufferStatus(GL_FRAMEBUFFER))
+	{
+		throw std::runtime_error("Texture could not add texture to framebuffer! : Post Process\n");
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+TransparencyBuffer::~TransparencyBuffer()
+{
+	glDeleteTextures(1, &AccumBuffer);
+	glDeleteTextures(1, &RevealageBuffer);
+	glDeleteFramebuffers(1, &FrameBuffer);
+}
+
+void TransparencyBuffer::Bind()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, FrameBuffer);
+	//unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+	//glDrawBuffers(2, attachments);
+}
+
+void TransparencyBuffer::Unbind()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void TransparencyBuffer::BindTextures()
+{
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, AccumBuffer);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, RevealageBuffer);
 }
 
 SSAOBuffer::SSAOBuffer(int width, int height)

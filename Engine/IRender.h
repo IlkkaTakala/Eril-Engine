@@ -49,6 +49,7 @@ public:
 	virtual void Update() = 0;
 	virtual void Render(float delta) = 0;
 	virtual void GameStart() = 0;
+	virtual void DestroyWindow() = 0;
 };
 
 class IInput

@@ -38,8 +38,11 @@ public:
 	uint8 Pass;
 
 private:
+	void AddUniforms(const char* const string);
+
 	GLint ShaderProgram;
 	std::list<Material*> Users;
+	std::map<String, int> UniformLocs;
 };
 
 class Material

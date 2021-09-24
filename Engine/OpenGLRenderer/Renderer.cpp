@@ -57,7 +57,6 @@ struct GLM_Light
 
 Renderer::Renderer()
 {
-	Batcher = nullptr;
 	DepthBuffer = nullptr;
 	BlurRender = nullptr;
 	Window = nullptr;
@@ -68,13 +67,18 @@ Renderer::Renderer()
 	SSAOBlurShader = nullptr;
 	SSAORender = nullptr;
 	PostProcess = nullptr;
+	Transparency = nullptr;
 	PostProcessMaster = nullptr;
+	CompositeShader = nullptr;
 	ShadowShader = nullptr;
 	ShadowMapping = nullptr;
 	ShadowColorShader = nullptr;
 	EnvironmentRender = nullptr;
 
 	MaxLightCount = 1024;
+
+	EnvironmentVAO = 0;
+	EnvironmentVBO = 0;
 
 	ScreenVao = 0;
 	ScreenVbo = 0;
@@ -130,9 +134,9 @@ int Renderer::SetupWindow(int width, int height)
 	}
 
 	printf("Allocating buffers...\n");
-	Batcher = new RenderBatch(/*262144*/524288);
 	DepthBuffer = new PreDepthBuffer(width, height);
 	PostProcess = new PostBuffer(width, height);
+	Transparency = new TransparencyBuffer(width, height);
 	SSAORender = new SSAOBuffer(width, height);
 	ShadowMapping = new ShadowMapBuffer(width, height);
 	EnvironmentRender = new ReflectionBuffer(EnvSizeX, EnvSizeY);
@@ -341,14 +345,15 @@ void Renderer::CleanRenderer()
 		delete t.second;
 	}
 
-	delete Batcher;
 	delete DepthBuffer;
 	delete PostProcess;
+	delete Transparency;
 	delete BlurRender;
 	delete SSAORender;
 	delete EnvironmentRender;
 	delete PreDepthShader;
 	delete PostProcessMaster;
+	delete CompositeShader;
 	delete LightCullingShader;
 	delete SSAOShader;
 	delete ShadowShader;
@@ -581,6 +586,7 @@ void Renderer::LoadShaders()
 					if (nShader != nullptr) {
 						if (f.path().filename() == "PreDepth.shader") PreDepthShader = nShader;
 						else if (f.path().filename() == "PostProcessMaster.shader") PostProcessMaster = nShader;
+						else if (f.path().filename() == "Composite.shader") CompositeShader = nShader;
 						else if (f.path().filename() == "SSAO.shader") SSAOShader = nShader;
 						else if (f.path().filename() == "SSAOBlur.shader") SSAOBlurShader = nShader;
 						else if (f.path().filename() == "ShadowColor.shader") ShadowColorShader = nShader;
@@ -836,11 +842,8 @@ void Renderer::Shadows(int width, int height)
 
 		ShadowColorShader->SetUniform("lSpace", ShadowOrtho * view);
 
-		Batcher->begin();
 		for (auto const& s : renders) {
-			Batcher->add(s);
 		}
-		Batcher->end();
 	}
 	glViewport(0, 0, width, height);
 }
@@ -878,11 +881,17 @@ void Renderer::SSAO(int width, int height)
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
 }
 
+constexpr glm::vec4 clearClrZero(0.f);
+constexpr glm::vec4 clearClrOne(1.f);
+
 void Renderer::Forward(int width, int height)
 {
+	PostProcess->Bind();
+
+	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LESS);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_BLEND);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	// Clear the screen
 	glClearColor(0.f, 0.f, 0.f, 0.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -890,9 +899,12 @@ void Renderer::Forward(int width, int height)
 	glEnable(GL_MULTISAMPLE);
 	glEnable(GL_CULL_FACE);
 
+	// Opaque Pass
 	for (auto const& [name, s] : Shaders)
 	{
 		if (s == nullptr) continue;
+
+		if (s->Pass != 0) continue;
 
 		s->Bind();
 
@@ -900,6 +912,7 @@ void Renderer::Forward(int width, int height)
 
 		for (Material* m : s->GetUsers())
 		{
+			if (m->GetObjects().size() < 1) continue;
 			for (auto const& param : m->GetVectorParameters()) {
 				s->SetUniform(param.first, param.second);
 			}
@@ -930,7 +943,7 @@ void Renderer::Forward(int width, int height)
 				glm::vec3 dir = glm::vec3(direction.X, direction.Z, direction.Y);
 				if ((loc - pos).length() > 2.f && (loc - pos).length() > radii)
 				{
-					if (glm::dot(dir, glm::normalize(loc - pos)) < 0.65f)
+					if (glm::dot(dir, glm::normalize(loc - pos)) < 0.5f)
 					{
 						continue;
 					}
@@ -940,7 +953,88 @@ void Renderer::Forward(int width, int height)
 				
 			}
 		}
+
 	}
+	
+	glDepthMask(GL_FALSE);
+	glEnable(GL_BLEND);
+	glBlendFunci(0, GL_ONE, GL_ONE); // accumulation blend target
+	glBlendFunci(1, GL_ZERO, GL_ONE_MINUS_SRC_COLOR); // revealge blend target
+	glBlendEquation(GL_FUNC_ADD);
+
+	Transparency->Bind();
+	glClearBufferfv(GL_COLOR, 0, &clearClrZero[0]);
+	glClearBufferfv(GL_COLOR, 1, &clearClrOne[0]);
+
+	// Translucent pass
+	for (auto const& [name, s] : Shaders)
+	{
+		if (s == nullptr) continue;
+
+		if (s->Pass != 1) continue;
+
+		s->Bind();
+
+		for (Material* m : s->GetUsers())
+		{
+			if (m->GetObjects().size() < 1) continue;
+			for (auto const& param : m->GetVectorParameters()) {
+				s->SetUniform(param.first, param.second);
+			}
+
+			for (auto const& param : m->GetScalarParameters()) {
+				s->SetUniform(param.first, param.second);
+			}
+
+			int round = 0;
+			for (auto const& param : m->GetTextures()) {
+				if (param.second > 0) {
+					s->SetUniform(param.first, round);
+					glActiveTexture(GL_TEXTURE0 + round);
+					glBindTexture(GL_TEXTURE_2D, param.second->GetTextureID());
+					round++;
+				}
+			}
+
+			for (Section* o : m->GetObjects())
+			{
+				glm::mat4 mm = o->Parent->GetModelMatrix();
+				Vector direction = ActiveCamera->GetForwardVector();
+				Vector location = ActiveCamera->GetLocation();
+				glm::vec3 pos = mm[3];
+				glm::vec3 rad = glm::vec3(o->GetRadius()) * glm::mat3(mm);
+				float radii = glm::max(rad.x, glm::max(rad.y, rad.z));
+				glm::vec3 loc = glm::vec3(location.X, location.Z, location.Y);
+				glm::vec3 dir = glm::vec3(direction.X, direction.Z, direction.Y);
+				if ((loc - pos).length() > 2.f && (loc - pos).length() > radii)
+				{
+					if (glm::dot(dir, glm::normalize(loc - pos)) < 0.5f)
+					{
+						continue;
+					}
+				}
+				s->SetUniform("Model", mm);
+				o->Render();
+
+			}
+		}
+	}
+
+	glDepthFunc(GL_ALWAYS);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	PostProcess->Bind();
+
+	// use composite shader
+	CompositeShader->Bind();
+
+	// draw screen quad
+	Transparency->BindTextures();
+	glBindVertexArray(ScreenVao);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	PostProcess->Unbind();
 }
 
 void Renderer::PreDepth(int width, int height)
@@ -1031,19 +1125,17 @@ void Renderer::Render(float delta)
 	DepthBuffer->BindTextures();
 	LightCulling(width, height);
 
-	PostProcess->Bind();
 	Forward(width, height);
-	PostProcess->Unbind();
 
 	glClearColor(0.f, 0.f, 0.f, 0.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	DepthBuffer->BindTextures();
 	EnvironmentRender->BindTextures();
 
-	glDepthFunc(GL_ALWAYS);
+	/*glDepthFunc(GL_ALWAYS);
 	glBindVertexArray(ScreenVao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glBindVertexArray(0);
+	glBindVertexArray(0);*/
 
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, DepthBuffer->GetBuffer());
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, PostProcess->GetBuffer());
@@ -1060,8 +1152,8 @@ void Renderer::Render(float delta)
 	PostProcess->BindTextures();
 
 	PostProcessMaster->Bind();
-	PostProcessMaster->SetUniform("Color", 0);
-	PostProcessMaster->SetUniform("Bloom", 1);
+	//PostProcessMaster->SetUniform("Color", 0);
+	//PostProcessMaster->SetUniform("Bloom", 1);
 
 	glDepthFunc(GL_ALWAYS);
 	glBindVertexArray(ScreenVao);
@@ -1082,6 +1174,11 @@ void Renderer::Render(float delta)
 void Renderer::GameStart()
 {
 	glfwSetWindowTitle(Window, "Eril Engine Demo");
+}
+
+void Renderer::DestroyWindow()
+{
+	glfwDestroyWindow(Window);
 }
 
 GLMesh::GLMesh()
@@ -1152,7 +1249,7 @@ void processMesh(LoadedMesh* meshHolder, aiMesh* mesh)
 	section->vertices = new Vertex[vertices.size() * sizeof(Vertex)];
 	memcpy(section->vertices, vertices.data(), vertices.size() * sizeof(Vertex));*/
 
-	section->Instance = RI->LoadMaterialByName("Shaders/test");
+	//section->Instance = RI->LoadMaterialByName("Shaders/test");
 
 	meshHolder->HolderCount++;
 	meshHolder->Holders.push_back(section);

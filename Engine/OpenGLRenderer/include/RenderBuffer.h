@@ -52,6 +52,28 @@ private:
 	PostBuffer& operator=(const PostBuffer&);
 };
 
+class TransparencyBuffer
+{
+public:
+	TransparencyBuffer(int width, int height);
+	~TransparencyBuffer();
+
+	void Bind();
+	void Unbind();
+	uint GetBuffer() const { return FrameBuffer; }
+
+	void BindTextures();
+
+private:
+	uint FrameBuffer;
+
+	uint AccumBuffer;
+	uint RevealageBuffer;
+
+	TransparencyBuffer(const TransparencyBuffer&);
+	TransparencyBuffer& operator=(const TransparencyBuffer&);
+};
+
 class SSAOBuffer
 {
 public:
