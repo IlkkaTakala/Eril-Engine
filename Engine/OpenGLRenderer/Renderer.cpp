@@ -333,6 +333,8 @@ int Renderer::SetupWindow(int width, int height)
 
 void Renderer::CleanRenderer()
 {
+	glfwDestroyWindow(Window);
+
 	for (auto const& m : BaseMaterials) {
 		delete m.second;
 	}
@@ -373,7 +375,6 @@ void Renderer::CleanRenderer()
 	glDeleteVertexArrays(1, &ScreenVao);
 	glDeleteVertexArrays(1, &EnvironmentVAO);
 
-	glfwDestroyWindow(Window);
 	glfwTerminate();
 }
 

@@ -1,6 +1,6 @@
 #include "PlayerController.h"
 
-Player::Player()
+Player::Player() : Actor()
 {
 	PlayerCamera = RI->CreateCamera();
 	RI->SetActiveCamera(PlayerCamera);

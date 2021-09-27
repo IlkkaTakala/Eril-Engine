@@ -228,6 +228,7 @@
     <ClCompile Include="Game\EngineInterface.cpp" />
     <ClCompile Include="Game\TestPlayer.cpp" />
     <ClCompile Include="$(SolutionDir)\Engine\OpenGLRenderer\ext\glfw\deps\glad_gl.c" />
+    <ClCompile Include="MovementComponent.cpp" />
     <ClInclude Include="Engine\BasicTypes.h" />
     <ClInclude Include="Engine\Core.h" />
     <ClInclude Include="Engine\GameLoop.h" />
@@ -240,6 +241,7 @@
     <ClInclude Include="Engine\Objects\Actor.h" />
     <ClInclude Include="Engine\Objects\BaseObject.h" />
     <ClInclude Include="Engine\Objects\InstancedObject.h" />
+    <ClInclude Include="Engine\Objects\MovementComponent.h" />
     <ClInclude Include="Engine\Objects\VisibleObject.h" />
     <ClInclude Include="Engine\OpenGLRenderer\ext\glfw\deps\glad\gl.h" />
     <ClInclude Include="Engine\OpenGLRenderer\include\Batcher.h" />

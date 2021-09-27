@@ -1,8 +1,9 @@
 #pragma once
 #include "Core.h"
 #include "IRender.h"
+#include "Objects/Actor.h"
 
-class Player : public BaseObject, public Tickable
+class Player : public Actor
 {
 public:
 	Player();

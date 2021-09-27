@@ -1,6 +1,7 @@
 #include "IRender.h"
 #include "LightData.h"
 #include "TestPlayer.h"
+#include "Objects/MovementComponent.h"
 
 TestPlayer::TestPlayer() : Player()
 {
@@ -21,26 +22,30 @@ TestPlayer::TestPlayer() : Player()
 	II->RegisterKeyInput(50, &TestPlayer::InputTwo, this);
 	II->RegisterKeyInput(256, &TestPlayer::InputExit, this);
 	II->RegisterMouseInput(0, &TestPlayer::MouseMoved, this);
+
+	Movement = SpawnObject<MovementComponent>();
+	Movement->SetTarget(dynamic_cast<Actor*>(this));
+	Movement->SetGravity(false);
 }
 
 void TestPlayer::RunInputW(float delta, bool KeyDown)
 {
-	GetCamera()->SetLocation(GetCamera()->GetLocation() - GetCamera()->GetForwardVector() * delta * Speed);
+	Movement->AddInput(-GetCamera()->GetForwardVector());
 }
 
 void TestPlayer::RunInputA(float delta, bool KeyDown)
 {
-	GetCamera()->SetLocation(GetCamera()->GetLocation() - GetCamera()->GetRightVector() * delta * Speed);
+	Movement->AddInput(-GetCamera()->GetRightVector());
 }
 
 void TestPlayer::RunInputD(float delta, bool KeyDown)
 {
-	GetCamera()->SetLocation(GetCamera()->GetLocation() + GetCamera()->GetRightVector() * delta * Speed);
+	Movement->AddInput(GetCamera()->GetRightVector());
 }
 
 void TestPlayer::RunInputS(float delta, bool KeyDown)
 {
-	GetCamera()->SetLocation(GetCamera()->GetLocation() + GetCamera()->GetForwardVector() * delta * Speed);
+	Movement->AddInput(GetCamera()->GetForwardVector());
 }
 
 void TestPlayer::RunInputSpace(float delta, bool KeyDown)
@@ -91,13 +96,14 @@ void TestPlayer::RightMouseDown(float delta, bool KeyDown)
 
 void TestPlayer::MouseMoved(float X, float Y)
 {
-	const Vector& rot = GetCamera()->GetRotation();
-	GetCamera()->SetRotation(Vector(rot.X + X * mouseSens, rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, rot.Z));
+	const Vector& rot = Rotation;
+	SetRotation(Vector(rot.X + X * mouseSens, rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, rot.Z));
 }
 
 void TestPlayer::Tick(float)
 {
-		
+	GetCamera()->SetLocation(Location);
+	GetCamera()->SetRotation(Rotation);
 }
 
 #include "Objects/InstancedObject.h"

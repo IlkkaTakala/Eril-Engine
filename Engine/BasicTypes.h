@@ -117,8 +117,11 @@ struct Vector
 	String ToString() { return String(std::to_string(X) + ',' + std::to_string(Y) + ',' + std::to_string(Z)); }
 
 	friend Vector operator+(const Vector& obj, const Vector& obj2) { return Vector(obj2.X + obj.X, obj2.Y + obj.Y, obj2.Z + obj.Z); }
+	friend void operator+=(Vector& obj, const Vector& obj2) { obj.X += obj2.X; obj.Y += obj2.Y; obj.Z += obj2.Z; }
 
 	friend Vector operator-(const Vector& obj, const Vector& obj2) { return Vector(obj.X - obj2.X, obj.Y - obj2.Y, obj.Z - obj2.Z); }
+	friend Vector operator-(const Vector& obj) { return Vector(-obj.X, -obj.Y, -obj.Z); }
+	friend void operator-=(Vector& obj, const Vector& obj2) { obj.X -= obj2.X; obj.Y -= obj2.Y; obj.Z -= obj2.Z; }
 
 	Vector& operator*=(const Vector& obj) { X *= obj.X; Y *= obj.Y; Z *= obj.Z; return *this; }
 	friend Vector operator*(Vector obj, const Vector& obj2) { obj *= obj2; return obj; }
