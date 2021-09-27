@@ -22,21 +22,36 @@ std::vector<String> split(const String& s, char delim);
 struct RecordInt {
 	uint64 record;
 
-	operator uint64() const {
-		return record;
-	}
-
-	RecordInt& operator=(uint64 i) {
-		record = i;
-		return *this;
-	}
-
 	RecordInt(uint64 i) {
 		record = i;
 	}
 
+	RecordInt() {
+		record = 0;
+	}
+
 	unsigned int GetModID() const {
 		return record >> 51;
+	}
+
+	operator uint64() const {
+		return record;
+	}
+
+	inline RecordInt& operator=(uint64 i) {
+		record = i;
+		return *this;
+	}
+
+	inline RecordInt& operator=(RecordInt& i) {
+		record = i;
+		return *this;
+	}
+
+	template <typename T>
+	inline RecordInt& operator=(T& i) {
+		record = reinterpret_cast<uint64>(i);
+		return *this;
 	}
 
 	inline bool operator==(const RecordInt& rhs) {

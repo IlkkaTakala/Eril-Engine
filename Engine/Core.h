@@ -41,8 +41,8 @@ public:
 		DataPtr = nullptr;
 	}
 
-	virtual const long GetRecord() const override {
-		return DataPtr ? DataPtr->GetRecord() : 0;
+	virtual const RecordInt GetRecord() const override {
+		return DataPtr ? DataPtr->GetRecord() : RecordInt(0);
 	}
 
 	T* GetPointer() { return Pointer; }

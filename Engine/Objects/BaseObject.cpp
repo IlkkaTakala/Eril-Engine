@@ -16,7 +16,7 @@ void Data::DestroyObject()
 
 Data::Data()
 {
-	RecordNumber = -1;
+	RecordNumber = 0;
 	bMarked = false;
 	ObjectManager::CreateRecord(this);
 }
