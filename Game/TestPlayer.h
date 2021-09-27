@@ -41,8 +41,10 @@ private:
 	Ref<Light> DirLight;
 	std::vector<Ref<Light>> Lights;
 	Ref<InstancedObject> Reflecting;
-	Ref<Actor> Spheres[100];
+	Ref<VisibleObject> Spheres[100];
 
 	Ref<Actor> LastSphere;
 	Ref<Actor> LastSphere2;
+
+	int spawnCounter;
 };

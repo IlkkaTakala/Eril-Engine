@@ -21,7 +21,6 @@ public:
 	void SetTarget(Actor* t) { Object = t; }
 	void SetMass(float m) { mass = m; }
 	void SetMaxSpeed(float speed) { max_speed = speed; }
-	void SetSpeed(float speed) { this->speed = speed; }
 	void SetPhysics(bool p) { isPhysics = p; }
 	void SetGravity(bool g) { isGravity = g; }
 
@@ -39,7 +38,6 @@ private:
 	bool isGravity;
 
 	float mass;
-	float speed;
 	float in_acceleration;
 	float max_speed;
 	float drag;

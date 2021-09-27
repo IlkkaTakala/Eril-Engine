@@ -2,12 +2,14 @@
 #include "LightData.h"
 #include "TestPlayer.h"
 #include "Objects/MovementComponent.h"
+#include "FallingCube.h"
 
 TestPlayer::TestPlayer() : Player()
 {
 	mouseSens = 0.5f;
 	Speed = 5.f;
 	LightMode = false;
+	spawnCounter = 0;
 	//GetCamera()->SetLocation(INI->GetValue("Player", "Start"));
 	//GetCamera()->SetRotation(INI->GetValue("Player", "Direction"));
 
@@ -79,8 +81,8 @@ void TestPlayer::InputTwo(float delta, bool KeyDown)
 
 void TestPlayer::RunInputShift(float delta, bool KeyDown)
 {
-	if (KeyDown) Speed = 10.f;
-	else Speed = 5.f;
+	if (KeyDown) Movement->SetMaxSpeed(20.f);
+	else Movement->SetMaxSpeed(10.f);
 }
 
 
@@ -104,10 +106,24 @@ void TestPlayer::Tick(float)
 {
 	GetCamera()->SetLocation(Location);
 	GetCamera()->SetRotation(Rotation);
+
+	if (spawnCounter++ == 10) {
+
+		FallingCube* obj = SpawnObject<FallingCube>();
+
+		float size = 80.f;
+		float rx = (float)rand() / (float)RAND_MAX - 0.5f;
+		float ry = (float)rand() / (float)RAND_MAX - 0.5f;
+		float rz = (float)rand() / (float)RAND_MAX;
+		obj->SetLocation(Vector(rx * size, ry * size, 10.f));
+
+		spawnCounter = 0;
+	}
 }
 
 #include "Objects/InstancedObject.h"
 #include "Objects/Actor.h"
+#include "Objects/VisibleObject.h"
 
 
 void TestPlayer::BeginPlay()
@@ -162,7 +178,7 @@ void TestPlayer::BeginPlay()
 	float size = 80.f;
 
 	for (int x = 0; x < 100; x++) {
-		Actor* next = SpawnObject<Actor>();
+		VisibleObject* next = SpawnObject<VisibleObject>();
 		next->SetModel("Cube");
 		float rx = (float)rand() / (float)RAND_MAX - 0.5f;
 		float ry = (float)rand() / (float)RAND_MAX - 0.5f;

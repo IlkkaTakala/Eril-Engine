@@ -2,7 +2,7 @@
 #include "TestPlayer.h"
 #include "EngineInterface.h"
 
-Ref<GameState> EngineInterface::CreateDefaults()
+GameState* EngineInterface::CreateDefaults()
 {
     Ref<GameState> State = SpawnObject<GameState>();
     TestPlayer* pla = SpawnObject<TestPlayer>();

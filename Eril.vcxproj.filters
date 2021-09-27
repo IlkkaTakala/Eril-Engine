@@ -82,8 +82,11 @@
     <ClCompile Include="Engine\Objects\InstancedObject.cpp">
       <Filter>Engine\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="MovementComponent.cpp">
+    <ClCompile Include="Engine\Objects\MovementComponent.cpp">
       <Filter>Engine\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\FallingCube.cpp">
+      <Filter>Game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -193,6 +196,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Objects\MovementComponent.h">
       <Filter>Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\FallingCube.h">
+      <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

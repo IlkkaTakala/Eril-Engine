@@ -4,7 +4,6 @@
 MovementComponent::MovementComponent()
 {
 	mass = 1.f;
-	speed = 10.f;
 	in_acceleration = 100.f;
 	max_speed = 10.f;
 	isPhysics = false;
@@ -52,6 +51,7 @@ void MovementComponent::Tick(float time)
 		}
 		velocity = velocity + acceleration * time;
 		if (velocity.Length() > max_speed) velocity = velocity.Normalize() * max_speed;
+		else if (velocity.Length() < 0.1f) velocity = Vector(0.f);
 		printf("%.1f\n", velocity.Length());
 		Object->AddLocation((velocity + gravity) * time);
 	}
