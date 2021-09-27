@@ -75,12 +75,12 @@ struct Vector
 		Z = std::stof(in.substr(o_off + 1, off = in.find(',', off + 1)));
 	}
 
-	float Length() { return (float)sqrt(X * X + Y * Y + Z * Z); }
+	float Length() const { return (float)sqrt(X * X + Y * Y + Z * Z); }
 	/*Vector Normalize() { float mag = Length(); return Vector(X / mag, Y / mag, Z / mag); }*/
 
 	//float Length() { return; }
 
-	Vector Normalize() { return *this * Q_rsqrt(X * X + Y * Y + Z * Z); }
+	Vector Normalize() const { return *this * Q_rsqrt(X * X + Y * Y + Z * Z); }
 
 	Vector Rotate(const Vector& In) 
 	{
@@ -158,7 +158,7 @@ struct Vector
 		};
 	}
 
-	float Q_rsqrt(float number)
+	float Q_rsqrt(float number) const
 	{
 		long i;
 		float x2, y;

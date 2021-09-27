@@ -33,12 +33,14 @@ private:
 
 	Vector velocity;
 	Vector acceleration;
+	Vector gravity;
 
 	bool isPhysics;
 	bool isGravity;
 
 	float mass;
 	float speed;
+	float in_acceleration;
 	float max_speed;
 	float drag;
 	float brake;
