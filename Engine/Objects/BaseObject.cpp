@@ -10,9 +10,8 @@
 
 void Data::DestroyObject()
 {
-	ObjectManager::DeleteRecord(RecordNumber);
 	OnDestroyed();
-	delete this;
+	ObjectManager::DeleteRecord(RecordNumber);
 }
 
 Data::Data()

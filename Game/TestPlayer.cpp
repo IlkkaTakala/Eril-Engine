@@ -115,7 +115,7 @@ void TestPlayer::Tick(float)
 		float rx = (float)rand() / (float)RAND_MAX - 0.5f;
 		float ry = (float)rand() / (float)RAND_MAX - 0.5f;
 		float rz = (float)rand() / (float)RAND_MAX;
-		obj->SetLocation(Vector(rx * size, ry * size, 10.f));
+		obj->SetLocation(Vector(rx * size, ry * size, 15.f));
 
 		spawnCounter = 0;
 	}

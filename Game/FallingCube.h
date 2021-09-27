@@ -8,6 +8,7 @@ class FallingCube : public Actor
 {
 public:
 	FallingCube();
+	virtual void Tick(float) override;
 
 private:
 	Ref<MovementComponent> move;
