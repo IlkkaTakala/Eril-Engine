@@ -10,14 +10,13 @@
 
 void Data::DestroyObject()
 {
-	ObjectManager::DeleteRecord(RecordNumber);
 	OnDestroyed();
-	delete this;
+	ObjectManager::DeleteRecord(RecordNumber);
 }
 
 Data::Data()
 {
-	RecordNumber = -1;
+	RecordNumber = 0;
 	bMarked = false;
 	ObjectManager::CreateRecord(this);
 }

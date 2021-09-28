@@ -1,4 +1,5 @@
 #pragma once
+#include <BasicTypes.h>
 
 class ObjectManager;
 struct Record;
@@ -7,7 +8,7 @@ class RefHold
 {
 public:
 	virtual const void NullThis() const = 0;
-	virtual const long GetRecord() const = 0;
+	virtual const RecordInt GetRecord() const = 0;
 protected:
 };
 
@@ -17,8 +18,7 @@ public:
 	Data();
 	void DestroyObject();
 	virtual void OnDestroyed() = 0;
-	long GetRecord() { return RecordNumber; }
-	void SetRecord(long record) { RecordNumber = record; }
+	RecordInt GetRecord() { return RecordNumber; }
 	void AddToRoot();
 	void RemoveFromRoot();
 protected:
@@ -26,9 +26,11 @@ protected:
 	virtual ~Data();
 	bool bMarked;
 private:
+	friend class ObjectManager;
 	friend class GC;
 	friend class GameLoop;
-	long RecordNumber;
+	RecordInt RecordNumber;
+	void SetRecord(RecordInt record) { RecordNumber = record; }
 };
 
 class Tickable

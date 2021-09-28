@@ -6,5 +6,5 @@ class GameState;
 class EngineInterface
 {
 public:
-	static Ref<GameState> CreateDefaults();
+	static GameState* CreateDefaults();
 };

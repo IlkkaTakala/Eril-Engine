@@ -22,21 +22,36 @@ std::vector<String> split(const String& s, char delim);
 struct RecordInt {
 	uint64 record;
 
-	operator uint64() const {
-		return record;
-	}
-
-	RecordInt& operator=(uint64 i) {
-		record = i;
-		return *this;
-	}
-
 	RecordInt(uint64 i) {
 		record = i;
 	}
 
+	RecordInt() {
+		record = 0;
+	}
+
 	unsigned int GetModID() const {
 		return record >> 51;
+	}
+
+	operator uint64() const {
+		return record;
+	}
+
+	inline RecordInt& operator=(uint64 i) {
+		record = i;
+		return *this;
+	}
+
+	inline RecordInt& operator=(RecordInt& i) {
+		record = i;
+		return *this;
+	}
+
+	template <typename T>
+	inline RecordInt& operator=(T& i) {
+		record = reinterpret_cast<uint64>(i);
+		return *this;
 	}
 
 	inline bool operator==(const RecordInt& rhs) {
@@ -75,12 +90,12 @@ struct Vector
 		Z = std::stof(in.substr(o_off + 1, off = in.find(',', off + 1)));
 	}
 
-	float Length() { return (float)sqrt(X * X + Y * Y + Z * Z); }
+	float Length() const { return (float)sqrt(X * X + Y * Y + Z * Z); }
 	/*Vector Normalize() { float mag = Length(); return Vector(X / mag, Y / mag, Z / mag); }*/
 
 	//float Length() { return; }
 
-	Vector Normalize() { return *this * Q_rsqrt(X * X + Y * Y + Z * Z); }
+	Vector Normalize() const { return *this * Q_rsqrt(X * X + Y * Y + Z * Z); }
 
 	Vector Rotate(const Vector& In) 
 	{
@@ -117,8 +132,11 @@ struct Vector
 	String ToString() { return String(std::to_string(X) + ',' + std::to_string(Y) + ',' + std::to_string(Z)); }
 
 	friend Vector operator+(const Vector& obj, const Vector& obj2) { return Vector(obj2.X + obj.X, obj2.Y + obj.Y, obj2.Z + obj.Z); }
+	friend void operator+=(Vector& obj, const Vector& obj2) { obj.X += obj2.X; obj.Y += obj2.Y; obj.Z += obj2.Z; }
 
 	friend Vector operator-(const Vector& obj, const Vector& obj2) { return Vector(obj.X - obj2.X, obj.Y - obj2.Y, obj.Z - obj2.Z); }
+	friend Vector operator-(const Vector& obj) { return Vector(-obj.X, -obj.Y, -obj.Z); }
+	friend void operator-=(Vector& obj, const Vector& obj2) { obj.X -= obj2.X; obj.Y -= obj2.Y; obj.Z -= obj2.Z; }
 
 	Vector& operator*=(const Vector& obj) { X *= obj.X; Y *= obj.Y; Z *= obj.Z; return *this; }
 	friend Vector operator*(Vector obj, const Vector& obj2) { obj *= obj2; return obj; }
@@ -155,7 +173,7 @@ struct Vector
 		};
 	}
 
-	float Q_rsqrt(float number)
+	float Q_rsqrt(float number) const
 	{
 		long i;
 		float x2, y;

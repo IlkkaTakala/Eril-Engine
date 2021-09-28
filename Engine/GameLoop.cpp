@@ -103,6 +103,7 @@ int GameLoop::MainLoop()
 		for (Tickable* t : TickListRemoval) {
 			TickList.remove(t);
 		}
+		TickListRemoval.clear();
 		lock.unlock();
 		duration = std::chrono::steady_clock::now() - start;
 		//fps = 1.f / duration.count();

@@ -41,9 +41,11 @@ public:
 		DataPtr = nullptr;
 	}
 
-	virtual const long GetRecord() const override {
-		return DataPtr ? DataPtr->GetRecord() : 0;
+	virtual const RecordInt GetRecord() const override {
+		return DataPtr ? DataPtr->GetRecord() : RecordInt(0);
 	}
+
+	T* GetPointer() { return Pointer; }
 	
 	Ref(const Ref& old) { 
 		ObjectManager::AddRef(old->GetRecord(), this);
@@ -70,18 +72,18 @@ public:
 };
 
 template <class T = BaseObject>
-Ref<T> SpawnObject()
+T* SpawnObject()
 {
-	T* next = new T();
-	BaseObject* base = dynamic_cast<BaseObject*>(next);
+	Ref<T> next = new T();
+	BaseObject* base = dynamic_cast<BaseObject*>(next.GetPointer());
 	if (base == nullptr) {
-		delete next;
+		next->DestroyObject();
 		return nullptr;
 	}
 	base->BeginPlay();
-	auto t = dynamic_cast<Tickable*>(next);
+	auto t = dynamic_cast<Tickable*>(next.GetPointer());
 	ObjectManager::AddTick(t);
-	return Ref<T>(next);
+	return next;
 }
 
 Data* GetObjectByName(const String& name);
