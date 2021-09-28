@@ -107,7 +107,7 @@ void TestPlayer::Tick(float)
 	GetCamera()->SetLocation(Location);
 	GetCamera()->SetRotation(Rotation);
 
-	if (spawnCounter++ == 10) {
+	if (spawnCounter++ == 30) {
 
 		FallingCube* obj = SpawnObject<FallingCube>();
 
@@ -137,7 +137,7 @@ void TestPlayer::BeginPlay()
 	DirLight->Data.Intensity = 50.0;
 	DirLight->Data.Rotation = Vector(45.0, 0.0, 0.0);
 
-	LastSphere = SpawnObject<Actor>();
+	/*LastSphere = SpawnObject<Actor>();
 	LastSphere->SetModel("sphere");
 	LastSphere->SetLocation(Vector(1.5f, 0.0f, 0.0f));
 	LastSphere->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/metal"));
@@ -145,7 +145,7 @@ void TestPlayer::BeginPlay()
 	LastSphere2 = SpawnObject<Actor>();
 	LastSphere2->SetModel("sphere");
 	LastSphere2->SetLocation(Vector(3.f, 0.0f, 0.0f));
-	LastSphere2->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/metal"));
+	LastSphere2->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/metal"));*/
 
 	/*int count = 2000;
 	Transformation* arr = new Transformation[count]();
@@ -175,22 +175,22 @@ void TestPlayer::BeginPlay()
 	Pillars->SetLocation(Vector(0.0, 0.0, -3.0));
 	Pillars->SetScale(Vector(3.f));*/
 
-	float size = 80.f;
+	//float size = 80.f;
 
-	for (int x = 0; x < 100; x++) {
-		VisibleObject* next = SpawnObject<VisibleObject>();
-		next->SetModel("Cube");
-		float rx = (float)rand() / (float)RAND_MAX - 0.5f;
-		float ry = (float)rand() / (float)RAND_MAX - 0.5f;
-		float rz = (float)rand() / (float)RAND_MAX;
-		//float scale = (float)rand() / (float)RAND_MAX * 2.f;
-		//next->SetScale(Vector(scale));
-		next->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/rocks"));
-		next->SetLocation(Vector(rx * size, ry * size, rz * size / 3));
-		Spheres[x] = next;
-	}
+	//for (int x = 0; x < 100; x++) {
+	//	VisibleObject* next = SpawnObject<VisibleObject>();
+	//	next->SetModel("Cube");
+	//	float rx = (float)rand() / (float)RAND_MAX - 0.5f;
+	//	float ry = (float)rand() / (float)RAND_MAX - 0.5f;
+	//	float rz = (float)rand() / (float)RAND_MAX;
+	//	//float scale = (float)rand() / (float)RAND_MAX * 2.f;
+	//	//next->SetScale(Vector(scale));
+	//	next->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/rocks"));
+	//	next->SetLocation(Vector(rx * size, ry * size, rz * size / 3));
+	//	Spheres[x] = next;
+	//}
 
-	Spheres[10]->SetScale(2.f);
+	//Spheres[10]->SetScale(2.f);
 
 	/*for (int x = 0; x < 20; x++) {
 		for (int y = 0; y < 20; y++) {

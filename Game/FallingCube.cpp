@@ -13,5 +13,6 @@ FallingCube::FallingCube()
 
 void FallingCube::Tick(float)
 {
-	if (GetLocation().Z < -50.f) DestroyObject();
+	if (GetRecord() == 35) printf("%f\n", Location.Z);
+	if (Location.Z < -10.f) DestroyObject();
 }
