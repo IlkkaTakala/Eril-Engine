@@ -18,8 +18,8 @@ void main()
 layout (location = 0) out vec4 color;
 layout (location = 1) out vec4 Bloom;
 
-layout (binding = 0) uniform sampler2D accum;
-layout (binding = 1) uniform sampler2D reveal;
+layout (binding = 2) uniform sampler2D accum;
+layout (binding = 3) uniform sampler2D reveal;
 
 in vec2 TexCoords;
 

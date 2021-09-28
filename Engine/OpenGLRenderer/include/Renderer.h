@@ -7,7 +7,6 @@ class RenderBatch;
 class GLCamera;
 class PreDepthBuffer;
 class PostBuffer;
-class TransparencyBuffer;
 class BlurBuffer;
 class SSAOBuffer;
 class ShadowMapBuffer;
@@ -73,7 +72,6 @@ private:
 	GLFWwindow* Window;
 	PreDepthBuffer* DepthBuffer;
 	PostBuffer* PostProcess;
-	TransparencyBuffer* Transparency;
 	BlurBuffer* BlurRender;
 	SSAOBuffer* SSAORender;
 	ShadowMapBuffer* ShadowMapping;

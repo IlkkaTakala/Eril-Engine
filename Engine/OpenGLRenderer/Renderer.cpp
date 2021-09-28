@@ -67,7 +67,6 @@ Renderer::Renderer()
 	SSAOBlurShader = nullptr;
 	SSAORender = nullptr;
 	PostProcess = nullptr;
-	Transparency = nullptr;
 	PostProcessMaster = nullptr;
 	CompositeShader = nullptr;
 	ShadowShader = nullptr;
@@ -136,7 +135,6 @@ int Renderer::SetupWindow(int width, int height)
 	printf("Allocating buffers...\n");
 	DepthBuffer = new PreDepthBuffer(width, height);
 	PostProcess = new PostBuffer(width, height);
-	Transparency = new TransparencyBuffer(width, height);
 	SSAORender = new SSAOBuffer(width, height);
 	ShadowMapping = new ShadowMapBuffer(width, height);
 	EnvironmentRender = new ReflectionBuffer(EnvSizeX, EnvSizeY);
@@ -349,7 +347,6 @@ void Renderer::CleanRenderer()
 
 	delete DepthBuffer;
 	delete PostProcess;
-	delete Transparency;
 	delete BlurRender;
 	delete SSAORender;
 	delete EnvironmentRender;
@@ -888,12 +885,12 @@ constexpr glm::vec4 clearClrOne(1.f);
 void Renderer::Forward(int width, int height)
 {
 	PostProcess->Bind();
+	unsigned int attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+	glDrawBuffers(2, attachments);
 
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LESS);
 	glDisable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	// Clear the screen
 	glClearColor(0.f, 0.f, 0.f, 0.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -908,8 +905,6 @@ void Renderer::Forward(int width, int height)
 		if (s->Pass != 0) continue;
 
 		s->Bind();
-
-		//s->SetUniform("VP", ActiveCamera->GetProjectionMatrix() * glm::inverse(ActiveCamera->GetViewMatrix()));
 
 		for (Material* m : s->GetUsers())
 		{
@@ -959,11 +954,13 @@ void Renderer::Forward(int width, int height)
 	
 	glDepthMask(GL_FALSE);
 	glEnable(GL_BLEND);
-	glBlendFunci(0, GL_ONE, GL_ONE); // accumulation blend target
-	glBlendFunci(1, GL_ZERO, GL_ONE_MINUS_SRC_COLOR); // revealge blend target
+	glBlendFunci(0, GL_ONE, GL_ONE);
+	glBlendFunci(1, GL_ZERO, GL_ONE_MINUS_SRC_COLOR);
 	glBlendEquation(GL_FUNC_ADD);
 
-	Transparency->Bind();
+	unsigned int attachments2[] = { GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+	glDrawBuffers(2, attachments2);
+
 	glClearBufferfv(GL_COLOR, 0, &clearClrZero[0]);
 	glClearBufferfv(GL_COLOR, 1, &clearClrOne[0]);
 
@@ -1021,17 +1018,19 @@ void Renderer::Forward(int width, int height)
 		}
 	}
 
+	glDrawBuffers(2, attachments);
+
 	glDepthFunc(GL_ALWAYS);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	PostProcess->Bind();
+	//PostProcess->Bind();
 
 	// use composite shader
 	CompositeShader->Bind();
 
 	// draw screen quad
-	Transparency->BindTextures();
+	PostProcess->BindTextures();
 	glBindVertexArray(ScreenVao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
