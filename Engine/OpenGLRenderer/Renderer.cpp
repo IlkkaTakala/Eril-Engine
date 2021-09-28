@@ -67,7 +67,6 @@ Renderer::Renderer()
 	SSAOBlurShader = nullptr;
 	SSAORender = nullptr;
 	PostProcess = nullptr;
-	Transparency = nullptr;
 	PostProcessMaster = nullptr;
 	CompositeShader = nullptr;
 	ShadowShader = nullptr;
@@ -136,7 +135,6 @@ int Renderer::SetupWindow(int width, int height)
 	printf("Allocating buffers...\n");
 	DepthBuffer = new PreDepthBuffer(width, height);
 	PostProcess = new PostBuffer(width, height);
-	Transparency = new TransparencyBuffer(width, height);
 	SSAORender = new SSAOBuffer(width, height);
 	ShadowMapping = new ShadowMapBuffer(width, height);
 	EnvironmentRender = new ReflectionBuffer(EnvSizeX, EnvSizeY);
@@ -349,7 +347,6 @@ void Renderer::CleanRenderer()
 
 	delete DepthBuffer;
 	delete PostProcess;
-	delete Transparency;
 	delete BlurRender;
 	delete SSAORender;
 	delete EnvironmentRender;
@@ -963,9 +960,8 @@ void Renderer::Forward(int width, int height)
 	glBlendFunci(1, GL_ZERO, GL_ONE_MINUS_SRC_COLOR); // revealge blend target
 	glBlendEquation(GL_FUNC_ADD);
 
-	Transparency->Bind();
-	glClearBufferfv(GL_COLOR, 0, &clearClrZero[0]);
-	glClearBufferfv(GL_COLOR, 1, &clearClrOne[0]);
+	glClearBufferfv(GL_COLOR, 2, &clearClrZero[0]);
+	glClearBufferfv(GL_COLOR, 3, &clearClrOne[0]);
 
 	// Translucent pass
 	for (auto const& [name, s] : Shaders)
@@ -1025,13 +1021,13 @@ void Renderer::Forward(int width, int height)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	PostProcess->Bind();
+	//PostProcess->Bind();
 
 	// use composite shader
 	CompositeShader->Bind();
 
 	// draw screen quad
-	Transparency->BindTextures();
+	PostProcess->BindTextures();
 	glBindVertexArray(ScreenVao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 

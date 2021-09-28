@@ -74,8 +74,8 @@ layout(std430, binding = 2) readonly buffer VisibleLightIndicesBuffer {
 	VisibleIndex data[];
 } visibleLightIndicesBuffer;
 
-layout (location = 0) out vec4 accum;
-layout (location = 1) out float reveal;
+layout (location = 2) out vec4 accum;
+layout (location = 3) out float reveal;
 
 in VS_OUT {
 	vec2 TexCoords;
