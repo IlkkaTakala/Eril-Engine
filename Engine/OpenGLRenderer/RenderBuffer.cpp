@@ -191,8 +191,8 @@ PostBuffer::PostBuffer(int width, int height)
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, RevealageBuffer, 0);
 
 	// - tell OpenGL which color attachments we'll use (of this framebuffer) for rendering 
-	unsigned int attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-	glDrawBuffers(4, attachments);
+	unsigned int attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+	glDrawBuffers(2, attachments);
 
 	glGenTextures(1, &DepthBuffer);
 	glBindTexture(GL_TEXTURE_2D, DepthBuffer);
@@ -246,7 +246,7 @@ void PostBuffer::BindTextures()
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, RevealageBuffer);
 
-	glActiveTexture(GL_TEXTURE3);
+	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, DepthBuffer);
 }
 
