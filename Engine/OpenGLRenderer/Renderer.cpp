@@ -1204,7 +1204,7 @@ void processMesh(LoadedMesh* meshHolder, aiMesh* mesh)
 		vertex.position.x = mesh->mVertices[i].x;
 		vertex.position.y = mesh->mVertices[i].y;
 		vertex.position.z = mesh->mVertices[i].z;
-		if (radius < mesh->mVertices[i].Length()) radius = mesh->mVertices[i].Length();
+		if (radius < mesh->mVertices[i].x) radius = mesh->mVertices[i].x;
 
 		vertex.normal.x = mesh->mNormals[i].x;
 		vertex.normal.y = mesh->mNormals[i].y;

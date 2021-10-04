@@ -62,7 +62,7 @@ RenderObject::RenderObject(LoadedMesh* mesh)
 {
 	mesh->Users++;
 	Mesh = mesh;
-	extent = 0.f;
+	float extent = 0.f;
 
 	SectionCount = mesh->HolderCount;
 	Sections = new Section[SectionCount]();
@@ -96,6 +96,7 @@ RenderObject::RenderObject(LoadedMesh* mesh)
 
 		if (Sections[i].GetRadius() > extent) extent = Sections[i].GetRadius();
 	}
+	bounds = extent;
 }
 
 RenderObject::~RenderObject()

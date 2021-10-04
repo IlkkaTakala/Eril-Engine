@@ -84,6 +84,15 @@ protected:
 	double MouseY;
 };
 
+struct AABB
+{
+	AABB() {}
+	AABB(float f) { mins = -f; maxs = f; }
+	AABB(Vector min, Vector max) { mins = min; maxs = max; }
+	Vector mins;
+	Vector maxs;
+};
+
 class RenderMesh
 {
 public:
@@ -92,9 +101,10 @@ public:
 	virtual void SetMaterial(uint section, Material* nextMat) = 0;
 	virtual Material* GetMaterial(uint section) const = 0;
 	virtual void SetInstances(int count, Transformation* dispArray) = 0;
-	float GetAABB() const { return extent; }
+	AABB GetAABB() const { return bounds; }
+	void SetAABB(AABB bounds) { this->bounds = bounds.maxs.Length(); }
 protected:
-	float extent;
+	AABB bounds;
 };
 
 class IMesh

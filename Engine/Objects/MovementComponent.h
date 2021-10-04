@@ -14,7 +14,7 @@ struct State
 	Vector location;
 	Vector rotation;
 	Vector velocity;
-	Vector angular;
+	Vector angular_v;
 	Vector acceleration;
 	Vector angular_a;
 	Vector gravity;
@@ -36,6 +36,7 @@ public:
 	void SetMaxSpeed(float speed) { max_speed = speed; }
 	void SetPhysics(bool p) { isPhysics = p; }
 	void SetGravity(bool g) { isGravity = g; }
+	void ApplyMovement();
 
 	void AddInput(const Vector dir) { directions[direction_count++] = dir; }
 

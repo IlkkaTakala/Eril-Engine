@@ -28,6 +28,9 @@ TestPlayer::TestPlayer() : Player()
 	Movement = SpawnObject<MovementComponent>();
 	Movement->SetTarget(dynamic_cast<Actor*>(this));
 	Movement->SetGravity(false);
+
+	SetModel("Cube");
+	RenderData->SetAABB(AABB(Vector(-0.5f), Vector(0.5f)));
 }
 
 void TestPlayer::RunInputW(float delta, bool KeyDown)
@@ -107,7 +110,7 @@ void TestPlayer::Tick(float)
 	GetCamera()->SetLocation(Location);
 	GetCamera()->SetRotation(Rotation);
 
-	if (spawnCounter++ == 40) {
+	/*if (spawnCounter++ == 40) {
 
 		FallingCube* obj = SpawnObject<FallingCube>();
 
@@ -118,7 +121,7 @@ void TestPlayer::Tick(float)
 		obj->SetLocation(Vector(rx * size, ry * size, 15.f));
 
 		spawnCounter = 0;
-	}
+	}*/
 }
 
 #include "Objects/InstancedObject.h"
@@ -177,20 +180,20 @@ void TestPlayer::BeginPlay()
 
 	float size = 80.f;
 
-	for (int x = 0; x < 100; x++) {
-		VisibleObject* next = SpawnObject<VisibleObject>();
-		next->SetModel("Cube");
-		float rx = (float)rand() / (float)RAND_MAX - 0.5f;
-		float ry = (float)rand() / (float)RAND_MAX - 0.5f;
-		float rz = (float)rand() / (float)RAND_MAX;
-		//float scale = (float)rand() / (float)RAND_MAX * 2.f;
-		//next->SetScale(Vector(scale));
-		next->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/rocks"));
-		next->SetLocation(Vector(rx * size, ry * size, rz * size / 3));
-		Spheres[x] = next;
-	}
+	//for (int x = 0; x < 100; x++) {
+	//	VisibleObject* next = SpawnObject<VisibleObject>();
+	//	next->SetModel("Cube");
+	//	float rx = (float)rand() / (float)RAND_MAX - 0.5f;
+	//	float ry = (float)rand() / (float)RAND_MAX - 0.5f;
+	//	float rz = (float)rand() / (float)RAND_MAX;
+	//	//float scale = (float)rand() / (float)RAND_MAX * 2.f;
+	//	//next->SetScale(Vector(scale));
+	//	next->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/rocks"));
+	//	next->SetLocation(Vector(rx * size, ry * size, rz * size / 3));
+	//	Spheres[x] = next;
+	//}
 
-	Spheres[10]->SetScale(2.f);
+	//Spheres[10]->SetScale(2.f);
 
 	/*for (int x = 0; x < 20; x++) {
 		for (int y = 0; y < 20; y++) {

@@ -56,11 +56,13 @@ void MovementComponent::Tick(float time)
 			const Vector gravity_const(0.f, 0.f, -9.8f);
 			DesiredState.gravity += gravity_const * time;
 		}
+		else DesiredState.gravity = 0.f;
+
 		DesiredState.velocity = DesiredState.velocity + DesiredState.acceleration * time;
 		if (DesiredState.velocity.Length() > max_speed) DesiredState.velocity = DesiredState.velocity.Normalize() * max_speed;
 		else if (DesiredState.velocity.Length() < 0.1f) DesiredState.velocity = Vector(0.f);
 		
-		Object->AddLocation((DesiredState.velocity + DesiredState.gravity) * time);
+		DesiredState.location = Object->GetLocation() + (DesiredState.velocity + DesiredState.gravity) * time;
 	}
 	break;
 	}
@@ -71,4 +73,9 @@ void MovementComponent::SetTarget(Actor* t)
 {
 	Object = t;
 	Physics::RemoveStatic(t);
+}
+
+void MovementComponent::ApplyMovement()
+{
+	Object->SetLocation(DesiredState.location);
 }
