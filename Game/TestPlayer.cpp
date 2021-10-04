@@ -107,7 +107,7 @@ void TestPlayer::Tick(float)
 	GetCamera()->SetLocation(Location);
 	GetCamera()->SetRotation(Rotation);
 
-	if (spawnCounter++ == 30) {
+	if (spawnCounter++ == 40) {
 
 		FallingCube* obj = SpawnObject<FallingCube>();
 

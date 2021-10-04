@@ -3,7 +3,6 @@
 
 class Shader;
 class Texture;
-class RenderBatch;
 class GLCamera;
 class PreDepthBuffer;
 class PostBuffer;

@@ -10,6 +10,7 @@ struct Record
 	Record(Data* o, short p) : object(o), protection(p), checkCount(0) {}
 	~Record();
 	std::list<const RefHold*> pointerRefs;
+	std::list<const RefHold*> weakRefs;
 	short protection;
 	short checkCount;
 	Data* object;
@@ -24,11 +25,13 @@ public:
 	}
 
 	static void AddRef(const uint64 record, const RefHold* obj) {
-		ObjectRecords[record]->pointerRefs.push_back(obj);
+		if (obj->bWeak) ObjectRecords[record]->weakRefs.push_back(obj);
+		else ObjectRecords[record]->pointerRefs.push_back(obj);
 	}
 
 	static void RemoveRef(const uint64 record, const RefHold* obj) {
-		ObjectRecords.find(record)->second->pointerRefs.remove(obj);
+		if (obj->bWeak) ObjectRecords.find(record)->second->weakRefs.remove(obj);
+		else ObjectRecords.find(record)->second->pointerRefs.remove(obj);
 	}
 
 	static void CreateRecord(Data* object, short protection = 0) {

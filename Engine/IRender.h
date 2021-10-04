@@ -92,6 +92,9 @@ public:
 	virtual void SetMaterial(uint section, Material* nextMat) = 0;
 	virtual Material* GetMaterial(uint section) const = 0;
 	virtual void SetInstances(int count, Transformation* dispArray) = 0;
+	float GetAABB() const { return extent; }
+protected:
+	float extent;
 };
 
 class IMesh

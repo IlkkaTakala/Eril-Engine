@@ -3,12 +3,11 @@
 #include <GLFW/glfw3.h>
 #include "Core.h"
 #include "Renderer.h"
-#include "Batcher.h"
 #include "Camera.h"
 #include "Mesh.h"
 #include "Texture.h"
 #include "RenderBuffer.h"
-#include "../Objects/VisibleObject.h"
+#include <Objects/VisibleObject.h>
 #include "LightData.h"
 #include "Settings.h"
 #include <filesystem>

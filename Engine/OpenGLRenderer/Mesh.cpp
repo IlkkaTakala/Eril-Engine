@@ -62,6 +62,7 @@ RenderObject::RenderObject(LoadedMesh* mesh)
 {
 	mesh->Users++;
 	Mesh = mesh;
+	extent = 0.f;
 
 	SectionCount = mesh->HolderCount;
 	Sections = new Section[SectionCount]();
@@ -92,6 +93,8 @@ RenderObject::RenderObject(LoadedMesh* mesh)
 		glBindVertexArray(0);
 		SetMaterial(i, mesh->Holders[i]->Instance);
 		Sections[i].Parent = this;
+
+		if (Sections[i].GetRadius() > extent) extent = Sections[i].GetRadius();
 	}
 }
 

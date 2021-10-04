@@ -9,6 +9,9 @@ Record::~Record()
 	for (const auto& p : pointerRefs) {
 		p->NullThis();
 	}
+	for (const auto& p : weakRefs) {
+		p->NullThis();
+	}
 	auto t = dynamic_cast<Tickable*>(object);
 	if (t != nullptr) Loop->RemoveFromTick(t);
 	delete object;

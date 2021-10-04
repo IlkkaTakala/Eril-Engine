@@ -1,4 +1,5 @@
 #include "VisibleObject.h"
+#include "Physics.h"
 
 VisibleObject::VisibleObject() : BaseObject()
 {
@@ -6,6 +7,12 @@ VisibleObject::VisibleObject() : BaseObject()
 	Rotation = Vector(0, 0, 0);
 	Scale = Vector(1, 1, 1);
 	RenderData = nullptr;
+	Physics::AddStatic(this);
+}
+
+void VisibleObject::OnDestroyed()
+{
+	Physics::RemoveStatic(this);
 }
 
 void VisibleObject::SetLocation(Vector NewLocation)

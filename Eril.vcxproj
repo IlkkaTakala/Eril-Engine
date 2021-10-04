@@ -224,6 +224,7 @@
     <ClCompile Include="Engine\OpenGLRenderer\RenderBuffer.cpp" />
     <ClCompile Include="Engine\OpenGLRenderer\Renderer.cpp" />
     <ClCompile Include="Engine\OpenGLRenderer\Texture.cpp" />
+    <ClCompile Include="Engine\Physics.cpp" />
     <ClCompile Include="Engine\Settings.cpp" />
     <ClCompile Include="Engine\WinConsole.cpp" />
     <ClCompile Include="Game\EngineInterface.cpp" />
@@ -253,6 +254,7 @@
     <ClInclude Include="Engine\OpenGLRenderer\include\RenderBuffer.h" />
     <ClInclude Include="Engine\OpenGLRenderer\include\Renderer.h" />
     <ClInclude Include="Engine\OpenGLRenderer\include\Texture.h" />
+    <ClInclude Include="Engine\Physics.h" />
     <ClInclude Include="Engine\Settings.h" />
     <ClInclude Include="Engine\WinConsole.h" />
     <ClInclude Include="Game\EngineInterface.h" />

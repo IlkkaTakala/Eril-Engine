@@ -6,7 +6,7 @@
 #include "GameLoop.h"
 #include "WinConsole.h"
 #include "GarbageCollector.h"
-#include <Windows.h>
+#include "Physics.h"
 
 using namespace std;
 
@@ -96,6 +96,8 @@ int GameLoop::MainLoop()
 			if (found) continue;
 			t->Tick(duration.count());
 		}
+
+		Physics::CheckCollisions();
 
 		RI->Render(duration.count());
 

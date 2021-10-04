@@ -1,4 +1,4 @@
-#include "Objects/Actor.h"
+#include "Physics.h"
 #include "Objects/MovementComponent.h"
 
 MovementComponent::MovementComponent()
@@ -11,10 +11,17 @@ MovementComponent::MovementComponent()
 	direction_count = 0;
 	drag = 1.f;
 	brake = 1000.f;
+	Physics::AddMovable(this);
+}
+
+void MovementComponent::OnDestroyed()
+{
+	Physics::RemoveMovable(this);
 }
 
 void MovementComponent::Tick(float time)
 {
+	OldState = DesiredState;
 	if (Object == nullptr) return;
 	switch (isPhysics)
 	{
@@ -23,9 +30,9 @@ void MovementComponent::Tick(float time)
 		const Vector gravity(0.f, 0.f, -9.8f);
 		Vector delta;
 
-		if (isGravity) acceleration += gravity * time;
-		velocity += acceleration * time;
-		delta = velocity * time;
+		if (isGravity) DesiredState.acceleration += gravity * time;
+		DesiredState.velocity += DesiredState.acceleration * time;
+		delta = DesiredState.velocity * time;
 		Object->AddLocation(delta);
 	}
 	break;
@@ -39,23 +46,29 @@ void MovementComponent::Tick(float time)
 		delta_a = delta_a.Normalize();
 		delta_a *= in_acceleration;
 
-		const Vector drag_a = velocity.Normalize() * brake * time;
+		const Vector drag_a = DesiredState.velocity.Normalize() * brake * time;
 
 		const Vector total_a = delta_a - drag_a;
 
-		acceleration = total_a;
+		DesiredState.acceleration = total_a;
 
 		if (isGravity) {
 			const Vector gravity_const(0.f, 0.f, -9.8f);
-			gravity += gravity_const * time;
+			DesiredState.gravity += gravity_const * time;
 		}
-		velocity = velocity + acceleration * time;
-		if (velocity.Length() > max_speed) velocity = velocity.Normalize() * max_speed;
-		else if (velocity.Length() < 0.1f) velocity = Vector(0.f);
+		DesiredState.velocity = DesiredState.velocity + DesiredState.acceleration * time;
+		if (DesiredState.velocity.Length() > max_speed) DesiredState.velocity = DesiredState.velocity.Normalize() * max_speed;
+		else if (DesiredState.velocity.Length() < 0.1f) DesiredState.velocity = Vector(0.f);
 		
-		Object->AddLocation((velocity + gravity) * time);
+		Object->AddLocation((DesiredState.velocity + DesiredState.gravity) * time);
 	}
 	break;
 	}
 	direction_count = 0;
+}
+
+void MovementComponent::SetTarget(Actor* t)
+{
+	Object = t;
+	Physics::RemoveStatic(t);
 }
