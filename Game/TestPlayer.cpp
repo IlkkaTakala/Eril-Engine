@@ -142,13 +142,13 @@ void TestPlayer::BeginPlay()
 
 	LastSphere = SpawnObject<Actor>();
 	LastSphere->SetModel("sphere");
-	LastSphere->SetLocation(Vector(1.5f, 0.0f, 0.0f));
+	LastSphere->SetLocation(Vector(3.5f, 0.0f, 0.0f));
 	LastSphere->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/metal"));
 
-	LastSphere2 = SpawnObject<Actor>();
+	/*LastSphere2 = SpawnObject<Actor>();
 	LastSphere2->SetModel("sphere");
 	LastSphere2->SetLocation(Vector(3.f, 0.0f, 0.0f));
-	LastSphere2->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/metal"));
+	LastSphere2->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/metal"));*/
 
 	/*int count = 2000;
 	Transformation* arr = new Transformation[count]();

@@ -1,5 +1,6 @@
 #include <Objects/VisibleObject.h>
 #include <Objects/MovementComponent.h>
+#include <limits>
 #include "Physics.h"
 
 namespace Physics
@@ -15,6 +16,93 @@ namespace Physics
 				(a.mins.Z <= b.maxs.Z && a.maxs.Z >= b.mins.Z);
 		}
 
+		float sign(float v) {
+			return v < 0.f ? -1.0f : 1.0f;
+		}
+
+		struct Hit {
+			AABB collider;
+			bool collided;
+			Vector pos;
+			Vector delta;
+			Vector normal;
+			Vector time;
+		};
+
+		struct Sweep {
+			Hit hit;
+			Vector pos;
+			float time;
+		};
+
+		Hit intersectSegment(const AABB& box, Vector pos, Vector delta, Vector padding)
+		{
+			Vector scale = Vector(1.0) / delta;
+			Vector vsign = Vector(sign(scale.X), sign(scale.Y), sign(scale.Z));
+			Vector nearTime = (box.position - vsign * (hwidth + padding) - pos) * scale;
+			Vector farTime = (position + vsign * (hwidth + padding) - pos) * scale;
+			if ((nearTime.X > farTime.Y) || (nearTime.X > farTime.Z) || (nearTime.Y > farTime.X) || (nearTime.Y > farTime.Z) || (nearTime.Z > farTime.X) || (nearTime.Z > farTime.Y))
+				return Hit(false);
+
+			float near = std::max(std::max(nearTime.X, nearTime.Y), nearTime.Z);
+			float far = std::min(std::min(farTime.X, farTime.Y), farTime.Z);
+
+			if ((near >= 1) || (far <= 0))
+				return Hit(false);
+
+			Hit hit;
+			hit.time = near;//glm::clamp(near , 0.f, 1.f);
+			if ((nearTime.X > nearTime.Y) && (nearTime.X > nearTime.Z))
+			{
+				hit.normal = Vector(-vsign.X, 0, 0);
+			}
+			else if ((nearTime.Y > nearTime.X) && (nearTime.Y > nearTime.Z))
+			{
+				hit.normal = Vector(0, -vsign.Y, 0);
+			}
+			else if ((nearTime.Z > nearTime.Y) && (nearTime.Z > nearTime.X))
+			{
+				hit.normal = Vector(0, 0, -vsign.Z);
+			}
+
+			hit.delta = hit.time * delta;
+
+			hit.pos = pos + hit.delta;
+			hit.time = nearTime;
+
+			return hit;
+
+		}
+		Sweep sweepAABB(AABB first, AABB box, Vector delta)
+		{
+			if (delta == Vector(0, 0, 0))
+			{
+				Sweep s;
+				s.hit.collided = false;
+				s.time = 1;
+				return s;
+			}
+			Sweep sweep;
+			sweep.hit = intersectSegment(first, box.position, delta, box.hwidth);
+
+			if (sweep.hit.collided)
+			{
+				sweep.time = glm::clamp(sweep.hit.time - EPSILON, 0.f, 1.f);
+				sweep.pos = box.position + (delta * sweep.time);
+
+				Vector direction = delta.Normalize();
+
+				sweep.hit.pos += direction * box.hwidth;
+				sweep.item = box.getSimple();
+				sweep.other = getSimple();
+			}
+			else
+			{
+				sweep.pos = box.position + delta;
+				sweep.time = 1;
+			}
+			return sweep;
+		}
 	}
 
 #pragma optimize("", off)
@@ -25,83 +113,17 @@ namespace Physics
 
 		for (const auto& o : Movables) {
 			if (o->GetTarget() == nullptr || o->GetTarget()->GetModel() == nullptr) continue;
-			Vector d_loc = o->DesiredState.location;
-			Vector o_loc = o->OldState.location;
-			AABB d_AABB = o->GetTarget()->GetModel()->GetAABB();
+			Vector& d_loc = o->DesiredState.location;
+			const Vector& o_loc = o->OldState.location;
+			const AABB& d_AABB = o->GetTarget()->GetModel()->GetAABB();
 
-			AABB final_o;
-			final_o.mins = d_AABB.mins + o_loc;
-			final_o.maxs = d_AABB.maxs + o_loc;
 
-			AABB final_d;
-			final_d.mins = d_AABB.mins + d_loc;
-			final_d.maxs = d_AABB.maxs + d_loc;
-
-			d_AABB.mins.X = final_o.mins.X < final_d.mins.X ? final_o.mins.X : final_d.mins.X;
-			d_AABB.mins.Y = final_o.mins.Y < final_d.mins.Y ? final_o.mins.Y : final_d.mins.Y;
-			d_AABB.mins.Z = final_o.mins.Z < final_d.mins.Z ? final_o.mins.Z : final_d.mins.Z;
-
-			d_AABB.maxs.X = final_o.maxs.X > final_d.maxs.X ? final_o.maxs.X : final_d.maxs.X;
-			d_AABB.maxs.Y = final_o.maxs.Y > final_d.maxs.Y ? final_o.maxs.Y : final_d.maxs.Y;
-			d_AABB.maxs.Z = final_o.maxs.Z > final_d.maxs.Z ? final_o.maxs.Z : final_d.maxs.Z;
 
 			std::vector<VisibleObject*> Collisions;
-
 			for (const auto& s : Statics) {
-				AABB bounds = s->GetModel()->GetAABB();
-				Vector loc = s->GetLocation();
-
-				bounds.mins += loc;
-				bounds.maxs += loc;
-
-				/*float d1x = bounds.mins.X - final_d.maxs.X;
-				float d2x = final_d.mins.X - bounds.maxs.X;
-				float d1y = bounds.mins.Y - final_d.maxs.Y;
-				float d2y = final_d.mins.Y - bounds.maxs.Y;
-				float d1z = bounds.mins.Z - final_d.maxs.Z;
-				float d2z = final_d.mins.Z - bounds.maxs.Z;
-
-				if (d1x <= 0.f) printf("Collision\n");
-				if (d2x <= 0.f) printf("Collision\n");
-				if (d1y <= 0.f) printf("Collision\n");
-				if (d2y <= 0.f) printf("Collision\n");
-				if (d1z <= 0.f) printf("Collision\n");
-				if (d2z <= 0.f) printf("Collision\n");*/
-
-				if (intersect(d_AABB, bounds)) {
-					float d1x = bounds.mins.X - final_d.maxs.X;
-					float d2x = final_d.mins.X - bounds.maxs.X;
-					float d1y = bounds.mins.Y - final_d.maxs.Y;
-					float d2y = final_d.mins.Y - bounds.maxs.Y;
-					float d1z = bounds.mins.Z - final_d.maxs.Z;
-					float d2z = final_d.mins.Z - bounds.maxs.Z;
-
-					if (d1x >= 0.f) {
-						o->DesiredState.location.X += d1x;
-						o->DesiredState.velocity.X = 0.f;
-					}
-					if (d2x >= 0.f) {
-						o->DesiredState.location.X += d2x;
-						o->DesiredState.velocity.X = 0.f;
-					}
-					if (d1y >= 0.f) {
-						o->DesiredState.location.Y += d1y;
-						o->DesiredState.velocity.Y = 0.f;
-					}
-					if (d2y >= 0.f) {
-						o->DesiredState.location.Y += d2y;
-						o->DesiredState.velocity.Y = 0.f;
-					}
-					if (d1z >= 0.f) {
-						o->DesiredState.location.Z += d1z;
-						o->DesiredState.velocity.Z = 0.f;
-					}
-					if (d2z >= 0.f) {
-						o->DesiredState.location.Z += d2z;
-						o->DesiredState.velocity.Z = 0.f;
-						o->DesiredState.gravity = 0.f;
-					}
-				}
+				const AABB& bounds = s->GetModel()->GetAABB();
+				const Vector& loc = s->GetLocation();
+				
 			}
 		}
 
