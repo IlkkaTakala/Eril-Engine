@@ -106,6 +106,7 @@ public:
 	GLMesh();
 	virtual ~GLMesh();
 	virtual	RenderMesh* LoadData(VisibleObject* parent, String name) override;
+	virtual RenderMesh* CreateProcedural(VisibleObject* parent, String name, std::vector<Vector>& positions, std::vector<Vector> UV, std::vector<Vector>& normal, std::vector<Vector>& tangent, std::vector<uint32>& indices) override;
 	virtual void StartLoading() override;
 
 private:

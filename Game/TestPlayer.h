@@ -7,6 +7,7 @@ class Actor;
 class InstancedObject;
 class Light;
 class MovementComponent;
+class Terrain;
 
 class TestPlayer : public Player
 {
@@ -45,6 +46,7 @@ private:
 
 	Ref<Actor> LastSphere;
 	Ref<Actor> LastSphere2;
+	Ref<Terrain> terra;
 
 	int spawnCounter;
 };

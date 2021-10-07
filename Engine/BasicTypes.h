@@ -149,7 +149,9 @@ struct Vector
 	friend Vector operator*(Vector obj, const float& obj2) { obj *= obj2; return obj; }
 	friend Vector operator*(const float& obj, Vector obj2) { obj2 *= obj; return obj2; }
 
-	friend Vector operator/(const Vector& obj, const Vector& obj2) { return Vector(obj2.X / obj.X, obj2.Y / obj.Y, obj2.Z / obj.Z); }
+	friend Vector operator/(const Vector& obj, const Vector& obj2) { return Vector(obj.X / obj2.X, obj.Y / obj2.Y, obj.Z / obj2.Z); }
+	friend Vector operator/(const Vector& obj, const int obj2) { return Vector(obj.X / obj2, obj.Y / obj2, obj.Z / obj2); }
+	friend Vector operator/(const Vector& obj, const float obj2) { return Vector(obj.X / obj2, obj.Y / obj2, obj.Z / obj2); }
 
 	friend bool operator==(const Vector& obj, const Vector& obj2) { return obj2.X == obj.X && obj2.Y == obj.Y && obj2.Z == obj.Z; }
 

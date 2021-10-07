@@ -215,6 +215,7 @@
     <ClCompile Include="Engine\Objects\BaseObject.cpp" />
     <ClCompile Include="Engine\Objects\InstancedObject.cpp" />
     <ClCompile Include="Engine\Objects\MovementComponent.cpp" />
+    <ClCompile Include="Engine\Objects\Terrain.cpp" />
     <ClCompile Include="Engine\Objects\VisibleObject.cpp" />
     <ClCompile Include="Engine\OpenGLRenderer\Batcher.cpp" />
     <ClCompile Include="Engine\OpenGLRenderer\Camera.cpp" />
@@ -244,6 +245,7 @@
     <ClInclude Include="Engine\Objects\BaseObject.h" />
     <ClInclude Include="Engine\Objects\InstancedObject.h" />
     <ClInclude Include="Engine\Objects\MovementComponent.h" />
+    <ClInclude Include="Engine\Objects\Terrain.h" />
     <ClInclude Include="Engine\Objects\VisibleObject.h" />
     <ClInclude Include="Engine\OpenGLRenderer\ext\glfw\deps\glad\gl.h" />
     <ClInclude Include="Engine\OpenGLRenderer\include\Batcher.h" />

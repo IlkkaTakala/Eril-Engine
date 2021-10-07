@@ -2,6 +2,8 @@
 #include <Core.h>
 #include <Objects/Actor.h>
 
+class Terrain;
+
 struct Force
 {
 	Vector Location;
@@ -17,7 +19,6 @@ struct State
 	Vector angular_v;
 	Vector acceleration;
 	Vector angular_a;
-	Vector gravity;
 };
 
 class MovementComponent : public BaseObject, public Tickable
@@ -31,6 +32,7 @@ public:
 	virtual void Tick(float) override;
 
 	void SetTarget(Actor* t);
+	void SetGround(Terrain* t);
 	Actor* GetTarget() const { return Object; }
 	void SetMass(float m) { mass = m; }
 	void SetMaxSpeed(float speed) { max_speed = speed; }
@@ -39,6 +41,9 @@ public:
 	void ApplyMovement();
 
 	void AddInput(const Vector dir) { directions[direction_count++] = dir; }
+	void AddImpulse(const Force& f) { forces[force_count++] = f; }
+	void AddImpulse(const Vector& d) { Force f; f.Direction = d; forces[force_count++] = f; }
+	bool IsInAir() { return inAir; }
 
 	State DesiredState;
 	State OldState;
@@ -46,18 +51,22 @@ public:
 private:
 
 	Ref<Actor> Object;
+	RefWeak<Terrain> Terra;
 
 	bool isPhysics;
 	bool isGravity;
+	bool inAir;
 
 	float mass;
 	float in_acceleration;
 	float max_speed;
 	float drag;
 	float brake;
+	float air_control;
 
 	Force forces[16];
 	Vector directions[16];
 	int direction_count;
+	int force_count;
 };
 

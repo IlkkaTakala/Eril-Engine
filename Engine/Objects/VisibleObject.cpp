@@ -38,3 +38,9 @@ void VisibleObject::SetModel(std::string Name)
 	RenderData = MI->LoadData(this, Name);
 	if (RenderData != nullptr) RenderData->ApplyTransform();
 }
+
+void VisibleObject::SetModel(RenderMesh* mesh)
+{
+	RenderData = mesh;
+	if (RenderData != nullptr) RenderData->ApplyTransform();
+}

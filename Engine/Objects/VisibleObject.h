@@ -20,6 +20,7 @@ public:
 	const Vector GetScale() const { return Scale; }
 
 	void SetModel(std::string Name);
+	void SetModel(RenderMesh* mesh);
 	std::string GetModelName() const { return std::string(); }
 	RenderMesh* GetModel() const { return RenderData; }
 

@@ -34,7 +34,7 @@ namespace Physics
 			Vector pos;
 			float time;
 		};
-
+		/*
 		Hit intersectSegment(const AABB& box, Vector pos, Vector delta, Vector padding)
 		{
 			Vector scale = Vector(1.0) / delta;
@@ -102,7 +102,7 @@ namespace Physics
 				sweep.time = 1;
 			}
 			return sweep;
-		}
+		}*/
 	}
 
 #pragma optimize("", off)

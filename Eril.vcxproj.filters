@@ -91,6 +91,9 @@
     <ClCompile Include="Engine\Physics.cpp">
       <Filter>Engine\Private</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Objects\Terrain.cpp">
+      <Filter>Engine\Objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -205,6 +208,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Physics.h">
       <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Objects\Terrain.h">
+      <Filter>Engine\Objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

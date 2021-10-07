@@ -3,6 +3,7 @@
 #include "TestPlayer.h"
 #include "Objects/MovementComponent.h"
 #include "FallingCube.h"
+#include "Objects/Terrain.h"
 
 TestPlayer::TestPlayer() : Player()
 {
@@ -25,17 +26,23 @@ TestPlayer::TestPlayer() : Player()
 	II->RegisterKeyInput(256, &TestPlayer::InputExit, this);
 	II->RegisterMouseInput(0, &TestPlayer::MouseMoved, this);
 
-	Movement = SpawnObject<MovementComponent>();
-	Movement->SetTarget(dynamic_cast<Actor*>(this));
-	Movement->SetGravity(false);
-
 	SetModel("Cube");
 	RenderData->SetAABB(AABB(Vector(-0.5f), Vector(0.5f)));
+
+	terra = SpawnObject<Terrain>();
+	terra->InitTerrain(1000, Vector(100.f, 100.f, 1.f));
+
+	Movement = SpawnObject<MovementComponent>();
+	Movement->SetTarget(dynamic_cast<Actor*>(this));
+	Movement->SetGravity(true);
+	Movement->SetGround(terra);
 }
 
 void TestPlayer::RunInputW(float delta, bool KeyDown)
 {
-	Movement->AddInput(-GetCamera()->GetForwardVector());
+	Vector dir = -GetCamera()->GetForwardVector();
+	dir.Z = 0.f;
+	Movement->AddInput(dir.Normalize());
 }
 
 void TestPlayer::RunInputA(float delta, bool KeyDown)
@@ -50,12 +57,15 @@ void TestPlayer::RunInputD(float delta, bool KeyDown)
 
 void TestPlayer::RunInputS(float delta, bool KeyDown)
 {
-	Movement->AddInput(GetCamera()->GetForwardVector());
+	Vector dir = GetCamera()->GetForwardVector();
+	dir.Z = 0.f;
+	Movement->AddInput(dir.Normalize());
 }
 
 void TestPlayer::RunInputSpace(float delta, bool KeyDown)
 {
-	
+	if (!Movement->IsInAir() && KeyDown)
+		Movement->AddImpulse(Vector(0.f, 0.f, 500.f));
 }
 
 void TestPlayer::InputOne(float delta, bool KeyDown)
@@ -107,7 +117,7 @@ void TestPlayer::MouseMoved(float X, float Y)
 
 void TestPlayer::Tick(float)
 {
-	GetCamera()->SetLocation(Location);
+	GetCamera()->SetLocation(Location + Vector(0.f, 0.f, 1.5f));
 	GetCamera()->SetRotation(Rotation);
 
 	/*if (spawnCounter++ == 40) {
@@ -141,9 +151,10 @@ void TestPlayer::BeginPlay()
 	DirLight->Data.Rotation = Vector(45.0, 0.0, 0.0);
 
 	LastSphere = SpawnObject<Actor>();
-	LastSphere->SetModel("sphere");
+	LastSphere->SetModel("Cube");
 	LastSphere->SetLocation(Vector(3.5f, 0.0f, 0.0f));
-	LastSphere->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/metal"));
+	LastSphere->SetScale(Vector(1.f, 1.f, 0.2f));
+	LastSphere->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/rocks"));
 
 	/*LastSphere2 = SpawnObject<Actor>();
 	LastSphere2->SetModel("sphere");
