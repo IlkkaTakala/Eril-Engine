@@ -225,6 +225,7 @@
     <ClCompile Include="Engine\OpenGLRenderer\Renderer.cpp" />
     <ClCompile Include="Engine\OpenGLRenderer\Texture.cpp" />
     <ClCompile Include="Engine\Settings.cpp" />
+    <ClCompile Include="Engine\Timer.cpp" />
     <ClCompile Include="Engine\WinConsole.cpp" />
     <ClCompile Include="Game\EngineInterface.cpp" />
     <ClCompile Include="Game\FallingCube.cpp" />
@@ -254,6 +255,7 @@
     <ClInclude Include="Engine\OpenGLRenderer\include\Renderer.h" />
     <ClInclude Include="Engine\OpenGLRenderer\include\Texture.h" />
     <ClInclude Include="Engine\Settings.h" />
+    <ClInclude Include="Engine\Timer.h" />
     <ClInclude Include="Engine\WinConsole.h" />
     <ClInclude Include="Game\EngineInterface.h" />
     <ClInclude Include="Game\FallingCube.h" />
