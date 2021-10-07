@@ -88,6 +88,9 @@
     <ClCompile Include="Game\FallingCube.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Timer.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -199,6 +202,9 @@
     </ClInclude>
     <ClInclude Include="Game\FallingCube.h">
       <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Timer.h">
+      <Filter>Engine\Public</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
