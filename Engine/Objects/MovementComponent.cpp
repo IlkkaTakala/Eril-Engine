@@ -14,7 +14,7 @@ MovementComponent::MovementComponent()
 	force_count = 0;
 	drag = 1.f;
 	brake = 2000.f;
-	air_control = 0.2f;
+	air_control = 0.05f;
 	Physics::AddMovable(this);
 }
 
@@ -61,8 +61,12 @@ void MovementComponent::Tick(float time)
 		DesiredState.acceleration = total_a;
 
 		DesiredState.velocity += DesiredState.acceleration * time;
-		if (DesiredState.velocity.Length() > max_speed) DesiredState.velocity = DesiredState.velocity.Normalize() * max_speed;
-		else if (DesiredState.velocity.Length() < 0.01f) DesiredState.velocity = Vector(0.f);
+		Vector temp = DesiredState.velocity;
+		temp.Z = 0.f;
+		if (temp.Length() > max_speed) temp = temp.Normalize() * max_speed;
+		else if (temp.Length() < 0.01f) temp = Vector(0.f);
+		DesiredState.velocity.X = temp.X;
+		DesiredState.velocity.Y = temp.Y;
 
 		if (isGravity && inAir) {
 			const Vector gravity_const(0.f, 0.f, -9.8f);
@@ -91,7 +95,6 @@ void MovementComponent::Tick(float time)
 	direction_count = 0;
 	force_count = 0;
 
-	printf("X: %.2f, Y: %.2f, Z: %.2f\n", DesiredState.acceleration.X, DesiredState.acceleration.Y, DesiredState.acceleration.Z);
 }
 
 void MovementComponent::SetTarget(Actor* t)
