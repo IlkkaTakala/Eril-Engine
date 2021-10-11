@@ -8,6 +8,7 @@ class VisibleObject : public BaseObject
 public:
 	VisibleObject();
 	virtual ~VisibleObject() { delete RenderData; }
+	virtual void OnDestroyed() override;
 
 	void SetLocation(Vector NewLocation);
 	void SetRotation(Vector NewRotation);
@@ -19,6 +20,7 @@ public:
 	const Vector GetScale() const { return Scale; }
 
 	void SetModel(std::string Name);
+	void SetModel(RenderMesh* mesh);
 	std::string GetModelName() const { return std::string(); }
 	RenderMesh* GetModel() const { return RenderData; }
 

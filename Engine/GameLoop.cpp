@@ -6,6 +6,7 @@
 #include "GameLoop.h"
 #include "WinConsole.h"
 #include "GarbageCollector.h"
+#include "Physics.h"
 #include "Timer.h"
 
 using namespace std;
@@ -96,7 +97,10 @@ int GameLoop::MainLoop()
 			if (found) continue;
 			t->Tick(duration.count());
 		}
+
 		Timer::UpdateTimers(duration.count());
+		Physics::CheckCollisions();
+
 		RI->Render(duration.count());
 
 		std::unique_lock<std::mutex> lock(TickListMutex);

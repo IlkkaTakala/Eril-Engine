@@ -1,20 +1,31 @@
-#include "Objects/Actor.h"
+#include "Physics.h"
+#include <Objects/Terrain.h>
 #include "Objects/MovementComponent.h"
 
 MovementComponent::MovementComponent()
 {
 	mass = 1.f;
-	in_acceleration = 100.f;
+	in_acceleration = 600.f;
 	max_speed = 10.f;
 	isPhysics = false;
 	isGravity = true;
+	inAir = true;
 	direction_count = 0;
+	force_count = 0;
 	drag = 1.f;
-	brake = 1000.f;
+	brake = 2000.f;
+	air_control = 0.05f;
+	Physics::AddMovable(this);
+}
+
+void MovementComponent::OnDestroyed()
+{
+	Physics::RemoveMovable(this);
 }
 
 void MovementComponent::Tick(float time)
 {
+	OldState = DesiredState;
 	if (Object == nullptr) return;
 	switch (isPhysics)
 	{
@@ -23,9 +34,9 @@ void MovementComponent::Tick(float time)
 		const Vector gravity(0.f, 0.f, -9.8f);
 		Vector delta;
 
-		if (isGravity) acceleration += gravity * time;
-		velocity += acceleration * time;
-		delta = velocity * time;
+		if (isGravity) DesiredState.acceleration += gravity * time;
+		DesiredState.velocity += DesiredState.acceleration * time;
+		delta = DesiredState.velocity * time;
 		Object->AddLocation(delta);
 	}
 	break;
@@ -37,25 +48,67 @@ void MovementComponent::Tick(float time)
 			delta_a += directions[i];
 		}
 		delta_a = delta_a.Normalize();
-		delta_a *= in_acceleration;
+		delta_a *= in_acceleration * (inAir ? air_control : 1.f);
 
-		const Vector drag_a = velocity.Normalize() * brake * time;
+		for (int i = 0; i < force_count; i++) {
+			delta_a += forces[i].Direction;
+		}
+
+		const Vector drag_a = Vector(DesiredState.velocity.X, DesiredState.velocity.Y, 0.f).Normalize() * brake * time;
 
 		const Vector total_a = delta_a - drag_a;
 
-		acceleration = total_a;
+		DesiredState.acceleration = total_a;
 
-		if (isGravity) {
+		DesiredState.velocity += DesiredState.acceleration * time;
+		Vector temp = DesiredState.velocity;
+		temp.Z = 0.f;
+		if (temp.Length() > max_speed) temp = temp.Normalize() * max_speed;
+		else if (temp.Length() < 0.01f) temp = Vector(0.f);
+		DesiredState.velocity.X = temp.X;
+		DesiredState.velocity.Y = temp.Y;
+
+		if (isGravity && inAir) {
 			const Vector gravity_const(0.f, 0.f, -9.8f);
-			gravity += gravity_const * time;
+			DesiredState.velocity += gravity_const * time;
 		}
-		velocity = velocity + acceleration * time;
-		if (velocity.Length() > max_speed) velocity = velocity.Normalize() * max_speed;
-		else if (velocity.Length() < 0.1f) velocity = Vector(0.f);
 		
-		Object->AddLocation((velocity + gravity) * time);
+		DesiredState.location = Object->GetLocation() + (DesiredState.velocity) * time;
+
+		if (Terra != nullptr) {
+			float height = Terra->GetHeight(DesiredState.location.X, DesiredState.location.Y);
+			
+			if (DesiredState.location.Z < height) {
+				DesiredState.location.Z = height;
+				if (DesiredState.velocity.Z < 0.f) DesiredState.velocity.Z = 0.f;
+				if (DesiredState.acceleration.Z < 0.f) DesiredState.acceleration.Z = 0.f;
+				inAir = false;
+			}
+			else {
+				if (DesiredState.location.Z > height)
+					inAir = true;
+			}
+		}
 	}
 	break;
 	}
 	direction_count = 0;
+	force_count = 0;
+
+}
+
+void MovementComponent::SetTarget(Actor* t)
+{
+	Object = t;
+	Physics::RemoveStatic(t);
+}
+
+void MovementComponent::SetGround(Terrain* t)
+{
+	Terra = t;
+}
+
+void MovementComponent::ApplyMovement()
+{
+	Object->SetLocation(DesiredState.location);
 }

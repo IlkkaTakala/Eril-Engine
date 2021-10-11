@@ -215,6 +215,7 @@
     <ClCompile Include="Engine\Objects\BaseObject.cpp" />
     <ClCompile Include="Engine\Objects\InstancedObject.cpp" />
     <ClCompile Include="Engine\Objects\MovementComponent.cpp" />
+    <ClCompile Include="Engine\Objects\Terrain.cpp" />
     <ClCompile Include="Engine\Objects\VisibleObject.cpp" />
     <ClCompile Include="Engine\OpenGLRenderer\Batcher.cpp" />
     <ClCompile Include="Engine\OpenGLRenderer\Camera.cpp" />
@@ -224,6 +225,7 @@
     <ClCompile Include="Engine\OpenGLRenderer\RenderBuffer.cpp" />
     <ClCompile Include="Engine\OpenGLRenderer\Renderer.cpp" />
     <ClCompile Include="Engine\OpenGLRenderer\Texture.cpp" />
+    <ClCompile Include="Engine\Physics.cpp" />
     <ClCompile Include="Engine\Settings.cpp" />
     <ClCompile Include="Engine\Timer.cpp" />
     <ClCompile Include="Engine\WinConsole.cpp" />
@@ -244,6 +246,7 @@
     <ClInclude Include="Engine\Objects\BaseObject.h" />
     <ClInclude Include="Engine\Objects\InstancedObject.h" />
     <ClInclude Include="Engine\Objects\MovementComponent.h" />
+    <ClInclude Include="Engine\Objects\Terrain.h" />
     <ClInclude Include="Engine\Objects\VisibleObject.h" />
     <ClInclude Include="Engine\OpenGLRenderer\ext\glfw\deps\glad\gl.h" />
     <ClInclude Include="Engine\OpenGLRenderer\include\Batcher.h" />
@@ -254,6 +257,7 @@
     <ClInclude Include="Engine\OpenGLRenderer\include\RenderBuffer.h" />
     <ClInclude Include="Engine\OpenGLRenderer\include\Renderer.h" />
     <ClInclude Include="Engine\OpenGLRenderer\include\Texture.h" />
+    <ClInclude Include="Engine\Physics.h" />
     <ClInclude Include="Engine\Settings.h" />
     <ClInclude Include="Engine\Timer.h" />
     <ClInclude Include="Engine\WinConsole.h" />

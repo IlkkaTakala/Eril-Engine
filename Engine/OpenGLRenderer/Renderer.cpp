@@ -3,12 +3,11 @@
 #include <GLFW/glfw3.h>
 #include "Core.h"
 #include "Renderer.h"
-#include "Batcher.h"
 #include "Camera.h"
 #include "Mesh.h"
 #include "Texture.h"
 #include "RenderBuffer.h"
-#include "../Objects/VisibleObject.h"
+#include <Objects/VisibleObject.h>
 #include "LightData.h"
 #include "Settings.h"
 #include <filesystem>
@@ -1205,7 +1204,7 @@ void processMesh(LoadedMesh* meshHolder, aiMesh* mesh)
 		vertex.position.x = mesh->mVertices[i].x;
 		vertex.position.y = mesh->mVertices[i].y;
 		vertex.position.z = mesh->mVertices[i].z;
-		if (radius < mesh->mVertices[i].Length()) radius = mesh->mVertices[i].Length();
+		if (radius < mesh->mVertices[i].x) radius = mesh->mVertices[i].x;
 
 		vertex.normal.x = mesh->mNormals[i].x;
 		vertex.normal.y = mesh->mNormals[i].y;
@@ -1238,7 +1237,7 @@ void processMesh(LoadedMesh* meshHolder, aiMesh* mesh)
 	}
 	std::vector<uint> adjacent;
 	MeshDataHolder* section = new MeshDataHolder(vertices.data(), vertices.size(), indices.data(), indices.size());
-	section->Radius = radius * 1.5f;
+	section->Radius = radius;
 	/*section->FaceCount = indices.size() / 3;
 	section->VertexCount = vertices.size();
 
@@ -1386,6 +1385,41 @@ RenderMesh* GLMesh::LoadData(VisibleObject* parent, String name)
 		obj->SetParent(parent);
 		return obj;
 	}
+}
+
+RenderMesh* GLMesh::CreateProcedural(VisibleObject* parent, String name, std::vector<Vector>& positions, std::vector<Vector> UV, std::vector<Vector>& normal, std::vector<Vector>& tangent, std::vector<uint32>& indices)
+{
+	LoadedMesh* mesh = new LoadedMesh();
+
+	std::vector<Vertex> verts;
+	verts.reserve(positions.size());
+
+	AABB bounds;
+	for (auto i = 0; i < positions.size(); i++) {
+		if		(bounds.mins.X > positions[i].X) bounds.mins.X = positions[i].X;
+		else if (bounds.maxs.X < positions[i].X) bounds.maxs.X = positions[i].X;
+		if		(bounds.mins.Y > positions[i].Y) bounds.mins.Y = positions[i].Y;
+		else if (bounds.maxs.Y < positions[i].Y) bounds.maxs.Y = positions[i].Y;
+		if		(bounds.mins.Z > positions[i].Z) bounds.mins.Z = positions[i].Z;
+		else if (bounds.maxs.Z < positions[i].Z) bounds.maxs.Z = positions[i].Z;
+
+		verts[i].position = glm::vec3(positions[i].X, positions[i].Z, positions[i].Y);
+		verts[i].uv = glm::vec3(UV[i].X, UV[i].Y, UV[i].Z);
+		verts[i].normal = glm::vec3(normal[i].X, normal[i].Z, normal[i].Y);
+		verts[i].tangent = glm::vec3(tangent[i].X, tangent[i].Z, tangent[i].Y);
+	}
+
+	MeshDataHolder* section = new MeshDataHolder(verts.data(), positions.size(), indices.data(), indices.size());
+
+	mesh->HolderCount++;
+	mesh->Holders.push_back(section);
+	section->Radius = bounds.maxs.Length();
+
+	LoadedMeshes.emplace(name, mesh);
+	RenderObject* obj = new RenderObject(mesh);
+	obj->SetParent(parent);
+	obj->SetAABB(bounds);
+	return obj;
 }
 
 void GLMesh::StartLoading()

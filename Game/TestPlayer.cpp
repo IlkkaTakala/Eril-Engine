@@ -3,6 +3,7 @@
 #include "TestPlayer.h"
 #include "Objects/MovementComponent.h"
 #include "FallingCube.h"
+#include "Objects/Terrain.h"
 #include "Timer.h"
 
 TestPlayer::TestPlayer() : Player()
@@ -26,14 +27,23 @@ TestPlayer::TestPlayer() : Player()
 	II->RegisterKeyInput(256, &TestPlayer::InputExit, this);
 	II->RegisterMouseInput(0, &TestPlayer::MouseMoved, this);
 
+	SetModel("Cube");
+	RenderData->SetAABB(AABB(Vector(-0.5f), Vector(0.5f)));
+
+	terra = SpawnObject<Terrain>();
+	terra->InitTerrain(1000, Vector(100.f, 100.f, 1.f));
+
 	Movement = SpawnObject<MovementComponent>();
 	Movement->SetTarget(dynamic_cast<Actor*>(this));
-	Movement->SetGravity(false);
+	Movement->SetGravity(true);
+	Movement->SetGround(terra);
 }
 
 void TestPlayer::RunInputW(float delta, bool KeyDown)
 {
-	Movement->AddInput(-GetCamera()->GetForwardVector());
+	Vector dir = -GetCamera()->GetForwardVector();
+	dir.Z = 0.f;
+	Movement->AddInput(dir.Normalize());
 }
 
 void TestPlayer::RunInputA(float delta, bool KeyDown)
@@ -48,12 +58,15 @@ void TestPlayer::RunInputD(float delta, bool KeyDown)
 
 void TestPlayer::RunInputS(float delta, bool KeyDown)
 {
-	Movement->AddInput(GetCamera()->GetForwardVector());
+	Vector dir = GetCamera()->GetForwardVector();
+	dir.Z = 0.f;
+	Movement->AddInput(dir.Normalize());
 }
 
 void TestPlayer::RunInputSpace(float delta, bool KeyDown)
 {
-	
+	if (!Movement->IsInAir() && KeyDown)
+		Movement->AddImpulse(Vector(0.f, 0.f, 300.f));
 }
 
 void TestPlayer::InputOne(float delta, bool KeyDown)
@@ -105,10 +118,10 @@ void TestPlayer::MouseMoved(float X, float Y)
 
 void TestPlayer::Tick(float)
 {
-	GetCamera()->SetLocation(Location);
+	GetCamera()->SetLocation(Location + Vector(0.f, 0.f, 1.5f));
 	GetCamera()->SetRotation(Rotation);
 
-	if (spawnCounter++ == 30) {
+	/*if (spawnCounter++ == 40) {
 
 		FallingCube* obj = SpawnObject<FallingCube>();
 
@@ -119,7 +132,7 @@ void TestPlayer::Tick(float)
 		obj->SetLocation(Vector(rx * size, ry * size, 15.f));
 
 		spawnCounter = 0;
-	}
+	}*/
 }
 
 #include "Objects/InstancedObject.h"
@@ -142,14 +155,15 @@ void TestPlayer::BeginPlay()
 	DirLight->Data.Rotation = Vector(45.0, 0.0, 0.0);
 
 	LastSphere = SpawnObject<Actor>();
-	LastSphere->SetModel("sphere");
-	LastSphere->SetLocation(Vector(1.5f, 0.0f, 0.0f));
-	LastSphere->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/metal"));
+	LastSphere->SetModel("Cube");
+	LastSphere->SetLocation(Vector(3.5f, 0.0f, 0.0f));
+	LastSphere->SetScale(Vector(1.f, 1.f, 0.2f));
+	LastSphere->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/rocks"));
 
-	LastSphere2 = SpawnObject<Actor>();
+	/*LastSphere2 = SpawnObject<Actor>();
 	LastSphere2->SetModel("sphere");
 	LastSphere2->SetLocation(Vector(3.f, 0.0f, 0.0f));
-	LastSphere2->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/metal"));
+	LastSphere2->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/metal"));*/
 
 	Timer::CreateTimer(5.f, TimeFunction, false);
 
@@ -183,20 +197,20 @@ void TestPlayer::BeginPlay()
 
 	float size = 80.f;
 
-	for (int x = 0; x < 100; x++) {
-		VisibleObject* next = SpawnObject<VisibleObject>();
-		next->SetModel("Cube");
-		float rx = (float)rand() / (float)RAND_MAX - 0.5f;
-		float ry = (float)rand() / (float)RAND_MAX - 0.5f;
-		float rz = (float)rand() / (float)RAND_MAX;
-		//float scale = (float)rand() / (float)RAND_MAX * 2.f;
-		//next->SetScale(Vector(scale));
-		next->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/rocks"));
-		next->SetLocation(Vector(rx * size, ry * size, rz * size / 3));
-		Spheres[x] = next;
-	}
+	//for (int x = 0; x < 100; x++) {
+	//	VisibleObject* next = SpawnObject<VisibleObject>();
+	//	next->SetModel("Cube");
+	//	float rx = (float)rand() / (float)RAND_MAX - 0.5f;
+	//	float ry = (float)rand() / (float)RAND_MAX - 0.5f;
+	//	float rz = (float)rand() / (float)RAND_MAX;
+	//	//float scale = (float)rand() / (float)RAND_MAX * 2.f;
+	//	//next->SetScale(Vector(scale));
+	//	next->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/rocks"));
+	//	next->SetLocation(Vector(rx * size, ry * size, rz * size / 3));
+	//	Spheres[x] = next;
+	//}
 
-	Spheres[10]->SetScale(2.f);
+	//Spheres[10]->SetScale(2.f);
 
 	/*for (int x = 0; x < 20; x++) {
 		for (int y = 0; y < 20; y++) {

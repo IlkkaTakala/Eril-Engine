@@ -10,6 +10,7 @@ class RenderObject;
 class VisibleObject;
 class LoadedMesh;
 struct LightData;
+struct Vertex;
 
 class Camera
 {
@@ -27,6 +28,9 @@ public:
 
 	virtual void SetFov(float) = 0;
 	virtual void SetPerspective(bool perspective) = 0;
+	void SetParent(VisibleObject* p) { Parent = p; }
+protected:
+	VisibleObject* Parent;
 };
 
 class IRender
@@ -84,6 +88,15 @@ protected:
 	double MouseY;
 };
 
+struct AABB
+{
+	AABB() {}
+	AABB(float f) { mins = -f; maxs = f; }
+	AABB(Vector min, Vector max) { mins = min; maxs = max; }
+	Vector mins;
+	Vector maxs;
+};
+
 class RenderMesh
 {
 public:
@@ -92,6 +105,10 @@ public:
 	virtual void SetMaterial(uint section, Material* nextMat) = 0;
 	virtual Material* GetMaterial(uint section) const = 0;
 	virtual void SetInstances(int count, Transformation* dispArray) = 0;
+	AABB GetAABB() const { return bounds; }
+	void SetAABB(AABB bounds) { this->bounds = bounds.maxs.Length(); }
+protected:
+	AABB bounds;
 };
 
 class IMesh
@@ -99,6 +116,7 @@ class IMesh
 public:
 	virtual ~IMesh() {}
 	virtual RenderMesh* LoadData(VisibleObject* parent, String name) = 0;
+	virtual RenderMesh* CreateProcedural(VisibleObject* parent, String name, std::vector<Vector>& positions, std::vector<Vector> UV, std::vector<Vector>& normal, std::vector<Vector>& tangent, std::vector<uint32>& indices) = 0;
 	virtual void StartLoading() = 0;
 
 protected:

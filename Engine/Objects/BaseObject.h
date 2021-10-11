@@ -10,6 +10,8 @@ public:
 	virtual const void NullThis() const = 0;
 	virtual const RecordInt GetRecord() const = 0;
 protected:
+	friend class ObjectManager;
+	const bool bWeak = false;
 };
 
 class Data
