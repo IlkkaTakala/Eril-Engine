@@ -4,6 +4,7 @@
 #include "Objects/MovementComponent.h"
 #include "FallingCube.h"
 #include "Objects/Terrain.h"
+#include "Timer.h"
 
 TestPlayer::TestPlayer() : Player()
 {
@@ -138,6 +139,9 @@ void TestPlayer::Tick(float)
 #include "Objects/Actor.h"
 #include "Objects/VisibleObject.h"
 
+void TimeFunction(float d) {
+	printf("Hello, timer ran\n");
+}
 
 void TestPlayer::BeginPlay()
 {
@@ -160,6 +164,8 @@ void TestPlayer::BeginPlay()
 	LastSphere2->SetModel("sphere");
 	LastSphere2->SetLocation(Vector(3.f, 0.0f, 0.0f));
 	LastSphere2->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/metal"));*/
+
+	Timer::CreateTimer(5.f, TimeFunction, false);
 
 	/*int count = 2000;
 	Transformation* arr = new Transformation[count]();
