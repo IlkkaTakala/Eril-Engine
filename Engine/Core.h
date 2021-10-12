@@ -21,6 +21,17 @@ class Ref : public RefHold
 protected:
 	mutable T* Pointer;
 	mutable Data* DataPtr;
+
+	Ref(T* ptr, bool weak) : Pointer(ptr) {
+		this->DataPtr = dynamic_cast<Data*>(ptr);
+		if (this->DataPtr == nullptr) {
+			this->Pointer = nullptr;
+			return;
+		}
+		bWeak = weak;
+		ObjectManager::AddRef(GetRecord(), this);
+	}
+
 public:
 	Ref() { Pointer = nullptr; DataPtr = nullptr; }
 	Ref(T* ptr) : Pointer(ptr) { 
@@ -75,10 +86,8 @@ public:
 template <class T>
 class RefWeak : public Ref<T>
 {
-	const bool bWeak = true;
-
 public:
-	RefWeak(T* ptr) : Ref<T>(ptr) {}
+	RefWeak(T* ptr) : Ref<T>(ptr, true) {}
 	RefWeak() : Ref<T>() {}
 
 	RefWeak(const RefWeak& old) {

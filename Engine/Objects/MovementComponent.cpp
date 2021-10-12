@@ -13,7 +13,7 @@ MovementComponent::MovementComponent()
 	direction_count = 0;
 	force_count = 0;
 	drag = 1.f;
-	brake = 2000.f;
+	brake = 5000.f;
 	air_control = 0.05f;
 	Physics::AddMovable(this);
 }
@@ -54,7 +54,7 @@ void MovementComponent::Tick(float time)
 			delta_a += forces[i].Direction;
 		}
 
-		const Vector drag_a = Vector(DesiredState.velocity.X, DesiredState.velocity.Y, 0.f).Normalize() * brake * time;
+		const Vector drag_a = inAir ? Vector(0.f) : DesiredState.velocity.Normalize() * brake * time;
 
 		const Vector total_a = delta_a - drag_a;
 
@@ -64,7 +64,7 @@ void MovementComponent::Tick(float time)
 		Vector temp = DesiredState.velocity;
 		temp.Z = 0.f;
 		if (temp.Length() > max_speed) temp = temp.Normalize() * max_speed;
-		else if (temp.Length() < 0.01f) temp = Vector(0.f);
+		else if (temp.Length() < 0.1f) temp = Vector(0.f);
 		DesiredState.velocity.X = temp.X;
 		DesiredState.velocity.Y = temp.Y;
 

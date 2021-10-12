@@ -5,6 +5,7 @@
 #include "FallingCube.h"
 #include "Objects/Terrain.h"
 #include "Timer.h"
+#include "Objects/InstancedObject.h"
 
 TestPlayer::TestPlayer() : Player()
 {
@@ -31,12 +32,36 @@ TestPlayer::TestPlayer() : Player()
 	RenderData->SetAABB(AABB(Vector(-0.5f), Vector(0.5f)));
 
 	terra = SpawnObject<Terrain>();
-	terra->InitTerrain(1000, Vector(100.f, 100.f, 1.f));
+	Terrain* terra2 = SpawnObject<Terrain>();
+	terra->InitTerrain(1000, Vector(100.f, 100.f, 1.f), Vector(-100.f, 0.f, 0.f));
+	terra2->InitTerrain(1000, Vector(100.f, 100.f, 1.f), Vector(0.f, 0.f, 0.f));
 
 	Movement = SpawnObject<MovementComponent>();
 	Movement->SetTarget(dynamic_cast<Actor*>(this));
 	Movement->SetGravity(true);
 	Movement->SetGround(terra);
+
+	Sky = SpawnObject<VisibleObject>();
+	Sky->SetModel(MI->LoadData(Sky, "SkySphere"));
+	Sky->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/Materials/Sky"));
+
+	Trees = SpawnObject<InstancedObject>();
+	Trees->SetModel(MI->LoadData(Trees, "tree"));
+	Trees->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/ground"));
+	Trees->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Shaders/ground"));
+
+	int count = 100;
+	Transformation* arr = new Transformation[count]();
+	for (int i = 0; i < count; i++)
+	{
+		float x = rand() % 200 - 100.f;
+		float y = rand() % 200 - 100.f;
+		arr[i].Location = Vector(x, y, terra->GetHeight(x, y));
+		arr[i].Scale = Vector(1.f, 1.f, 1.f);
+	}
+
+	Trees->AddInstances(count, arr);
+	delete[] arr; 
 }
 
 void TestPlayer::RunInputW(float delta, bool KeyDown)
@@ -120,6 +145,7 @@ void TestPlayer::Tick(float)
 {
 	GetCamera()->SetLocation(Location + Vector(0.f, 0.f, 1.5f));
 	GetCamera()->SetRotation(Rotation);
+	Sky->SetLocation(Location);
 
 	/*if (spawnCounter++ == 40) {
 
@@ -135,7 +161,6 @@ void TestPlayer::Tick(float)
 	}*/
 }
 
-#include "Objects/InstancedObject.h"
 #include "Objects/Actor.h"
 #include "Objects/VisibleObject.h"
 
@@ -149,15 +174,15 @@ void TestPlayer::BeginPlay()
 
 	DirLight = SpawnObject<Light>();
 	DirLight->Data.Location = Vector(0.f);
-	DirLight->Data.Type = LIGHT_POINT;
+	DirLight->Data.Type = LIGHT_DIRECTIONAL;
 	DirLight->Data.Size = 7.0;
-	DirLight->Data.Intensity = 50.0;
-	DirLight->Data.Rotation = Vector(45.0, 0.0, 0.0);
+	DirLight->Data.Intensity = 5.0;
+	DirLight->Data.Rotation = Vector(0.0, 45.0, -45.0);
 
 	LastSphere = SpawnObject<Actor>();
 	LastSphere->SetModel("Cube");
 	LastSphere->SetLocation(Vector(3.5f, 0.0f, 0.0f));
-	LastSphere->SetScale(Vector(1.f, 1.f, 0.2f));
+	LastSphere->SetScale(Vector(1.f, 1.f, 1.f));
 	LastSphere->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/rocks"));
 
 	/*LastSphere2 = SpawnObject<Actor>();

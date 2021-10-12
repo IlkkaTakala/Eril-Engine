@@ -9,15 +9,16 @@ public:
 
 	virtual void BeginPlay() override {}
 
-	void InitTerrain(int r, Vector scale = Vector(1.f));
+	void InitTerrain(int r, Vector scale = Vector(1.f), Vector location = Vector(0.f));
 	float GetHeight(float x, float y);
 private:
+	virtual ~Terrain() {};
 
 	int resolution;
 	Vector Scale;
 
-	float noise_scale = 0.010;
-	float amplitude = 10.0;
+	float noise_scale;
+	float amplitude;
 
 	bool isTexture;
 	Texture* Heightmap;
