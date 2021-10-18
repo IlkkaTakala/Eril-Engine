@@ -89,7 +89,7 @@ in VS_OUT {
 uniform sampler2D Albedo;
 uniform sampler2D Normal;
 uniform sampler2D Roughness;
-uniform sampler2D Metallic;
+uniform sampler2D AOt;
 
 uniform int numberOfTilesX;
 
@@ -183,8 +183,8 @@ void main()
 	
 	vec3 albedo = texture(Albedo, fs_in.TexCoords).rgb;
 	float metallic = 0.0;//texture(Metallic, fs_in.TexCoords).r;
-	float AO = 1.0;
-	float roughness = texture(Roughness, fs_in.TexCoords).r;
+	float AO = texture(AOt, fs_in.TexCoords).r;
+	float roughness = 1 - texture(Roughness, fs_in.TexCoords).r;
 	vec3 normal = texture(Normal, fs_in.TexCoords).rgb;
 	
 	float shadow = 0;
@@ -219,7 +219,7 @@ void main()
 				float radius 	= 10000000.0;
 				float b 		= 1.0 / (radius * radius * 0.01);
 				float attenuation = 1.0 / (1.0 + 0.1 * distance + b * distance * distance);//1.0 / (distance * distance);
-				radiance = light.color.rgb * attenuation;
+				radiance = light.color.rgb;// * attenuation;
 				//shadow = ShadowCalculation(light.transform * vec4(fs_in.FragPos, 1.0), L, N);
 			} break;
 			

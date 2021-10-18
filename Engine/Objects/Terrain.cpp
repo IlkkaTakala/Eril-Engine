@@ -59,7 +59,7 @@ namespace Noise {
 		{
 			int bx0, bx1, by0, by1, b00, b10, b01, b11;
 			float rx0, rx1, ry0, ry1, * q, sx, sy, a, b, t, u, v;
-			register int i, j;
+			int i, j;
 
 			if (start) {
 				start = 0;
@@ -97,7 +97,7 @@ namespace Noise {
 		{
 			int bx0, bx1, by0, by1, bz0, bz1, b00, b10, b01, b11;
 			float rx0, rx1, ry0, ry1, rz0, rz1, * q, sy, sz, a, b, c, d, t, u, v;
-			register int i, j;
+			int i, j;
 
 			if (start) {
 				start = 0;
@@ -205,17 +205,18 @@ Terrain::Terrain()
 	Heightmap = nullptr;
 
 	resolution = 0;
-	noise_scale = 0.010;
-	amplitude = 10.0;
+	noise_scale = 0.010f;
+	amplitude = 10.0f;
 
 	Mesh = SpawnObject<VisibleObject>();
 }
 
 #pragma optimize("", off)
-void Terrain::InitTerrain(int r, Vector scale)
+void Terrain::InitTerrain(int r, Vector scale, Vector location)
 {
 	resolution = r;
 	Scale = scale / r;
+	Mesh->SetLocation(location);
 
 	std::vector<Vector> pos;
 	std::vector<Vector> uvs;
@@ -230,9 +231,10 @@ void Terrain::InitTerrain(int r, Vector scale)
 
 	for (int32 y = 0; y < r + 1; y++) {
 		for (int32 x = 0; x < r + 1; x++) {
-			pos.emplace_back(Vector(Scale.X * x, Scale.Y * y, GetHeight(Scale.X * x, Scale.Y * y)));
-			uvs.emplace_back(Vector((x - 1) / (float)r, (y - 1) / (float)r, 0.f));
+			pos.emplace_back(Vector(Scale.X * x, Scale.Y * y, GetHeight(Scale.X * x + location.X, Scale.Y * y + location.Y)));
+			uvs.emplace_back(Vector((x - 1) / (float)r, (y - 1) / (float)r, 0.f) * 10.f);
 			normals.emplace_back(Vector(0.f, 0.f, 1.f));
+			tangents.emplace_back(Vector(1.f, 0.f, 0.f));
 			if (y < r && x < r) {
 				inds.emplace_back(y * (r + 1) + x);
 				inds.emplace_back((y + 1) * (r + 1) + x);
@@ -249,7 +251,7 @@ void Terrain::InitTerrain(int r, Vector scale)
 	tangents.resize(pos.size());
 
 	Mesh->SetModel(MI->CreateProcedural(Mesh, "Terrain_" + std::to_string(GetRecord()), pos, uvs, normals, tangents, inds));
-	Mesh->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/ground"));
+	Mesh->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/Materials/ground"));
 }
 //
 //float fract(float p)
@@ -326,6 +328,6 @@ float Terrain::GetHeight(float x, float y)
 	x *= noise_scale;
 	y *= noise_scale;
 	float arr[] = { x, y };
-	return Noise::noise2(arr) * amplitude;
+	return Noise::noise2(arr) * amplitude + Mesh->GetLocation().Z;
 }
 #pragma optimize("", on)

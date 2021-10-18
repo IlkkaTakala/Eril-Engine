@@ -3,6 +3,7 @@
 #include <list>
 #include "BasicTypes.h"
 #include <Objects/BaseObject.h>
+#include <mutex>
 
 struct Record
 {
@@ -24,15 +25,9 @@ public:
 		return dynamic_cast<T>(ObjectRecords.find(record)->second.object);
 	}
 
-	static void AddRef(const uint64 record, const RefHold* obj) {
-		if (obj->bWeak) ObjectRecords[record]->weakRefs.push_back(obj);
-		else ObjectRecords[record]->pointerRefs.push_back(obj);
-	}
+	static void AddRef(const RecordInt record, const RefHold* obj);
 
-	static void RemoveRef(const uint64 record, const RefHold* obj) {
-		if (obj->bWeak) ObjectRecords.find(record)->second->weakRefs.remove(obj);
-		else ObjectRecords.find(record)->second->pointerRefs.remove(obj);
-	}
+	static void RemoveRef(const RecordInt record, const RefHold* obj);
 
 	static void CreateRecord(Data* object, short protection = 0) {
 		ObjectRecords.emplace(counter, new Record(object, protection));
@@ -65,9 +60,15 @@ public:
 
 	static void AddTick(Tickable*);
 
+	static void ThreadSafeDelete(const RecordInt& record);
+
+	static void DeleteListed();
+
 private:
 	friend class GC;
 	static long counter;
 	static std::map<RecordInt, Record*> ObjectRecords;
+	static std::list<RecordInt> DeleteList;
+	static std::mutex delete_m;
 };
 

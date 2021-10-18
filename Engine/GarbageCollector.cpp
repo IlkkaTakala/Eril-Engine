@@ -44,7 +44,7 @@ void GC::CleanRunner()
 			}
 		}
 		for (RecordInt d : removal) {
-			ObjectManager::DeleteRecord(d);
+			ObjectManager::ThreadSafeDelete(d);
 			printf("Removed record: %llu. No active references\n", (uint64)d);
 		}
 

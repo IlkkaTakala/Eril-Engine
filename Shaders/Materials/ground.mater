@@ -1,0 +1,7 @@
+[Shader]
+name=shader_002
+[Textures]
+Albedo=Textures/forestGround/diffuse_d.jpg
+Normal=Textures/forestGround/normal_n.jpg
+Roughness=Textures/forestGround/gloss.jpg
+AO=Textures/forestGround/ao.jpg

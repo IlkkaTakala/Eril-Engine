@@ -19,7 +19,7 @@ GLCamera::GLCamera(RenderObject* parent)
 	int x = std::atoi(INI->GetValue("Render", "ResolutionX").c_str());
 	int y = std::atoi(INI->GetValue("Render", "ResolutionY").c_str());
 
-	Projection = glm::perspectiveFov(glm::radians(Fov), (float)x, (float)y, 0.1f, 100.f);
+	Projection = glm::perspectiveFov(glm::radians(Fov), (float)x, (float)y, 0.1f, 1000.f);
 }
 
 void GLCamera::SetFov(float fov)

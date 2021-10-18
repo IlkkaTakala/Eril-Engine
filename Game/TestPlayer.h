@@ -41,12 +41,13 @@ private:
 	bool LightMode;
 	Ref<Light> DirLight;
 	std::vector<Ref<Light>> Lights;
-	Ref<InstancedObject> Reflecting;
+	Ref<InstancedObject> Trees;
 	Ref<VisibleObject> Spheres[100];
+	Ref<VisibleObject> Sky;
 
 	Ref<Actor> LastSphere;
 	Ref<Actor> LastSphere2;
-	Ref<Terrain> terra;
+	Ref<Terrain> terra[4];
 
 	int spawnCounter;
 };

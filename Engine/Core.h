@@ -21,6 +21,17 @@ class Ref : public RefHold
 protected:
 	mutable T* Pointer;
 	mutable Data* DataPtr;
+
+	Ref(T* ptr, bool weak) : Pointer(ptr) {
+		this->DataPtr = dynamic_cast<Data*>(ptr);
+		if (this->DataPtr == nullptr) {
+			this->Pointer = nullptr;
+			return;
+		}
+		bWeak = weak;
+		ObjectManager::AddRef(GetRecord(), this);
+	}
+
 public:
 	Ref() { Pointer = nullptr; DataPtr = nullptr; }
 	Ref(T* ptr) : Pointer(ptr) { 
@@ -49,6 +60,7 @@ public:
 	T* GetPointer() { return Pointer; }
 	
 	Ref(const Ref& old) { 
+		this->bWeak = old.bWeak;
 		ObjectManager::AddRef(old->GetRecord(), this);
 		if (this->DataPtr != nullptr) ObjectManager::RemoveRef(this->GetRecord(), this);
 		this->Pointer = old.Pointer;
@@ -56,6 +68,7 @@ public:
 	}
 
 	Ref& operator=(const Ref& old) {
+		this->bWeak = old.bWeak;
 		ObjectManager::AddRef(old->GetRecord(), this);
 		if (this->DataPtr != nullptr) ObjectManager::RemoveRef(this->GetRecord(), this);
 		this->Pointer = old.Pointer;
@@ -75,13 +88,12 @@ public:
 template <class T>
 class RefWeak : public Ref<T>
 {
-	const bool bWeak = true;
-
 public:
-	RefWeak(T* ptr) : Ref<T>(ptr) {}
+	RefWeak(T* ptr) : Ref<T>(ptr, true) {}
 	RefWeak() : Ref<T>() {}
 
 	RefWeak(const RefWeak& old) {
+		this->bWeak = old.bWeak;
 		ObjectManager::AddRef(old->GetRecord(), this);
 		if (this->DataPtr != nullptr) ObjectManager::RemoveRef(this->GetRecord(), this);
 		this->Pointer = old.Pointer;
@@ -89,6 +101,7 @@ public:
 	}
 
 	RefWeak& operator=(const RefWeak& old) {
+		this->bWeak = old.bWeak;
 		ObjectManager::AddRef(old->GetRecord(), this);
 		if (this->DataPtr != nullptr) ObjectManager::RemoveRef(this->GetRecord(), this);
 		this->Pointer = old.Pointer;

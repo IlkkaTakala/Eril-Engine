@@ -88,6 +88,32 @@ Renderer::Renderer()
 
 Renderer::~Renderer()
 {
+	for (auto const& m : BaseMaterials) {
+		delete m.second;
+	}
+
+	for (auto const& s : Shaders) {
+		delete s.second;
+	}
+
+	for (auto const& t : LoadedTextures) {
+		delete t.second;
+	}
+
+	delete DepthBuffer;
+	delete PostProcess;
+	delete BlurRender;
+	delete SSAORender;
+	delete EnvironmentRender;
+	delete PreDepthShader;
+	delete PostProcessMaster;
+	delete CompositeShader;
+	delete LightCullingShader;
+	delete SSAOShader;
+	delete ShadowShader;
+	delete ShadowMapping;
+	delete SkyDomeShader;
+	delete SkyBoxShader;
 }
 
 inline float lerp(float a, float b, float f)
@@ -260,7 +286,7 @@ int Renderer::SetupWindow(int width, int height)
 
 	float aspect = (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT;
 	float near = 0.1f;
-	float far = 200.0f;
+	float far = 1000.0f;
 	ShadowProj = glm::perspective(glm::radians(90.0f), aspect, near, far);
 	ShadowOrtho = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near, far);
 
@@ -331,33 +357,6 @@ int Renderer::SetupWindow(int width, int height)
 void Renderer::CleanRenderer()
 {
 	glfwDestroyWindow(Window);
-
-	for (auto const& m : BaseMaterials) {
-		delete m.second;
-	}
-
-	for (auto const& s : Shaders) {
-		delete s.second;
-	}
-
-	for (auto const& t : LoadedTextures) {
-		delete t.second;
-	}
-
-	delete DepthBuffer;
-	delete PostProcess;
-	delete BlurRender;
-	delete SSAORender;
-	delete EnvironmentRender;
-	delete PreDepthShader;
-	delete PostProcessMaster;
-	delete CompositeShader;
-	delete LightCullingShader;
-	delete SSAOShader;
-	delete ShadowShader;
-	delete ShadowMapping;
-	delete SkyDomeShader;
-	delete SkyBoxShader;
 
 	glDeleteBuffers(1, &LightBuffer);
 	glDeleteBuffers(1, &VisibleLightIndicesBuffer);
@@ -1392,7 +1391,7 @@ RenderMesh* GLMesh::CreateProcedural(VisibleObject* parent, String name, std::ve
 	LoadedMesh* mesh = new LoadedMesh();
 
 	std::vector<Vertex> verts;
-	verts.reserve(positions.size());
+	verts.resize(positions.size());
 
 	AABB bounds;
 	for (auto i = 0; i < positions.size(); i++) {
