@@ -60,6 +60,7 @@ public:
 	T* GetPointer() { return Pointer; }
 	
 	Ref(const Ref& old) { 
+		this->bWeak = old.bWeak;
 		ObjectManager::AddRef(old->GetRecord(), this);
 		if (this->DataPtr != nullptr) ObjectManager::RemoveRef(this->GetRecord(), this);
 		this->Pointer = old.Pointer;
@@ -67,6 +68,7 @@ public:
 	}
 
 	Ref& operator=(const Ref& old) {
+		this->bWeak = old.bWeak;
 		ObjectManager::AddRef(old->GetRecord(), this);
 		if (this->DataPtr != nullptr) ObjectManager::RemoveRef(this->GetRecord(), this);
 		this->Pointer = old.Pointer;
@@ -91,6 +93,7 @@ public:
 	RefWeak() : Ref<T>() {}
 
 	RefWeak(const RefWeak& old) {
+		this->bWeak = old.bWeak;
 		ObjectManager::AddRef(old->GetRecord(), this);
 		if (this->DataPtr != nullptr) ObjectManager::RemoveRef(this->GetRecord(), this);
 		this->Pointer = old.Pointer;
@@ -98,6 +101,7 @@ public:
 	}
 
 	RefWeak& operator=(const RefWeak& old) {
+		this->bWeak = old.bWeak;
 		ObjectManager::AddRef(old->GetRecord(), this);
 		if (this->DataPtr != nullptr) ObjectManager::RemoveRef(this->GetRecord(), this);
 		this->Pointer = old.Pointer;

@@ -251,7 +251,7 @@ void Terrain::InitTerrain(int r, Vector scale, Vector location)
 	tangents.resize(pos.size());
 
 	Mesh->SetModel(MI->CreateProcedural(Mesh, "Terrain_" + std::to_string(GetRecord()), pos, uvs, normals, tangents, inds));
-	Mesh->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/ground"));
+	Mesh->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/Materials/ground"));
 }
 //
 //float fract(float p)

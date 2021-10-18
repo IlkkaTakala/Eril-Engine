@@ -1,7 +1,0 @@
-[Shader]
-name=shader_002
-[Textures]
-Albedo=Textures/rocks/diffuse_d.jpg
-Normal=Textures/rocks/normal_n.jpg
-Roughness=Textures/rocks/gloss.jpg
-AO=Textures/rocks/ao.jpg

@@ -88,6 +88,32 @@ Renderer::Renderer()
 
 Renderer::~Renderer()
 {
+	for (auto const& m : BaseMaterials) {
+		delete m.second;
+	}
+
+	for (auto const& s : Shaders) {
+		delete s.second;
+	}
+
+	for (auto const& t : LoadedTextures) {
+		delete t.second;
+	}
+
+	delete DepthBuffer;
+	delete PostProcess;
+	delete BlurRender;
+	delete SSAORender;
+	delete EnvironmentRender;
+	delete PreDepthShader;
+	delete PostProcessMaster;
+	delete CompositeShader;
+	delete LightCullingShader;
+	delete SSAOShader;
+	delete ShadowShader;
+	delete ShadowMapping;
+	delete SkyDomeShader;
+	delete SkyBoxShader;
 }
 
 inline float lerp(float a, float b, float f)
@@ -331,33 +357,6 @@ int Renderer::SetupWindow(int width, int height)
 void Renderer::CleanRenderer()
 {
 	glfwDestroyWindow(Window);
-
-	for (auto const& m : BaseMaterials) {
-		delete m.second;
-	}
-
-	for (auto const& s : Shaders) {
-		delete s.second;
-	}
-
-	for (auto const& t : LoadedTextures) {
-		delete t.second;
-	}
-
-	delete DepthBuffer;
-	delete PostProcess;
-	delete BlurRender;
-	delete SSAORender;
-	delete EnvironmentRender;
-	delete PreDepthShader;
-	delete PostProcessMaster;
-	delete CompositeShader;
-	delete LightCullingShader;
-	delete SSAOShader;
-	delete ShadowShader;
-	delete ShadowMapping;
-	delete SkyDomeShader;
-	delete SkyBoxShader;
 
 	glDeleteBuffers(1, &LightBuffer);
 	glDeleteBuffers(1, &VisibleLightIndicesBuffer);

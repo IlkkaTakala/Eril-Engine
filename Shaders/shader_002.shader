@@ -89,7 +89,7 @@ in VS_OUT {
 uniform sampler2D Albedo;
 uniform sampler2D Normal;
 uniform sampler2D Roughness;
-uniform sampler2D Metallic;
+uniform sampler2D AOt;
 
 uniform int numberOfTilesX;
 
@@ -183,7 +183,7 @@ void main()
 	
 	vec3 albedo = texture(Albedo, fs_in.TexCoords).rgb;
 	float metallic = 0.0;//texture(Metallic, fs_in.TexCoords).r;
-	float AO = 1.0;
+	float AO = texture(AOt, fs_in.TexCoords).r;
 	float roughness = 1 - texture(Roughness, fs_in.TexCoords).r;
 	vec3 normal = texture(Normal, fs_in.TexCoords).rgb;
 	

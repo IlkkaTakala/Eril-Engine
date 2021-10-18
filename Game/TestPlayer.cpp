@@ -31,15 +31,16 @@ TestPlayer::TestPlayer() : Player()
 	SetModel("Cube");
 	RenderData->SetAABB(AABB(Vector(-0.5f), Vector(0.5f)));
 
-	terra = SpawnObject<Terrain>();
-	Terrain* terra2 = SpawnObject<Terrain>();
-	terra->InitTerrain(1000, Vector(100.f, 100.f, 1.f), Vector(-100.f, 0.f, 0.f));
-	terra2->InitTerrain(1000, Vector(100.f, 100.f, 1.f), Vector(0.f, 0.f, 0.f));
-
+	for (int y = 0; y < 2; y++) {
+		for (int x = 0; x < 2; x++) {
+			terra[y * 2 + x] = SpawnObject<Terrain>();
+			terra[y * 2 + x]->InitTerrain(1000, Vector(100.f, 100.f, 1.f), Vector(-100.f * x, -100.f * y, 0.f));
+		}
+	}
 	Movement = SpawnObject<MovementComponent>();
 	Movement->SetTarget(dynamic_cast<Actor*>(this));
 	Movement->SetGravity(true);
-	Movement->SetGround(terra);
+	Movement->SetGround(terra[0]);
 
 	Sky = SpawnObject<VisibleObject>();
 	Sky->SetModel(MI->LoadData(Sky, "SkySphere"));
@@ -47,8 +48,8 @@ TestPlayer::TestPlayer() : Player()
 
 	Trees = SpawnObject<InstancedObject>();
 	Trees->SetModel(MI->LoadData(Trees, "tree"));
-	Trees->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/ground"));
-	Trees->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Shaders/ground"));
+	Trees->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/Materials/tree"));
+	Trees->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Shaders/Materials/leaves"));
 
 	int count = 100;
 	Transformation* arr = new Transformation[count]();
@@ -56,7 +57,7 @@ TestPlayer::TestPlayer() : Player()
 	{
 		float x = rand() % 200 - 100.f;
 		float y = rand() % 200 - 100.f;
-		arr[i].Location = Vector(x, y, terra->GetHeight(x, y));
+		arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y));
 		arr[i].Scale = Vector(1.f, 1.f, 1.f);
 	}
 

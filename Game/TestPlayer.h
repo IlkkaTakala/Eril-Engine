@@ -47,7 +47,7 @@ private:
 
 	Ref<Actor> LastSphere;
 	Ref<Actor> LastSphere2;
-	Ref<Terrain> terra;
+	Ref<Terrain> terra[4];
 
 	int spawnCounter;
 };
