@@ -73,6 +73,10 @@ struct RecordInt {
 	}
 };
 
+inline float radians(const float& v) {
+	return v * PI / 180.f;
+}
+
 struct Vector
 {
 	float X, Y, Z;
@@ -128,6 +132,16 @@ struct Vector
 		return out;
 	}
 
+	static Vector RotateByAxis(const Vector& in, const Vector& axis, float angle) {
+		return in * cos(angle) + Cross(axis, in) * sin(angle) + axis * Dot(axis, in) * (1 - cos(angle));
+	}
+
+	static Vector Cross(const Vector& x, const Vector& y) {
+		return Vector(
+			x.Y * y.Z - y.Y * x.Z,
+			x.Z * y.X - y.Z * x.X,
+			x.X * y.Y - y.X * x.Y);
+	}
 	static float Dot(const Vector& in1, const Vector& in2) { return in1.X* in2.X + in1.Y * in2.Y + in1.Z * in2.Z; }
 	String ToString() { return String(std::to_string(X) + ',' + std::to_string(Y) + ',' + std::to_string(Z)); }
 
@@ -148,6 +162,10 @@ struct Vector
 	Vector& operator*=(const float& obj) { X *= obj; Y *= obj; Z *= obj; return *this; }
 	friend Vector operator*(Vector obj, const float& obj2) { obj *= obj2; return obj; }
 	friend Vector operator*(const float& obj, Vector obj2) { obj2 *= obj; return obj2; }
+
+	Vector& operator*=(const double& obj) { X *= (float)obj; Y *= (float)obj; Z *= (float)obj; return *this; }
+	friend Vector operator*(Vector obj, const double& obj2) { obj *= obj2; return obj; }
+	friend Vector operator*(const double& obj, Vector obj2) { obj2 *= obj; return obj2; }
 
 	friend Vector operator/(const Vector& obj, const Vector& obj2) { return Vector(obj.X / obj2.X, obj.Y / obj2.Y, obj.Z / obj2.Z); }
 	friend Vector operator/(const Vector& obj, const int obj2) { return Vector(obj.X / obj2, obj.Y / obj2, obj.Z / obj2); }
@@ -192,6 +210,35 @@ struct Vector
 		return y;
 	}
 
+	static Vector toEuler(const Vector& in, double angle) {
+		Vector out;
+		double s = sin(angle);
+		double c = cos(angle);
+		double t = 1 - c;
+		//  if ain.Xis is not alreadin.Y normalised then uncomment this
+		// double magnitude = Math.sqrt(in.X*in.X + in.Y*in.Y + in.Z*in.Z);
+		// if (magnitude==0) throw error;
+		// in.X /= magnitude;
+		// in.Y /= magnitude;
+		// in.Z /= magnitude;
+		if ((in.X * in.Y * t + in.Z * s) > 0.998) { // north pole singularitin.Y detected
+			out.Y = 2 * (float)atan2(in.X * sin(angle / 2), cos(angle / 2));
+			out.Z = PI / 2;
+			out.X = 0;
+			return 0.f;
+		}
+		if ((in.X * in.Y * t + in.Z * s) < -0.998) { // south pole singularitin.Y detected
+			out.Y = -2 * (float)atan2(in.X * sin(angle / 2), cos(angle / 2));
+			out.Z = -PI / 2;
+			out.X = 0;
+			return 0.f;
+		}
+		out.Y = (float)atan2(in.Y * s - in.X * in.Z * t, 1 - (in.Y * in.Y + in.Z * in.Z) * t);
+		out.Z = (float)asin(in.X * in.Y * t + in.Z * s);
+		out.X = (float)atan2(in.X * s - in.Y * in.Z * t, 1 - (in.X * in.X + in.Z * in.Z) * t);
+
+		return out;
+	}
 };
 
 struct Vector2D

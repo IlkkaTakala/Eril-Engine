@@ -72,6 +72,8 @@ Renderer::Renderer()
 	ShadowMapping = nullptr;
 	ShadowColorShader = nullptr;
 	EnvironmentRender = nullptr;
+	SkyDomeShader = nullptr;
+	SkyBoxShader = nullptr;
 
 	MaxLightCount = 1024;
 
@@ -548,6 +550,7 @@ void Renderer::LoadShaders()
 				if (LoadVertex(stre, vertex)) {
 					Shader* nShader = new Shader(1, vertex.c_str());
 					nShader->Pass = std::atoi(params[1].c_str());
+					if (params.size() > 2) nShader->FaceCulling = std::atoi(params[2].c_str());
 					if (!nShader->Success) nShader = nullptr;
 					if (nShader != nullptr) {
 						if (f.path().filename() == "LightCullingShader.shader") LightCullingShader = nShader;
@@ -563,6 +566,7 @@ void Renderer::LoadShaders()
 				if (LoadFragment(stre, fragment)) {
 					Shader* nShader = new Shader(2, fragment.c_str());
 					nShader->Pass = std::atoi(params[1].c_str());
+					if (params.size() > 2) nShader->FaceCulling = std::atoi(params[2].c_str());
 					if (!nShader->Success) nShader = nullptr;
 					if (nShader != nullptr) {
 						Shaders.emplace(f.path().filename().replace_extension("").string(), nShader);
@@ -578,6 +582,7 @@ void Renderer::LoadShaders()
 				if (LoadVertex(stre, vertex) && LoadFragment(stre, fragment)) {
 					Shader* nShader = new Shader(vertex.c_str(), fragment.c_str());
 					nShader->Pass = std::atoi(params[1].c_str());
+					if (params.size() > 2) nShader->FaceCulling = std::atoi(params[2].c_str());
 					if (!nShader->Success) nShader = nullptr;
 					if (nShader != nullptr) {
 						if (f.path().filename() == "PreDepth.shader") PreDepthShader = nShader;
@@ -605,6 +610,7 @@ void Renderer::LoadShaders()
 				if (LoadVertex(stre, vertex) && LoadFragment(stre, fragment) && LoadGeometry(stre, geom)) {
 					Shader* nShader = new Shader(vertex.c_str(), geom.c_str(), fragment.c_str());
 					nShader->Pass = std::atoi(params[1].c_str());
+					if (params.size() > 2) nShader->FaceCulling = std::atoi(params[2].c_str());
 					if (!nShader->Success) nShader = nullptr;
 					if (nShader != nullptr) {
 						if (f.path().filename() == "Shadow.shader") ShadowShader = nShader;
@@ -623,6 +629,7 @@ void Renderer::LoadShaders()
 				if (LoadCompute(stre, compute)) {
 					Shader* nShader = new Shader(0, compute.c_str());
 					nShader->Pass = std::atoi(params[1].c_str());
+					if (params.size() > 2) nShader->FaceCulling = std::atoi(params[2].c_str());
 					if (!nShader->Success) nShader = nullptr;
 					if (nShader != nullptr) {
 						if (f.path().filename() == "LightCullingShader.shader") LightCullingShader = nShader;
@@ -893,7 +900,6 @@ void Renderer::Forward(int width, int height)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glEnable(GL_MULTISAMPLE);
-	glEnable(GL_CULL_FACE);
 
 	// Opaque Pass
 	for (auto const& [name, s] : Shaders)
@@ -901,6 +907,9 @@ void Renderer::Forward(int width, int height)
 		if (s == nullptr) continue;
 
 		if (s->Pass != 0) continue;
+
+		if (s->FaceCulling == 1) glDisable(GL_CULL_FACE);
+		else glEnable(GL_CULL_FACE);
 
 		s->Bind();
 
@@ -931,7 +940,7 @@ void Renderer::Forward(int width, int height)
 				Vector direction = ActiveCamera->GetForwardVector();
 				Vector location = ActiveCamera->GetLocation();
 				glm::vec3 pos = mm[3];
-				glm::vec3 rad = glm::vec3(o->GetRadius()) * glm::mat3(mm);
+				glm::vec3 rad = glm::vec3((o->Parent->GetAABB().maxs - o->Parent->GetAABB().mins).Length()) * glm::mat3(mm);
 				float radii = glm::max(rad.x, glm::max(rad.y, rad.z));
 				glm::vec3 loc = glm::vec3(location.X, location.Z, location.Y);
 				glm::vec3 dir = glm::vec3(direction.X, direction.Z, direction.Y);
@@ -968,6 +977,9 @@ void Renderer::Forward(int width, int height)
 		if (s == nullptr) continue;
 
 		if (s->Pass != 1) continue;
+
+		if (s->FaceCulling == 1) glDisable(GL_CULL_FACE);
+		else glEnable(GL_CULL_FACE);
 
 		s->Bind();
 
@@ -1048,6 +1060,9 @@ void Renderer::PreDepth(int width, int height)
 	PreDepthShader->Bind();
 	for (auto const& [name, s] : Shaders)
 	{
+		if (s->FaceCulling == 1) glDisable(GL_CULL_FACE);
+		else glEnable(GL_CULL_FACE);
+
 		for (Material* m : s->GetUsers())
 		{
 			for (Section* o : m->GetObjects())

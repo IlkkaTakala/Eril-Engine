@@ -42,6 +42,9 @@ private:
 	Ref<Light> DirLight;
 	std::vector<Ref<Light>> Lights;
 	Ref<InstancedObject> Trees;
+	Ref<InstancedObject> Trees2;
+	Ref<InstancedObject> Grass;
+	Ref<InstancedObject> Flowers;
 	Ref<VisibleObject> Spheres[100];
 	Ref<VisibleObject> Sky;
 

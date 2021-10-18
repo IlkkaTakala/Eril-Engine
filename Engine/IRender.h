@@ -106,7 +106,7 @@ public:
 	virtual Material* GetMaterial(uint section) const = 0;
 	virtual void SetInstances(int count, Transformation* dispArray) = 0;
 	AABB GetAABB() const { return bounds; }
-	void SetAABB(AABB bounds) { this->bounds = bounds.maxs.Length(); }
+	void SetAABB(AABB bounds) { this->bounds = bounds; }
 protected:
 	AABB bounds;
 };

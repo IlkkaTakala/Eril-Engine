@@ -53,6 +53,7 @@ void MovementComponent::Tick(float time)
 		for (int i = 0; i < force_count; i++) {
 			delta_a += forces[i].Direction;
 		}
+		if (delta_a.Z > 0.f) inAir = true;
 
 		const Vector drag_a = inAir ? Vector(0.f) : DesiredState.velocity.Normalize() * brake * time;
 
@@ -78,15 +79,14 @@ void MovementComponent::Tick(float time)
 		if (Terra != nullptr) {
 			float height = Terra->GetHeight(DesiredState.location.X, DesiredState.location.Y);
 			
-			if (DesiredState.location.Z < height) {
+			if (!inAir) {
 				DesiredState.location.Z = height;
 				if (DesiredState.velocity.Z < 0.f) DesiredState.velocity.Z = 0.f;
 				if (DesiredState.acceleration.Z < 0.f) DesiredState.acceleration.Z = 0.f;
-				inAir = false;
 			}
 			else {
-				if (DesiredState.location.Z > height)
-					inAir = true;
+				if (DesiredState.location.Z <= height)
+					inAir = false;
 			}
 		}
 	}

@@ -1,0 +1,4 @@
+[Shader]
+name=shader_003
+[Textures]
+Albedo=Textures/grass/flower_d.png

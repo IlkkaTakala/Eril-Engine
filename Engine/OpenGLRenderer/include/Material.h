@@ -36,6 +36,7 @@ public:
 	int Success;
 
 	uint8 Pass;
+	uint8 FaceCulling;
 
 private:
 	void AddUniforms(const char* const string);

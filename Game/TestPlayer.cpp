@@ -34,7 +34,7 @@ TestPlayer::TestPlayer() : Player()
 	for (int y = 0; y < 2; y++) {
 		for (int x = 0; x < 2; x++) {
 			terra[y * 2 + x] = SpawnObject<Terrain>();
-			terra[y * 2 + x]->InitTerrain(1000, Vector(100.f, 100.f, 1.f), Vector(-100.f * x, -100.f * y, 0.f));
+			terra[y * 2 + x]->InitTerrain(100, Vector(100.f, 100.f, 1.f), Vector(-100.f * x, -100.f * y, 0.f));
 		}
 	}
 	Movement = SpawnObject<MovementComponent>();
@@ -50,19 +50,85 @@ TestPlayer::TestPlayer() : Player()
 	Trees->SetModel(MI->LoadData(Trees, "tree"));
 	Trees->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/Materials/tree"));
 	Trees->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Shaders/Materials/leaves"));
+	Trees->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
 
 	int count = 100;
 	Transformation* arr = new Transformation[count]();
 	for (int i = 0; i < count; i++)
 	{
-		float x = rand() % 200 - 100.f;
-		float y = rand() % 200 - 100.f;
-		arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y));
-		arr[i].Scale = Vector(1.f, 1.f, 1.f);
+		float x = rand() % 100 - 50.f;
+		float y = rand() % 100 - 50.f;
+		float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
+		arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y) - 0.2f);
+		arr[i].Scale = Vector(s);
 	}
-
 	Trees->AddInstances(count, arr);
-	delete[] arr; 
+
+	Trees2 = SpawnObject<InstancedObject>();
+	Trees2->SetModel(MI->LoadData(Trees2, "tree2"));
+	Trees2->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/Materials/tree"));
+	Trees2->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Shaders/Materials/leaves2"));
+	Trees2->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
+
+	for (int i = 0; i < count; i++)
+	{
+		float x = rand() % 100 - 50.f;
+		float y = rand() % 100 - 50.f;
+		float s = (1.f - rand() / (float)RAND_MAX * 0.7f) * 1.5f;
+		arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y) - 0.2f);
+		arr[i].Scale = Vector(s);
+	}
+	Trees2->AddInstances(count, arr);
+	delete[] arr;
+
+	Grass = SpawnObject<InstancedObject>();
+	Grass->SetModel(MI->LoadData(Grass, "grass"));
+	Grass->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/Materials/grass"));
+	Grass->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
+
+	count = 1000;
+	arr = new Transformation[count]();
+
+	for (int i = 0; i < count; i++)
+	{
+		float x = rand() % 100 - 50.f;
+		float y = rand() % 100 - 50.f;
+		float s = (1.f - rand() / (float)RAND_MAX * 0.7f) * 1.5f;
+		Vector normal = terra[0]->GetNormal(x, y);
+		arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y)) - normal * 0.1;
+		arr[i].Scale = Vector(1.f);
+		Vector up(0.f, 0.f, 1.f);
+		Vector axis = Vector::Cross(normal, up).Normalize();
+		float angle = acos(Vector::Dot(up, normal));
+		arr[i].Rotation = Vector::toEuler(axis, angle) * 180.f / PI;
+	}
+	Grass->AddInstances(count, arr);
+	delete[] arr;
+
+	Flowers = SpawnObject<InstancedObject>();
+	Flowers->SetModel(MI->LoadData(Flowers, "flower"));
+	Flowers->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/Materials/flower"));
+	Flowers->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
+
+	count = 1000;
+	arr = new Transformation[count]();
+	for (int i = 0; i < count; i++)
+	{
+		float x = rand() % 100 - 50.f;
+		float y = rand() % 100 - 50.f;
+		float s = (1.f - rand() / (float)RAND_MAX * 0.4f);
+		Vector normal = terra[0]->GetNormal(x, y);
+		arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y));
+		arr[i].Scale = Vector(s);
+		Vector up(0.f, 0.f, 1.f);
+		Vector axis = Vector::Cross(normal, up).Normalize();
+		float angle = acos(Vector::Dot(up, normal));
+		arr[i].Rotation = Vector::toEuler(axis, angle) * 180.f / PI;
+	}
+	Flowers->AddInstances(count, arr);
+
+	delete[] arr;
+
 }
 
 void TestPlayer::RunInputW(float delta, bool KeyDown)

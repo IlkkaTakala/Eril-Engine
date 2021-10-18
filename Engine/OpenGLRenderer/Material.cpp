@@ -31,6 +31,7 @@ Shader::Shader(const char* const vertexShaderString, const char* const fragmentS
 {
 	Success = false;
 	Pass = 0;
+	FaceCulling = 0;
 	
 	int vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertexShaderString, NULL);
@@ -76,6 +77,7 @@ Shader::Shader(const char* const vertexShaderString, const char* geomShaderStrin
 {
 	Success = false;
 	Pass = 0;
+	FaceCulling = 0;
 
 	int vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertexShaderString, NULL);
@@ -132,6 +134,7 @@ Shader::Shader(const char* const vertexShaderString, const char* geomShaderStrin
 
 Shader::Shader(int type, const char* const ShaderString)
 {
+	FaceCulling = 0;
 	char infoLog[512];
 	switch (type)
 	{
@@ -225,7 +228,7 @@ Shader::Shader(int type, const char* const ShaderString)
 
 Shader::~Shader()
 {
-	glDeleteProgram(ShaderProgram);
+	if (ShaderProgram != 0) glDeleteProgram(ShaderProgram);
 }
 
 void Shader::Bind()
