@@ -57,6 +57,9 @@ public:
 	std::map<String, float>& GetScalarParameters() { return ScalarParameters; }
 	std::map<String, Texture*>& GetTextures() { return Textures; }
 
+	void SetParameter(const String& name, Vector value) { VectorParameters[name] = value; }
+	void SetParameter(const String& name, float value) { ScalarParameters[name] = value; }
+
 	void AddSection(Section*);
 	void RemoveSection(Section*);
 

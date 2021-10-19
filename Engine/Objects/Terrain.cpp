@@ -206,7 +206,7 @@ Terrain::Terrain()
 
 	resolution = 0;
 	noise_scale = 0.010f;
-	amplitude = 10.0f;
+	amplitude = 0.0f;
 
 	Mesh = SpawnObject<VisibleObject>();
 }
@@ -232,8 +232,21 @@ void Terrain::InitTerrain(int r, Vector scale, Vector location)
 		for (int32 x = 0; x < r + 1; x++) {
 			pos.emplace_back(Vector(Scale.X * x, Scale.Y * y, GetHeight(Scale.X * x + location.X, Scale.Y * y + location.Y)));
 			uvs.emplace_back(Vector((x - 1) / (float)r, (y - 1) / (float)r, 0.f) * 10.f);
-			normals.emplace_back(Vector(0.f, 0.f, 1.f));
-			tangents.emplace_back(Vector(1.f, 0.f, 0.f));
+			Vector normal = GetNormal(Scale.X * x + location.X, Scale.Y * y + location.Y);
+			normals.emplace_back(normal);
+			Vector tangent;
+			Vector t1 = Vector::Cross(normal, Vector(1.f, 0.f, 0.f));
+			Vector t2 = Vector::Cross(normal, Vector(0.f, 1.f, 0.f));
+			if (t1.Length() > t2.Length())
+			{
+				tangent = t1;
+			}
+			else
+			{
+				tangent = t2;
+			}
+
+			tangents.emplace_back(tangent);
 			if (y < r && x < r) {
 				inds.emplace_back(y * (r + 1) + x);
 				inds.emplace_back((y + 1) * (r + 1) + x);

@@ -247,7 +247,7 @@ void Shader::SetUniform(const String& name, const Vector& m)
 {
 	auto const& locs = UniformLocs.find(name);
 	if (locs == UniformLocs.end() || locs->second < 0) return;
-	glUniform3fv(UniformLocs[name], 3, &m[0]);
+	glUniform3fv(UniformLocs[name], 1, &m[0]);
 }
 
 void Shader::SetUniform(const String& name, const int x, const int y)

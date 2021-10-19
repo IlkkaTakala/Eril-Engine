@@ -8,6 +8,7 @@ class InstancedObject;
 class Light;
 class MovementComponent;
 class Terrain;
+class Hunter;
 
 class TestPlayer : public Player
 {
@@ -35,22 +36,18 @@ private:
 	void InputExit(float delta, bool) { Exit(); }
 
 	Ref<MovementComponent> Movement;
-	Ref<Actor> Domain;
-	Ref<Actor> Pillars;
 
-	bool LightMode;
+	bool InputMode;
 	Ref<Light> DirLight;
-	std::vector<Ref<Light>> Lights;
 	Ref<InstancedObject> Trees;
 	Ref<InstancedObject> Trees2;
 	Ref<InstancedObject> Grass;
 	Ref<InstancedObject> Flowers;
-	Ref<VisibleObject> Spheres[100];
 	Ref<VisibleObject> Sky;
 
-	Ref<Actor> LastSphere;
-	Ref<Actor> LastSphere2;
 	Ref<Terrain> terra[4];
+
+	Ref<Hunter> hunt;
 
 	int spawnCounter;
 };

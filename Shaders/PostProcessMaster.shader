@@ -17,9 +17,19 @@ void main()
 
 layout (binding = 0) uniform sampler2D Color;
 layout (binding = 1) uniform sampler2D Bloom;
+layout (binding = 4) uniform sampler2D Depth;
 
 in vec2 TexCoords;
 out vec4 FragColor;
+
+float LinearizeDepth(float depth) {
+	float z = depth * 2.0 - 1.0;
+	return (2.0 * 0.1 * 1000.0) / (1000.0 + 0.1 - z * (1000.0 - 0.1));
+}
+
+vec3 blendNormal(vec3 base, vec3 blend, float opacity) {
+	return (blend * opacity + base * (1.0 - opacity));
+}
 
 void main()
 {
@@ -27,11 +37,14 @@ void main()
 	const float exposure = 1.0;
     vec3 hdrColor = texture(Color, TexCoords).rgb;      
     vec3 bloomColor = texture(Bloom, TexCoords).rgb;
-    hdrColor += bloomColor; // additive blending
-    // tone mapping
-    vec3 result = vec3(1.0) - exp(-hdrColor * exposure);
-    // also gamma correct while we're at it       
+    hdrColor += bloomColor;
+    vec3 result = vec3(1.0) - exp(-hdrColor * exposure);  
     result = pow(result, vec3(1.0 / gamma));
+	
+	float depth = LinearizeDepth(texture(Depth, TexCoords).r) / 30.0;
+	//result = blendNormal(result, vec3(0.5), clamp(depth - 0.15, 0.0, 8.0));
+
+	
     FragColor = vec4(result, 1.0);
 }
 ###END_FRAGMENT###

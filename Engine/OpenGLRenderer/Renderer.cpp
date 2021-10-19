@@ -43,14 +43,12 @@ struct GLM_Light
 	glm::vec4 locationAndSize;
 	glm::vec4 rotation;
 	glm::ivec4 type;
-	glm::mat4 transform;
 
 	GLM_Light() {
 		color = glm::vec4(0.0);
 		locationAndSize = glm::vec4(0.0);
 		rotation = glm::vec4(0.0);
 		type = glm::ivec4(1);
-		transform = glm::mat4(1.0);
 	}
 };
 
@@ -415,10 +413,6 @@ void Renderer::UpdateLights()
 		light.rotation = rot * glm::vec4(0.0, -1.0, 0.0, 0.0);
 		light.color = glm::vec4(Lights[i]->Color.X, Lights[i]->Color.Y, Lights[i]->Color.Z, 1.0) * Lights[i]->Intensity;
 		light.type.x = Lights[i]->Type;
-		glm::vec3 loc = glm::vec3(ActiveCamera->GetLocation().X, ActiveCamera->GetLocation().Z, ActiveCamera->GetLocation().Y);
-		glm::vec3 up = glm::toMat4(glm::quat(glm::vec3(glm::radians(Lights[i]->Rotation.X), glm::radians(Lights[i]->Rotation.Y), glm::radians(Lights[i]->Rotation.Z)))) * glm::vec4(1.0, 0.0, 0.0, 0.0);
-		glm::vec3 newLoc = loc + glm::vec3(-light.rotation * 70.f);
-		light.transform = ShadowOrtho * glm::lookAt(newLoc, newLoc + glm::vec3(light.rotation), up);
 		mapped[i] = light;
 	}
 	int result = glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
@@ -1114,7 +1108,7 @@ void Renderer::Render(float delta)
 	GlobalVariables.Projection = ActiveCamera->GetProjectionMatrix();
 	GlobalVariables.View = glm::inverse(ActiveCamera->GetViewMatrix());
 	const Vector& loc = ActiveCamera->GetLocation();
-	GlobalVariables.ViewPoint = glm::vec4(loc.X, loc.Y, loc.Z, 1.f);
+	GlobalVariables.ViewPoint = glm::vec4(loc.X, loc.Z, loc.Y, 1.f);
 	GlobalVariables.ScreenSize = glm::ivec2(width, height);
 	GlobalVariables.SceneLightCount = (int)Lights.size();
 
@@ -1142,7 +1136,7 @@ void Renderer::Render(float delta)
 
 	glClearColor(0.f, 0.f, 0.f, 0.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	DepthBuffer->BindTextures();
+	//DepthBuffer->BindTextures();
 	EnvironmentRender->BindTextures();
 
 	/*glDepthFunc(GL_ALWAYS);
@@ -1150,11 +1144,11 @@ void Renderer::Render(float delta)
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);*/
 
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, DepthBuffer->GetBuffer());
+	/*glBindFramebuffer(GL_READ_FRAMEBUFFER, DepthBuffer->GetBuffer());
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, PostProcess->GetBuffer());
 	glBlitFramebuffer(
 		0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST
-	);
+	);*/
 
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, 0);
@@ -1165,8 +1159,6 @@ void Renderer::Render(float delta)
 	PostProcess->BindTextures();
 
 	PostProcessMaster->Bind();
-	//PostProcessMaster->SetUniform("Color", 0);
-	//PostProcessMaster->SetUniform("Bloom", 1);
 
 	glDepthFunc(GL_ALWAYS);
 	glBindVertexArray(ScreenVao);

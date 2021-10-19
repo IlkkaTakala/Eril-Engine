@@ -49,7 +49,6 @@ struct LightData {
 	vec4 positionAndSize;
 	vec4 rotation;
 	ivec4 type;
-	mat4 transform;
 };
 
 struct VisibleIndex {
@@ -180,8 +179,8 @@ void main()
 	// Get color and normal components from texture maps
 	//vec3 FragPos = texture(gPosition, TexCoords).xyz;
 	//vec4 data = texture(gData, TexCoords);
-	
-	vec3 albedo = texture(Albedo, fs_in.TexCoords).rgb;
+	float gamma = 2.2;	
+	vec3 albedo = pow(texture(Albedo, fs_in.TexCoords).rgb, vec3(gamma));
 	float metallic = 0.0;//texture(Metallic, fs_in.TexCoords).r;
 	float AO = texture(AOt, fs_in.TexCoords).r;
 	float roughness = 1 - texture(Roughness, fs_in.TexCoords).r;
@@ -213,13 +212,9 @@ void main()
 			case 0:
 			{
 				L = normalize(-light.rotation.xyz);
-				H = normalize(V + L);
+				H = normalize(V + L); // ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-				float distance 	= 1.0;
-				float radius 	= 10000000.0;
-				float b 		= 1.0 / (radius * radius * 0.01);
-				float attenuation = 1.0 / (1.0 + 0.1 * distance + b * distance * distance);//1.0 / (distance * distance);
-				radiance = light.color.rgb;// * attenuation;
+				radiance = light.color.rgb;
 				//shadow = ShadowCalculation(light.transform * vec4(fs_in.FragPos, 1.0), L, N);
 			} break;
 			
@@ -227,7 +222,7 @@ void main()
 			{
 				L = normalize(light.positionAndSize.xyz - fs_in.FragPos.xyz);
 				H = normalize(V + L);
-			  
+				
 				float distance 	= length(light.positionAndSize.xyz - fs_in.FragPos.xyz);
 				float radius 	= light.positionAndSize.w;
 				float b 		= 1.0 / (radius * radius * 0.01);
@@ -245,8 +240,8 @@ void main()
 		float G   = GeometrySmith(N, V, L, roughness);
 		
 		vec3 numerator    = NDF * G * F;
-		float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0);
-		vec3 specular     = numerator / max(denominator, 0.001);
+		float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0)  + 0.0001;
+		vec3 specular     = numerator / denominator; 
 		
 		vec3 kS = F;
 		vec3 kD = vec3(1.0) - kS;
@@ -254,7 +249,7 @@ void main()
 		kD *= 1.0 - metallic;
 
 		float NdotL = max(dot(N, L), 0.0);
-		Lo += (kD * albedo / PI + specular) * radiance * NdotL * (1.0 - shadow);
+		Lo += (kD * albedo / PI + specular) * radiance * NdotL; //
 		
 	}
 	

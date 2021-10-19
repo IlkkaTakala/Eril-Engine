@@ -53,7 +53,7 @@ void MovementComponent::Tick(float time)
 		for (int i = 0; i < force_count; i++) {
 			delta_a += forces[i].Direction;
 		}
-		if (delta_a.Z > 0.f) inAir = true;
+		if (delta_a.Z > 0.3f) inAir = true;
 
 		const Vector drag_a = inAir ? Vector(0.f) : DesiredState.velocity.Normalize() * brake * time;
 
