@@ -183,8 +183,10 @@ void main()
 	vec3 albedo = pow(texture(Albedo, fs_in.TexCoords).rgb, vec3(gamma));
 	float metallic = 0.0;//texture(Metallic, fs_in.TexCoords).r;
 	float AO = texture(AOt, fs_in.TexCoords).r;
-	float roughness = 1 - texture(Roughness, fs_in.TexCoords).r;
+	float roughness = 1.0 - texture(Roughness, fs_in.TexCoords).r;
 	vec3 normal = texture(Normal, fs_in.TexCoords).rgb;
+	normal.g = 1.0 - normal.g;
+	normal = normalize(normal * 2.0 - 1.0);
 	
 	float shadow = 0;
 	//float SSAO = texture(gSSAO, TexCoords).r;
@@ -212,7 +214,7 @@ void main()
 			case 0:
 			{
 				L = normalize(-light.rotation.xyz);
-				H = normalize(V + L); // ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+				H = normalize(V + L);
 
 				radiance = light.color.rgb;
 				//shadow = ShadowCalculation(light.transform * vec4(fs_in.FragPos, 1.0), L, N);
@@ -249,7 +251,7 @@ void main()
 		kD *= 1.0 - metallic;
 
 		float NdotL = max(dot(N, L), 0.0);
-		Lo += (kD * albedo / PI + specular) * radiance * NdotL; //
+		Lo += (kD * albedo / PI + specular) * radiance * NdotL;
 		
 	}
 	

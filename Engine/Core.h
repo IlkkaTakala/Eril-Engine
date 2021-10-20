@@ -126,3 +126,7 @@ T* SpawnObject()
 }
 
 Data* GetObjectByName(const String& name);
+
+class GameState;
+
+GameState* GetGameState();

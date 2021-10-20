@@ -206,7 +206,7 @@ Terrain::Terrain()
 
 	resolution = 0;
 	noise_scale = 0.010f;
-	amplitude = 0.0f;
+	amplitude = 10.0f;
 
 	Mesh = SpawnObject<VisibleObject>();
 }

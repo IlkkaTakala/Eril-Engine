@@ -18,6 +18,8 @@ public:
 	void Quit();
 	void AddToTick(Tickable* t) { std::unique_lock<std::mutex> lock(TickListMutex); TickList.push_back(t); }
 	void RemoveFromTick(Tickable* t) { std::unique_lock<std::mutex> lock(TickListMutex); TickListRemoval.push_back(t); }
+	
+	static Ref<GameState> State;
 
 private:
 	int MainLoop();
@@ -27,7 +29,6 @@ private:
 
 	GC* Collector;
 	std::mutex TickListMutex;
-	static Ref<GameState> State;
 	bool bQuit;
 	bool bQuitStarted;
 	float fps;

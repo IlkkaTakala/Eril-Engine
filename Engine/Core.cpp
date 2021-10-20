@@ -18,3 +18,6 @@ Data* GetObjectByName(const String& name)
 	return nullptr;
 }
 
+GameState* GetGameState() {
+	return GameLoop::State;
+}

@@ -95,11 +95,13 @@ struct Vector
 	}
 
 	float Length() const { return (float)sqrt(X * X + Y * Y + Z * Z); }
+	float LengthSquared() const { return (float)(X * X + Y * Y + Z * Z); }
 	/*Vector Normalize() { float mag = Length(); return Vector(X / mag, Y / mag, Z / mag); }*/
 
 	//float Length() { return; }
 
 	Vector Normalize() const { return *this * Q_rsqrt(X * X + Y * Y + Z * Z); }
+	Vector SafeNormalize() const { return Normalize(); }
 
 	Vector Rotate(const Vector& In) 
 	{

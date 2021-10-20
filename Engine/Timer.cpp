@@ -2,9 +2,9 @@
 
 std::list<Timer*> Timer::Timers;
 
-void Timer::CreateTimer(float duration, std::function<void(float)> function, bool looping, bool runBeforeDuration)
+void Timer::CreateTimer(float duration, void (*Callback)(float), bool looping, bool runBeforeDuration)
 {
-	Timers.push_back(new Timer(duration, function, looping, runBeforeDuration));
+	Timers.push_back(new Timer(duration, Callback, looping, runBeforeDuration));
 }
 
 Timer::Timer(float duration, std::function<void(float)> function, bool looping, bool runBeforeDuration)

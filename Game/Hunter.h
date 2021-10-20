@@ -13,5 +13,9 @@ public:
 	virtual void Tick(float) override;
 private:
 	float time;
+	Vector targetLoc;
+	bool caught;
+
+	void SetNewTarget(float);
 };
 

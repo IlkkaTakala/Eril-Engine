@@ -39,6 +39,7 @@ private:
 
 	bool InputMode;
 	Ref<Light> DirLight;
+	Ref<Light> Lights[100];
 	Ref<InstancedObject> Trees;
 	Ref<InstancedObject> Trees2;
 	Ref<InstancedObject> Grass;
