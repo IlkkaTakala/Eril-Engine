@@ -97,6 +97,9 @@
     <ClCompile Include="Engine\Timer.cpp">
       <Filter>Engine\Private</Filter>
     </ClCompile>
+    <ClCompile Include="Game\Hunter.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -217,6 +220,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Timer.h">
       <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Hunter.h">
+      <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

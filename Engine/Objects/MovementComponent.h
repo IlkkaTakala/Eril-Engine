@@ -38,9 +38,11 @@ public:
 	void SetMaxSpeed(float speed) { max_speed = speed; }
 	void SetPhysics(bool p) { isPhysics = p; }
 	void SetGravity(bool g) { isGravity = g; }
+	void SetAllowMovement(bool value) { allowMovement = value; }
+	bool GetAllowMovement() const { return allowMovement; }
 	void ApplyMovement();
 
-	void AddInput(const Vector dir) { directions[direction_count++] = dir; }
+	void AddInput(const Vector& dir) { directions[direction_count++] = dir; }
 	void AddImpulse(const Force& f) { forces[force_count++] = f; }
 	void AddImpulse(const Vector& d) { Force f; f.Direction = d; forces[force_count++] = f; }
 	bool IsInAir() { return inAir; }
@@ -56,6 +58,7 @@ private:
 	bool isPhysics;
 	bool isGravity;
 	bool inAir;
+	bool allowMovement;
 
 	float mass;
 	float in_acceleration;

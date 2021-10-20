@@ -43,14 +43,12 @@ struct GLM_Light
 	glm::vec4 locationAndSize;
 	glm::vec4 rotation;
 	glm::ivec4 type;
-	glm::mat4 transform;
 
 	GLM_Light() {
 		color = glm::vec4(0.0);
 		locationAndSize = glm::vec4(0.0);
 		rotation = glm::vec4(0.0);
 		type = glm::ivec4(1);
-		transform = glm::mat4(1.0);
 	}
 };
 
@@ -72,6 +70,8 @@ Renderer::Renderer()
 	ShadowMapping = nullptr;
 	ShadowColorShader = nullptr;
 	EnvironmentRender = nullptr;
+	SkyDomeShader = nullptr;
+	SkyBoxShader = nullptr;
 
 	MaxLightCount = 1024;
 
@@ -413,10 +413,6 @@ void Renderer::UpdateLights()
 		light.rotation = rot * glm::vec4(0.0, -1.0, 0.0, 0.0);
 		light.color = glm::vec4(Lights[i]->Color.X, Lights[i]->Color.Y, Lights[i]->Color.Z, 1.0) * Lights[i]->Intensity;
 		light.type.x = Lights[i]->Type;
-		glm::vec3 loc = glm::vec3(ActiveCamera->GetLocation().X, ActiveCamera->GetLocation().Z, ActiveCamera->GetLocation().Y);
-		glm::vec3 up = glm::toMat4(glm::quat(glm::vec3(glm::radians(Lights[i]->Rotation.X), glm::radians(Lights[i]->Rotation.Y), glm::radians(Lights[i]->Rotation.Z)))) * glm::vec4(1.0, 0.0, 0.0, 0.0);
-		glm::vec3 newLoc = loc + glm::vec3(-light.rotation * 70.f);
-		light.transform = ShadowOrtho * glm::lookAt(newLoc, newLoc + glm::vec3(light.rotation), up);
 		mapped[i] = light;
 	}
 	int result = glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
@@ -548,6 +544,7 @@ void Renderer::LoadShaders()
 				if (LoadVertex(stre, vertex)) {
 					Shader* nShader = new Shader(1, vertex.c_str());
 					nShader->Pass = std::atoi(params[1].c_str());
+					if (params.size() > 2) nShader->FaceCulling = std::atoi(params[2].c_str());
 					if (!nShader->Success) nShader = nullptr;
 					if (nShader != nullptr) {
 						if (f.path().filename() == "LightCullingShader.shader") LightCullingShader = nShader;
@@ -563,6 +560,7 @@ void Renderer::LoadShaders()
 				if (LoadFragment(stre, fragment)) {
 					Shader* nShader = new Shader(2, fragment.c_str());
 					nShader->Pass = std::atoi(params[1].c_str());
+					if (params.size() > 2) nShader->FaceCulling = std::atoi(params[2].c_str());
 					if (!nShader->Success) nShader = nullptr;
 					if (nShader != nullptr) {
 						Shaders.emplace(f.path().filename().replace_extension("").string(), nShader);
@@ -578,6 +576,7 @@ void Renderer::LoadShaders()
 				if (LoadVertex(stre, vertex) && LoadFragment(stre, fragment)) {
 					Shader* nShader = new Shader(vertex.c_str(), fragment.c_str());
 					nShader->Pass = std::atoi(params[1].c_str());
+					if (params.size() > 2) nShader->FaceCulling = std::atoi(params[2].c_str());
 					if (!nShader->Success) nShader = nullptr;
 					if (nShader != nullptr) {
 						if (f.path().filename() == "PreDepth.shader") PreDepthShader = nShader;
@@ -605,6 +604,7 @@ void Renderer::LoadShaders()
 				if (LoadVertex(stre, vertex) && LoadFragment(stre, fragment) && LoadGeometry(stre, geom)) {
 					Shader* nShader = new Shader(vertex.c_str(), geom.c_str(), fragment.c_str());
 					nShader->Pass = std::atoi(params[1].c_str());
+					if (params.size() > 2) nShader->FaceCulling = std::atoi(params[2].c_str());
 					if (!nShader->Success) nShader = nullptr;
 					if (nShader != nullptr) {
 						if (f.path().filename() == "Shadow.shader") ShadowShader = nShader;
@@ -623,6 +623,7 @@ void Renderer::LoadShaders()
 				if (LoadCompute(stre, compute)) {
 					Shader* nShader = new Shader(0, compute.c_str());
 					nShader->Pass = std::atoi(params[1].c_str());
+					if (params.size() > 2) nShader->FaceCulling = std::atoi(params[2].c_str());
 					if (!nShader->Success) nShader = nullptr;
 					if (nShader != nullptr) {
 						if (f.path().filename() == "LightCullingShader.shader") LightCullingShader = nShader;
@@ -893,7 +894,6 @@ void Renderer::Forward(int width, int height)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glEnable(GL_MULTISAMPLE);
-	glEnable(GL_CULL_FACE);
 
 	// Opaque Pass
 	for (auto const& [name, s] : Shaders)
@@ -901,6 +901,9 @@ void Renderer::Forward(int width, int height)
 		if (s == nullptr) continue;
 
 		if (s->Pass != 0) continue;
+
+		if (s->FaceCulling == 1) glDisable(GL_CULL_FACE);
+		else glEnable(GL_CULL_FACE);
 
 		s->Bind();
 
@@ -931,7 +934,7 @@ void Renderer::Forward(int width, int height)
 				Vector direction = ActiveCamera->GetForwardVector();
 				Vector location = ActiveCamera->GetLocation();
 				glm::vec3 pos = mm[3];
-				glm::vec3 rad = glm::vec3(o->GetRadius()) * glm::mat3(mm);
+				glm::vec3 rad = glm::vec3((o->Parent->GetAABB().maxs - o->Parent->GetAABB().mins).Length()) * glm::mat3(mm);
 				float radii = glm::max(rad.x, glm::max(rad.y, rad.z));
 				glm::vec3 loc = glm::vec3(location.X, location.Z, location.Y);
 				glm::vec3 dir = glm::vec3(direction.X, direction.Z, direction.Y);
@@ -968,6 +971,9 @@ void Renderer::Forward(int width, int height)
 		if (s == nullptr) continue;
 
 		if (s->Pass != 1) continue;
+
+		if (s->FaceCulling == 1) glDisable(GL_CULL_FACE);
+		else glEnable(GL_CULL_FACE);
 
 		s->Bind();
 
@@ -1048,6 +1054,9 @@ void Renderer::PreDepth(int width, int height)
 	PreDepthShader->Bind();
 	for (auto const& [name, s] : Shaders)
 	{
+		if (s->FaceCulling == 1) glDisable(GL_CULL_FACE);
+		else glEnable(GL_CULL_FACE);
+
 		for (Material* m : s->GetUsers())
 		{
 			for (Section* o : m->GetObjects())
@@ -1099,7 +1108,7 @@ void Renderer::Render(float delta)
 	GlobalVariables.Projection = ActiveCamera->GetProjectionMatrix();
 	GlobalVariables.View = glm::inverse(ActiveCamera->GetViewMatrix());
 	const Vector& loc = ActiveCamera->GetLocation();
-	GlobalVariables.ViewPoint = glm::vec4(loc.X, loc.Y, loc.Z, 1.f);
+	GlobalVariables.ViewPoint = glm::vec4(loc.X, loc.Z, loc.Y, 1.f);
 	GlobalVariables.ScreenSize = glm::ivec2(width, height);
 	GlobalVariables.SceneLightCount = (int)Lights.size();
 
@@ -1127,7 +1136,7 @@ void Renderer::Render(float delta)
 
 	glClearColor(0.f, 0.f, 0.f, 0.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	DepthBuffer->BindTextures();
+	//DepthBuffer->BindTextures();
 	EnvironmentRender->BindTextures();
 
 	/*glDepthFunc(GL_ALWAYS);
@@ -1135,11 +1144,11 @@ void Renderer::Render(float delta)
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);*/
 
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, DepthBuffer->GetBuffer());
+	/*glBindFramebuffer(GL_READ_FRAMEBUFFER, DepthBuffer->GetBuffer());
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, PostProcess->GetBuffer());
 	glBlitFramebuffer(
 		0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST
-	);
+	);*/
 
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, 0);
@@ -1150,8 +1159,6 @@ void Renderer::Render(float delta)
 	PostProcess->BindTextures();
 
 	PostProcessMaster->Bind();
-	//PostProcessMaster->SetUniform("Color", 0);
-	//PostProcessMaster->SetUniform("Bloom", 1);
 
 	glDepthFunc(GL_ALWAYS);
 	glBindVertexArray(ScreenVao);

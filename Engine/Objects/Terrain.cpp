@@ -211,7 +211,6 @@ Terrain::Terrain()
 	Mesh = SpawnObject<VisibleObject>();
 }
 
-#pragma optimize("", off)
 void Terrain::InitTerrain(int r, Vector scale, Vector location)
 {
 	resolution = r;
@@ -233,8 +232,21 @@ void Terrain::InitTerrain(int r, Vector scale, Vector location)
 		for (int32 x = 0; x < r + 1; x++) {
 			pos.emplace_back(Vector(Scale.X * x, Scale.Y * y, GetHeight(Scale.X * x + location.X, Scale.Y * y + location.Y)));
 			uvs.emplace_back(Vector((x - 1) / (float)r, (y - 1) / (float)r, 0.f) * 10.f);
-			normals.emplace_back(Vector(0.f, 0.f, 1.f));
-			tangents.emplace_back(Vector(1.f, 0.f, 0.f));
+			Vector normal = GetNormal(Scale.X * x + location.X, Scale.Y * y + location.Y);
+			normals.emplace_back(normal);
+			Vector tangent;
+			Vector t1 = Vector::Cross(normal, Vector(1.f, 0.f, 0.f));
+			Vector t2 = Vector::Cross(normal, Vector(0.f, 1.f, 0.f));
+			if (t1.Length() > t2.Length())
+			{
+				tangent = t1;
+			}
+			else
+			{
+				tangent = t2;
+			}
+
+			tangents.emplace_back(tangent);
 			if (y < r && x < r) {
 				inds.emplace_back(y * (r + 1) + x);
 				inds.emplace_back((y + 1) * (r + 1) + x);
@@ -253,81 +265,22 @@ void Terrain::InitTerrain(int r, Vector scale, Vector location)
 	Mesh->SetModel(MI->CreateProcedural(Mesh, "Terrain_" + std::to_string(GetRecord()), pos, uvs, normals, tangents, inds));
 	Mesh->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/Materials/ground"));
 }
-//
-//float fract(float p)
-//{
-//	return p - floor(p);
-//}
-//
-//float hash1(float px, float py)
-//{
-//	px = 50.0 * fract(px * 0.3183099);
-//	py = 50.0 * fract(py * 0.3183099);
-//	return fract(px * py * (px + py));
-//}
-//
-//float clamp(float x, float lowerlimit, float upperlimit) {
-//	if (x < lowerlimit)
-//		x = lowerlimit;
-//	if (x > upperlimit)
-//		x = upperlimit;
-//	return x;
-//}
-//
-//float smoothstep(float edge0, float edge1, float x) {
-//	x = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
-//	return x * x * (3 - 2 * x);
-//}
-//
-//float noise(float x, float y)
-//{
-//	float px = floor(x);
-//	float py = floor(x);
-//	float wx = fract(x);
-//	float wy = fract(x);
-//
-//	float ux = wx * wx * wx * (wx * (wx * 6.0 - 15.0) + 10.0);
-//	float uy = wy * wy * wy * (wy * (wy * 6.0 - 15.0) + 10.0);
-//
-//	float a = hash1(px, py);
-//
-//	float b = hash1(px + 1, py + 0);
-//
-//	float c = hash1(px + 0, py + 1);
-//
-//	float d = hash1(px + 1, py + 1);
-//
-//	return -1.0 + 2.0 * (a + (b - a) * ux + (c - a) * uy + (a - b - c + d) * ux * uy);
-//}
-//
-//float fbm_9(float x, float y)
-//{
-//	float f = 1.9;
-//	float s = 0.55;
-//	float a = 0.0;
-//	float b = 0.5;
-//	for (int i = 0; i < 9; i++)
-//	{
-//		float n = noise(x, y);
-//		a += b * n;
-//	}
-//	return a;
-//}
 
 float Terrain::GetHeight(float x, float y)
 {
-	//const float sca = 0.010;
-	//const float amp = 10.0;
-	//x *= sca;
-	//y *= sca;
-	//float e = fbm_9( x + 1.0, y + -2.0);
-	//float a = 1.0 - smoothstep(0.12, 0.13, abs(e + 0.12)); // flag high-slope areas (-0.25, 0.0)
-	//e = e + 0.15 * smoothstep(-0.08, -0.01, e);
-	//e *= amp;
-	//return e;
 	x *= noise_scale;
 	y *= noise_scale;
 	float arr[] = { x, y };
 	return Noise::noise2(arr) * amplitude + Mesh->GetLocation().Z;
 }
-#pragma optimize("", on)
+
+Vector Terrain::GetNormal(float x, float y)
+{
+	Vector first(x - 0.1f, y - 0.1f, 0.f);
+	Vector second(x + 0.1f, y + 0.1f, 0.f);
+
+	Vector x_dir(0.2f, 0.f, GetHeight(second.X, y) - GetHeight(first.X, y));
+	Vector y_dir(0.f, 0.2f, GetHeight(x, second.Y) - GetHeight(x, first.Y));
+
+	return Vector::Cross(x_dir.Normalize(), y_dir.Normalize());
+}

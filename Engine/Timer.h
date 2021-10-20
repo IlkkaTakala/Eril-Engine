@@ -5,7 +5,16 @@
 class Timer
 {
 public:
-	static void CreateTimer(float duration, std::function<void(float)> function, bool looping = false, bool runBeforeDuration = false);
+	static void CreateTimer(float duration, void (*Callback)(float), bool looping = false, bool runBeforeDuration = false);
+	
+	template <class UserClass>
+	static void CreateTimer(float duration, void (UserClass::* Callback)(float), UserClass* Caller, bool looping = false, bool runBeforeDuration = false)
+	{
+		using std::placeholders::_1;
+		std::function<void(float)> f = std::bind(Callback, Caller, _1);
+		Timers.push_back(new Timer(duration, f, looping, runBeforeDuration));
+	}
+
 	static void UpdateTimers(float delta);
 
 	bool IsComplete() const { return complete; }

@@ -1,4 +1,4 @@
-2;0;
+2;0;1;
 ###VERTEX###
 #version 430 core
 layout (location = 0) in vec3 in_position;
@@ -49,7 +49,6 @@ struct LightData {
 	vec4 positionAndSize;
 	vec4 rotation;
 	ivec4 type;
-	mat4 transform;
 };
 
 struct VisibleIndex {
@@ -177,8 +176,8 @@ void main()
 	// Get color and normal components from texture maps
 	//vec3 FragPos = texture(gPosition, TexCoords).xyz;
 	//vec4 data = texture(gData, TexCoords);
-	
-	vec3 albedo = texture(Albedo, fs_in.TexCoords).rgb;
+	float gamma = 2.2;
+	vec3 albedo = pow(texture(Albedo, fs_in.TexCoords).rgb, vec3(gamma));
 	float alpha = texture(Albedo, fs_in.TexCoords).a;
 	float metallic = 0.0;//texture(Metallic, fs_in.TexCoords).r;
 	float AO = 1.0;
