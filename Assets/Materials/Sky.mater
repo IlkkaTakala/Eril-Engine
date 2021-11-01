@@ -1,0 +1,4 @@
+[Shader]
+name=skyshader
+[Textures]
+Albedo=Assets/Textures/hdri_sphere2.hdr

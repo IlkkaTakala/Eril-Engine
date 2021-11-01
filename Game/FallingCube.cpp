@@ -4,7 +4,7 @@
 FallingCube::FallingCube()
 {
 	SetModel("Cube");
-	GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/ground"));
+	GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/ground"));
 
 	move = SpawnObject<MovementComponent>();
 	move->SetTarget(this);

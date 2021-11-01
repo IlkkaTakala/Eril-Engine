@@ -8,7 +8,7 @@
 Hunter::Hunter()
 {
 	SetModel(MI->LoadData(this, "hunter"));
-	RenderData->SetMaterial(0, RI->LoadMaterialByName("Shaders/Materials/hunter"));
+	RenderData->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/hunter"));
 
 	move = SpawnObject<MovementComponent>();
 	move->SetTarget(this);

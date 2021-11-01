@@ -1,0 +1,4 @@
+[Shader]
+name=shader_003
+[Textures]
+Albedo=Assets/Textures/trees2/Leaves_d.png

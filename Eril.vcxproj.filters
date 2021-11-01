@@ -1,118 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="$(SolutionDir)\Engine\OpenGLRenderer\ext\glfw\deps\glad_gl.c">
-      <Filter>Engine\OpenGLRenderer</Filter>
-    </ClCompile>
-    <ClCompile Include="$(SolutionDir)\Engine\Launch.cpp">
-      <Filter>Engine\Private</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\OpenGLRenderer\Batcher.cpp">
-      <Filter>Engine\OpenGLRenderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\OpenGLRenderer\Texture.cpp">
-      <Filter>Engine\OpenGLRenderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\OpenGLRenderer\Renderer.cpp">
-      <Filter>Engine\OpenGLRenderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\OpenGLRenderer\RenderBuffer.cpp">
-      <Filter>Engine\OpenGLRenderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\OpenGLRenderer\Mesh.cpp">
-      <Filter>Engine\OpenGLRenderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\OpenGLRenderer\Material.cpp">
-      <Filter>Engine\OpenGLRenderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Objects\Actor.cpp">
-      <Filter>Engine\GamePlay</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Gameplay\PlayerController.cpp">
-      <Filter>Engine\GamePlay</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Gameplay\GameState.cpp">
-      <Filter>Engine\GamePlay</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\BasicTypes.cpp">
-      <Filter>Engine\Private</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Core.cpp">
-      <Filter>Engine\Private</Filter>
-    </ClCompile>
     <ClCompile Include="Game\EngineInterface.cpp">
       <Filter>Engine\Private</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GameLoop.cpp">
-      <Filter>Engine\Private</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GarbageCollector.cpp">
-      <Filter>Engine\Private</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Settings.cpp">
-      <Filter>Engine\Private</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\OpenGLRenderer\InputControl.cpp">
-      <Filter>Engine\OpenGLRenderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\LightData.cpp">
-      <Filter>Engine\Private</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\IRender.cpp">
-      <Filter>Engine\Private</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Objects\VisibleObject.cpp">
-      <Filter>Engine\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Objects\BaseObject.cpp">
-      <Filter>Engine\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\WinConsole.cpp">
-      <Filter>Engine\Private</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\OpenGLRenderer\Camera.cpp">
-      <Filter>Engine\OpenGLRenderer</Filter>
     </ClCompile>
     <ClCompile Include="Game\TestPlayer.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\ObjectManager.cpp">
-      <Filter>Engine\Private</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Objects\InstancedObject.cpp">
-      <Filter>Engine\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Objects\MovementComponent.cpp">
-      <Filter>Engine\Objects</Filter>
-    </ClCompile>
     <ClCompile Include="Game\FallingCube.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Physics.cpp">
-      <Filter>Engine\Private</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Objects\Terrain.cpp">
-      <Filter>Engine\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Timer.cpp">
-      <Filter>Engine\Private</Filter>
-    </ClCompile>
     <ClCompile Include="Game\Hunter.cpp">
       <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Objects\Actor.cpp">
+      <Filter>Engine\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Objects\BaseObject.cpp">
+      <Filter>Engine\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Gameplay\GameState.cpp">
+      <Filter>Engine\GamePlay</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Gameplay\PlayerController.cpp">
+      <Filter>Engine\GamePlay</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Objects\InstancedObject.cpp">
+      <Filter>Engine\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Objects\MovementComponent.cpp">
+      <Filter>Engine\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Objects\Terrain.cpp">
+      <Filter>Engine\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Objects\VisibleObject.cpp">
+      <Filter>Engine\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\BasicTypes.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\RenderCore\OpenGL\Batcher.cpp">
+      <Filter>Engine\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\RenderCore\OpenGL\Camera.cpp">
+      <Filter>Engine\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\GameLoop.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\GarbageCollector.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\RenderCore\include\IRender.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Physics.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Settings.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Timer.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\WinConsole.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\ObjectManager.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\LightData.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Launch.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Core.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\RenderCore\OpenGL\RenderBuffer.cpp">
+      <Filter>Engine\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\RenderCore\OpenGL\Renderer.cpp">
+      <Filter>Engine\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\RenderCore\OpenGL\Texture.cpp">
+      <Filter>Engine\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\RenderCore\OpenGL\Mesh.cpp">
+      <Filter>Engine\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\RenderCore\OpenGL\Material.cpp">
+      <Filter>Engine\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\RenderCore\OpenGL\InputControl.cpp">
+      <Filter>Engine\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Objects\SceneComponent.cpp">
+      <Filter>Engine\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\external\glfw\deps\glad_gl.c">
+      <Filter>Engine\OpenGL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
       <UniqueIdentifier>{7342fc3c-6d01-494a-a680-080c5267f5be}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\OpenGLRenderer">
-      <UniqueIdentifier>{1a8dd4f1-9c5c-40d8-8a15-89a92e8920dd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\Public">
       <UniqueIdentifier>{8edf9179-3f4e-4d90-8608-b5cafe1caf30}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\GamePlay">
-      <UniqueIdentifier>{e29abf93-90c0-4074-9f16-9dbe2439f940}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\UI">
       <UniqueIdentifier>{b865335b-fcd6-4165-a7ae-ae54e9eb89e4}</UniqueIdentifier>
@@ -126,103 +123,112 @@
     <Filter Include="Game">
       <UniqueIdentifier>{a3bd1c7f-6d77-46fc-a244-25d7f744f2c9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\GamePlay">
+      <UniqueIdentifier>{e29abf93-90c0-4074-9f16-9dbe2439f940}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\OpenGL">
+      <UniqueIdentifier>{1a8dd4f1-9c5c-40d8-8a15-89a92e8920dd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Engine\OpenGLRenderer\include\Batcher.h">
-      <Filter>Engine\OpenGLRenderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\OpenGLRenderer\include\Texture.h">
-      <Filter>Engine\OpenGLRenderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\OpenGLRenderer\include\Renderer.h">
-      <Filter>Engine\OpenGLRenderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\OpenGLRenderer\include\RenderBuffer.h">
-      <Filter>Engine\OpenGLRenderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\OpenGLRenderer\include\Mesh.h">
-      <Filter>Engine\OpenGLRenderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\OpenGLRenderer\include\Material.h">
-      <Filter>Engine\OpenGLRenderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Objects\Actor.h">
-      <Filter>Engine\GamePlay</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Gameplay\PlayerController.h">
-      <Filter>Engine\GamePlay</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Gameplay\GameState.h">
-      <Filter>Engine\GamePlay</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Core.h">
-      <Filter>Engine\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\BasicTypes.h">
-      <Filter>Engine\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GameLoop.h">
-      <Filter>Engine\Public</Filter>
-    </ClInclude>
     <ClInclude Include="Game\EngineInterface.h">
       <Filter>Engine\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GarbageCollector.h">
-      <Filter>Engine\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Settings.h">
-      <Filter>Engine\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\OpenGLRenderer\include\InputControl.h">
-      <Filter>Engine\OpenGLRenderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\LightData.h">
-      <Filter>Engine\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\IRender.h">
-      <Filter>Engine\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Objects\VisibleObject.h">
-      <Filter>Engine\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Objects\BaseObject.h">
-      <Filter>Engine\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\WinConsole.h">
-      <Filter>Engine\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\OpenGLRenderer\include\Camera.h">
-      <Filter>Engine\OpenGLRenderer</Filter>
     </ClInclude>
     <ClInclude Include="Game\TestPlayer.h">
       <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\OpenGLRenderer\ext\glfw\deps\glad\gl.h">
-      <Filter>Engine\OpenGLRenderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\ObjectManager.h">
-      <Filter>Engine\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Objects\InstancedObject.h">
-      <Filter>Engine\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Objects\MovementComponent.h">
-      <Filter>Engine\Objects</Filter>
-    </ClInclude>
     <ClInclude Include="Game\FallingCube.h">
       <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Physics.h">
-      <Filter>Engine\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Objects\Terrain.h">
-      <Filter>Engine\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Timer.h">
-      <Filter>Engine\Public</Filter>
-    </ClInclude>
     <ClInclude Include="Game\Hunter.h">
       <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Objects\Actor.h">
+      <Filter>Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Objects\BaseObject.h">
+      <Filter>Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Gameplay\GameState.h">
+      <Filter>Engine\GamePlay</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Gameplay\PlayerController.h">
+      <Filter>Engine\GamePlay</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Objects\InstancedObject.h">
+      <Filter>Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Objects\MovementComponent.h">
+      <Filter>Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Objects\Terrain.h">
+      <Filter>Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Objects\VisibleObject.h">
+      <Filter>Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\BasicTypes.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Core.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\GameLoop.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\GarbageCollector.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\include\IRender.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\LightData.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\ObjectManager.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Physics.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Settings.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Timer.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\WinConsole.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\Batcher.h">
+      <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\Camera.h">
+      <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\RenderBuffer.h">
+      <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\Renderer.h">
+      <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\Texture.h">
+      <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\Mesh.h">
+      <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\Material.h">
+      <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\InputControl.h">
+      <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Objects\SceneComponent.h">
+      <Filter>Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\external\glfw\deps\glad\gl.h">
+      <Filter>Engine\OpenGL</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
