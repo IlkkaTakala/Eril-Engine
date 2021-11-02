@@ -2,7 +2,6 @@
 #include "LightData.h"
 #include "TestPlayer.h"
 #include "Objects/MovementComponent.h"
-#include "FallingCube.h"
 #include "Objects/Terrain.h"
 #include "Timer.h"
 #include "Objects/InstancedObject.h"
@@ -29,8 +28,9 @@ TestPlayer::TestPlayer() : Player()
 	II->RegisterKeyInput(256, &TestPlayer::InputExit, this);
 	II->RegisterMouseInput(0, &TestPlayer::MouseMoved, this);
 
-	SetModel("Cube");
-	RenderData->SetAABB(AABB(Vector(-0.5f), Vector(0.5f)));
+	Mesh = SpawnObject<VisibleObject>();
+	Mesh->SetModel("Cube");
+	Mesh->GetModel()->SetAABB(AABB(Vector(-0.5f), Vector(0.5f)));
 
 	for (int y = 0; y < 2; y++) {
 		for (int x = 0; x < 2; x++) {
@@ -45,13 +45,13 @@ TestPlayer::TestPlayer() : Player()
 
 	Sky = SpawnObject<VisibleObject>();
 	Sky->SetModel(MI->LoadData(Sky, "SkySphere"));
-	Sky->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/Materials/Sky"));
+	Sky->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/Sky"));
 	
 	{
 		Trees = SpawnObject<InstancedObject>();
 		Trees->SetModel(MI->LoadData(Trees, "tree"));
-		Trees->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/Materials/tree"));
-		Trees->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Shaders/Materials/leaves"));
+		Trees->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/tree"));
+		Trees->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Assets/Materials/leaves"));
 		Trees->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
 
 		int count = 100;
@@ -68,8 +68,8 @@ TestPlayer::TestPlayer() : Player()
 		
 		Trees2 = SpawnObject<InstancedObject>();
 		Trees2->SetModel(MI->LoadData(Trees2, "tree2"));
-		Trees2->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/Materials/tree"));
-		Trees2->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Shaders/Materials/leaves2"));
+		Trees2->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/tree"));
+		Trees2->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Assets/Materials/leaves2"));
 		Trees2->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
 
 		for (int i = 0; i < count; i++)
@@ -85,7 +85,7 @@ TestPlayer::TestPlayer() : Player()
 
 		Grass = SpawnObject<InstancedObject>();
 		Grass->SetModel(MI->LoadData(Grass, "grass"));
-		Grass->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/Materials/grass"));
+		Grass->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/grass"));
 		Grass->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
 
 		count = 1000;
@@ -109,7 +109,7 @@ TestPlayer::TestPlayer() : Player()
 
 		Flowers = SpawnObject<InstancedObject>();
 		Flowers->SetModel(MI->LoadData(Flowers, "flower"));
-		Flowers->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Shaders/Materials/flower"));
+		Flowers->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/flower"));
 		Flowers->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
 
 		count = 1000;
