@@ -113,7 +113,7 @@ namespace Physics
 			auto it2 = Statics.remove_if([](const auto& v) { return v == nullptr; });
 		}
 
-		for (const auto& o : Movables) {
+		/*for (const auto& o : Movables) {
 			if (o->GetTarget() == nullptr || o->GetTarget()->GetModel() == nullptr) continue;
 			Vector& d_loc = o->DesiredState.location;
 			const Vector& o_loc = o->OldState.location;
@@ -127,7 +127,7 @@ namespace Physics
 				const Vector& loc = s->GetLocation();
 				
 			}
-		}
+		}*/
 
 		for (const auto& m : Movables) {
 			m->ApplyMovement();

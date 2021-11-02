@@ -260,7 +260,30 @@ struct Vector2D
 
 struct Transformation 
 {
+	Transformation() {
+		Location = Vector(0.f);
+		Rotation = Vector(0.f);
+		Scale = Vector(1.f);
+	}
+
+	Transformation(const Vector& Loc, const Vector& Rot, const Vector& Sca) {
+		Location = Loc;
+		Rotation = Rot;
+		Scale = Sca;
+	}
+
 	Vector Location;
 	Vector Rotation;
 	Vector Scale;
+
+	friend Transformation operator+(Transformation lhs, const Transformation& rhs) {
+		lhs += rhs;
+		return lhs;
+	}
+
+	friend void operator+=(Transformation& lhs, const Transformation& rhs) {
+		lhs.Location += rhs.Location;
+		lhs.Rotation += rhs.Rotation;
+		lhs.Scale *= rhs.Scale;
+	}
 };

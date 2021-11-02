@@ -91,4 +91,5 @@ private:
 	LoadedMesh* Mesh;
 	uint SectionCount;
 	glm::mat4 ModelMatrix;
+	bool requireUpdate;
 };

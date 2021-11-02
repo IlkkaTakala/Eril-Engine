@@ -36,6 +36,7 @@ private:
 	void InputExit(float delta, bool) { Exit(); }
 
 	Ref<MovementComponent> Movement;
+	Ref<VisibleObject> Mesh;
 
 	bool InputMode;
 	Ref<Light> DirLight;

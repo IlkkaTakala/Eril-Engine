@@ -92,7 +92,7 @@ void MovementComponent::Tick(float time)
 void MovementComponent::SetTarget(Actor* t)
 {
 	Object = t;
-	Physics::RemoveStatic(t);
+	//Physics::RemoveStatic(t);
 }
 
 void MovementComponent::SetGround(Terrain* t)

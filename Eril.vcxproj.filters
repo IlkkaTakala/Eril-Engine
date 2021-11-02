@@ -7,9 +7,6 @@
     <ClCompile Include="Game\TestPlayer.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="Game\FallingCube.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="Game\Hunter.cpp">
       <Filter>Game</Filter>
     </ClCompile>
@@ -135,9 +132,6 @@
       <Filter>Engine\Public</Filter>
     </ClInclude>
     <ClInclude Include="Game\TestPlayer.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\FallingCube.h">
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Game\Hunter.h">

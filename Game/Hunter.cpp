@@ -4,11 +4,13 @@
 #include <Timer.h>
 #include <Gameplay/GameState.h>
 #include <Gameplay/PlayerController.h>
+#include <Objects/VisibleObject.h>
 
 Hunter::Hunter()
 {
-	SetModel(MI->LoadData(this, "hunter"));
-	RenderData->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/hunter"));
+	Mesh = SpawnObject<VisibleObject>();
+	Mesh->SetModel("hunter");
+	Mesh->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/hunter"));
 
 	move = SpawnObject<MovementComponent>();
 	move->SetTarget(this);
@@ -24,8 +26,8 @@ Hunter::Hunter()
 void Hunter::Tick(float delta)
 {
 	time += delta;
-	RenderData->GetMaterial(0)->SetParameter("delta", time);
-	RenderData->GetMaterial(0)->SetParameter("velocity", move->DesiredState.velocity);
+	Mesh->GetModel()->GetMaterial(0)->SetParameter("delta", time);
+	Mesh->GetModel()->GetMaterial(0)->SetParameter("velocity", move->DesiredState.velocity);
 
 
 	Vector player = GetGameState()->CurrentPlayer->GetLocation();

@@ -2,7 +2,6 @@
 #include "LightData.h"
 #include "TestPlayer.h"
 #include "Objects/MovementComponent.h"
-#include "FallingCube.h"
 #include "Objects/Terrain.h"
 #include "Timer.h"
 #include "Objects/InstancedObject.h"
@@ -29,8 +28,9 @@ TestPlayer::TestPlayer() : Player()
 	II->RegisterKeyInput(256, &TestPlayer::InputExit, this);
 	II->RegisterMouseInput(0, &TestPlayer::MouseMoved, this);
 
-	SetModel("Cube");
-	RenderData->SetAABB(AABB(Vector(-0.5f), Vector(0.5f)));
+	Mesh = SpawnObject<VisibleObject>();
+	Mesh->SetModel("Cube");
+	Mesh->GetModel()->SetAABB(AABB(Vector(-0.5f), Vector(0.5f)));
 
 	for (int y = 0; y < 2; y++) {
 		for (int x = 0; x < 2; x++) {

@@ -97,6 +97,7 @@ RenderObject::RenderObject(LoadedMesh* mesh)
 		if (Sections[i].GetRadius() > extent) extent = Sections[i].GetRadius();
 	}
 	bounds = extent;
+	requireUpdate = true;
 }
 
 RenderObject::~RenderObject()
@@ -116,6 +117,7 @@ void RenderObject::SetMaterial(uint section, Material* nextMat)
 
 const glm::mat4& RenderObject::GetModelMatrix()
 {
+	requireUpdate = true;
 	return ModelMatrix;
 }
 
@@ -126,12 +128,25 @@ void RenderObject::SetParent(VisibleObject* parent)
 
 void RenderObject::ApplyTransform()
 {
-	Vector loc = Parent->GetLocation();
-	Vector rot = Parent->GetRotation();
-	Vector sca = Parent->GetScale();
+	Transformation finalT;
+	SceneComponent* parent = Parent;
+	while (true)
+	{
+		finalT += parent->GetTransformation();
+
+		if (parent->GetParent() == nullptr) break;
+
+		parent = parent->GetParent();
+	}
+
+	Vector loc = finalT.Location;
+	Vector rot = finalT.Rotation;
+	Vector sca = finalT.Scale;
 	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Z, loc.Y))
 		* glm::toMat4(glm::quat(glm::vec3(glm::radians(rot.X), glm::radians(rot.Z), glm::radians(rot.Y))))
 		* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Z, sca.Y));
+
+	requireUpdate = false;
 }
 
 void RenderObject::SetInstances(int count, Transformation* dispArray)

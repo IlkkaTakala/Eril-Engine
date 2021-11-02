@@ -51,6 +51,7 @@ private:
 	void Forward(int width, int height);
 	void PreDepth(int width, int height);
 	void LightCulling(int width, int height);
+	void UpdateTransforms();
 
 	std::map<String, Shader*> Shaders;
 	std::map<String, Material*> BaseMaterials;

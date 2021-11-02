@@ -1097,11 +1097,29 @@ void Renderer::LightCulling(int width, int height)
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
 
+void Renderer::UpdateTransforms() {
+	for (auto const& [name, s] : Shaders)
+	{
+		if (s->FaceCulling == 1) glDisable(GL_CULL_FACE);
+		else glEnable(GL_CULL_FACE);
+
+		for (Material* m : s->GetUsers())
+		{
+			for (Section* o : m->GetObjects())
+			{
+				o->Parent->ApplyTransform();
+			}
+		}
+	}
+}
+
 void Renderer::Render(float delta)
 {
 	int width, height;
 
 	if (ActiveCamera == nullptr) return;
+
+	UpdateTransforms();
 
 	glfwGetFramebufferSize(Window, &width, &height);
 
