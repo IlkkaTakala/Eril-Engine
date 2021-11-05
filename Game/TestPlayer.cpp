@@ -64,7 +64,7 @@ TestPlayer::TestPlayer() : Player()
 			arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y) - 0.2f);
 			arr[i].Scale = Vector(s);
 		}
-		Trees->AddInstances(count, arr);
+		Trees->AddInstances(count, arr); // visible objects instead?
 		
 		Trees2 = SpawnObject<InstancedObject>();
 		Trees2->SetModel(MI->LoadData(Trees2, "tree2"));

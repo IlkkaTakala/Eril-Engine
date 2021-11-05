@@ -2,6 +2,7 @@
 #include <Objects/MovementComponent.h>
 #include <limits>
 #include "Physics.h"
+#include <cassert>
 
 namespace Physics
 {
@@ -9,12 +10,12 @@ namespace Physics
 	{
 		std::list<RefWeak<VisibleObject>> Statics;
 		std::list<RefWeak<MovementComponent>> Movables;
-
-		bool intersect(AABB a, AABB b) {
+		// -------------------------------------------------------------------> alla oleva koodi on alkuperäistä
+		/*bool intersect(AABB a, AABB b) {
 			return (a.mins.X <= b.maxs.X && a.maxs.X >= b.mins.X) &&
 				(a.mins.Y <= b.maxs.Y && a.maxs.Y >= b.mins.Y) &&
 				(a.mins.Z <= b.maxs.Z && a.maxs.Z >= b.mins.Z);
-		}
+		}*/
 
 		float sign(float v) {
 			return v < 0.f ? -1.0f : 1.0f;
@@ -158,4 +159,75 @@ namespace Physics
 			if (i->GetPointer() == obj) Movables.erase(i);
 		}
 	}
-}
+	// poitettu käytöstä 11.11 koitetaan toista tapaa ---> muista poistaa nämä kun saat collisionin toimimaan!
+	//// testataan collison AABB ---> https://studiofreya.com/3d-math-and-physics/simple-aabb-vs-aabb-collision-detection/ ei toimi vielä
+	//// TESTI PÄIVÄ 5.11 ->>>> tekijä: MARKUS
+
+	//struct AABB
+	//{
+	//	AABB() : c(), r() {}
+
+	//	AABB(const Point& center, const Point& halfwidths)
+	//		: c(center)
+	//		, r(halfwidths)
+	//	{}
+
+	//	Point c;        // center point
+	//	Point r;        // halfwidths
+	//};
+
+	//struct Point
+	//{
+	//	Point() {}
+	//	Point(double x, double y, double z)
+	//		: x(x)
+	//		, y(y)
+	//		, z(z)
+	//	{}
+	//	double x = 0.0;
+	//	double y = 0.0;
+	//	double z = 0.0;
+	//	double w = 0.0;
+
+	//	const double operator[](const int idx) const
+	//	{
+	//		if (idx == 0) return x;
+	//		if (idx == 1) return y;
+	//		if (idx == 2) return z;
+	//		if (idx == 3) return w;
+
+	//		assert(0);
+	//	}
+	//};
+
+	//double Abs(double a)
+	//{
+	//	return std::fabs(a);
+	//}
+
+	//bool testAABBAABB(const AABB& a, const AABB& b)
+	//{
+	//	if (Abs(a.c[0] - b.c[0]) > (a.r[0] + b.r[0])) return false;
+	//	if (Abs(a.c[1] - b.c[1]) > (a.r[1] + b.r[1])) return false;
+	//	if (Abs(a.c[2] - b.c[2]) > (a.r[2] + b.r[2])) return false;
+
+	//	// We have an overlap
+	//	return true;
+	//};
+
+
+	//bool testAABBAABB_SIMD(const AABB& a, const AABB& b)
+	//{
+	//	// SIMD optimized AABB-AABB test
+	//	// Optimized by removing conditional branches
+	//	bool x = Abs(a.c[0] - b.c[0]) <= (a.r[0] + b.r[0]);
+	//	bool y = Abs(a.c[1] - b.c[1]) <= (a.r[1] + b.r[1]);
+	//	bool z = Abs(a.c[2] - b.c[2]) <= (a.r[2] + b.r[2]);
+
+	//	return x && y && z;
+	//}
+
+
+	};
+
+
