@@ -20,7 +20,7 @@ Feature list of Eril v0.1
 | Ilkka  | Project lead, design, programming |
 | Albert | Producer, programming |
 | Matti  | Demo design, programming |
-| Susanne| Documentation, design assistant |
+| Susanne| Documentation, design assistant, bug fixing |
 | Markus | Research, programming |
 | Oskari | UI workflow design |
 
@@ -97,12 +97,12 @@ gantt
 dateFormat  DD-MM
 
 section Susanne
-TDD set up              :         sdes1, 04-11, 17-12
-Light fix  Desing       :         sdes2, 04-11, 17-12
-Light fix implementation:         sdes3, 04-11, 17-12
-Commenting code         :         sdes4, 04-11, 17-12
-ECS Implementation Desing:         sdes5, 04-11, 17-12
-TDD documentation finish:         sdes6, 04-11, 17-12
+TDD set up              :         sdes1, 04-11, 06-11
+Light fix  Desing       :         sdes2, after sdes1, 18-11
+Light fix implementation:         sdes3, 10-11, 10-12
+Commenting code         :         sdes4, 04-11, 03-12
+ECS Implementation Desing:         sdes5, 04-11, 18-11
+TDD documentation finish:         sdes6, after sdes1, 17-12
 ```
 ```mermaid
 gantt
@@ -110,7 +110,7 @@ dateFormat  DD-MM
 
 section Markus
 Menu System/UI          :         mades1, 19-11, 16-12
-Scripting               :         mades2, 20-11, 09-12
+Scripting               :         mades2, 10-11, 09-12
 Collision               :         mades3, 05-11, 19-11
 Information research    :         mades6, 04-11, 11-11
 Debugging               :         mades8, 10-12, 17-12
@@ -121,6 +121,10 @@ gantt
 dateFormat  DD-MM
 
 section Oskari
+Skeletal animations     :        odes1, 07-11, 06-11
+UI framework            :        odes2, 07-11, 06-11
+Research                :        odes3, 05-11, 26-11
+Documentation           :        odes4, 02-12, 09-12
 
 ```
 
