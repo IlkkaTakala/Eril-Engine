@@ -1,0 +1,7 @@
+[Shader]
+name=shader_002
+[Textures]
+Albedo=Assets/Textures/rocks/diffuse_d.jpg
+Normal=Assets/Textures/rocks/normal_n.jpg
+Roughness=Assets/Textures/rocks/gloss.jpg
+AO=Assets/Textures/rocks/ao.jpg

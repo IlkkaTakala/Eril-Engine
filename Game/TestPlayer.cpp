@@ -9,8 +9,8 @@
 
 TestPlayer::TestPlayer() : Player()
 {
-	mouseSens = 0.5f;
-	Speed = 5.f;
+	mouseSens = 0.2f;
+	Speed = 15.f;
 	InputMode = true;
 	spawnCounter = 0;
 	//GetCamera()->SetLocation(INI->GetValue("Player", "Start"));
@@ -49,9 +49,9 @@ TestPlayer::TestPlayer() : Player()
 	
 	{
 		Trees = SpawnObject<InstancedObject>();
-		Trees->SetModel(MI->LoadData(Trees, "tree"));
-		Trees->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/tree"));
-		Trees->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Assets/Materials/leaves"));
+		Trees->SetModel(MI->LoadData(Trees, "rock"));
+		Trees->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/rock"));
+		//Trees->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Assets/Materials/leaves"));
 		Trees->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
 
 		int count = 100;
@@ -61,7 +61,7 @@ TestPlayer::TestPlayer() : Player()
 			float x = rand() % 100 - 50.f;
 			float y = rand() % 100 - 50.f;
 			float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
-			arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y) - 0.2f);
+			arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y) + 1.0f);
 			arr[i].Scale = Vector(s);
 		}
 		Trees->AddInstances(count, arr);
