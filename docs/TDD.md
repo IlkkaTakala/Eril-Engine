@@ -14,3 +14,7 @@ Goal is to continue developing Ilkka Takalas Eril Engine and create version 0.2.
 # Proposed Desing
 # System Architecture
 # workflow
+blender:
+mallin saaminen näkyviin. 
+blenderissä tehdään malli, joka exportataan obj:nä. tehdään material file tekstieditorissa, märitellään mitä tekstuureja ja sheideriä se käyttää. 
+tiedostojen tulee olla assets kansion sisällä. Tämän jälkeen enginen sisällä uusi classi, jossa määritellään onko se esimerkiksi actori ja muu tarvittava data. Sille luodaan visible object componentti. Visible objekytille valitaan malliksi valittu obj. alkuperäinen actor tai uusi classista luodan objekti.
