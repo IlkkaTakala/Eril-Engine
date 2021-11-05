@@ -9,6 +9,7 @@
 Hunter::Hunter()
 {
 	Mesh = SpawnObject<VisibleObject>();
+	AddComponent(Mesh);
 	Mesh->SetModel("hunter");
 	Mesh->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/hunter"));
 

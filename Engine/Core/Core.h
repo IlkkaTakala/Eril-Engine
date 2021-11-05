@@ -4,11 +4,9 @@
 #include "ObjectManager.h"
 #include "IRender.h"
 
-#define REN_UI 0x20
-#define REN_REQUIRESBUILD 0x21
-
 class GameLoop;
 class INISettings;
+class GameState;
 
 extern GameLoop* Loop;
 extern INISettings* INI;
@@ -33,13 +31,14 @@ protected:
 	}
 
 public:
-	Ref() { Pointer = nullptr; DataPtr = nullptr; }
+	Ref() { Pointer = nullptr; DataPtr = nullptr; bWeak = false; }
 	Ref(T* ptr) : Pointer(ptr) { 
 		this->DataPtr = dynamic_cast<Data*>(ptr);
 		if (this->DataPtr == nullptr) {
 			this->Pointer = nullptr;
 			return;
 		}
+		bWeak = false;
 		ObjectManager::AddRef(GetRecord(), this);
 	}
 
@@ -127,6 +126,5 @@ T* SpawnObject()
 
 Data* GetObjectByName(const String& name);
 
-class GameState;
 
 GameState* GetGameState();

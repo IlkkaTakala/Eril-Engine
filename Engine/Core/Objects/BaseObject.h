@@ -2,6 +2,7 @@
 #include <BasicTypes.h>
 
 class ObjectManager;
+class Scene;
 struct Record;
 
 class RefHold
@@ -46,12 +47,14 @@ class BaseObject : public Data
 {
 public:
 	//void operator delete(void* ptr);
+	BaseObject();
 
 	virtual void BeginPlay() = 0;
 	virtual void OnDestroyed() {};
+	const Scene* GetScene() const { return World; }
 
 protected:
-
 	virtual ~BaseObject() {};
-
+private:
+	Scene* World;
 };
