@@ -1,5 +1,7 @@
 # Project plan - Eril
 
+### __[See branch docs for faster updates](../../tree/docs/docs/ProjectPlan.md)__
+
 ## Goals
 Our goal is to advance the Eril Project and create version 0.2.
 Eril is a game engine previously developed by Ilkka Takala. It has most of the basic functionality, but requires much work to be called complete. 
@@ -121,10 +123,10 @@ gantt
 dateFormat  DD-MM
 
 section Oskari
-Skeletal animations     :        odes1, 07-11, 06-11
-UI framework            :        odes2, 07-11, 06-11
-Research                :        odes3, 05-11, 26-11
-Documentation           :        odes4, 02-12, 09-12
+Skeletal animations     :        odes1, 12-11, 10-12
+UI framework            :        odes2, 05-11, 26-11
+Research                :        odes3, 04-11, 18-11
+Documentation           :        odes4, 26-11, 09-12
 
 ```
 
