@@ -4,3 +4,22 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 */
 
 #include "ECSWorldManager.h"
+
+ECSWorldManager::ECSWorldManager()
+{
+	WorldComponentManager = new ComponentManager();
+	WorldEntityManager = new EntityManager(*WorldComponentManager);
+	WorldSystemsManager = new SystemsManager(*WorldEntityManager, *WorldComponentManager);
+}
+
+ECSWorldManager::~ECSWorldManager()
+{
+	delete WorldSystemsManager;
+	delete WorldEntityManager;
+	delete WorldComponentManager;
+}
+
+void ECSWorldManager::Tick(float deltaTime)
+{
+	WorldSystemsManager->UpdateSystems(deltaTime);
+}

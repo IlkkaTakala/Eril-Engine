@@ -6,9 +6,13 @@
 #include "Timer.h"
 #include "Objects/InstancedObject.h"
 #include "Hunter.h"
+#include "ECSTesting.h"
 
 TestPlayer::TestPlayer() : Player()
 {
+	//ECS TEST
+	ecsTest = SpawnObject<ECSTesting>();
+
 	mouseSens = 0.5f;
 	Speed = 5.f;
 	InputMode = true;
@@ -47,6 +51,7 @@ TestPlayer::TestPlayer() : Player()
 	Sky->SetModel(MI->LoadData(Sky, "SkySphere"));
 	Sky->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/Sky"));
 	
+	/*
 	{
 		Trees = SpawnObject<InstancedObject>();
 		Trees->SetModel(MI->LoadData(Trees, "tree"));
@@ -131,6 +136,7 @@ TestPlayer::TestPlayer() : Player()
 
 		delete[] arr;
 	}
+	*/
 
 	hunt = SpawnObject<Hunter>();
 	hunt->SetLocation(Vector(100.f, 0.f, 0.f));

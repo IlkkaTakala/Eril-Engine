@@ -6,5 +6,20 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 
 class Component
 {
+	friend class ComponentManager;
+public:
+	Component() { ID = -1; Type = -1; }
+	Component(int id, int type) : ID(id), Type(type) {}
+	~Component() {}
+
+	int GetID() { return ID; }
+	int GetType() { return Type; }
+
+	void SetType(int type) { Type = type; }
+	void SetID(int id) { ID = id; }
+
+private:
+	int ID;
+	int Type;
 };
 
