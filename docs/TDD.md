@@ -12,7 +12,7 @@ Goal is to continue developing Ilkka Takalas Eril Engine and create version 0.2.
 
 
 # Proposed Desing
-# System Architecture
+### System Architecture
 The engine consists of Core, Render Core and External.
 
 Core
@@ -24,7 +24,7 @@ lisää luokka kaavio
 External
 lisää luokka kaavio
 
-# Workflow
+### Workflow
 Blender
 
 Mallin saaminen näkyviin:
