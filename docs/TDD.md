@@ -24,8 +24,15 @@ lisää luokka kaavio
 External
 lisää luokka kaavio
 
-# workflow
-blender:
-mallin saaminen näkyviin. 
-blenderissä tehdään malli, joka exportataan obj:nä. tehdään material file tekstieditorissa, märitellään mitä tekstuureja ja sheideriä se käyttää. 
-tiedostojen tulee olla assets kansion sisällä. Tämän jälkeen enginen sisällä uusi classi, jossa määritellään onko se esimerkiksi actori ja muu tarvittava data. Sille luodaan visible object componentti. Visible objekytille valitaan malliksi valittu obj. alkuperäinen actor tai uusi classista luodan objekti.
+# Workflow
+Blender
+
+Mallin saaminen näkyviin:
+- Blenderissä tehdään malli, joka exportataan obj:na.
+- Obj:lle tehdään materieal file tekstieditorissa, määritellään mitä tekstuuria ja sheideriä obj käyttää.
+- Enginen sisällä tehdään uusi luokka, jossa määritellään onko se actori ja muut tarvittavat tiedot.
+- Obj:lle luodaan visible componentti ja sille valitaan malliksi valittu obj.
+- Alkuperäisestä actorista tai uudesta luokasta luodaan objekti.
+
+Huom! Tiedostojen tulee olla assets kansion sisällä.
+
