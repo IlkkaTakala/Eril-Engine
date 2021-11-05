@@ -12,8 +12,8 @@ public:
 
 	static void OpenLevel(String map);
 
-	void AddToRoot() {}
-	void RemoveFromRoot() {}
+	void AddSceneRoot(SceneComponent*);
+	void RemoveSceneRoot(SceneComponent*);
 
 private:
 

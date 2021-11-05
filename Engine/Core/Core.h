@@ -61,7 +61,7 @@ public:
 	Ref(const Ref& old) { 
 		this->bWeak = old.bWeak;
 		ObjectManager::AddRef(old->GetRecord(), this);
-		if (this->DataPtr != nullptr) ObjectManager::RemoveRef(this->GetRecord(), this);
+		if (this->DataPtr != nullptr && this->DataPtr == this->Pointer) ObjectManager::RemoveRef(this->GetRecord(), this);
 		this->Pointer = old.Pointer;
 		this->DataPtr = old.DataPtr;
 	}
@@ -69,7 +69,7 @@ public:
 	Ref& operator=(const Ref& old) {
 		this->bWeak = old.bWeak;
 		ObjectManager::AddRef(old->GetRecord(), this);
-		if (this->DataPtr != nullptr) ObjectManager::RemoveRef(this->GetRecord(), this);
+		if (this->DataPtr != nullptr && this->DataPtr == this->Pointer) ObjectManager::RemoveRef(this->GetRecord(), this);
 		this->Pointer = old.Pointer;
 		this->DataPtr = old.DataPtr;
 		return *this;
@@ -109,6 +109,21 @@ public:
 	}
 };
 
+template <typename T>
+BaseObject* invokeCreate() { return SpawnObject<T>(); }
+
+template <typename T>
+bool do_register(String name) {
+	ObjectManager::TypeList[name] = &invokeCreate<T>;
+	return true;
+}
+#define REGISTER(CLASSNAME)				private: inline static bool Registered = do_register<CLASSNAME>(#CLASSNAME);
+#define REGISTER_NAME(CLASSNAME, NAME)	private: inline static bool Registered = do_register<CLASSNAME>(#NAME);
+
+#define GET_MACRO(_1,_2,_3,NAME,...) NAME
+#define FOO(...) GET_MACRO(__VA_ARGS__, REGISTER_NAME, REGISTER)(__VA_ARGS__)
+
+
 template <class T = BaseObject>
 T* SpawnObject()
 {
@@ -123,8 +138,5 @@ T* SpawnObject()
 	ObjectManager::AddTick(t);
 	return next;
 }
-
-Data* GetObjectByName(const String& name);
-
 
 GameState* GetGameState();

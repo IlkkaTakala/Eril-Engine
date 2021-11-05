@@ -6,7 +6,7 @@
 #include <Gameplay/PlayerController.h>
 #include <Objects/VisibleObject.h>
 
-Hunter::Hunter()
+Hunter::Hunter() : Actor()
 {
 	Mesh = SpawnObject<VisibleObject>();
 	AddComponent(Mesh);

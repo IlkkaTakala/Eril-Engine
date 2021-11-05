@@ -51,7 +51,7 @@ public:
 
 	virtual void BeginPlay() = 0;
 	virtual void OnDestroyed() {};
-	const Scene* GetScene() const { return World; }
+	Scene* GetScene() const { return World; }
 
 protected:
 	virtual ~BaseObject() {};

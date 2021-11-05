@@ -64,6 +64,7 @@ public:
 
 	static void DeleteListed();
 
+	static std::map<String, BaseObject* (*)()> TypeList;
 private:
 	friend class GC;
 	static long counter;

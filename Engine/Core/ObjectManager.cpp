@@ -4,6 +4,7 @@
 
 long ObjectManager::counter = 1;
 std::map<RecordInt, Record*> ObjectManager::ObjectRecords;
+std::map<String, BaseObject* (*)()> ObjectManager::TypeList;
 std::list<RecordInt> ObjectManager::DeleteList;
 std::mutex ObjectManager::delete_m;
 

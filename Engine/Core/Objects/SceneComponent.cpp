@@ -1,5 +1,6 @@
 #include "VisibleObject.h"
 #include "Physics.h"
+#include <Gameplay/Scene.h>
 
 SceneComponent::SceneComponent() : BaseObject()
 {
@@ -8,6 +9,7 @@ SceneComponent::SceneComponent() : BaseObject()
 	Scale = Vector(1, 1, 1);
 
 	Parent = nullptr;
+	GetScene()->AddSceneRoot(this);
 }
 
 void SceneComponent::OnDestroyed()
@@ -36,6 +38,7 @@ void SceneComponent::SetScale(const Vector& NewScale)
 
 void SceneComponent::AddComponent(SceneComponent* obj)
 {
+	GetScene()->RemoveSceneRoot(obj);
 	Children.push_back(obj);
 	obj->Parent = this;
 }
