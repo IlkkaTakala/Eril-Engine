@@ -108,7 +108,7 @@ public:
 	AABB GetAABB() const { return bounds; }
 	void SetAABB(AABB bounds) { this->bounds = bounds; }
 protected:
-	AABB bounds;
+	AABB bounds; // low level " collision " --> tänne collision
 };
 
 class IMesh

@@ -267,6 +267,9 @@
     <ClInclude Include="Game\Hunter.h" />
     <ClInclude Include="Game\TestPlayer.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
