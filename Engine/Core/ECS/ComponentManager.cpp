@@ -24,7 +24,7 @@ int ComponentManager::AddComponent(Component* component, String typeName)
 	int usedIndex = -1;
 	for (int i = 0; i < IndexUsage.size(); i++)
 	{
-		if (IndexUsage[i] = i)
+		if (!IndexUsage[i])
 		{
 			usedIndex = i;
 			break;

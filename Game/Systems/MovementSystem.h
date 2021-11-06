@@ -10,7 +10,7 @@ public:
 
 	void Update(float deltaTime, std::vector<int> entities) override
 	{
-		printf("Size: %d  ", entities.size());
+		printf("Size: %d   \n", entities.size());
 		for (auto e : entities)
 		{
 			PositionComponent* pos = static_cast<PositionComponent*>(WorldEntityManager.GetComponentFromEntity(e, "PositionComponent"));

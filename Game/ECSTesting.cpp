@@ -47,7 +47,7 @@ ECSTesting::ECSTesting()
 		printf("%f,%f,%f\n", pos->x, pos->y, pos->z);
 	}
 
-	/*
+	
 	Entity* e2 = ECSEntityManager.AddEntity();
 	printf("%d\n", e2->GetID());
 	ECSEntityManager.AddComponentToEntity(e2->GetID(), new PositionComponent, "PositionComponent");
@@ -84,9 +84,6 @@ ECSTesting::ECSTesting()
 
 		printf("%f,%f,%f\n", pos->x, pos->y, pos->z);
 	}
-	*/
-
-
 
 	SystemsManager& ECSSystemsManager = ECSWorld.GetSystemsManager();
 	MovementSystem* movementSystem = new MovementSystem(ECSEntityManager);
