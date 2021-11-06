@@ -1,5 +1,6 @@
 # Naming Conventions and Other Stuff
 ## Naming
+Naming is not the most important aspect, but everything should be readable and understandable. Below are some guidelines to assist naming.
 ### Classes
 Classes should be named clearly and descriptively. Name should start with a Capital letter, e.g. Name or TwoName.
 
