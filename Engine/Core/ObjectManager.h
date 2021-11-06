@@ -29,9 +29,13 @@ public:
 
 	static void RemoveRef(const RecordInt record, const RefHold* obj);
 
-	static void CreateRecord(Data* object, short protection = 0) {
-		ObjectRecords.emplace(counter, new Record(object, protection));
-		object->SetRecord(counter);
+	static void CreateRecord(Data* object, short protection = 0, uint SpawnType = Constants::Record::SPAWNED, bool isServer = false) {
+		uint64 r = 0;
+		if (isServer) r |= 1ULL << 51;
+		r += (uint64)SpawnType << 48;
+		r += counter;
+		ObjectRecords.emplace(r, new Record(object, protection));
+		object->SetRecord(r);
 		counter++;
 	}
 

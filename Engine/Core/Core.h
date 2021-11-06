@@ -109,33 +109,39 @@ public:
 	}
 };
 
-template <typename T>
-BaseObject* invokeCreate() { return SpawnObject<T>(); }
+namespace helpers{
+	
+	bool helper(BaseObject* base);
+
+	template <typename T>
+	BaseObject* invokeCreate() {
+		Ref<T> next = new T();
+		//ObjectManager::CreateRecord(next, 0, Constants::Record::LOADED);
+		BaseObject* base = dynamic_cast<BaseObject*>(next.GetPointer());
+		if (!helper(base)) next->DestroyObject();
+		return next;
+	}
+}
 
 template <typename T>
 bool do_register(String name) {
-	ObjectManager::TypeList[name] = &invokeCreate<T>;
+	ObjectManager::TypeList[name] = &helpers::invokeCreate<T>;
 	return true;
 }
+
 #define REGISTER(CLASSNAME)				private: inline static bool Registered = do_register<CLASSNAME>(#CLASSNAME);
 #define REGISTER_NAME(CLASSNAME, NAME)	private: inline static bool Registered = do_register<CLASSNAME>(#NAME);
 
 #define GET_MACRO(_1,_2,_3,NAME,...) NAME
 #define FOO(...) GET_MACRO(__VA_ARGS__, REGISTER_NAME, REGISTER)(__VA_ARGS__)
 
-
 template <class T = BaseObject>
 T* SpawnObject()
 {
 	Ref<T> next = new T();
+	//ObjectManager::CreateRecord(next, 0, Constants::Record::SPAWNED);
 	BaseObject* base = dynamic_cast<BaseObject*>(next.GetPointer());
-	if (base == nullptr) {
-		next->DestroyObject();
-		return nullptr;
-	}
-	base->BeginPlay();
-	auto t = dynamic_cast<Tickable*>(next.GetPointer());
-	ObjectManager::AddTick(t);
+	if (!helpers::helper(base)) next->DestroyObject();
 	return next;
 }
 

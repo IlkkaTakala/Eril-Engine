@@ -19,8 +19,27 @@ typedef __int64		int64;
 typedef std::string	String;
 std::vector<String> split(const String& s, char delim);
 
+namespace Constants {
+	namespace Record
+	{
+		constexpr uint LOADED = 0;
+		constexpr uint SPAWNED = 1;
+		constexpr uint CONSOLE = 2;
+	}
+}
+
 struct RecordInt {
 	uint64 record;
+
+	/*
+		Contains data about the object
+
+		mod id						: 3
+		server state & spawn type	: 1
+		reserved					: 4
+		object id					: 8 
+
+	*/
 
 	RecordInt(uint64 i) {
 		record = i;
@@ -30,8 +49,16 @@ struct RecordInt {
 		record = 0;
 	}
 
-	unsigned int GetModID() const {
-		return record >> 51;
+	uint GetModID() const {
+		return uint(record >> 52);
+	}
+
+	bool GetIsServer() const {
+		return uint8(record >> 48) & 0x08;
+	}
+
+	uint8 GetSpawnState() const {
+		return uint8(record >> 48) & 0x07;
 	}
 
 	operator uint64() const {
