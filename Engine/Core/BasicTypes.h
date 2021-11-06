@@ -22,9 +22,9 @@ std::vector<String> split(const String& s, char delim);
 namespace Constants {
 	namespace Record
 	{
-		constexpr uint LOADED = 0;
-		constexpr uint SPAWNED = 1;
-		constexpr uint CONSOLE = 2;
+		constexpr uint8 LOADED = 0;
+		constexpr uint8 SPAWNED = 1;
+		constexpr uint8 CONSOLE = 2;
 	}
 }
 
@@ -47,6 +47,14 @@ struct RecordInt {
 
 	RecordInt() {
 		record = 0;
+	}
+
+	RecordInt(uint32 ID, uint8 SpawnType, bool isServer, uint16 Mod = 0) {
+		uint64 r = 0;
+		if (isServer) r |= 1ULL << 51;
+		r += (uint64)SpawnType << 48;
+		r += ID;
+		record = r;
 	}
 
 	uint GetModID() const {

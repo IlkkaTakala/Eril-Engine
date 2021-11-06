@@ -114,7 +114,8 @@ namespace helpers{
 	bool helper(BaseObject* base);
 
 	template <typename T>
-	BaseObject* invokeCreate() {
+	BaseObject* invokeCreate(uint32 ID = 0, uint SpawnType = Constants::Record::SPAWNED, bool isServer = false, uint16 mod = 0) {
+		if (ID != 0) ObjectManager::PrepareRecord(ID, SpawnType, isServer, mod);
 		Ref<T> next = new T();
 		//ObjectManager::CreateRecord(next, 0, Constants::Record::LOADED);
 		BaseObject* base = dynamic_cast<BaseObject*>(next.GetPointer());
@@ -136,8 +137,9 @@ bool do_register(String name) {
 #define FOO(...) GET_MACRO(__VA_ARGS__, REGISTER_NAME, REGISTER)(__VA_ARGS__)
 
 template <class T = BaseObject>
-T* SpawnObject()
+T* SpawnObject(uint32 ID = 0)
 {
+	if (ID != 0) ObjectManager::PrepareRecord(ID);
 	Ref<T> next = new T();
 	//ObjectManager::CreateRecord(next, 0, Constants::Record::SPAWNED);
 	BaseObject* base = dynamic_cast<BaseObject*>(next.GetPointer());

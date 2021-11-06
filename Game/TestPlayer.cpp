@@ -139,4 +139,7 @@ void TestPlayer::BeginPlay()
 	if (r.GetSpawnState() == Constants::Record::SPAWNED) {
 		printf("Spawned object\n");
 	}
+	uint64 l = 0xABCDEF0123456789;
+	uint32 h = (uint32)l;
+	printf("0x%lx\n", h);
 }
