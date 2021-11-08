@@ -2,7 +2,7 @@
 #include "Gameplay/GameState.h"
 #include "EngineInterface.h"
 #include "Settings.h"
-#include "IRender.h"
+#include "Interface/IRender.h"
 #include "GameLoop.h"
 #include "WinConsole.h"
 #include "GarbageCollector.h"
@@ -46,7 +46,7 @@ int GameLoop::Start()
 	try
 	{
 		if (INI->GetValue("Engine", "Console") == "true") 
-			AddConsole();
+			Console::CreateOld();
 		MI->StartLoading();
 		int x = std::atoi(INI->GetValue("Render", "ResolutionX").c_str());
 		int y = std::atoi(INI->GetValue("Render", "ResolutionY").c_str());

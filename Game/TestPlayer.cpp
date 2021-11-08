@@ -1,4 +1,4 @@
-#include "IRender.h"
+#include "Interface/IRender.h"
 #include "LightData.h"
 #include "TestPlayer.h"
 #include "Objects/MovementComponent.h"
@@ -142,4 +142,6 @@ void TestPlayer::BeginPlay()
 	uint64 l = 0xABCDEF0123456789;
 	uint32 h = (uint32)l;
 	printf("0x%lx\n", h);
+
+	Console::Flush();
 }
