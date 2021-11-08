@@ -143,5 +143,5 @@ void TestPlayer::BeginPlay()
 	uint32 h = (uint32)l;
 	printf("0x%lx\n", h);
 
-	Console::Flush();
+	Console::Log("Hello beautiful world\n");
 }

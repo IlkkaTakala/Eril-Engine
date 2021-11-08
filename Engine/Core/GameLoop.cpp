@@ -46,7 +46,7 @@ int GameLoop::Start()
 	try
 	{
 		if (INI->GetValue("Engine", "Console") == "true") 
-			Console::CreateOld();
+			Console::Create();
 		MI->StartLoading();
 		int x = std::atoi(INI->GetValue("Render", "ResolutionX").c_str());
 		int y = std::atoi(INI->GetValue("Render", "ResolutionY").c_str());

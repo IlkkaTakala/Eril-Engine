@@ -10,6 +10,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 {
 	WindowManager::SetInstance(hInstance);
 	Console::Init();
+	Console::Log("Hello, startup\n");
 	GameLoop* Game = new GameLoop();
 	if (InterfaceInit()) return 11;
 	int retur = Game->Start();
@@ -26,5 +27,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		break;
 	}
 	Console::Log("\nGame closed, press enter to continue\n");
+	Console::Close();
 	return retur;
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include <Core.h>
 
 namespace Console {
 
@@ -7,16 +8,18 @@ namespace Console {
 	void Init();
 
 	void Create();
+
+	void Close();
 	
-	void Log(const char* line);
+	void Log(const String& line);
 
-	void Error(const char* line);
+	void Error(const String& line);
 
-	void Warning(const char* line);
+	void Warning(const String& line);
 
 	void GetLogs(int lines, char* data, size_t& datasize);
 
 	void Flush();
 
-	void Execute(const char* command);
+	void Execute(const String& line);
 }
