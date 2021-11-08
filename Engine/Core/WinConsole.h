@@ -3,8 +3,6 @@
 
 namespace Console {
 
-	void CreateOld();
-
 	void Init();
 
 	void Create();
