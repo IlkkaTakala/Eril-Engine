@@ -61,6 +61,7 @@
 #include <wincodec.h>
 
 #define WM_ADDLOG (WM_USER + 0x0021)
+#define IDC_CMDLINE 2
 
 static HWND m_hwnd = nullptr;
 static bool bQuit = false;
@@ -94,7 +95,6 @@ inline void SafeRelease(
 EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 #define HINST_THISCOMPONENT ((HINSTANCE)&__ImageBase)
 #endif
-
 
 class DemoApp
 {
@@ -187,16 +187,17 @@ public:
 				HINST_THISCOMPONENT,
 				this
 			);
-			m_input = CreateWindowW(
+			m_input = CreateWindowExW(
+				WS_EX_CLIENTEDGE,
 				L"EDIT",
 				NULL,
-				WS_CHILD | WS_VISIBLE | ES_LEFT,
-				CW_USEDEFAULT,
-				CW_USEDEFAULT,
+				WS_VISIBLE | WS_CHILD | WS_BORDER | ES_LEFT,
+				0,
+				0,
 				30,
 				0,
 				m_hwnd,
-				NULL,
+				(HMENU)IDC_CMDLINE,
 				HINST_THISCOMPONENT,
 				this
 			);
@@ -387,14 +388,15 @@ private:
 			}
 		}
 
+		ValidateRect(m_logArea, NULL);
+
 		return hr;
 	}
 
 	// Resize the render target.
 	void OnResize(UINT width, UINT height)
 	{
-		MoveWindow(m_input, 0, height - 30, width, 30, TRUE);
-		MoveWindow(m_logArea, 0, 0, width, height - 30, TRUE);
+		MoveWindow(m_logArea, 0, 0, width, height - 31, FALSE);
 		if (m_pRenderTarget)
 		{
 			// Note: This method can fail, but it's okay to ignore the
@@ -409,6 +411,7 @@ private:
 			);
 			m_pRenderTarget->Resize(size);
 		}
+		MoveWindow(m_input, 0, height - 30, width, 30, TRUE);
 	}
 
 	// The windows procedure.
@@ -464,7 +467,6 @@ private:
 				case WM_PAINT:
 				{
 					pDemoApp->OnRender();
-					ValidateRect(hwnd, NULL);
 				}
 				result = 0;
 				wasHandled = true;
@@ -544,7 +546,11 @@ void Console::Close()
 
 void Console::Log(const String& line)
 {
-	logs << "[LOG] " << line.c_str();
+
+	LPCSTR format = "hh':'mm':'ss";
+	char w[10];
+	GetTimeFormatA(LOCALE_NAME_USER_DEFAULT, TIME_NOTIMEMARKER | TIME_FORCE24HOURFORMAT, NULL, NULL, w, 9);
+	logs << "[LOG] " << w << ' | ' << line.c_str() << '\n';
 	SendMessage(m_hwnd, WM_ADDLOG, 0, 0);
 }
 
