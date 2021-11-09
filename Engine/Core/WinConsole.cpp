@@ -63,9 +63,12 @@
 #define WM_ADDLOG (WM_USER + 0x0021)
 #define IDC_CMDLINE 2
 
+constexpr int max_line_count = 400;
 static HWND m_hwnd = nullptr;
 static bool bQuit = false;
 static std::list<std::wstring> logs;
+static int yPos = 0;
+static int yStep = 14;
 
 template<class Interface>
 inline void SafeRelease(
@@ -162,7 +165,7 @@ public:
 			m_hwnd = CreateWindowW(
 				L"ErilConsole",
 				L"Eril Console",
-				WS_OVERLAPPEDWINDOW,
+				WS_OVERLAPPEDWINDOW | WS_VSCROLL,
 				CW_USEDEFAULT,
 				CW_USEDEFAULT,
 				static_cast<UINT>(ceil(640.f * dpiX / 96.f)),
@@ -175,7 +178,7 @@ public:
 			m_logArea = CreateWindowW(
 				L"STATIC",
 				NULL,
-				WS_CHILD | WS_VISIBLE | WS_VSCROLL,
+				WS_CHILD | WS_VISIBLE,
 				0,
 				0,
 				0,
@@ -185,6 +188,7 @@ public:
 				HINST_THISCOMPONENT,
 				this
 			);
+
 			m_input = CreateWindowExW(
 				WS_EX_CLIENTEDGE,
 				L"EDIT",
@@ -199,6 +203,20 @@ public:
 				HINST_THISCOMPONENT,
 				this
 			);
+			/*m_scrollBar = CreateWindowExW(
+				0,
+				L"SCROLLBAR",
+				NULL,
+				WS_VISIBLE | WS_CHILD | SBS_VERT,
+				0,
+				0,
+				0,
+				0,
+				m_hwnd,
+				(HMENU)IDC_CMDLINE,
+				HINST_THISCOMPONENT,
+				this
+			);*/
 			HFONT font = CreateFontA(
 				14,
 				6,
@@ -365,8 +383,14 @@ private:
 			int fontSize = (int)m_pTextFormat->GetFontSize() + 2;
 			int max_lineCount = int(bottom / fontSize) - 1;
 
+			SCROLLINFO si = { 0 };
+			si.cbSize = sizeof(si);
+			GetScrollInfo(m_hwnd, SBS_VERT, &si);
+
+			si.nPos / fontSize;
+
 			std::wstring text;
-			int round = 1;
+			int round = yPos / fontSize;
 			if (logs.size() > 0) {
 				for (auto i = --logs.end(); i != logs.begin(); i--) {
 					m_pRenderTarget->DrawText(
@@ -414,12 +438,39 @@ private:
 			m_pRenderTarget->Resize(size);
 		}
 		MoveWindow(m_input, 0, height - 30, width, 30, TRUE);
+		MoveWindow(m_scrollBar, width - 16, 0, 16, height - 30, TRUE);
+		SetScrollBar();
+	}
+
+	void SetScrollBar()
+	{
+		// Retrieve the dimensions of the client area. 
+		SCROLLINFO si;
+
+		// Get y-coordinate (bottom) of the second edit control 
+		RECT editCtl2Rect = { 0 };
+		GetWindowRect(m_logArea, &editCtl2Rect);
+		POINT point = { 0 };
+		point.x = editCtl2Rect.right;
+		point.y = editCtl2Rect.bottom;
+
+		// Convert screen coordinate to parent client-area coordinates
+		ScreenToClient(m_hwnd, &point);
+
+		// Set the vertical scrolling range and page size
+		si.cbSize = sizeof(si);
+		si.fMask = SIF_RANGE | SIF_PAGE;
+		si.nMin = 0;
+		si.nMax = max_line_count * yStep;
+		si.nPage = point.y / yStep;
+		SetScrollInfo(m_hwnd, SB_VERT, &si, TRUE);
 	}
 
 	// The windows procedure.
 	static LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		LRESULT result = 0;
+		SCROLLINFO si = { 0 };
 
 		if (message == WM_CREATE)
 		{
@@ -431,6 +482,8 @@ private:
 				GWLP_USERDATA,
 				reinterpret_cast<LONG_PTR>(pDemoApp)
 			);
+
+			pDemoApp->SetScrollBar();
 
 			result = 1;
 		}
@@ -489,6 +542,73 @@ private:
 				result = 1;
 				wasHandled = true;
 				break;
+
+				case WM_VSCROLL:
+					// Get all the vertial scroll bar information.
+					si.cbSize = sizeof(si);
+					si.fMask = SIF_ALL;
+					GetScrollInfo(hwnd, SB_VERT, &si);
+
+					// Save the position for comparison later on.
+					yPos = si.nPos;
+					switch (LOWORD(wParam))
+					{
+
+						// User clicked the HOME keyboard key.
+					case SB_TOP:
+						si.nPos = si.nMin;
+						break;
+
+						// User clicked the END keyboard key.
+					case SB_BOTTOM:
+						si.nPos = si.nMax;
+						break;
+
+						// User clicked the top arrow.
+					case SB_LINEUP:
+						si.nPos -= 1;
+						break;
+
+						// User clicked the bottom arrow.
+					case SB_LINEDOWN:
+						si.nPos += 1;
+						break;
+
+						// User clicked the scroll bar shaft above the scroll box.
+					case SB_PAGEUP:
+						si.nPos -= si.nPage;
+						break;
+
+						// User clicked the scroll bar shaft below the scroll box.
+					case SB_PAGEDOWN:
+						si.nPos += si.nPage;
+						break;
+
+						// User dragged the scroll box.
+					case SB_THUMBTRACK:
+						si.nPos = si.nTrackPos;
+						break;
+
+					default:
+						break;
+					}
+
+					// Set the position and then retrieve it.  Due to adjustments
+					// by Windows it may not be the same as the value set.
+					si.fMask = SIF_POS;
+					SetScrollInfo(hwnd, SB_VERT, &si, TRUE);
+					GetScrollInfo(hwnd, SB_VERT, &si);
+
+					// If the position has changed, scroll window and update it.
+					if (si.nPos != yPos)
+					{
+						//ScrollWindow(hwnd, 0, yChar * (yPos - si.nPos), NULL, NULL);
+						UpdateWindow(hwnd);
+					}
+
+					wasHandled = true;
+					result = 0;
+					break;
 				}
 			}
 
@@ -511,6 +631,7 @@ private:
 	IDWriteFactory* m_pDWriteFactory;
 	HWND m_logArea;
 	HWND m_input;
+	HWND m_scrollBar;
 };
 
 void D2D1Init() {
@@ -553,6 +674,7 @@ void AddLine(const String& pre, const String& line)
 	std::wstringstream temp;
 	temp << pre.c_str() << w << " | " << line.c_str() << '\n';
 	logs.push_back(temp.str());
+	if (logs.size() > max_line_count) logs.pop_front();
 	SendMessage(m_hwnd, WM_ADDLOG, 0, 0);
 }
 
