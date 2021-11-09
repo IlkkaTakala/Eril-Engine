@@ -65,7 +65,7 @@
 
 static HWND m_hwnd = nullptr;
 static bool bQuit = false;
-static std::wstringstream logs;
+static std::list<std::wstring> logs;
 
 template<class Interface>
 inline void SafeRelease(
@@ -102,12 +102,11 @@ public:
 	DemoApp() :
 		m_pDirect2dFactory(NULL),
 		m_pRenderTarget(NULL),
-		m_pLightSlateGrayBrush(NULL),
-		m_pCornflowerBlueBrush(NULL),
+		m_pRedBrush(NULL),
 		m_pDWriteFactory(NULL),
 		m_pTextFormat(NULL),
 		m_pBlackBrush(NULL),
-		m_pYellowGreenBrush(NULL),
+		m_pYellowBrush(NULL),
 		m_logArea(NULL),
 		m_input(NULL)
 	{
@@ -117,12 +116,11 @@ public:
 	{
 		SafeRelease(&m_pDirect2dFactory);
 		SafeRelease(&m_pRenderTarget);
-		SafeRelease(&m_pLightSlateGrayBrush);
-		SafeRelease(&m_pCornflowerBlueBrush);
+		SafeRelease(&m_pRedBrush);
 		SafeRelease(&m_pDWriteFactory);
 		SafeRelease(&m_pTextFormat);
 		SafeRelease(&m_pBlackBrush);
-		SafeRelease(&m_pYellowGreenBrush);
+		SafeRelease(&m_pYellowBrush);
 	}
 
 	// Register the window class and call methods for instantiating drawing resources
@@ -312,16 +310,8 @@ private:
 			{
 				// Create a gray brush.
 				hr = m_pRenderTarget->CreateSolidColorBrush(
-					D2D1::ColorF(D2D1::ColorF::LightSlateGray),
-					&m_pLightSlateGrayBrush
-				);
-			}
-			if (SUCCEEDED(hr))
-			{
-				// Create a blue brush.
-				hr = m_pRenderTarget->CreateSolidColorBrush(
-					D2D1::ColorF(D2D1::ColorF::CornflowerBlue),
-					&m_pCornflowerBlueBrush
+					D2D1::ColorF(D2D1::ColorF::Red),
+					&m_pRedBrush
 				);
 			}
 			if (SUCCEEDED(hr))
@@ -336,8 +326,8 @@ private:
 			if (SUCCEEDED(hr))
 			{
 				hr = m_pRenderTarget->CreateSolidColorBrush(
-					D2D1::ColorF(D2D1::ColorF(0x9ACD32, 1.0f)),
-					&m_pYellowGreenBrush
+					D2D1::ColorF(D2D1::ColorF::Orange),
+					&m_pYellowBrush
 				);
 			}
 		}
@@ -349,8 +339,8 @@ private:
 	void DiscardDeviceResources()
 	{
 		SafeRelease(&m_pRenderTarget);
-		SafeRelease(&m_pLightSlateGrayBrush);
-		SafeRelease(&m_pCornflowerBlueBrush);
+		SafeRelease(&m_pRedBrush);
+		SafeRelease(&m_pYellowBrush);
 	}
 
 	// Draw content.
@@ -369,15 +359,27 @@ private:
 
 			m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
 
-			m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
+			m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::Gray));
 
-			m_pRenderTarget->DrawText(
-				logs.str().c_str(),
-				logs.str().size(),
-				m_pTextFormat,
-				D2D1::RectF(0, 0, renderTargetSize.width, renderTargetSize.height),
-				m_pBlackBrush
-			);
+			float bottom = renderTargetSize.height - 5.f;
+			int fontSize = (int)m_pTextFormat->GetFontSize() + 2;
+			int max_lineCount = int(bottom / fontSize) - 1;
+
+			std::wstring text;
+			int round = 1;
+			if (logs.size() > 0) {
+				for (auto i = --logs.end(); i != logs.begin(); i--) {
+					m_pRenderTarget->DrawText(
+						i->c_str(),
+						i->size(),
+						m_pTextFormat,
+						D2D1::RectF(0, bottom - fontSize * round, renderTargetSize.width, bottom - fontSize * (round - 1)),
+						i->starts_with(L"[LOG]") ? m_pBlackBrush : i->starts_with(L"[WARN]") ? m_pYellowBrush : m_pRedBrush
+					);
+					if (round > max_lineCount) break;
+					round++;
+				}
+			}
 
 			hr = m_pRenderTarget->EndDraw();
 
@@ -396,7 +398,7 @@ private:
 	// Resize the render target.
 	void OnResize(UINT width, UINT height)
 	{
-		MoveWindow(m_logArea, 0, 0, width, height - 31, FALSE);
+		MoveWindow(m_logArea, 0, 0, width, height - 30, FALSE);
 		if (m_pRenderTarget)
 		{
 			// Note: This method can fail, but it's okay to ignore the
@@ -502,10 +504,9 @@ private:
 private:
 	ID2D1Factory* m_pDirect2dFactory;
 	ID2D1HwndRenderTarget* m_pRenderTarget;
-	ID2D1SolidColorBrush* m_pLightSlateGrayBrush;
-	ID2D1SolidColorBrush* m_pCornflowerBlueBrush;
+	ID2D1SolidColorBrush* m_pRedBrush;
 	ID2D1SolidColorBrush* m_pBlackBrush;
-	ID2D1SolidColorBrush* m_pYellowGreenBrush;
+	ID2D1SolidColorBrush* m_pYellowBrush;
 	IDWriteTextFormat* m_pTextFormat;
 	IDWriteFactory* m_pDWriteFactory;
 	HWND m_logArea;
@@ -544,16 +545,28 @@ void Console::Close()
 	ConsoleThread.join();
 }
 
-void Console::Log(const String& line)
+void AddLine(const String& pre, const String& line)
 {
-
 	LPCSTR format = "hh':'mm':'ss";
 	char w[10];
 	GetTimeFormatA(LOCALE_NAME_USER_DEFAULT, TIME_NOTIMEMARKER | TIME_FORCE24HOURFORMAT, NULL, NULL, w, 9);
-	logs << "[LOG] " << w << ' | ' << line.c_str() << '\n';
+	std::wstringstream temp;
+	temp << pre.c_str() << w << " | " << line.c_str() << '\n';
+	logs.push_back(temp.str());
 	SendMessage(m_hwnd, WM_ADDLOG, 0, 0);
+}
+
+void Console::Log(const String& line)
+{
+	AddLine("[LOG]", line);
 }
 
 void Console::Error(const String& line)
 {
+	AddLine("[ERROR]", line);
+}
+
+void Console::Warning(const String& line)
+{
+	AddLine("[WARN]", line);
 }
