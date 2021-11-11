@@ -49,9 +49,6 @@
     <ClCompile Include="Engine\Core\GarbageCollector.cpp">
       <Filter>Engine\Private</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\RenderCore\include\IRender.cpp">
-      <Filter>Engine\Private</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Core\Physics.cpp">
       <Filter>Engine\Private</Filter>
     </ClCompile>
@@ -100,6 +97,7 @@
     <ClCompile Include="Engine\external\glfw\deps\glad_gl.c">
       <Filter>Engine\OpenGL</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="Engine\Core\ECS\ComponentManager.cpp">
       <Filter>Engine\ECS</Filter>
     </ClCompile>
@@ -123,6 +121,16 @@
     </ClCompile>
     <ClCompile Include="Game\ECSTesting.cpp">
       <Filter>Game</Filter>
+=======
+    <ClCompile Include="Engine\Core\Gameplay\Scene.cpp">
+      <Filter>Engine\GamePlay</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Interface\IRender.cpp">
+      <Filter>Engine\Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Interface\WindowManager.cpp">
+      <Filter>Engine\Interfaces</Filter>
+>>>>>>> origin/master
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -150,6 +158,7 @@
     <Filter Include="Engine\OpenGL">
       <UniqueIdentifier>{1a8dd4f1-9c5c-40d8-8a15-89a92e8920dd}</UniqueIdentifier>
     </Filter>
+<<<<<<< HEAD
     <Filter Include="Engine\ECS">
       <UniqueIdentifier>{ee669dbc-1437-4613-b8e8-9420e11f382e}</UniqueIdentifier>
     </Filter>
@@ -158,6 +167,10 @@
     </Filter>
     <Filter Include="Engine\ECS\Components">
       <UniqueIdentifier>{2e41f838-8014-47c1-8a2d-e5a2d8acb614}</UniqueIdentifier>
+=======
+    <Filter Include="Engine\Interfaces">
+      <UniqueIdentifier>{a9b01a03-e735-4af0-a8ab-0cc6cc9019f6}</UniqueIdentifier>
+>>>>>>> origin/master
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -204,9 +217,6 @@
       <Filter>Engine\Public</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\GarbageCollector.h">
-      <Filter>Engine\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\RenderCore\include\IRender.h">
       <Filter>Engine\Public</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\LightData.h">
@@ -257,6 +267,7 @@
     <ClInclude Include="Engine\external\glfw\deps\glad\gl.h">
       <Filter>Engine\OpenGL</Filter>
     </ClInclude>
+<<<<<<< HEAD
     <ClInclude Include="Engine\Core\ECS\ComponentManager.h">
       <Filter>Engine\ECS</Filter>
     </ClInclude>
@@ -292,6 +303,16 @@
     </ClInclude>
     <ClInclude Include="Engine\Core\ECS\Systems\LightControllerSystem.h">
       <Filter>Engine\ECS\Systems</Filter>
+=======
+    <ClInclude Include="Engine\Core\Gameplay\Scene.h">
+      <Filter>Engine\GamePlay</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Interface\IRender.h">
+      <Filter>Engine\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Interface\WindowManager.h">
+      <Filter>Engine\Interfaces</Filter>
+>>>>>>> origin/master
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,6 +1,5 @@
 #pragma once
 #include "Core.h"
-#include <vector>
 
 class Player;
 class UIHolder;
@@ -19,5 +18,4 @@ public:
 	}
 
 	Ref<Player> CurrentPlayer;
-	Vector Sun;
 };

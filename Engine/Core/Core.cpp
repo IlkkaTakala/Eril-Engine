@@ -11,11 +11,15 @@ void Exit()
 	Loop->Quit();
 }
 
-Data* GetObjectByName(const String& name)
+bool helpers::helper(BaseObject* base)
 {
-	//auto result = GC::Pointers.find(name);
-	//return result == GC::Pointers.end() ? nullptr : result->second;
-	return nullptr;
+	if (base == nullptr) {
+		return false;
+	}
+	base->BeginPlay();
+	auto t = dynamic_cast<Tickable*>(base);
+	ObjectManager::AddTick(t);
+	return true;
 }
 
 GameState* GetGameState() {

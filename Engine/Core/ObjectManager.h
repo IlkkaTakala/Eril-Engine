@@ -29,11 +29,7 @@ public:
 
 	static void RemoveRef(const RecordInt record, const RefHold* obj);
 
-	static void CreateRecord(Data* object, short protection = 0) {
-		ObjectRecords.emplace(counter, new Record(object, protection));
-		object->SetRecord(counter);
-		counter++;
-	}
+	static void CreateRecord(Data* object, short protection = 0);
 
 	static void Protect(RecordInt record) {
 		ObjectRecords.find(record)->second->protection = 1;
@@ -43,20 +39,9 @@ public:
 		ObjectRecords.find(record)->second->protection = 0;
 	}
 
-	static void DeleteRecord(RecordInt record) {
-		auto p = ObjectRecords.find(record);
-		if (p != ObjectRecords.end()) {
-			delete p->second;
-			ObjectRecords.erase(p);
-		}
-	}
+	static void DeleteRecord(RecordInt record);
 
-	static void CleanObjects() {
-		while (ObjectRecords.size() > 0)
-		{
-			DeleteRecord(ObjectRecords.begin()->first);
-		}
-	}
+	static void CleanObjects();
 
 	static void AddTick(Tickable*);
 
@@ -64,9 +49,13 @@ public:
 
 	static void DeleteListed();
 
+	static bool PrepareRecord(uint32 ID, uint SpawnType = Constants::Record::SPAWNED, bool isServer = false, uint16 mod = 0);
+
+	static std::map<String, BaseObject* (*)(uint32, uint, bool, uint16)> TypeList;
 private:
 	friend class GC;
 	static long counter;
+	static RecordInt Prepared;
 	static std::map<RecordInt, Record*> ObjectRecords;
 	static std::list<RecordInt> DeleteList;
 	static std::mutex delete_m;

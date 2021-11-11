@@ -6,9 +6,10 @@
 #include <Gameplay/PlayerController.h>
 #include <Objects/VisibleObject.h>
 
-Hunter::Hunter()
+Hunter::Hunter() : Actor()
 {
 	Mesh = SpawnObject<VisibleObject>();
+	AddComponent(Mesh);
 	Mesh->SetModel("hunter");
 	Mesh->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/hunter"));
 
@@ -50,6 +51,6 @@ void Hunter::Tick(float delta)
 
 void Hunter::SetNewTarget(float delta)
 {
-	printf("New target set\n");
+	Console::Log("New target set");
 	targetLoc = GetGameState()->CurrentPlayer->GetLocation();
 }
