@@ -71,7 +71,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>Game;Engine\external\assimp\include;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine\RenderCore\include;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Game;Engine\external\assimp\include;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -100,14 +100,14 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>assimp-vc140-mt.lib;zlibstaticd.lib;IrrXML.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>dwrite.lib;d2d1.lib;assimp-vc140-mt.lib;zlibstaticd.lib;IrrXML.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\build\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImportLibrary>$(SolutionDir)/build/Debug/Eril.lib</ImportLibrary>
       <ProgramDataBaseFile>$(SolutionDir)/build/Debug/Eril.pdb</ProgramDataBaseFile>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -115,7 +115,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>Game;Engine\external\assimp\include;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine\RenderCore\include;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Game;Engine\external\assimp\include;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ExceptionHandling>Sync</ExceptionHandling>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -144,14 +144,14 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>assimp-vc140-mt.lib;zlibstatic.lib;IrrXML.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>dwrite.lib;d2d1.lib;assimp-vc140-mt.lib;zlibstatic.lib;IrrXML.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\build\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImportLibrary>$(SolutionDir)/build/Release/Eril.lib</ImportLibrary>
       <ProgramDataBaseFile>$(SolutionDir)/build/Release/Eril.pdb</ProgramDataBaseFile>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -159,7 +159,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>Game;Engine\external\assimp\include;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine\RenderCore\include;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Game;Engine\external\assimp\include;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -187,14 +187,14 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>assimp-vc140-mt.lib;zlibstatic.lib;IrrXML.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>dwrite.lib;d2d1.lib;assimp-vc140-mt.lib;zlibstatic.lib;IrrXML.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\build\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImportLibrary>$(SolutionDir)/build/RelWithDebInfo/Eril.lib</ImportLibrary>
       <ProgramDataBaseFile>$(SolutionDir)/build/RelWithDebInfo/Eril.pdb</ProgramDataBaseFile>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -223,7 +223,8 @@
     <ClCompile Include="Engine\Core\Timer.cpp" />
     <ClCompile Include="Engine\Core\WinConsole.cpp" />
     <ClCompile Include="Engine\external\glfw\deps\glad_gl.c" />
-    <ClCompile Include="Engine\RenderCore\include\IRender.cpp" />
+    <ClCompile Include="Engine\Interface\IRender.cpp" />
+    <ClCompile Include="Engine\Interface\WindowManager.cpp" />
     <ClCompile Include="Engine\RenderCore\OpenGL\Batcher.cpp" />
     <ClCompile Include="Engine\RenderCore\OpenGL\Camera.cpp" />
     <ClCompile Include="Engine\RenderCore\OpenGL\InputControl.cpp" />
@@ -256,7 +257,8 @@
     <ClInclude Include="Engine\Core\Timer.h" />
     <ClInclude Include="Engine\Core\WinConsole.h" />
     <ClInclude Include="Engine\external\glfw\deps\glad\gl.h" />
-    <ClInclude Include="Engine\RenderCore\include\IRender.h" />
+    <ClInclude Include="Engine\Interface\IRender.h" />
+    <ClInclude Include="Engine\Interface\WindowManager.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\include\Batcher.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\include\Camera.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\include\InputControl.h" />

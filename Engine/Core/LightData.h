@@ -1,6 +1,6 @@
 #pragma once
 #include "Core.h"
-#include "IRender.h"
+#include "Interface/IRender.h"
 
 struct LightData 
 {

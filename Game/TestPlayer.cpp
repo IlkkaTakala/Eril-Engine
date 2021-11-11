@@ -1,4 +1,4 @@
-#include "IRender.h"
+#include "Interface/IRender.h"
 #include "LightData.h"
 #include "TestPlayer.h"
 #include "Objects/MovementComponent.h"
@@ -125,11 +125,12 @@ void TestPlayer::Tick(float)
 }
 
 void TimeFunction(float d) {
-	printf("Hello, timer ran\n");
+	Console::Log("Hello, timer ran");
 }
 
 void TestPlayer::BeginPlay()
 {
+	Timer::CreateTimer(2.f, &TimeFunction, true);
 	RecordInt r = GetRecord();//0xABCDEF0123456789;
 	printf("Record: 0x%llx\n", (uint64)r);
 	printf("Mod: 0x%x\n", (uint)r.GetModID());
@@ -142,4 +143,6 @@ void TestPlayer::BeginPlay()
 	uint64 l = 0xABCDEF0123456789;
 	uint32 h = (uint32)l;
 	printf("0x%lx\n", h);
+
+	Console::Log("Hello beautiful world\n");
 }
