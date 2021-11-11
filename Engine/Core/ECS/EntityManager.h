@@ -58,7 +58,7 @@ public:
 			}
 			if (componentFound)
 			{
-				Component* component = WorldComponentManager.GetComponent(componentID, componentType, type);
+				Component* component = WorldComponentManager.GetComponent(entity->GetComponents().at(componentID), componentType, type);
 				if (component != nullptr)
 				{
 					return component;

@@ -76,39 +76,6 @@ public:
 		ComponentCount++;
 	}
 
-	/*
-	int AddComponent(T& component)
-	{
-		int usedIndex = -1;
-
-		for (int i = 0; i < IndexUsage->size(); i++)
-		{
-			if (!(IndexUsage->at(i)))
-			{
-				usedIndex = i;
-				break;
-			}
-		}
-		if (usedIndex == -1)
-		{
-			usedIndex = IndexUsage->size();
-			component.SetID(usedIndex);
-			Components->push_back(component);
-			Components->at(usedIndex).Init();
-			IndexUsage->push_back(true);
-		}
-		else
-		{
-			component.SetID(usedIndex);
-			Components->at(usedIndex) = component;
-			Components->at(usedIndex).Init();
-			IndexUsage->at(usedIndex) = true;
-		}
-
-		return usedIndex;
-	}
-	*/
-
 	Component* GetComponent(int id)
 	{
 		if (id < Components->size())
