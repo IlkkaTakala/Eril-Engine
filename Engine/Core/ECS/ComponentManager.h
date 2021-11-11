@@ -9,19 +9,6 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 #include "Core.h"
 #include "Component.h"
 
-
-template <class T>
-class ComponentArray
-{
-public:
-	ComponentArray() {};
-	~ComponentArray() {};
-
-	T& at(int i) { return Components.at(i); }
-
-	std::vector<T> Components;
-};
-
 class ComponentManager
 {
 	friend class ECSWorldManager;
@@ -31,8 +18,7 @@ public:
 	ComponentManager();
 	~ComponentManager();
 
-	template <typename T>
-	int AddComponent(T& component, String typeName);
+	int AddComponent(Component* component, String typeName);
 	Component* GetComponent(int id, int type);
 	bool RemoveComponent(int id, int type);
 	int GetTypeByName(String typeName);
@@ -42,7 +28,7 @@ protected:
 
 private:
 
-	std::vector<ComponentArray<Component>*> ComponentsPerType;
+	std::vector<std::vector<Component*>*> ComponentsPerType;
 	std::vector<std::vector<bool>> IndexUsage;
 
 	

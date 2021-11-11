@@ -35,20 +35,25 @@ ECSTesting::ECSTesting()
 	EntityManager& ECSEntityManager = ECSWorld.GetEntityManager();
 	
 	Entity* e1 = ECSEntityManager.AddEntity();
-	PositionComponent component;
+	PositionComponent* component = new PositionComponent;
 
+	
 	ECSEntityManager.AddComponentToEntity(e1->GetID(), component, "PositionComponent");
+	
+	
 	PositionComponent* pos = static_cast<PositionComponent*>(ECSEntityManager.GetComponentFromEntity(e1->GetID(), "PositionComponent"));
 	if (pos != nullptr)
 	{
 		pos->x += 1.0f;
 		pos->y += 1.0f;
 		pos->z += 1.0f;
-
-		printf("%f,%f,%f\n", pos->x, pos->y, pos->z);
+		Console::Log( std::to_string(pos->x) + "," + std::to_string(pos->y) + "," + std::to_string(pos->z));
 	}
 
+
+	
 	Entity* e2 = ECSEntityManager.AddEntity();
+	component = new PositionComponent;
 	ECSEntityManager.AddComponentToEntity(e2->GetID(), component, "PositionComponent");
 	pos = static_cast<PositionComponent*>(ECSEntityManager.GetComponentFromEntity(e2->GetID(), "PositionComponent"));
 	if (pos != nullptr)
@@ -57,10 +62,11 @@ ECSTesting::ECSTesting()
 		pos->y += 20.0f;
 		pos->z += 20.0f;
 
-		printf("%f,%f,%f\n", pos->x, pos->y, pos->z);
+		Console::Log(std::to_string(pos->x) + "," + std::to_string(pos->y) + "," + std::to_string(pos->z));
 	}
 	
 	Entity* e3 = ECSEntityManager.AddEntity();
+	component = new PositionComponent;
 	ECSEntityManager.AddComponentToEntity(e3->GetID(), component, "PositionComponent");
 	pos = static_cast<PositionComponent*>(ECSEntityManager.GetComponentFromEntity(e3->GetID(), "PositionComponent"));
 	if (pos != nullptr)
@@ -69,10 +75,11 @@ ECSTesting::ECSTesting()
 		pos->y += 300.0f;
 		pos->z += 300.0f;
 
-		printf("%f,%f,%f\n", pos->x, pos->y, pos->z);
+		Console::Log(std::to_string(pos->x) + "," + std::to_string(pos->y) + "," + std::to_string(pos->z));
 	}
 
 	Entity* e4 = ECSEntityManager.AddEntity();
+	component = new PositionComponent;
 	ECSEntityManager.AddComponentToEntity(e4->GetID(), component, "PositionComponent");
 	pos = static_cast<PositionComponent*>(ECSEntityManager.GetComponentFromEntity(e4->GetID(), "PositionComponent"));
 	if (pos != nullptr)
@@ -81,10 +88,10 @@ ECSTesting::ECSTesting()
 		pos->y += 4000.0f;
 		pos->z += 4000.0f;
 
-		printf("%f,%f,%f\n", pos->x, pos->y, pos->z);
+		Console::Log(std::to_string(pos->x) + "," + std::to_string(pos->y) + "," + std::to_string(pos->z));
 	}
 	
-
+	
 
 	SystemsManager& ECSSystemsManager = ECSWorld.GetSystemsManager();
 	MovementSystem* movementSystem = new MovementSystem(ECSEntityManager);

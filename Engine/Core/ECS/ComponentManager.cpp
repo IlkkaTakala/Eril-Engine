@@ -35,26 +35,25 @@ ComponentManager::~ComponentManager()
 	*/
 }
 
-template <typename T>
-int ComponentManager::AddComponent(T& component, String typeName)
+int ComponentManager::AddComponent(Component* component, String typeName)
 {
 	//Check if that type of component is already in use, if not, add it to the list
 	std::map<String, int>::iterator it = TypeNames.find(typeName);
 	if (it != TypeNames.end())
 	{
-		component.Type = it->second;
+		component->Type = it->second;
 	}
 	else
 	{
-		component.Type = typeCount;
+		component->Type = typeCount;
 		TypeNames.insert(std::pair<String, int>(typeName, typeCount));
 		typeCount++;
-		ComponentArray<T>* newComponentArray = new ComponentArray<T>;
+		std::vector<Component*>* newComponentArray = new std::vector<Component*>;
 		ComponentsPerType.push_back(newComponentArray);
 		std::vector<bool> b;
 		IndexUsage.push_back(b);
 	}
-	int componentType = component.Type;
+	int componentType = component->Type;
 	int usedIndex = -1;
 	std::vector<bool>& indexUsageVector = IndexUsage.at(componentType);
 
@@ -70,13 +69,13 @@ int ComponentManager::AddComponent(T& component, String typeName)
 	if (usedIndex == -1)
 	{
 		usedIndex = indexUsageVector.size();
-		component.ID = usedIndex;
+		component->ID = usedIndex;
 		ComponentsPerType.at(componentType)->push_back(component);
 		IndexUsage.at(componentType).push_back(true);
 	}
 	else
 	{
-		component.ID = usedIndex;
+		component->ID = usedIndex;
 		ComponentsPerType.at(componentType)->at(usedIndex) = component;
 		IndexUsage.at(componentType).at(usedIndex) = true;
 	}
@@ -90,12 +89,9 @@ bool ComponentManager::RemoveComponent(int id, int type)
 	{
 		if (id < IndexUsage.at(type).size())
 		{
-			ComponentsPerType.at(type)->at(id).Delete();
+			delete ComponentsPerType.at(type)->at(id);
 			IndexUsage.at(type).at(id) = false;
-
-			//delete Components.at(id);
-			//Components.at(id) = nullptr;
-			
+			ComponentsPerType.at(type)->at(id) = nullptr;		
 			return true;
 		}
 	}
@@ -119,7 +115,7 @@ Component* ComponentManager::GetComponent(int id, int type)
 	{
 		if (id < IndexUsage.at(type).size())
 		{
-			return &ComponentsPerType.at(type)->at(id);
+			return ComponentsPerType.at(type)->at(id);
 		}
 	}
 	return nullptr;

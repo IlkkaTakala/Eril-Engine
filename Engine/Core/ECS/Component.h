@@ -18,12 +18,8 @@ public:
 	void SetType(int type) { Type = type; }
 	void SetID(int id) { ID = id; }
 
-	void Delete() { Valid = false; }
-	bool IsValid() { return Valid; }
-
 private:
 	int ID;
 	int Type;
-	bool Valid = true;
 };
 

@@ -19,8 +19,8 @@ public:
 	Entity* GetEntity(int entityIndex);
 	bool RemoveEntity(int entityIndex);
 	bool RemoveEntity(Entity& entity);
-	
-	bool AddComponentToEntity(int entityIndex, Component& component, String typeName);
+
+	bool AddComponentToEntity(int entityIndex, Component* component, String typeName);
 
 
 	Component* GetComponentFromEntity(int entityIndex, String componentType);

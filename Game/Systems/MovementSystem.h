@@ -14,7 +14,8 @@ public:
 
 	void Update(float deltaTime, std::vector<int> entities) override
 	{
-		printf("Size: %d   \n", entities.size());
+		Console::Log("Size" + std::to_string(entities.size()));
+
 		for (auto e : entities)
 		{
 			PositionComponent* pos = static_cast<PositionComponent*>(WorldEntityManager.GetComponentFromEntity(e, "PositionComponent"));
@@ -24,11 +25,11 @@ public:
 				pos->y += 1.0f * deltaTime;
 				pos->z += 1.0f * deltaTime;
 
-				//printf("Entity %d position: %f,%f,%f\n", e, pos->x, pos->y, pos->z);
+				//Console::Log(std::to_string(pos->x) + "," + std::to_string(pos->y) + "," + std::to_string(pos->z));
 			}
 			else
 			{
-				printf("Component NOT FOUND! \n");
+				Console::Log("Component NOT FOUND!");
 			}
 		}
 	}

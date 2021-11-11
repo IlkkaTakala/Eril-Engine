@@ -2,8 +2,9 @@
 
 #include "ECS/Component.h"
 
-struct PositionComponent : public Component
+class PositionComponent : public Component
 {
+public:
 	PositionComponent() : Component() {}
 	float x = 0;
 	float y = 0;

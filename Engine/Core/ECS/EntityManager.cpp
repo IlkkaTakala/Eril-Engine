@@ -81,7 +81,8 @@ bool EntityManager::RemoveEntity(Entity& entity)
 	return false;
 }
 
-bool EntityManager::AddComponentToEntity(int entityIndex, Component& component, String typeName)
+
+bool EntityManager::AddComponentToEntity( int entityIndex, Component* component, String typeName)
 {
 	if (entityIndex < IndexUsage.size())
 	{
@@ -97,6 +98,7 @@ bool EntityManager::AddComponentToEntity(int entityIndex, Component& component, 
 	}
 	return false;
 }
+
 
 Component* EntityManager::GetComponentFromEntity(int entityIndex, String componentType)
 {
