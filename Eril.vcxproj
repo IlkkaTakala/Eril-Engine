@@ -206,6 +206,7 @@
     <ClCompile Include="Engine\Core\GameLoop.cpp" />
     <ClCompile Include="Engine\Core\Gameplay\GameState.cpp" />
     <ClCompile Include="Engine\Core\Gameplay\PlayerController.cpp" />
+    <ClCompile Include="Engine\Core\Gameplay\Scene.cpp" />
     <ClCompile Include="Engine\Core\GarbageCollector.cpp" />
     <ClCompile Include="Engine\Core\Launch.cpp" />
     <ClCompile Include="Engine\Core\LightData.cpp" />
@@ -239,6 +240,7 @@
     <ClInclude Include="Engine\Core\GameLoop.h" />
     <ClInclude Include="Engine\Core\Gameplay\GameState.h" />
     <ClInclude Include="Engine\Core\Gameplay\PlayerController.h" />
+    <ClInclude Include="Engine\Core\Gameplay\Scene.h" />
     <ClInclude Include="Engine\Core\GarbageCollector.h" />
     <ClInclude Include="Engine\Core\LightData.h" />
     <ClInclude Include="Engine\Core\ObjectManager.h" />

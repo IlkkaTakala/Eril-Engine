@@ -1,6 +1,7 @@
 #include "BaseObject.h"
-#include "../GarbageCollector.h"
+#include "GarbageCollector.h"
 #include "ObjectManager.h"
+#include <GameLoop.h>
 
 //void BaseObject::operator delete(void* ptr)
 //{ 
@@ -34,4 +35,9 @@ void Data::AddToRoot()
 void Data::RemoveFromRoot()
 {
 	ObjectManager::Unprotect(RecordNumber);
+}
+
+BaseObject::BaseObject()
+{
+	World = Loop->World;
 }

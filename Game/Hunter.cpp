@@ -6,9 +6,10 @@
 #include <Gameplay/PlayerController.h>
 #include <Objects/VisibleObject.h>
 
-Hunter::Hunter()
+Hunter::Hunter() : Actor()
 {
 	Mesh = SpawnObject<VisibleObject>();
+	AddComponent(Mesh);
 	Mesh->SetModel("hunter");
 	Mesh->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Assets/Materials/hunter"));
 	Mesh->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/hunter"));

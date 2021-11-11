@@ -209,37 +209,22 @@ void TestPlayer::Tick(float)
 	Sky->SetLocation(Location);
 }
 
-#include "Objects/Actor.h"
-#include "Objects/VisibleObject.h"
-
 void TimeFunction(float d) {
 	printf("Hello, timer ran\n");
 }
 
 void TestPlayer::BeginPlay()
 {
-	/*DirLight = SpawnObject<Light>();
-	DirLight->Data.Location = Vector(0.f, 0.f, 1.f);
-	DirLight->Data.Type = LIGHT_POINT;
-	DirLight->Data.Size = 3.f;
-	DirLight->Data.Intensity = 5.f;
-	DirLight->Data.Color = Vector(1.f);
-	DirLight->Data.Rotation = Vector(0.0, 45.0, -45.0);*/
+	RecordInt r = GetRecord();//0xABCDEF0123456789;
+	printf("Record: 0x%llx\n", (uint64)r);
+	printf("Mod: 0x%x\n", (uint)r.GetModID());
+	printf("State: 0x%x\n", (uint8)r.GetSpawnState());
+	printf("Server: %s\n", r.GetIsServer() ? "true" : "false");
 
-	Timer::CreateTimer(5.f, TimeFunction, false);
-
-	/*for (int i = 0; i < 100; i++) {
-
-		float x = rand() % 100 - 50.f;
-		float y = rand() % 100 - 50.f;
-		float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
-
-		Lights[i] = SpawnObject<Light>();
-
-		Lights[i]->Data.Location = Vector(x, y, terra[0]->GetHeight(x, y) + 0.2f);
-		Lights[i]->Data.Type = LIGHT_POINT;
-		Lights[i]->Data.Size = 5.f;
-		Lights[i]->Data.Intensity = rand() / (float)RAND_MAX * 20.f;
-		Lights[i]->Data.Color = Vector(1.f);
-	}*/
+	if (r.GetSpawnState() == Constants::Record::SPAWNED) {
+		printf("Spawned object\n");
+	}
+	uint64 l = 0xABCDEF0123456789;
+	uint32 h = (uint32)l;
+	printf("0x%lx\n", h);
 }

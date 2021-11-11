@@ -8,12 +8,14 @@
 #include "GarbageCollector.h"
 #include "Physics.h"
 #include "Timer.h"
+#include <GamePlay/Scene.h>
 
 using namespace std;
 
 std::list<Tickable*> GameLoop::TickList;
 std::list<Tickable*> GameLoop::TickListRemoval;
 Ref<GameState> GameLoop::State = nullptr;
+Ref<Scene> GameLoop::World = nullptr;
 
 GameLoop::GameLoop()
 {
