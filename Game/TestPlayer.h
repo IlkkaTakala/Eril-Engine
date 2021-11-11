@@ -12,6 +12,7 @@ class Hunter;
 
 class Item : public BaseObject
 {
+	REGISTER(Item)
 public:
 	Item();
 
@@ -20,10 +21,6 @@ public:
 	virtual void BeginPlay();
 
 	virtual void DestroyObject();
-
-
-private:
-
 };
 
 
@@ -40,7 +37,6 @@ private:
 	float Speed;
 
 	void ItemPickE(float delta, bool KeyDown);
-
 	void RunInputW(float delta, bool KeyDown);
 	void RunInputA(float delta, bool KeyDown);
 	void RunInputD(float delta, bool KeyDown);
