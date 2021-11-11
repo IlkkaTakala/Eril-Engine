@@ -205,6 +205,7 @@
     <ClCompile Include="Engine\Core\Core.cpp" />
     <ClCompile Include="Engine\Core\ECS\Component.cpp" />
     <ClCompile Include="Engine\Core\ECS\ComponentManager.cpp" />
+    <ClCompile Include="Engine\Core\ECS\ComponentTypeStorage.cpp" />
     <ClCompile Include="Engine\Core\ECS\ECSWorldManager.cpp" />
     <ClCompile Include="Engine\Core\ECS\Entity.cpp" />
     <ClCompile Include="Engine\Core\ECS\EntityManager.cpp" />
@@ -249,6 +250,7 @@
     <ClInclude Include="Engine\Core\ECS\Component.h" />
     <ClInclude Include="Engine\Core\ECS\ComponentManager.h" />
     <ClInclude Include="Engine\Core\ECS\Components\LightComponent.h" />
+    <ClInclude Include="Engine\Core\ECS\ComponentTypeStorage.h" />
     <ClInclude Include="Engine\Core\ECS\ECSWorldManager.h" />
     <ClInclude Include="Engine\Core\ECS\Entity.h" />
     <ClInclude Include="Engine\Core\ECS\EntityManager.h" />

@@ -130,6 +130,9 @@
     <ClCompile Include="Engine\Interface\WindowManager.cpp">
       <Filter>Engine\Private</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Core\ECS\ComponentTypeStorage.cpp">
+      <Filter>Engine\ECS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -304,6 +307,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Interface\WindowManager.h">
       <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\ECS\ComponentTypeStorage.h">
+      <Filter>Engine\ECS</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

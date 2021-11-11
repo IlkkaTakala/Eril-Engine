@@ -12,11 +12,15 @@ public:
 	Component(int id, int type) : ID(id), Type(type) {}
 	~Component() {}
 
+	virtual void Init() {};
+
 	int GetID() { return ID; }
 	int GetType() { return Type; }
 
 	void SetType(int type) { Type = type; }
 	void SetID(int id) { ID = id; }
+
+	Component* GetPointer() { return this; }
 
 private:
 	int ID;

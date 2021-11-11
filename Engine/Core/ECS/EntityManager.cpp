@@ -81,7 +81,7 @@ bool EntityManager::RemoveEntity(Entity& entity)
 	return false;
 }
 
-
+/*
 bool EntityManager::AddComponentToEntity( int entityIndex, Component* component, String typeName)
 {
 	if (entityIndex < IndexUsage.size())
@@ -102,6 +102,7 @@ bool EntityManager::AddComponentToEntity( int entityIndex, Component* component,
 
 Component* EntityManager::GetComponentFromEntity(int entityIndex, String componentType)
 {
+	
 	int typeID = WorldComponentManager.GetTypeByName(componentType);
 
 	Entity* entity = GetEntity(entityIndex);
@@ -120,7 +121,7 @@ Component* EntityManager::GetComponentFromEntity(int entityIndex, String compone
 		{
 			for (auto c : entity->GetComponents())
 			{
-				Component* component = WorldComponentManager.GetComponent(c, typeID);
+				Component* component = WorldComponentManager.GetComponent(c, componentType);
 				if (component != nullptr)
 				{
 					if (component->GetType() == typeID)
@@ -132,7 +133,9 @@ Component* EntityManager::GetComponentFromEntity(int entityIndex, String compone
 		}
 	}
 	return nullptr;
+	
 }
+*/
 
 std::vector<int> EntityManager::QueryEntitiesByType(std::vector<int> allowedTypes)
 {

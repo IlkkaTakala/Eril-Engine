@@ -14,18 +14,19 @@ public:
 
 	void Update(float deltaTime, std::vector<int> entities) override
 	{
-		Console::Log("Size" + std::to_string(entities.size()));
+		//Console::Log("Size" + std::to_string(entities.size()));
 
 		for (auto e : entities)
 		{
-			PositionComponent* pos = static_cast<PositionComponent*>(WorldEntityManager.GetComponentFromEntity(e, "PositionComponent"));
+			PositionComponent component;
+			PositionComponent* pos = static_cast<PositionComponent*>(WorldEntityManager.GetComponentFromEntity(e, "PositionComponent", component));
 			if (pos != nullptr)
 			{
 				pos->x += 1.0f * deltaTime;
 				pos->y += 1.0f * deltaTime;
 				pos->z += 1.0f * deltaTime;
 
-				//Console::Log(std::to_string(pos->x) + "," + std::to_string(pos->y) + "," + std::to_string(pos->z));
+				Console::Log(std::to_string(pos->x) + "," + std::to_string(pos->y) + "," + std::to_string(pos->z));
 			}
 			else
 			{

@@ -17,11 +17,12 @@ ComponentManager::~ComponentManager()
 {
 	
 	//TODO: Clear
+	/*
 	for (int i = 0; i < IndexUsage.size(); i++)
 	{
 		delete ComponentsPerType.at(i);
 	}
-
+	*/
 	/*
 	for (int i = 0; i < IndexUsage.size(); i++)
 	{
@@ -34,6 +35,7 @@ ComponentManager::~ComponentManager()
 	}
 	*/
 }
+/*
 
 int ComponentManager::AddComponent(Component* component, String typeName)
 {
@@ -120,3 +122,5 @@ Component* ComponentManager::GetComponent(int id, int type)
 	}
 	return nullptr;
 }
+
+*/

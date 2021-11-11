@@ -20,10 +20,53 @@ public:
 	bool RemoveEntity(int entityIndex);
 	bool RemoveEntity(Entity& entity);
 
-	bool AddComponentToEntity(int entityIndex, Component* component, String typeName);
+	bool AddComponentToEntity(int entityIndex, Component& component, String typeName)
+	{
+		if (entityIndex < IndexUsage.size())
+		{
+			if (IndexUsage.at(entityIndex))
+			{
+				int componentID = WorldComponentManager.AddComponent(component, typeName);
+				int componentType = WorldComponentManager.GetTypeByName(typeName);
 
+				Entities.at(entityIndex)->GetComponents().push_back(componentID);
+				Entities.at(entityIndex)->GetComponentTypes().push_back(componentType);
+				return true;
+			}
+		}
+		return false;
+	}
+	template <typename T>
+	Component* GetComponentFromEntity(int entityIndex, String componentType, T type)
+	{
+		int typeID = WorldComponentManager.GetTypeByName(componentType);
 
-	Component* GetComponentFromEntity(int entityIndex, String componentType);
+		Entity* entity = GetEntity(entityIndex);
+		if (entity != nullptr)
+		{
+			bool componentFound = false;
+			int componentID = 0;
+
+			for (auto c : entity->GetComponentTypes())
+			{
+				if (c == typeID)
+				{
+					componentFound = true;
+					break;
+				}
+				componentID++;
+			}
+			if (componentFound)
+			{
+				Component* component = WorldComponentManager.GetComponent(componentID, componentType, type);
+				if (component != nullptr)
+				{
+					return component;
+				}
+			}
+		}
+		return nullptr;
+	}
 
 	std::vector<int> QueryEntitiesByType(std::vector<int> allowedTypes);
 private:
