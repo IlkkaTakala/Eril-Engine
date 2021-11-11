@@ -72,6 +72,9 @@ static std::queue<std::wstring> logQueue;
 static std::mutex logsMutex;
 static int yPos = 0;
 static int yStep = 14;
+static bool ConsoleOpen = false;
+
+void AddLine(const String& pre, const String& line);
 
 template<class Interface>
 inline void SafeRelease(
@@ -352,6 +355,7 @@ private:
 					&m_pYellowBrush
 				);
 			}
+			SendMessage(m_hwnd, WM_ADDLOG, 0, 0);
 		}
 
 		return hr;
@@ -404,7 +408,7 @@ private:
 						i->size(),
 						m_pTextFormat,
 						D2D1::RectF(0, float(fontSize * round), renderTargetSize.width, float(fontSize + fontSize * round)),
-						i->starts_with(L"[LOG]") ? m_pBlackBrush : i->starts_with(L"[WARN]") ? m_pYellowBrush : m_pRedBrush
+						i->starts_with(L"[ERROR]") ? m_pRedBrush : i->starts_with(L"[WARN]") ? m_pYellowBrush : m_pBlackBrush
 					);
 					round++;
 					i++;
@@ -468,7 +472,7 @@ private:
 		si.fMask = SIF_RANGE | SIF_PAGE;
 		si.nMin = 0;
 		si.nMax = max_line_count * yStep;
-		si.nPage = point.y / yStep;
+		si.nPage = point.y * 0.5;
 		SetScrollInfo(m_hwnd, SB_VERT, &si, TRUE);
 	}
 
@@ -489,9 +493,20 @@ private:
 				si.nPos = ((int)logs.size() - max_lineCount) * fontSize;
 				yPos = si.nPos;
 				SetScrollInfo(m_hwnd, SB_VERT, &si, TRUE);
-				InvalidateRect(m_input, NULL, FALSE);
+				InvalidateRect(m_logArea, NULL, FALSE);
 			}
 		}
+	}
+
+	void EnterCommand()
+	{
+		char buff[1024];
+		GetWindowText(m_input, buff, 1024);
+		String line(buff);
+		if (line.size() < 1) return;
+		AddLine("[>>>]", line);
+		SetWindowText(m_input, "");
+		UpdateWindow(m_input);
 	}
 
 	// The windows procedure.
@@ -512,7 +527,6 @@ private:
 			);
 
 			pDemoApp->SetScrollBar();
-
 			result = 1;
 		}
 		else
@@ -605,12 +619,12 @@ private:
 
 						// User clicked the top arrow.
 					case SB_LINEUP:
-						si.nPos -= 1;
+						si.nPos -= yStep;
 						break;
 
 						// User clicked the bottom arrow.
 					case SB_LINEDOWN:
-						si.nPos += 1;
+						si.nPos += yStep;
 						break;
 
 						// User clicked the scroll bar shaft above the scroll box.
@@ -645,10 +659,45 @@ private:
 						UpdateWindow(hwnd);
 					}
 
-					wasHandled = true;
-					result = 0;
-					break;
+				wasHandled = true;
+				result = 0;
+				break;
+
+				case WM_MOUSEWHEEL:
+				{
+					float distance = GET_WHEEL_DELTA_WPARAM(wParam);
+					SCROLLINFO si = { 0 };
+					si.cbSize = sizeof(si);
+					si.fMask = SIF_ALL;
+					GetScrollInfo(hwnd, SB_VERT, &si);
+					si.nPos -= yStep * (int)(distance / 120.f);
+					yPos = si.nPos;
+					SetScrollInfo(hwnd, SBS_VERT, &si, TRUE);
+					if (si.nPos != yPos)
+					{
+						//ScrollWindow(hwnd, 0, yChar * (yPos - si.nPos), NULL, NULL);
+						UpdateWindow(hwnd);
+					}
 				}
+				wasHandled = true;
+				result = 0;
+				break;
+
+				case WM_KEYDOWN:
+				{
+
+					switch (wParam)
+					{
+					case VK_RETURN:
+						pDemoApp->EnterCommand();
+						break;
+					}
+				}
+				wasHandled = true;
+				result = 0;
+				break;
+				}
+
 			}
 
 			if (!wasHandled)
@@ -696,13 +745,22 @@ void Console::Init()
 
 void Console::Create()
 {
-	ConsoleThread = std::thread(D2D1Init);
+	if (!ConsoleOpen) {
+		ConsoleThread = std::thread(D2D1Init);
+		ConsoleOpen = true;
+	}
+}
+
+bool Console::IsOpen()
+{
+	return ConsoleOpen;
 }
 
 void Console::Close()
 {
 	bQuit = true;
 	ConsoleThread.join();
+	ConsoleOpen = false;
 }
 
 void AddLine(const String& pre, const String& line)
@@ -715,8 +773,9 @@ void AddLine(const String& pre, const String& line)
 	{
 		std::unique_lock<std::mutex> logs(logsMutex);
 		logQueue.push(temp.str());
+		logs.unlock();
 	}
-	SendMessage(m_hwnd, WM_ADDLOG, 0, 0);
+	SendNotifyMessage(m_hwnd, WM_ADDLOG, 0, 0);
 }
 
 void Console::Log(const String& line)

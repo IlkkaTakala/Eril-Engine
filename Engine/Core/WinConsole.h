@@ -7,6 +7,8 @@ namespace Console {
 
 	void Create();
 
+	bool IsOpen();
+
 	void Close();
 	
 	void Log(const String& line);

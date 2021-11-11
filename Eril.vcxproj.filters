@@ -106,9 +106,6 @@
     <ClCompile Include="Engine\Interface\WindowManager.cpp">
       <Filter>Engine\Interfaces</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\RenderCore\OpenGL\WindowImplementation.cpp">
-      <Filter>Engine\OpenGL</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -241,9 +238,6 @@
     </ClInclude>
     <ClInclude Include="Engine\Interface\WindowManager.h">
       <Filter>Engine\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\RenderCore\OpenGL\include\WindowImplementation.h">
-      <Filter>Engine\OpenGL</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

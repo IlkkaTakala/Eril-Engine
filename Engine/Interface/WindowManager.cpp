@@ -1,5 +1,6 @@
 #include "WindowManager.h"
-#include "WindowImplementation.h"
+
+static void* WindowInstance = nullptr;
 
 void WindowManager::AddWindow()
 {
@@ -7,10 +8,10 @@ void WindowManager::AddWindow()
 
 void WindowManager::SetInstance(void* instance)
 {
-	WindowImplementation::StoreInstance(instance);
+	WindowInstance = instance;
 }
 
 void* WindowManager::GetInstance()
 {
-	return WindowImplementation::GetInstance();
+	return WindowInstance;
 }
