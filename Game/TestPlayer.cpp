@@ -27,6 +27,7 @@ TestPlayer::TestPlayer() : Player()
 	II->RegisterKeyInput(50, &TestPlayer::InputTwo, this);
 	II->RegisterKeyInput(256, &TestPlayer::InputExit, this);
 	II->RegisterMouseInput(0, &TestPlayer::MouseMoved, this);
+	II->RegisterKeyInput(69, &TestPlayer::ItemPickE, this);
 
 	Mesh = SpawnObject<VisibleObject>();
 	Mesh->SetModel("Cube");
@@ -48,10 +49,10 @@ TestPlayer::TestPlayer() : Player()
 	Sky->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/Sky"));
 	
 	{
-		Trees = SpawnObject<InstancedObject>();
-		Trees->SetModel(MI->LoadData(Trees, "rock"));
-		Trees->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/rock"));
-		//Trees->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Assets/Materials/leaves"));
+		/*Trees = SpawnObject<InstancedObject>();
+		Trees->SetModel(MI->LoadData(Trees, "tree"));
+		Trees->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/tree"));
+		Trees->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Assets/Materials/leaves"));
 		Trees->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
 
 		int count = 100;
@@ -61,7 +62,7 @@ TestPlayer::TestPlayer() : Player()
 			float x = rand() % 100 - 50.f;
 			float y = rand() % 100 - 50.f;
 			float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
-			arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y) + 1.0f);
+			arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y) - 0.2f);
 			arr[i].Scale = Vector(s);
 		}
 		Trees->AddInstances(count, arr);
@@ -105,24 +106,24 @@ TestPlayer::TestPlayer() : Player()
 			arr[i].Rotation = Vector::toEuler(axis, angle) * 180.f / PI;
 		}
 		Grass->AddInstances(count, arr);
-		delete[] arr;
+		delete[] arr;*/
 
 		Flowers = SpawnObject<InstancedObject>();
-		Flowers->SetModel(MI->LoadData(Flowers, "flower"));
-		Flowers->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/flower"));
+		Flowers->SetModel(MI->LoadData(Flowers, "candyCane"));
+		Flowers->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/rock"));
 		Flowers->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
 
-		count = 1000;
-		arr = new Transformation[count]();
+		int count = 100;
+		Transformation* arr = new Transformation[count]();
 		for (int i = 0; i < count; i++)
 		{
 			float x = rand() % 100 - 50.f;
 			float y = rand() % 100 - 50.f;
 			float s = (1.f - rand() / (float)RAND_MAX * 0.4f);
 			Vector normal = terra[0]->GetNormal(x, y);
-			arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y));
-			arr[i].Scale = Vector(s);
-			Vector up(0.f, 0.f, 1.f);
+			arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y) + 0.8f);
+			arr[i].Scale = Vector(0.2f);
+			Vector up(0.f, 1.f, 0.f);
 			Vector axis = Vector::Cross(normal, up).Normalize();
 			float angle = acos(Vector::Dot(up, normal));
 			arr[i].Rotation = Vector::toEuler(axis, angle) * 180.f / PI;
@@ -193,8 +194,15 @@ void TestPlayer::LeftMouseDown(float delta, bool)
 
 void TestPlayer::RightMouseDown(float delta, bool KeyDown)
 {
-
+	
 }
+
+void TestPlayer::ItemPickE(float delta, bool KeyDown)
+{
+	if (!KeyDown) items.push_back(SpawnObject<Item>());
+	printf("Items: %lld", items.size());
+}
+
 
 void TestPlayer::MouseMoved(float X, float Y)
 {
@@ -227,4 +235,19 @@ void TestPlayer::BeginPlay()
 	uint64 l = 0xABCDEF0123456789;
 	uint32 h = (uint32)l;
 	printf("0x%lx\n", h);
+}
+
+Item::Item() : BaseObject()
+{
+
+}
+
+void Item::BeginPlay()
+{
+
+}
+
+void Item::DestroyObject()
+{
+	BaseObject::DestroyObject();
 }

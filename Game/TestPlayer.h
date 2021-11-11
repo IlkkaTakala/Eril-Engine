@@ -10,6 +10,23 @@ class MovementComponent;
 class Terrain;
 class Hunter;
 
+class Item : public BaseObject
+{
+public:
+	Item();
+
+	virtual ~Item() { }
+
+	virtual void BeginPlay();
+
+	virtual void DestroyObject();
+
+
+private:
+
+};
+
+
 class TestPlayer : public Player
 {
 public:
@@ -17,9 +34,12 @@ public:
 	virtual ~TestPlayer() { /*INI->SetValue("Player", "Start", CameraPoint.ToString()); INI->SetValue("Player", "Direction", CameraDirection.ToString());*/ }
 	virtual void Tick(float Delta) override;
 	virtual void BeginPlay() override;
+
 private:
 	float mouseSens;
 	float Speed;
+
+	void ItemPickE(float delta, bool KeyDown);
 
 	void RunInputW(float delta, bool KeyDown);
 	void RunInputA(float delta, bool KeyDown);
@@ -52,4 +72,5 @@ private:
 	Ref<Hunter> hunt;
 
 	int spawnCounter;
+	std::vector<Ref<Item>> items;
 };
