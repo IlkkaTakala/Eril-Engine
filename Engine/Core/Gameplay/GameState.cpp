@@ -3,7 +3,6 @@
 
 GameState::GameState()
 {
-	Sun = Vector(1, 1, -1).Normalize();
 }
 
 void GameState::BeginPlay()

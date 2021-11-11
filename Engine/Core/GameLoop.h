@@ -20,6 +20,7 @@ public:
 	void RemoveFromTick(Tickable* t) { std::unique_lock<std::mutex> lock(TickListMutex); TickListRemoval.push_back(t); }
 	
 	static Ref<GameState> State;
+	static Ref<Scene> World;
 
 private:
 	int MainLoop();

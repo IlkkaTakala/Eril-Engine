@@ -6,6 +6,7 @@ class MovementComponent;
 
 class Hunter : public Actor
 {
+	REGISTER(Hunter)
 public:
 	Hunter();
 	Ref<MovementComponent> move;
