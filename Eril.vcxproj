@@ -246,6 +246,7 @@
     <ClInclude Include="Engine\Core\Core.h" />
     <ClInclude Include="Engine\Core\ECS\Component.h" />
     <ClInclude Include="Engine\Core\ECS\ComponentManager.h" />
+    <ClInclude Include="Engine\Core\ECS\Components\LightComponent.h" />
     <ClInclude Include="Engine\Core\ECS\ECSWorldManager.h" />
     <ClInclude Include="Engine\Core\ECS\Entity.h" />
     <ClInclude Include="Engine\Core\ECS\EntityManager.h" />

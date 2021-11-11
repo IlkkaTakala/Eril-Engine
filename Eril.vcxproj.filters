@@ -153,6 +153,12 @@
     <Filter Include="Engine\ECS">
       <UniqueIdentifier>{ee669dbc-1437-4613-b8e8-9420e11f382e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\ECS\Systems">
+      <UniqueIdentifier>{d736ca87-ac68-4580-9866-30ec99950895}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\ECS\Components">
+      <UniqueIdentifier>{2e41f838-8014-47c1-8a2d-e5a2d8acb614}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\EngineInterface.h">
@@ -280,6 +286,9 @@
     </ClInclude>
     <ClInclude Include="Game\Systems\MovementSystem.h">
       <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\ECS\Components\LightComponent.h">
+      <Filter>Engine\ECS\Components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

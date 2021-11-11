@@ -94,7 +94,7 @@ ECSTesting::ECSTesting()
 
 void ECSTesting::Tick(float deltaTime)
 {
-	ECSWorld.Tick(deltaTime);
+	//ECSWorld.Tick(deltaTime);
 
 	/*
 	ComponentManager& ECSComponentManager = ECSWorld.GetComponentManager();

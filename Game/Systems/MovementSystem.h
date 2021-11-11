@@ -20,7 +20,7 @@ public:
 				pos->y += 1.0f * deltaTime;
 				pos->z += 1.0f * deltaTime;
 
-				printf("Entity %d position: %f,%f,%f\n", e, pos->x, pos->y, pos->z);
+				//printf("Entity %d position: %f,%f,%f\n", e, pos->x, pos->y, pos->z);
 			}
 			else
 			{
