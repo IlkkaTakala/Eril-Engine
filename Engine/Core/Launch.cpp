@@ -12,7 +12,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	Console::Init();
 	Console::Log("Hello, startup\n");
 	for (int i = 0; i < 100; i++) {
-		Console::Log("Console line" + std::to_string(i));
+		Console::Log("Console line " + std::to_string(i));
 	}
 	Console::Error("This world is an error");
 	GameLoop* Game = new GameLoop();

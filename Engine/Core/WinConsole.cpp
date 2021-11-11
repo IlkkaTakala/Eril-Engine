@@ -2,6 +2,7 @@
 #include <Interface/WindowManager.h>
 #include <thread>
 #include <queue>
+#include <mutex>
 //#define	WIN32_LEAN_AND_MEAN
 //#include <windows.h>
 //#include <stdio.h>
@@ -67,6 +68,8 @@ constexpr int max_line_count = 400;
 static HWND m_hwnd = nullptr;
 static bool bQuit = false;
 static std::list<std::wstring> logs;
+static std::queue<std::wstring> logQueue;
+static std::mutex logsMutex;
 static int yPos = 0;
 static int yStep = 14;
 
@@ -111,7 +114,8 @@ public:
 		m_pBlackBrush(NULL),
 		m_pYellowBrush(NULL),
 		m_logArea(NULL),
-		m_input(NULL)
+		m_input(NULL),
+		m_scrollBar(NULL)
 	{
 	}
 
@@ -381,27 +385,29 @@ private:
 
 			float bottom = renderTargetSize.height - 5.f;
 			int fontSize = (int)m_pTextFormat->GetFontSize() + 2;
-			int max_lineCount = int(bottom / fontSize) - 1;
+			int max_lineCount = int(bottom / fontSize);
 
 			SCROLLINFO si = { 0 };
 			si.cbSize = sizeof(si);
 			GetScrollInfo(m_hwnd, SBS_VERT, &si);
 
-			si.nPos / fontSize;
+			int start = yPos / fontSize;
 
 			std::wstring text;
-			int round = yPos / fontSize;
+			int round = 0;
 			if (logs.size() > 0) {
-				for (auto i = --logs.end(); i != logs.begin(); i--) {
+				auto i = logs.begin();
+				std::advance(i, min(start, logs.size()));
+				while (i != logs.end() && round < max_lineCount) {
 					m_pRenderTarget->DrawText(
 						i->c_str(),
 						i->size(),
 						m_pTextFormat,
-						D2D1::RectF(0, bottom - fontSize * round, renderTargetSize.width, bottom - fontSize * (round - 1)),
+						D2D1::RectF(0, float(fontSize * round), renderTargetSize.width, float(fontSize + fontSize * round)),
 						i->starts_with(L"[LOG]") ? m_pBlackBrush : i->starts_with(L"[WARN]") ? m_pYellowBrush : m_pRedBrush
 					);
-					if (round > max_lineCount) break;
 					round++;
+					i++;
 				}
 			}
 
@@ -464,6 +470,28 @@ private:
 		si.nMax = max_line_count * yStep;
 		si.nPage = point.y / yStep;
 		SetScrollInfo(m_hwnd, SB_VERT, &si, TRUE);
+	}
+
+	void ScrollDown(int count)
+	{
+		D2D1_SIZE_F renderTargetSize = m_pRenderTarget->GetSize();
+		float bottom = renderTargetSize.height - 5.f;
+		int fontSize = (int)m_pTextFormat->GetFontSize() + 2;
+		int max_lineCount = int(bottom / fontSize);
+		int row = yPos / fontSize;
+		int test = logs.size() - count - row;
+		if (test >= 0 && test <= max_lineCount) {
+			if (logs.size() > row + max_lineCount) {
+				SCROLLINFO si = { 0 };
+				si.cbSize = sizeof(si);
+				si.fMask = SIF_ALL;
+				GetScrollInfo(m_hwnd, SB_VERT, &si);
+				si.nPos = ((int)logs.size() - max_lineCount) * fontSize;
+				yPos = si.nPos;
+				SetScrollInfo(m_hwnd, SB_VERT, &si, TRUE);
+				InvalidateRect(m_input, NULL, FALSE);
+			}
+		}
 	}
 
 	// The windows procedure.
@@ -529,7 +557,18 @@ private:
 
 				case WM_ADDLOG:
 				{
-					RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
+					int count = 0;
+					if (!logQueue.empty())
+					{
+						std::unique_lock<std::mutex> logLock(logsMutex);
+						while (!logQueue.empty()) {
+							logs.push_back(logQueue.front());
+							logQueue.pop();
+							if (logs.size() > max_line_count) logs.pop_front();
+							count++;
+						}
+					}
+					pDemoApp->ScrollDown(count);
 				}
 				result = 0;
 				wasHandled = true;
@@ -672,9 +711,11 @@ void AddLine(const String& pre, const String& line)
 	char w[10];
 	GetTimeFormatA(LOCALE_NAME_USER_DEFAULT, TIME_NOTIMEMARKER | TIME_FORCE24HOURFORMAT, NULL, NULL, w, 9);
 	std::wstringstream temp;
-	temp << pre.c_str() << w << " | " << line.c_str() << '\n';
-	logs.push_back(temp.str());
-	if (logs.size() > max_line_count) logs.pop_front();
+	temp << pre.c_str() << " " << w << " | " << line.c_str() << '\n';
+	{
+		std::unique_lock<std::mutex> logs(logsMutex);
+		logQueue.push(temp.str());
+	}
 	SendMessage(m_hwnd, WM_ADDLOG, 0, 0);
 }
 
