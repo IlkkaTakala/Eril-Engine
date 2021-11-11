@@ -49,9 +49,6 @@
     <ClCompile Include="Engine\Core\GarbageCollector.cpp">
       <Filter>Engine\Private</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\RenderCore\include\IRender.cpp">
-      <Filter>Engine\Private</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Core\Physics.cpp">
       <Filter>Engine\Private</Filter>
     </ClCompile>
@@ -103,6 +100,12 @@
     <ClCompile Include="Engine\Core\Gameplay\Scene.cpp">
       <Filter>Engine\GamePlay</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Interface\IRender.cpp">
+      <Filter>Engine\Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Interface\WindowManager.cpp">
+      <Filter>Engine\Interfaces</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -128,6 +131,9 @@
     </Filter>
     <Filter Include="Engine\OpenGL">
       <UniqueIdentifier>{1a8dd4f1-9c5c-40d8-8a15-89a92e8920dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Interfaces">
+      <UniqueIdentifier>{a9b01a03-e735-4af0-a8ab-0cc6cc9019f6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -174,9 +180,6 @@
       <Filter>Engine\Public</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\GarbageCollector.h">
-      <Filter>Engine\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\RenderCore\include\IRender.h">
       <Filter>Engine\Public</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\LightData.h">
@@ -229,6 +232,12 @@
     </ClInclude>
     <ClInclude Include="Engine\Core\Gameplay\Scene.h">
       <Filter>Engine\GamePlay</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Interface\IRender.h">
+      <Filter>Engine\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Interface\WindowManager.h">
+      <Filter>Engine\Interfaces</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

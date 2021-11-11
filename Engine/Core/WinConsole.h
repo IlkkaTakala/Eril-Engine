@@ -1,3 +1,25 @@
 #pragma once
+#include <Core.h>
 
-void AddConsole();
+namespace Console {
+
+	void Init();
+
+	void Create();
+
+	bool IsOpen();
+
+	void Close();
+	
+	void Log(const String& line);
+
+	void Error(const String& line);
+
+	void Warning(const String& line);
+
+	void GetLogs(int lines, char* data, size_t& datasize);
+
+	void Flush();
+
+	void Execute(const String& line);
+}

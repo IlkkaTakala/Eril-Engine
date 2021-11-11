@@ -52,6 +52,6 @@ void Hunter::Tick(float delta)
 
 void Hunter::SetNewTarget(float delta)
 {
-	printf("New target set\n");
+	Console::Log("New target set");
 	targetLoc = GetGameState()->CurrentPlayer->GetLocation();
 }

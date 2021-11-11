@@ -1,7 +1,7 @@
 #pragma once
 #include <Core.h>
 #include <Objects/SceneComponent.h>
-#include "IRender.h"
+#include "Interface/IRender.h"
 
 class VisibleObject : public SceneComponent
 {
