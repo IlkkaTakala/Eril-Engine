@@ -290,5 +290,8 @@
     <ClInclude Include="Engine\Core\ECS\Components\LightComponent.h">
       <Filter>Engine\ECS\Components</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Core\ECS\Systems\LightControllerSystem.h">
+      <Filter>Engine\ECS\Systems</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

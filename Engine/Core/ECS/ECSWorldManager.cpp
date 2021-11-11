@@ -10,6 +10,8 @@ ECSWorldManager::ECSWorldManager()
 	WorldComponentManager = new ComponentManager();
 	WorldEntityManager = new EntityManager(*WorldComponentManager);
 	WorldSystemsManager = new SystemsManager(*WorldEntityManager, *WorldComponentManager);
+
+	SetupEngineSystems();
 }
 
 ECSWorldManager::~ECSWorldManager()
@@ -19,7 +21,14 @@ ECSWorldManager::~ECSWorldManager()
 	delete WorldComponentManager;
 }
 
-void ECSWorldManager::Tick(float deltaTime)
+void ECSWorldManager::Update(float deltaTime)
 {
 	WorldSystemsManager->UpdateSystems(deltaTime);
+}
+
+void ECSWorldManager::SetupEngineSystems()
+{
+	LightControllerSystem* lightController = new LightControllerSystem(*WorldEntityManager);
+	int systemIndex = WorldSystemsManager->AddSystem(lightController);
+	WorldSystemsManager->AddWantedComponentType(systemIndex, "LightComponent");
 }

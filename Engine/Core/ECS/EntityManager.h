@@ -19,8 +19,10 @@ public:
 	Entity* GetEntity(int entityIndex);
 	bool RemoveEntity(int entityIndex);
 	bool RemoveEntity(Entity& entity);
-	bool AddComponentToEntity(int entityIndex, Component* component, String typeName);
-	bool AttachComponentToEntity(int entityIndex, int componentID);
+	
+	bool AddComponentToEntity(int entityIndex, Component& component, String typeName);
+
+
 	Component* GetComponentFromEntity(int entityIndex, String componentType);
 
 	std::vector<int> QueryEntitiesByType(std::vector<int> allowedTypes);

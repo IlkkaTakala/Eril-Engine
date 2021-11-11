@@ -35,8 +35,9 @@ ECSTesting::ECSTesting()
 	EntityManager& ECSEntityManager = ECSWorld.GetEntityManager();
 	
 	Entity* e1 = ECSEntityManager.AddEntity();
-	printf("%d\n", e1->GetID());
-	ECSEntityManager.AddComponentToEntity(e1->GetID(), new PositionComponent, "PositionComponent");
+	PositionComponent component;
+
+	ECSEntityManager.AddComponentToEntity(e1->GetID(), component, "PositionComponent");
 	PositionComponent* pos = static_cast<PositionComponent*>(ECSEntityManager.GetComponentFromEntity(e1->GetID(), "PositionComponent"));
 	if (pos != nullptr)
 	{
@@ -47,10 +48,8 @@ ECSTesting::ECSTesting()
 		printf("%f,%f,%f\n", pos->x, pos->y, pos->z);
 	}
 
-	
 	Entity* e2 = ECSEntityManager.AddEntity();
-	printf("%d\n", e2->GetID());
-	ECSEntityManager.AddComponentToEntity(e2->GetID(), new PositionComponent, "PositionComponent");
+	ECSEntityManager.AddComponentToEntity(e2->GetID(), component, "PositionComponent");
 	pos = static_cast<PositionComponent*>(ECSEntityManager.GetComponentFromEntity(e2->GetID(), "PositionComponent"));
 	if (pos != nullptr)
 	{
@@ -62,7 +61,7 @@ ECSTesting::ECSTesting()
 	}
 	
 	Entity* e3 = ECSEntityManager.AddEntity();
-	ECSEntityManager.AddComponentToEntity(e3->GetID(), new PositionComponent, "PositionComponent");
+	ECSEntityManager.AddComponentToEntity(e3->GetID(), component, "PositionComponent");
 	pos = static_cast<PositionComponent*>(ECSEntityManager.GetComponentFromEntity(e3->GetID(), "PositionComponent"));
 	if (pos != nullptr)
 	{
@@ -74,7 +73,7 @@ ECSTesting::ECSTesting()
 	}
 
 	Entity* e4 = ECSEntityManager.AddEntity();
-	ECSEntityManager.AddComponentToEntity(e4->GetID(), new PositionComponent, "PositionComponent");
+	ECSEntityManager.AddComponentToEntity(e4->GetID(), component, "PositionComponent");
 	pos = static_cast<PositionComponent*>(ECSEntityManager.GetComponentFromEntity(e4->GetID(), "PositionComponent"));
 	if (pos != nullptr)
 	{
@@ -84,6 +83,8 @@ ECSTesting::ECSTesting()
 
 		printf("%f,%f,%f\n", pos->x, pos->y, pos->z);
 	}
+	
+
 
 	SystemsManager& ECSSystemsManager = ECSWorld.GetSystemsManager();
 	MovementSystem* movementSystem = new MovementSystem(ECSEntityManager);
@@ -94,7 +95,7 @@ ECSTesting::ECSTesting()
 
 void ECSTesting::Tick(float deltaTime)
 {
-	//ECSWorld.Tick(deltaTime);
+	ECSWorld.Update(deltaTime);
 
 	/*
 	ComponentManager& ECSComponentManager = ECSWorld.GetComponentManager();

@@ -138,9 +138,9 @@ TestPlayer::TestPlayer() : Player()
 	}
 	*/
 
-	hunt = SpawnObject<Hunter>();
-	hunt->SetLocation(Vector(100.f, 0.f, 0.f));
-	hunt->move->SetGround(terra[0]);
+	//hunt = SpawnObject<Hunter>();
+	//hunt->SetLocation(Vector(100.f, 0.f, 0.f));
+	//hunt->move->SetGround(terra[0]);
 }
 
 void TestPlayer::RunInputW(float delta, bool KeyDown)
@@ -234,6 +234,7 @@ void TestPlayer::BeginPlay()
 
 	Timer::CreateTimer(5.f, TimeFunction, false);
 
+	/*
 	for (int i = 0; i < 0; i++) {
 
 		float x = rand() % 100 - 50.f;
@@ -248,4 +249,5 @@ void TestPlayer::BeginPlay()
 		Lights[i]->Data.Intensity = rand() / (float)RAND_MAX * 20.f;
 		Lights[i]->Data.Color = Vector(1.f);
 	}
+	*/
 }

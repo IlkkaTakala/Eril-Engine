@@ -5,8 +5,24 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 
 #include "ComponentManager.h"
 
+
+
+
+ComponentManager::ComponentManager()
+{
+}
+
+
 ComponentManager::~ComponentManager()
 {
+	
+	//TODO: Clear
+	for (int i = 0; i < IndexUsage.size(); i++)
+	{
+		delete ComponentsPerType.at(i);
+	}
+
+	/*
 	for (int i = 0; i < IndexUsage.size(); i++)
 	{
 		if (IndexUsage.at(i))
@@ -16,15 +32,36 @@ ComponentManager::~ComponentManager()
 			IndexUsage.at(i) = false;
 		}
 	}
+	*/
 }
 
-int ComponentManager::AddComponent(Component* component, String typeName)
+template <typename T>
+int ComponentManager::AddComponent(T& component, String typeName)
 {
-
-	int usedIndex = -1;
-	for (int i = 0; i < IndexUsage.size(); i++)
+	//Check if that type of component is already in use, if not, add it to the list
+	std::map<String, int>::iterator it = TypeNames.find(typeName);
+	if (it != TypeNames.end())
 	{
-		if (!IndexUsage[i])
+		component.Type = it->second;
+	}
+	else
+	{
+		component.Type = typeCount;
+		TypeNames.insert(std::pair<String, int>(typeName, typeCount));
+		typeCount++;
+		ComponentArray<T>* newComponentArray = new ComponentArray<T>;
+		ComponentsPerType.push_back(newComponentArray);
+		std::vector<bool> b;
+		IndexUsage.push_back(b);
+	}
+	int componentType = component.Type;
+	int usedIndex = -1;
+	std::vector<bool>& indexUsageVector = IndexUsage.at(componentType);
+
+
+	for (int i = 0; i < indexUsageVector.size(); i++)
+	{
+		if (!indexUsageVector[i])
 		{
 			usedIndex = i;
 			break;
@@ -32,44 +69,35 @@ int ComponentManager::AddComponent(Component* component, String typeName)
 	}
 	if (usedIndex == -1)
 	{
-		usedIndex = IndexUsage.size();
-
-		Components.push_back(component);
-		IndexUsage.push_back(true);
+		usedIndex = indexUsageVector.size();
+		component.ID = usedIndex;
+		ComponentsPerType.at(componentType)->push_back(component);
+		IndexUsage.at(componentType).push_back(true);
 	}
 	else
 	{
-		Components.at(usedIndex) = component;
-		IndexUsage.at(usedIndex) = true;
+		component.ID = usedIndex;
+		ComponentsPerType.at(componentType)->at(usedIndex) = component;
+		IndexUsage.at(componentType).at(usedIndex) = true;
 	}
-
-	//Give component index
-	component->ID = usedIndex;
-
-	//Check if that type of component is already in use, if not, add it to the list
-	std::map<String, int>::iterator it = TypeNames.find(typeName);
-	if (it != TypeNames.end())
-	{
-		component->Type = it->second;
-	}
-	else
-	{
-		component->Type = typeCount;
-		TypeNames.insert(std::pair<String, int>(typeName, typeCount));
-		typeCount++;
-	}
-
+	//ComponentsPerType.at(componentType)->at(usedIndex).Init();
 	return usedIndex;
 }
 
-bool ComponentManager::RemoveComponent(int id)
+bool ComponentManager::RemoveComponent(int id, int type)
 {
-	if (id < IndexUsage.size())
+	if (type < IndexUsage.size())
 	{
-		delete Components.at(id);
-		Components.at(id) = nullptr;
-		IndexUsage.at(id) = false;
-		return true;
+		if (id < IndexUsage.at(type).size())
+		{
+			ComponentsPerType.at(type)->at(id).Delete();
+			IndexUsage.at(type).at(id) = false;
+
+			//delete Components.at(id);
+			//Components.at(id) = nullptr;
+			
+			return true;
+		}
 	}
 	return false;
 }
@@ -85,11 +113,14 @@ int ComponentManager::GetTypeByName(String typeName)
 	return -1;
 }
 
-Component* ComponentManager::GetComponent(int id)
+Component* ComponentManager::GetComponent(int id, int type)
 {
-	if (id < IndexUsage.size())
+	if (type < IndexUsage.size())
 	{
-		return Components.at(id);
+		if (id < IndexUsage.at(type).size())
+		{
+			return &ComponentsPerType.at(type)->at(id);
+		}
 	}
 	return nullptr;
 }

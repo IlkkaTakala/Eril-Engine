@@ -1,4 +1,8 @@
 #pragma once
+/*
+Author: Albert Uusi-Illikainen [RabbitTortoise]
+11.11.2021
+*/
 
 #include "ECS/SystemsManager.h"
 #include "Components/PositionComponent.h"

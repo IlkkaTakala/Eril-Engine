@@ -81,49 +81,18 @@ bool EntityManager::RemoveEntity(Entity& entity)
 	return false;
 }
 
-bool EntityManager::AddComponentToEntity(int entityIndex, Component* component, String typeName)
+bool EntityManager::AddComponentToEntity(int entityIndex, Component& component, String typeName)
 {
 	if (entityIndex < IndexUsage.size())
 	{
 		if (IndexUsage.at(entityIndex))
 		{
-			WorldComponentManager.AddComponent(component, typeName);
-			std::vector<int>& entityComponents = Entities.at(entityIndex)->GetComponents();
-			entityComponents.push_back(component->GetID());
-			Entities.at(entityIndex)->GetComponentTypes().push_back(component->GetType());
-			return true;
-		}
-	}
-	return false;
-}
+			int componentID = WorldComponentManager.AddComponent(component, typeName);
+			int componentType = WorldComponentManager.GetTypeByName(typeName);
 
-/// <summary>
-/// THIS IS NOT FULLY TESTED!! USE WITH CAUTION!
-/// </summary>
-/// <param name="entityIndex"></param>
-/// <param name="componentID"></param>
-/// <returns></returns>
-bool EntityManager::AttachComponentToEntity(int entityIndex, int componentID)
-{
-	if (entityIndex < IndexUsage.size())
-	{
-		if (IndexUsage.at(entityIndex))
-		{
-			std::vector<int>& components = Entities.at(entityIndex)->GetComponents();
-			std::vector<int>::iterator it = 
-				std::find_if(components.begin(), components.end(), [componentID](const int c)
-				{
-					if (componentID == c)
-					{
-						return true;
-					}
-					return false; 
-				});
-			if (it != components.end())
-			{
-				components.push_back(componentID);
-				return true;
-			}
+			Entities.at(entityIndex)->GetComponents().push_back(componentID);
+			Entities.at(entityIndex)->GetComponentTypes().push_back(componentType);
+			return true;
 		}
 	}
 	return false;
@@ -131,7 +100,8 @@ bool EntityManager::AttachComponentToEntity(int entityIndex, int componentID)
 
 Component* EntityManager::GetComponentFromEntity(int entityIndex, String componentType)
 {
-	int typeID = WorldComponentManager.TypeNames.find(componentType)->second;
+	int typeID = WorldComponentManager.GetTypeByName(componentType);
+
 	Entity* entity = GetEntity(entityIndex);
 	if (entity != nullptr)
 	{
@@ -148,10 +118,13 @@ Component* EntityManager::GetComponentFromEntity(int entityIndex, String compone
 		{
 			for (auto c : entity->GetComponents())
 			{
-				Component* component = WorldComponentManager.GetComponent(c);
-				if (component->GetType() == typeID)
+				Component* component = WorldComponentManager.GetComponent(c, typeID);
+				if (component != nullptr)
 				{
-					return component;
+					if (component->GetType() == typeID)
+					{
+						return component;
+					}
 				}
 			}
 		}

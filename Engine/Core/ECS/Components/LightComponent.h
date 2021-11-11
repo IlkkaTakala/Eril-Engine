@@ -1,3 +1,4 @@
+#pragma once
 /*
 Author: Albert Uusi-Illikainen [RabbitTortoise]
 11.11.2021
@@ -5,11 +6,6 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 
 #include "Core.h"
 #include "ECS/Component.h"
-
-//#include "IRender.h"
-
-
-
 
 struct LightComponent : public Component
 {
@@ -23,4 +19,11 @@ struct LightComponent : public Component
 
 	Vector Location = Vector(0.f, 0.f, 0.f);
 	Vector Rotation = Vector(0.f, 0.f, 0.f);
+
+	// 0 = Not initialized
+	// 1 = Enabled
+	// 3 = Enabled, Needs Disabling		
+	// 4 = Disabled
+	// 5 = Disabled, Needs Enabling
+	int state = 0;
 };
