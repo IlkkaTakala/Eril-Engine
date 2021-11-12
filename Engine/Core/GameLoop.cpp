@@ -38,7 +38,7 @@ GameLoop::~GameLoop()
 
 int GameLoop::Start()
 {
-	printf("Starting game...\n");
+	Console::Log("Starting game...");
 	Loop = this;
 	INI = new INISettings("Settings.ini");
 	if (!INI->IsValid()) return 10;
@@ -55,17 +55,16 @@ int GameLoop::Start()
 	}
 	catch (const std::exception& e)
 	{
-		printf(e.what());
-		printf("\n");
+		Console::Log(e.what());
 		RI->DestroyWindow();
 		return 11;
 	}
 	
-	printf("Creating defaults...\n");
+	Console::Log("Creating defaults...");
 	State = EngineInterface::CreateDefaults();
 	Collector = new GC();
 
-	printf("Loading finished\n");
+	Console::Log("Loading finished");
 	return MainLoop();
 }
 

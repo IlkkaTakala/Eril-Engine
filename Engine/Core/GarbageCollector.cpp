@@ -45,7 +45,7 @@ void GC::CleanRunner()
 		}
 		for (RecordInt d : removal) {
 			ObjectManager::ThreadSafeDelete(d);
-			printf("Removed record: %llu. No active references\n", (uint64)d);
+			Console::Log("Removed record: " + d.ToString() + ". No active references");
 		}
 
 		duration = std::chrono::steady_clock::now() - start;

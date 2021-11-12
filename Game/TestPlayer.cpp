@@ -7,6 +7,10 @@
 #include "Objects/InstancedObject.h"
 #include "Hunter.h"
 
+void TestPlayer::OpenConsole(float, bool) {
+	Console::Create();
+}
+
 TestPlayer::TestPlayer() : Player()
 {
 	mouseSens = 0.5f;
@@ -26,6 +30,7 @@ TestPlayer::TestPlayer() : Player()
 	II->RegisterKeyInput(49, &TestPlayer::InputOne, this);
 	II->RegisterKeyInput(50, &TestPlayer::InputTwo, this);
 	II->RegisterKeyInput(256, &TestPlayer::InputExit, this);
+	II->RegisterKeyInput(257, &TestPlayer::OpenConsole, this);
 	II->RegisterMouseInput(0, &TestPlayer::MouseMoved, this);
 
 	Mesh = SpawnObject<VisibleObject>();

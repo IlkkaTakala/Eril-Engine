@@ -137,7 +137,7 @@ int Renderer::SetupWindow(int width, int height)
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
 
-	printf("Creating window...\n");
+	Console::Log("Creating window...");
 	Window = glfwCreateWindow(width, height, "Eril Engine Demo | Loading...", NULL, NULL);
 	if (!Window) {
 		glfwTerminate();
@@ -157,7 +157,7 @@ int Renderer::SetupWindow(int width, int height)
 		return -1;
 	}
 
-	printf("Allocating buffers...\n");
+	Console::Log("Allocating buffers...");
 	DepthBuffer = new PreDepthBuffer(width, height);
 	PostProcess = new PostBuffer(width, height);
 	SSAORender = new SSAOBuffer(width, height);
@@ -231,7 +231,7 @@ int Renderer::SetupWindow(int width, int height)
 	glViewport(0, 0, width, height);
 	glClearColor(0.f, 0.f, 0.f, 0.f);
 
-	printf("Loading shaders...\n");
+	Console::Log("Loading shaders...");
 	LoadShaders();
 
 	if (LightCullingShader == nullptr || PreDepthShader == nullptr) throw std::exception("Important shaders not found!\n");
@@ -638,7 +638,7 @@ void Renderer::LoadShaders()
 				break;
 			}
 
-			printf("Shader loaded: %s\n", f.path().string().c_str());
+			Console::Log("Shader loaded: " + f.path().string());
 			stre.close();
 		}
 	}
@@ -680,7 +680,7 @@ Material* Renderer::LoadMaterialByName(String name)
 					nMat->VectorParameters.emplace(name, Vector(vec));
 				}
 				BaseMaterials.emplace(name, nMat);
-				printf("Material loaded: %s\n", name.c_str());
+				Console::Log("Material loaded: " + name);
 				return BaseMaterials.find(name)->second;
 			}
 		}
@@ -703,7 +703,7 @@ Texture* Renderer::LoadTextureByName(String name)
 		Texture* next = new Texture(width, height, nrChannels, data, type);
 		stbi_image_free(data);
 		LoadedTextures.emplace(name, next);
-		printf("Texture loaded: %s\n", name.c_str());
+		Console::Log("Texture loaded: " + name);
 		return next;
 	}
 }
@@ -1304,7 +1304,7 @@ LoadedMesh* loadMeshes(const std::string& path)
 	//Check for errors
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
-		printf("Error loading model file \"%s\": \"%s\" ", path.c_str(), importer.GetErrorString());
+		Console::Log("Error loading model file " + path + " : " + importer.GetErrorString());
 		delete mesh;
 		return nullptr;
 	}

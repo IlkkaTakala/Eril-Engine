@@ -3,8 +3,6 @@
 
 namespace Console {
 
-	void Init();
-
 	void Create();
 
 	bool IsOpen();
@@ -17,9 +15,7 @@ namespace Console {
 
 	void Warning(const String& line);
 
-	void GetLogs(int lines, char* data, size_t& datasize);
-
-	void Flush();
+	void GetLogs(int lines, std::vector<String> data);
 
 	void Execute(const String& line);
 }
