@@ -9,6 +9,7 @@ class Light;
 class MovementComponent;
 class Terrain;
 class Hunter;
+class VisibleObject;
 
 class Item : public BaseObject
 {
@@ -21,6 +22,22 @@ public:
 	virtual void BeginPlay();
 
 	virtual void DestroyObject();
+};
+
+class PlaceableItem : public Actor
+{
+	REGISTER(PlaceableItem)
+public:
+	PlaceableItem();
+
+	virtual ~PlaceableItem() { }
+
+	virtual void BeginPlay();
+
+	virtual void DestroyObject();
+
+	Ref<MovementComponent> Move;
+	Ref<VisibleObject> Mesh;
 };
 
 
@@ -36,6 +53,7 @@ private:
 	float mouseSens;
 	float Speed;
 
+	void ItemThrowQ(float delta, bool KeyDown);
 	void ItemPickE(float delta, bool KeyDown);
 	void RunInputW(float delta, bool KeyDown);
 	void RunInputA(float delta, bool KeyDown);
@@ -68,5 +86,5 @@ private:
 	Ref<Hunter> hunt;
 
 	int spawnCounter;
-	std::vector<Ref<Item>> items;
+	std::vector<Ref<Item>> Items;
 };

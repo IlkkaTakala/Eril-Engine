@@ -6,6 +6,7 @@
 #include "Timer.h"
 #include "Objects/InstancedObject.h"
 #include "Hunter.h"
+#include "Objects/Actor.h"
 
 TestPlayer::TestPlayer() : Player()
 {
@@ -28,6 +29,7 @@ TestPlayer::TestPlayer() : Player()
 	II->RegisterKeyInput(256, &TestPlayer::InputExit, this);
 	II->RegisterMouseInput(0, &TestPlayer::MouseMoved, this);
 	II->RegisterKeyInput(69, &TestPlayer::ItemPickE, this);
+	II->RegisterKeyInput(81, &TestPlayer::ItemThrowQ, this);
 
 	Mesh = SpawnObject<VisibleObject>();
 	Mesh->SetModel("Cube");
@@ -108,7 +110,7 @@ TestPlayer::TestPlayer() : Player()
 		Grass->AddInstances(count, arr);
 		delete[] arr;*/
 
-		Flowers = SpawnObject<InstancedObject>();
+		/*Flowers = SpawnObject<InstancedObject>();
 		Flowers->SetModel(MI->LoadData(Flowers, "candyCane"));
 		Flowers->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/rock"));
 		Flowers->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
@@ -130,7 +132,7 @@ TestPlayer::TestPlayer() : Player()
 		}
 		Flowers->AddInstances(count, arr);
 
-		delete[] arr;
+		delete[] arr;*/
 	}
 
 	hunt = SpawnObject<Hunter>();
@@ -197,10 +199,26 @@ void TestPlayer::RightMouseDown(float delta, bool KeyDown)
 	
 }
 
+void TestPlayer::ItemThrowQ(float delta, bool KeyDown)
+{
+	if (!KeyDown)
+	{
+		if (Items.size() > 0) {
+			auto it = SpawnObject<PlaceableItem>();
+			it->SetLocation(GetLocation());
+			it->Move->AddImpulse(Vector(0.f, 0.f, 300.f));
+			Items.erase(Items.begin());
+		}
+		Console::Log("Items: " + std::to_string(Items.size()));
+	}
+}
+
 void TestPlayer::ItemPickE(float delta, bool KeyDown)
 {
-	if (!KeyDown) items.push_back(SpawnObject<Item>());
-	printf("Items: %lld", items.size());
+	if (!KeyDown) {
+		Items.push_back(SpawnObject<Item>());
+		Console::Log("Items: " + std::to_string(Items.size()));
+	}
 }
 
 
@@ -225,19 +243,16 @@ void TestPlayer::BeginPlay()
 {
 	Timer::CreateTimer(2.f, &TimeFunction, true);
 	RecordInt r = GetRecord();//0xABCDEF0123456789;
-	printf("Record: 0x%llx\n", (uint64)r);
-	printf("Mod: 0x%x\n", (uint)r.GetModID());
-	printf("State: 0x%x\n", (uint8)r.GetSpawnState());
-	printf("Server: %s\n", r.GetIsServer() ? "true" : "false");
+	
 
 	if (r.GetSpawnState() == Constants::Record::SPAWNED) {
-		printf("Spawned object\n");
+		Console::Log("Spawned object");
 	}
 	uint64 l = 0xABCDEF0123456789;
 	uint32 h = (uint32)l;
-	printf("0x%lx\n", h);
+	Console::Log("0x%lx " + std::to_string(h));
 
-	Console::Log("Hello beautiful world\n");
+	Console::Log("Hello beautiful world");
 }
 
 Item::Item() : BaseObject()
@@ -253,4 +268,24 @@ void Item::BeginPlay()
 void Item::DestroyObject()
 {
 	BaseObject::DestroyObject();
+}
+
+PlaceableItem::PlaceableItem() : Actor()
+{
+
+}
+
+void PlaceableItem::BeginPlay()
+{
+	Move = SpawnObject<MovementComponent>();
+	Move->SetTarget(this);
+	Mesh = SpawnObject<VisibleObject>();
+	AddComponent(Mesh);
+	Mesh->SetModel("candyCane");
+	Mesh->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/rock"));
+}
+
+void PlaceableItem::DestroyObject()
+{
+
 }
