@@ -9,11 +9,7 @@
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
 	WindowManager::SetInstance(hInstance);
-	Console::Init();
-	Console::Log("Hello, startup\n");
-	for (int i = 0; i < 100; i++) {
-		Console::Log("Console line " + std::to_string(i));
-	}
+	Console::Log("Hello, Eril is starting\n");
 	Console::Error("This world is an error");
 	GameLoop* Game = new GameLoop();
 	if (InterfaceInit()) return 11;

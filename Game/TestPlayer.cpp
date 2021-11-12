@@ -8,6 +8,10 @@
 #include "Hunter.h"
 #include "Objects/Actor.h"
 
+void TestPlayer::OpenConsole(float, bool) {
+	Console::Create();
+}
+
 TestPlayer::TestPlayer() : Player()
 {
 	mouseSens = 0.2f;
@@ -27,6 +31,7 @@ TestPlayer::TestPlayer() : Player()
 	II->RegisterKeyInput(49, &TestPlayer::InputOne, this);
 	II->RegisterKeyInput(50, &TestPlayer::InputTwo, this);
 	II->RegisterKeyInput(256, &TestPlayer::InputExit, this);
+	II->RegisterKeyInput(257, &TestPlayer::OpenConsole, this);
 	II->RegisterMouseInput(0, &TestPlayer::MouseMoved, this);
 	II->RegisterKeyInput(69, &TestPlayer::ItemPickE, this);
 	II->RegisterKeyInput(81, &TestPlayer::ItemThrowQ, this);

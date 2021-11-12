@@ -40,7 +40,7 @@ void Hunter::Tick(float delta)
 
 		if ((player - Location).Length() < 1.f) {
 			caught = true;
-			printf("Player caught, game over!\n");
+			Console::Log("Player caught, game over!");
 			move->SetAllowMovement(false);
 		}
 	}

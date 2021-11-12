@@ -49,6 +49,12 @@ struct RecordInt {
 		record = 0;
 	}
 
+	String ToString() {
+		char hex_string[24];
+		sprintf_s(hex_string, "0x%llX", record);
+		return hex_string;
+	}
+
 	RecordInt(uint32 ID, uint8 SpawnType, bool isServer, uint16 Mod = 0) {
 		uint64 r = 0;
 		if (isServer) r |= 1ULL << 51;
