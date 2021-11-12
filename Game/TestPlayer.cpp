@@ -115,7 +115,7 @@ TestPlayer::TestPlayer() : Player()
 		Grass->AddInstances(count, arr);
 		delete[] arr;*/
 
-		/*Flowers = SpawnObject<InstancedObject>();
+		Flowers = SpawnObject<InstancedObject>();
 		Flowers->SetModel(MI->LoadData(Flowers, "candyCane"));
 		Flowers->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/rock"));
 		Flowers->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
@@ -137,7 +137,7 @@ TestPlayer::TestPlayer() : Player()
 		}
 		Flowers->AddInstances(count, arr);
 
-		delete[] arr;*/
+		delete[] arr;
 	}
 
 	hunt = SpawnObject<Hunter>();
@@ -285,6 +285,7 @@ void PlaceableItem::BeginPlay()
 {
 	Move = SpawnObject<MovementComponent>();
 	Move->SetTarget(this);
+	Move->SetBrake(0.2f);
 	Mesh = SpawnObject<VisibleObject>();
 	AddComponent(Mesh);
 	Mesh->SetModel("candyCane");

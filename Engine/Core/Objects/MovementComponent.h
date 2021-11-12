@@ -35,6 +35,7 @@ public:
 	void SetGround(Terrain* t);
 	Actor* GetTarget() const { return Object; }
 	void SetMass(float m) { mass = m; }
+	void SetBrake(float b) { brake = b; }
 	void SetMaxSpeed(float speed) { max_speed = speed; }
 	void SetPhysics(bool p) { isPhysics = p; }
 	void SetGravity(bool g) { isGravity = g; }

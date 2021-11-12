@@ -61,7 +61,7 @@ void MovementComponent::Tick(float time)
 			brake_a = brake_a.LengthSquared() > DesiredState.velocity.LengthSquared() ? -DesiredState.velocity : brake_a;
 		}
 		for (int i = 0; i < force_count; i++) {
-			//delta_a += forces[i].Direction;
+			delta_a += forces[i].Direction;
 		}
 
 		velocity = OldState.velocity + delta_a * time + brake_a;
