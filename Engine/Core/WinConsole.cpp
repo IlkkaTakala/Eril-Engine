@@ -64,7 +64,7 @@
 #define WM_ADDLOG (WM_USER + 0x0021)
 #define IDC_CMDLINE 2
 
-constexpr int max_line_count = 400;
+constexpr int max_line_count = 1000;
 static HWND m_hwnd = nullptr;
 static bool bQuit = false;
 static std::list<std::wstring> logs;
@@ -490,7 +490,6 @@ private:
 				si.nPos = ((int)logs.size() - max_lineCount) * fontSize;
 				yPos = si.nPos;
 				SetScrollInfo(m_hwnd, SB_VERT, &si, TRUE);
-				InvalidateRect(m_logArea, NULL, FALSE);
 			}
 		}
 	}
@@ -503,7 +502,7 @@ private:
 		if (line.size() < 1) return;
 		AddLine("[>>>]", line);
 		SetWindowText(m_input, "");
-		UpdateWindow(m_input);
+		RedrawWindow(m_hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
 	}
 
 	// The windows procedure.
@@ -561,9 +560,6 @@ private:
 				case WM_PAINT:
 				{
 					pDemoApp->OnRender();
-					/*PAINTSTRUCT ps;
-					HDC dc = BeginPaint(hwnd, &ps);
-					EndPaint(hwnd, &ps);*/
 				}
 				result = 0;
 				wasHandled = false;
@@ -583,6 +579,7 @@ private:
 						}
 					}
 					pDemoApp->ScrollDown(count);
+					RedrawWindow(m_hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
 				}
 				result = 0;
 				wasHandled = true;
@@ -652,7 +649,7 @@ private:
 
 					if (si.nPos != yPos)
 					{
-						RedrawWindow(m_hwnd, NULL, NULL, RDW_NOFRAME);
+						RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
 					}
 
 				wasHandled = true;
@@ -667,13 +664,12 @@ private:
 					si.fMask = SIF_ALL;
 					GetScrollInfo(hwnd, SB_VERT, &si);
 					si.nPos -= yStep * (int)(distance / 120.f);
-					yPos = si.nPos;
 					SetScrollInfo(hwnd, SBS_VERT, &si, TRUE);
 					if (si.nPos != yPos)
 					{
-						//UpdateWindow(hwnd);
-						RedrawWindow(m_hwnd, NULL, NULL, RDW_NOFRAME);
+						RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
 					}
+					yPos = si.nPos;
 				}
 				wasHandled = true;
 				result = 0;
