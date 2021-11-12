@@ -212,6 +212,7 @@ void TestPlayer::ItemThrowQ(float delta, bool KeyDown)
 			auto it = SpawnObject<PlaceableItem>();
 			it->SetLocation(GetLocation());
 			it->Move->AddImpulse(Vector(0.f, 0.f, 300.f));
+			Items[0]->DestroyObject();
 			Items.erase(Items.begin());
 		}
 		Console::Log("Items: " + std::to_string(Items.size()));
