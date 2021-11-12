@@ -6,7 +6,6 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 
 class Component
 {
-	friend class ComponentManager;
 public:
 	Component() { ID = -1; Type = -1; }
 	Component(int id, int type) : ID(id), Type(type) {}

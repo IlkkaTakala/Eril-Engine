@@ -22,12 +22,12 @@ public:
 
 	bool AddComponentToEntity(int entityIndex, Component& component, String typeName)
 	{
-		if (entityIndex < IndexUsage.size())
+		if (entityIndex < static_cast<int>(IndexUsage.size()))
 		{
 			if (IndexUsage.at(entityIndex))
 			{
 				int componentID = WorldComponentManager.AddComponent(component, typeName);
-				int componentType = WorldComponentManager.GetTypeByName(typeName);
+				int componentType = WorldComponentManager.GetTypeIdByName(typeName);
 
 				Entities.at(entityIndex)->GetComponents().push_back(componentID);
 				Entities.at(entityIndex)->GetComponentTypes().push_back(componentType);
@@ -39,7 +39,7 @@ public:
 	template <typename T>
 	Component* GetComponentFromEntity(int entityIndex, String componentType, T type)
 	{
-		int typeID = WorldComponentManager.GetTypeByName(componentType);
+		int typeID = WorldComponentManager.GetTypeIdByName(componentType);
 
 		Entity* entity = GetEntity(entityIndex);
 		if (entity != nullptr)

@@ -21,7 +21,7 @@ Entity* EntityManager::AddEntity()
 	}
 	if (usedIndex == -1)
 	{
-		usedIndex = IndexUsage.size();
+		usedIndex = static_cast<int>(IndexUsage.size());
 
 		Entities.push_back(entity);
 		IndexUsage.push_back(true);

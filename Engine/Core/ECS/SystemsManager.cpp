@@ -9,7 +9,7 @@ int SystemsManager::AddSystem(System* system)
 {
 	system->bEnabled = true;
 	Systems.push_back(system);
-	return(Systems.size()-1);
+	return(static_cast<int>(Systems.size())-1);
 }
 
 bool SystemsManager::DisableSystem(int systemIndex)
@@ -26,7 +26,7 @@ bool SystemsManager::AddWantedComponentType(int systemIndex, String componentTyp
 {
 	if (systemIndex < Systems.size())
 	{
-		int typeIndex = WorldComponentManager.GetTypeByName(componentType);
+		int typeIndex = WorldComponentManager.GetTypeIdByName(componentType);
 		if (typeIndex != -1)
 		{
 			Systems.at(systemIndex)->TypesWanted.push_back(typeIndex);
@@ -38,7 +38,7 @@ bool SystemsManager::AddWantedComponentType(int systemIndex, String componentTyp
 
 void SystemsManager::UpdateSystems(float deltaTime)
 {
-	for (int i = 0; i < Systems.size(); i++)
+	for (int i = 0; i < static_cast<int>(Systems.size()); i++)
 	{
 		if (Systems.at(i)->bEnabled)
 		{

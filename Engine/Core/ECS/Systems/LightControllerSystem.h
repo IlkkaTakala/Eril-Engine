@@ -14,7 +14,7 @@ public:
 
 	void Update(float deltaTime, std::vector<int> entities) override
 	{
-		printf("Size: %d   \n", entities.size());
+		
 		for (auto e : entities)
 		{
 			//

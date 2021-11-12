@@ -8,21 +8,13 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 #include <Objects/Actor.h>
 
 
-#include "ECS/ECSWorldManager.h"
-#include "Components/PositionComponent.h"
-#include "Systems/MovementSystem.h"
-
 class ECSTesting : public Actor
 {
 public:
 	ECSTesting();
-
 	virtual void Tick(float) override;
 private:
 
-	ECSWorldManager ECSWorld;
-	int testID;
-	int entityID;
 };
 
 

@@ -205,7 +205,6 @@
     <ClCompile Include="Engine\Core\Core.cpp" />
     <ClCompile Include="Engine\Core\ECS\Component.cpp" />
     <ClCompile Include="Engine\Core\ECS\ComponentManager.cpp" />
-    <ClCompile Include="Engine\Core\ECS\ComponentTypeStorage.cpp" />
     <ClCompile Include="Engine\Core\ECS\ECSWorldManager.cpp" />
     <ClCompile Include="Engine\Core\ECS\Entity.cpp" />
     <ClCompile Include="Engine\Core\ECS\EntityManager.cpp" />
@@ -231,6 +230,7 @@
     <ClCompile Include="Engine\Core\Timer.cpp" />
     <ClCompile Include="Engine\Core\WinConsole.cpp" />
     <ClCompile Include="Engine\external\glfw\deps\glad_gl.c" />
+    <ClCompile Include="Engine\Interface\IECS.cpp" />
     <ClCompile Include="Engine\Interface\IRender.cpp" />
     <ClCompile Include="Engine\Interface\WindowManager.cpp" />
     <ClCompile Include="Engine\RenderCore\OpenGL\Batcher.cpp" />
@@ -255,6 +255,7 @@
     <ClInclude Include="Engine\Core\ECS\Entity.h" />
     <ClInclude Include="Engine\Core\ECS\EntityManager.h" />
     <ClInclude Include="Engine\Core\ECS\Systems\LightControllerSystem.h" />
+    <ClInclude Include="Engine\Interface\IECS.h" />
     <ClInclude Include="Game\Components\PositionComponent.h" />
     <ClInclude Include="Engine\Core\ECS\System.h" />
     <ClInclude Include="Engine\Core\ECS\SystemsManager.h" />
