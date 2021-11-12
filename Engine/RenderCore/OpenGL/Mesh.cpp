@@ -25,6 +25,7 @@ void Section::Render()
 {
 	glBindVertexArray(Holder->VAO);
 	if (Instanced) {
+		glBindBuffer(GL_ARRAY_BUFFER, InstanceDisp);
 		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(0));
 		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 4));
 		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 8));
