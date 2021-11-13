@@ -51,10 +51,10 @@ title Project Timeline
 
 section Project
 Kick Off                :done,    des1, 04-11, 2d
-Research                :active,  des2, 05-11, 12-11
-Design                  :         des3, 11-11, 19-11
-Coding                  :         des4, 11-11, 09-12
-Art                     :         des4, 10-11, 17-11
+Research                :done,    des2, 05-11, 12-11
+Design                  :active,  des3, 11-11, 19-11
+Coding                  :active,  des4, 11-11, 09-12
+Art                     :active,  des4, 10-11, 17-11
 Testing                 :         des4, 04-11, 16-12
 Release                 :         des4, 09-12, 10-12
 Finish Documentation    :         des4, 03-12, 16-12
@@ -68,7 +68,8 @@ title Personal timelines
 
 section Ilkka
 Scene graph             :done  ,  ides1, 05-11, 5d
-Console                 :active,  ides2, after ides1, 12d
+Console                 :done,    ides2, after ides1, 12d
+UI Framework            :active,  ides6, 13-11, 14d 
 Level Loading           :         ides5, after ides1, 20d
 Git control             :         ides3, 04-11, 17-12
 Lead dev/assistance     :         ides4, 04-11, 17-12
@@ -80,7 +81,7 @@ dateFormat  DD-MM
 section Albert
 Audio System            :         ades1, 12-11, 28d
 ECS Implementation Desing:active, ades2, 04-11, 13d
-ECS System              :         ades3, 10-11, 09-12
+ECS System              :active,  ades3, 10-11, 09-12
 ECS Example             :         ades4, 03-12, 09-12
 Video Presentation      :         ades5, 09-12, 17-12
 ```
