@@ -14,6 +14,8 @@
 #include <stdexcept>
 #include <iostream>
 #include <random>
+#include "UI/UISpace.h"
+#include "UI/Panel.h"
 
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/quaternion.hpp>
@@ -114,6 +116,7 @@ Renderer::~Renderer()
 	delete ShadowMapping;
 	delete SkyDomeShader;
 	delete SkyBoxShader;
+	delete UIHolder;
 }
 
 inline float lerp(float a, float b, float f)
@@ -350,6 +353,10 @@ int Renderer::SetupWindow(int width, int height)
 	glBindVertexArray(0);
 
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
+	UIHolder = new UISpace();
+	UIHolder->SetSize(width, height);
+	UIHolder->AddComponent(new Panel());
 
 	return 0;
 }
@@ -1043,7 +1050,7 @@ void Renderer::Forward(int width, int height)
 
 void Renderer::PreDepth(int width, int height)
 {
-	//glEnable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
 	glDepthFunc(GL_LESS);
 	// Clear the screen
 	glClearColor(0.f, 0.f, 0.f, 0.f);
@@ -1182,6 +1189,8 @@ void Renderer::Render(float delta)
 	glBindVertexArray(ScreenVao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
+
+	UIHolder->Render(0);
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, 0);
 

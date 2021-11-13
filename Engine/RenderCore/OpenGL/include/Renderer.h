@@ -11,6 +11,7 @@ class SSAOBuffer;
 class ShadowMapBuffer;
 class ReflectionBuffer;
 struct LightData;
+class UISpace;
 
 struct GLFWwindow;
 
@@ -77,6 +78,7 @@ private:
 	ShadowMapBuffer* ShadowMapping;
 	ReflectionBuffer* EnvironmentRender;
 	GLCamera* ActiveCamera;
+	UISpace* UIHolder;
 
 	uint ScreenVao;
 	uint ScreenVbo;

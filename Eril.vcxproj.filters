@@ -106,6 +106,13 @@
     <ClCompile Include="Engine\Interface\WindowManager.cpp">
       <Filter>Engine\Interfaces</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\RenderCore\OpenGL\UI\UIComponent.cpp">
+      <Filter>Engine\OpenGL\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\RenderCore\OpenGL\UI\UISpace.cpp">
+      <Filter>Engine\OpenGL\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\RenderCore\OpenGL\UI\Panel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -134,6 +141,9 @@
     </Filter>
     <Filter Include="Engine\Interfaces">
       <UniqueIdentifier>{a9b01a03-e735-4af0-a8ab-0cc6cc9019f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\OpenGL\UI">
+      <UniqueIdentifier>{3244437c-caa9-4877-ba7a-a047bf86f946}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -239,5 +249,12 @@
     <ClInclude Include="Engine\Interface\WindowManager.h">
       <Filter>Engine\Interfaces</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\UI\UIComponent.h">
+      <Filter>Engine\OpenGL\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\UI\UISpace.h">
+      <Filter>Engine\OpenGL\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\UI\Panel.h" />
   </ItemGroup>
 </Project>
