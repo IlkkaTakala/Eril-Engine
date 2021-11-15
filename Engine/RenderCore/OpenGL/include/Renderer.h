@@ -42,6 +42,8 @@ public:
 	virtual void GameStart() override;
 	virtual void DestroyWindow() override;
 
+	virtual UISpace* GetUIManager(int screen = 0) const override { return UIHolder; }
+
 private:
 	friend class GLInput;
 

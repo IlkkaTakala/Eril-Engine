@@ -1,5 +1,6 @@
 #include "UISpace.h"
 #include <glad/gl.h>
+#include <UI/UI.h>
 #include "UIComponent.h"
 #include <Material.h>
 #include <glm/gtx/transform.hpp>
@@ -129,7 +130,7 @@ void UISpace::Render(uint target)
 
 	glEnable(GL_DEPTH_TEST);
 	for (const auto& c : TopLevel) {
-		c->Render(ScreenSize);
+		c->TopLevel->Render();
 	}
 
 	Combiner->Bind();
@@ -143,7 +144,11 @@ void UISpace::Render(uint target)
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-void UISpace::AddComponent(UIComponent* com)
+void UISpace::AddComponent(UI* com)
 {
+	com->TopLevel->UpdateMatrices(ScreenSize);
+	com->PreConstruct();
+	com->Construct();
+	com->PostConstruct();
 	TopLevel.push_back(com);
 }

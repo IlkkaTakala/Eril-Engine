@@ -37,9 +37,6 @@
     <ClCompile Include="Engine\Core\BasicTypes.cpp">
       <Filter>Engine\Private</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\RenderCore\OpenGL\Batcher.cpp">
-      <Filter>Engine\OpenGL</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\RenderCore\OpenGL\Camera.cpp">
       <Filter>Engine\OpenGL</Filter>
     </ClCompile>
@@ -112,7 +109,15 @@
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\UISpace.cpp">
       <Filter>Engine\OpenGL\UI</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\RenderCore\OpenGL\UI\Panel.cpp" />
+    <ClCompile Include="Engine\RenderCore\OpenGL\UI\Panel.cpp">
+      <Filter>Engine\OpenGL\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\RenderCore\OpenGL\UI\UI.cpp">
+      <Filter>Engine\OpenGL\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\TestUI.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -210,9 +215,6 @@
     <ClInclude Include="Engine\Core\WinConsole.h">
       <Filter>Engine\Public</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\RenderCore\OpenGL\include\Batcher.h">
-      <Filter>Engine\OpenGL</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\RenderCore\OpenGL\include\Camera.h">
       <Filter>Engine\OpenGL</Filter>
     </ClInclude>
@@ -255,6 +257,14 @@
     <ClInclude Include="Engine\RenderCore\OpenGL\UI\UISpace.h">
       <Filter>Engine\OpenGL\UI</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\RenderCore\OpenGL\UI\Panel.h" />
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\UI.h">
+      <Filter>Engine\OpenGL\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\TestUI.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Panel.h">
+      <Filter>Engine\OpenGL\UI</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

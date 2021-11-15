@@ -6,6 +6,7 @@
 #include "Timer.h"
 #include "Objects/InstancedObject.h"
 #include "Hunter.h"
+#include "TestUI.h"
 
 void TestPlayer::OpenConsole(float, bool) {
 	Console::Create();
@@ -55,6 +56,9 @@ TestPlayer::TestPlayer() : Player()
 	hunt = SpawnObject<Hunter>();
 	hunt->SetLocation(Vector(100.f, 0.f, 0.f));
 	hunt->move->SetGround(terra[0]);
+
+	auto ui = SpawnObject<TestUI>();
+	UI::AddToScreen(ui, this);
 }
 
 void TestPlayer::RunInputW(float delta, bool KeyDown)

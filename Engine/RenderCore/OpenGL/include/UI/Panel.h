@@ -1,6 +1,7 @@
 #pragma once
 #include <Core.h>
-#include "UIComponent.h"
+#include "../../OpenGL/UI/UIComponent.h"
+
 class Shader;
 
 class Panel : public UIComponent
@@ -8,9 +9,9 @@ class Panel : public UIComponent
 public:
 	Panel();
 	virtual ~Panel();
-	void AddChild(UIComponent* child);
+	Panel* AddChild(UIComponent* child);
 
-	virtual void Render(const Vector2D& size) const override;
+	virtual void Render() override;
 	virtual void UpdateDepth(float& depth) override;
 	virtual float GetTreeDepth() const override;
 private:

@@ -356,7 +356,6 @@ int Renderer::SetupWindow(int width, int height)
 
 	UIHolder = new UISpace();
 	UIHolder->SetSize(width, height);
-	UIHolder->AddComponent(new Panel());
 
 	return 0;
 }

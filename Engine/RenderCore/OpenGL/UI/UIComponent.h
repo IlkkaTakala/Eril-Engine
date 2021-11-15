@@ -26,21 +26,21 @@ public:
 
 	int GetZIndex() const { return z_index; }
 	virtual float GetTreeDepth() const { return realDepth; }
-	virtual void UpdateDepth(float& depth) { realDepth = depth; depth += 0.1f; }
+	virtual void UpdateDepth(float& depth) { realDepth = depth; depth += 0.1f; recalculate = true; }
 	void SetParent(UIComponent* p) { parent = p; }
-	virtual void Render(const Vector2D& size) const = 0;
+	virtual void Render() = 0;
 
 protected:
 	friend class UISpace;
 	friend class UIComponent;
-	virtual void UpdateMatrices();
+	virtual void UpdateMatrices(const Vector2D& size);
 
-	Vector2D origin;
-	Vector2D vertical;
-	Vector2D horizontal;
+	Vector origin;
+	Vector vertical;
+	Vector horizontal;
 
-	Vector2D anchor_v;
-	Vector2D anchor_h;
+	Vector anchor_v;
+	Vector anchor_h;
 
 	Visibility visible;
 	HitReg hits;
@@ -51,6 +51,10 @@ protected:
 
 	int z_index;
 	float realDepth;
+
+	Vector basecolor;
+	Vector tint;
+	float opacity;
 
 	bool focusable;
 	bool hasFocus;

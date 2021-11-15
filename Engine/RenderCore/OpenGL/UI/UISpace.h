@@ -2,7 +2,7 @@
 
 #include <Core.h>
 
-class UIComponent;
+class UI;
 class Shader;
 
 class UISpace
@@ -13,7 +13,7 @@ public:
 
 	void SetSize(uint width, uint height);
 	void Render(uint Target);
-	void AddComponent(UIComponent* com);
+	void AddComponent(UI* com);
 
 private:
 
@@ -28,6 +28,6 @@ private:
 
 	Vector2D ScreenSize;
 
-	std::list<UIComponent*> TopLevel;
+	std::list<Ref<UI>> TopLevel;
 };
 
