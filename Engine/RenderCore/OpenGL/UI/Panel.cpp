@@ -83,3 +83,12 @@ float Panel::GetTreeDepth() const
 		return children.rbegin()->second->GetTreeDepth();
 	return realDepth;
 }
+
+void Panel::UpdateMatrices(const Vector2D& size)
+{
+	UIComponent::UpdateMatrices(size);
+
+	for (const auto& c : children) {
+		c.second->UpdateMatrices(realSize);
+	}
+}

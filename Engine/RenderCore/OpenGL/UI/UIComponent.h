@@ -29,15 +29,17 @@ public:
 	virtual void UpdateDepth(float& depth) { realDepth = depth; depth += 0.1f; recalculate = true; }
 	void SetParent(UIComponent* p) { parent = p; }
 	virtual void Render() = 0;
+	virtual void UpdateMatrices(const Vector2D& size);
 
 protected:
 	friend class UISpace;
 	friend class UIComponent;
-	virtual void UpdateMatrices(const Vector2D& size);
 
 	Vector origin;
-	Vector vertical;
-	Vector horizontal;
+	float leftOffset;
+	float topOffset;
+	float rightOffset;
+	float bottomOffset;
 
 	Vector anchor_v;
 	Vector anchor_h;
@@ -51,6 +53,7 @@ protected:
 
 	int z_index;
 	float realDepth;
+	Vector2D realSize;
 
 	Vector basecolor;
 	Vector tint;

@@ -14,6 +14,7 @@ public:
 	virtual void Render() override;
 	virtual void UpdateDepth(float& depth) override;
 	virtual float GetTreeDepth() const override;
+	virtual void UpdateMatrices(const Vector2D& size) override;
 private:
 	Shader* temp_shader;
 	std::multimap<int, UIComponent*> children;
