@@ -404,7 +404,8 @@ private:
 						i->size(),
 						m_pTextFormat,
 						D2D1::RectF(0, float(fontSize * round), renderTargetSize.width, float(fontSize + fontSize * round)),
-						i->starts_with(L"[ERROR]") ? m_pRedBrush : i->starts_with(L"[WARN]") ? m_pYellowBrush : m_pBlackBrush
+						i->starts_with(L"[ERROR]") ? m_pRedBrush : i->starts_with(L"[WARN]") ? m_pYellowBrush : m_pBlackBrush,
+						D2D1_DRAW_TEXT_OPTIONS_CLIP
 					);
 					round++;
 					i++;
@@ -776,10 +777,18 @@ void AddLine(const String& pre, const String& line)
 	char w[10];
 	GetTimeFormatA(LOCALE_NAME_USER_DEFAULT, TIME_NOTIMEMARKER | TIME_FORCE24HOURFORMAT, NULL, NULL, w, 9);
 	std::wstringstream temp;
-	temp << pre.c_str() << " " << w << " | " << line.c_str() << '\n';
 	{
 		std::unique_lock<std::mutex> logs(logsMutex);
+		auto list = split(line, '\n');
+		temp << pre.c_str() << " " << w << " | " << list[0].c_str();
 		logQueue.push(temp.str());
+		if (list.size() > 1) {
+			for (auto it = ++list.begin(); it != list.end(); it++) {
+				temp.str(L"\t");
+				temp << it->c_str();
+				logQueue.push(temp.str());
+			}
+		}
 		logs.unlock();
 	}
 	SendNotifyMessage(m_hwnd, WM_ADDLOG, 0, 0);

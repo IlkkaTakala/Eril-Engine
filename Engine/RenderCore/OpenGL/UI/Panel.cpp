@@ -18,15 +18,17 @@ uniform mat4 model;
 out vec2 TexCoords;
 void main() {
 	TexCoords = in_texCoord;
-	gl_Position = model * vec4(in_position, 1.0);
+	vec4 loc = model * vec4((in_position + 1.0) / 2.0, 1.0);
+	loc.z = model[3][2];
+	gl_Position = vec4(loc.xyz, 1.0);
 }
 )~~~";
 	const char* fragmentShader = R"~~~(
 #version 430 core
-layout(location = 0) out vec4 FragColor;
+out vec4 FragColor;
 in vec2 TexCoords;
 void main() 
-{ FragColor = vec4(0.5); }
+{ FragColor = vec4(vec3(1.0), 1.0); }
 )~~~";
 
 	temp_shader = new Shader(vertexShader, fragmentShader);

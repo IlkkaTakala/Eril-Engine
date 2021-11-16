@@ -9,6 +9,7 @@ UISpace::UISpace()
 {
 	UIBuffer = 0;
 	Color = 0;
+	Depth = 0;
 	UIShader = nullptr;
 
 	const char* vertexShader = R"~~~(
@@ -23,7 +24,7 @@ void main() {
 )~~~";
 	const char* fragmentShader = R"~~~(
 #version 430 core
-layout(location = 0) out vec4 FragColor;
+out vec4 FragColor;
 layout (binding = 0) uniform sampler2D Color;
 in vec2 TexCoords;
 void main() 
@@ -112,14 +113,24 @@ void UISpace::SetSize(uint width, uint height)
 	unsigned int attachments[1] = { GL_COLOR_ATTACHMENT0 };
 	glDrawBuffers(1, attachments);
 
+	glGenTextures(1, &Depth);
+	glBindTexture(GL_TEXTURE_2D, Depth);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, Depth, 0);
+	GLfloat borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+
 	if (GL_FRAMEBUFFER_COMPLETE != glCheckFramebufferStatus(GL_FRAMEBUFFER))
 	{
 		throw std::runtime_error("Could not initialize UI Renderer!");
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	glm::mat4 view = glm::ortho(0.f, 0.f, (float)height, (float)width, 100.f, 0.f);
 }
 
 void UISpace::Render(uint target)
@@ -127,8 +138,13 @@ void UISpace::Render(uint target)
 	glBindVertexArray(VAO);
 	
 	glBindFramebuffer(GL_FRAMEBUFFER, UIBuffer);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	glDepthMask(GL_TRUE);
+	glDepthFunc(GL_LESS);
+	glDisable(GL_MULTISAMPLE);
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_ALWAYS);
 	for (const auto& c : TopLevel) {
 		c->TopLevel->Render();
 	}
@@ -146,9 +162,10 @@ void UISpace::Render(uint target)
 
 void UISpace::AddComponent(UI* com)
 {
-	com->TopLevel->UpdateMatrices(ScreenSize);
 	com->PreConstruct();
 	com->Construct();
+	if (com->TopLevel != nullptr)
+		com->TopLevel->UpdateMatrices(ScreenSize);
 	com->PostConstruct();
 	TopLevel.push_back(com);
 }

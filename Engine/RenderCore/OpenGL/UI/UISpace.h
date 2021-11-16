@@ -19,6 +19,7 @@ private:
 
 	uint UIBuffer;
 	uint Color;
+	uint Depth;
 	uint VAO;
 	uint VBO;
 	uint TBO;

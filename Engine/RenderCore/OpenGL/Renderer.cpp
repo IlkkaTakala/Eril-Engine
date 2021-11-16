@@ -1149,6 +1149,7 @@ void Renderer::Render(float delta)
 	//EnvReflection(width, height);
 
 	glViewport(0, 0, width, height);
+	glEnable(GL_DEPTH_TEST);
 	DepthBuffer->Bind();
 
 	PreDepth(width, height);
