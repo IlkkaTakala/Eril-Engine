@@ -171,8 +171,11 @@ void TestPlayer::RunInputS(float delta, bool KeyDown)
 
 void TestPlayer::RunInputSpace(float delta, bool KeyDown)
 {
-	if (!Movement->IsInAir() && KeyDown)
-		Movement->AddImpulse(Vector(0.f, 0.f, 300.f));
+	if (!Movement->IsInAir() && KeyDown) {
+		//Movement->SetBrake(0.1f);
+		//Movement->SetGravity(0.1f);
+		Movement->AddImpulse(Vector(0.f, 0.f, 0.f));
+	}
 }
 
 void TestPlayer::InputOne(float delta, bool KeyDown)
@@ -211,7 +214,7 @@ void TestPlayer::ItemThrowQ(float delta, bool KeyDown)
 		if (Items.size() > 0) {
 			auto it = SpawnObject<PlaceableItem>();
 			it->SetLocation(GetLocation());
-			it->Move->AddImpulse(Vector(0.f, 0.f, 300.f));
+			it->Move->AddImpulse(-GetCamera()->GetForwardVector() * 3000.f);
 			Items[0]->DestroyObject();
 			Items.erase(Items.begin());
 		}
@@ -285,7 +288,7 @@ void PlaceableItem::BeginPlay()
 {
 	Move = SpawnObject<MovementComponent>();
 	Move->SetTarget(this);
-	Move->SetBrake(0.2f);
+	Move->SetBrake(0.1f);
 	Mesh = SpawnObject<VisibleObject>();
 	AddComponent(Mesh);
 	Mesh->SetModel("candyCane");
