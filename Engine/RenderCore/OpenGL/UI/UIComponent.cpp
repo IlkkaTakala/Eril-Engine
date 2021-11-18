@@ -60,8 +60,8 @@ void UIComponent::UpdateMatrices(const Vector2D& size)
 	anchor_h;
 	anchor_v;
 	origin;
-	topOffset = 500.f;
-	rightOffset = 500.f;
+	topOffset = 50.f;
+	rightOffset = 10.f;
 
 	glm::vec3 scale(1.f);
 	if (anchor_v.X == anchor_v.Y)
