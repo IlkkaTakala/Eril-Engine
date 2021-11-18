@@ -18,14 +18,13 @@ ECSTesting::ECSTesting()
 	PositionComponent component;
 	componentManager->CreateComponentTypeStorage(component, "PositionComponent");
 
-
 	Entity* e1 = ECSEntityManager->AddEntity();
 	ECSEntityManager->AddComponentToEntity(e1->GetID(), component, "PositionComponent");
 	
 	//Component* comp;
 	// (e1->GetID(), "PositionComponent");
 	PositionComponent* pos = nullptr;
-	pos = static_cast<PositionComponent*>(ECSEntityManager->GetComponentFromEntity(e1->GetID(), "PositionComponent", component));
+	pos = static_cast<PositionComponent*>(ECSEntityManager->GetComponentFromEntity(e1->GetID(), "PositionComponent"));
 	// = static_cast<PositionComponent*>(comp)
 	if (pos != nullptr)
 	{
@@ -37,7 +36,7 @@ ECSTesting::ECSTesting()
 	
 	Entity* e2 = ECSEntityManager->AddEntity();
 	ECSEntityManager->AddComponentToEntity(e2->GetID(), component, "PositionComponent");
-	pos = static_cast<PositionComponent*>(ECSEntityManager->GetComponentFromEntity(e2->GetID(), "PositionComponent", component));
+	pos = static_cast<PositionComponent*>(ECSEntityManager->GetComponentFromEntity(e2->GetID(), "PositionComponent"));
 	if (pos != nullptr)
 	{
 		pos->x += 20.0f;
@@ -49,7 +48,7 @@ ECSTesting::ECSTesting()
 	
 	Entity* e3 = ECSEntityManager->AddEntity();
 	ECSEntityManager->AddComponentToEntity(e3->GetID(), component, "PositionComponent");
-	pos = static_cast<PositionComponent*>(ECSEntityManager->GetComponentFromEntity(e3->GetID(), "PositionComponent", component));
+	pos = static_cast<PositionComponent*>(ECSEntityManager->GetComponentFromEntity(e3->GetID(), "PositionComponent"));
 	if (pos != nullptr)
 	{
 		pos->x += 300.0f;
@@ -61,7 +60,7 @@ ECSTesting::ECSTesting()
 
 	Entity* e4 = ECSEntityManager->AddEntity();
 	ECSEntityManager->AddComponentToEntity(e4->GetID(), component, "PositionComponent");
-	pos = static_cast<PositionComponent*>(ECSEntityManager->GetComponentFromEntity(e4->GetID(), "PositionComponent", component));
+	pos = static_cast<PositionComponent*>(ECSEntityManager->GetComponentFromEntity(e4->GetID(), "PositionComponent"));
 	if (pos != nullptr)
 	{
 		pos->x += 4000.0f;

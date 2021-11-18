@@ -19,7 +19,7 @@ public:
 		for (auto e : entities)
 		{
 			PositionComponent component;
-			PositionComponent* pos = static_cast<PositionComponent*>(WorldEntityManager.GetComponentFromEntity(e, "PositionComponent", component));
+			PositionComponent* pos = static_cast<PositionComponent*>(WorldEntityManager.GetComponentFromEntity(e, "PositionComponent"));
 			if (pos != nullptr)
 			{
 				pos->x += 1.0f * deltaTime;

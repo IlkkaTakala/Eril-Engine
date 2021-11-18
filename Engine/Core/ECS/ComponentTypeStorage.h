@@ -1,12 +1,17 @@
 #pragma once
 /*
 Author: Albert Uusi-Illikainen [RabbitTortoise]
-11.11.2021, Last Edited 12.11.2021
+11.11.2021, Last Edited by RabbitTortoise 18.11.2021
 */
+
+
 
 #include <vector>
 #include <ECS/Component.h>
 
+/// <summary>
+/// This is used in storing all the components in different vectors.
+/// </summary>
 class IComponentStorage
 {
 public:
@@ -16,14 +21,18 @@ public:
 	int GetComponentCount() { return ComponentCount; }
 
 	virtual int AddComponent() = 0;
-	virtual Component* GetComponent(int id) = 0;
 	virtual bool RemoveComponent(int id) = 0;
+	virtual Component* GetComponent(int id) = 0;
 
 protected:
 	int Type;
 	int ComponentCount = 0;
 };
 
+/// <summary>
+/// This is used to get to store one type of component. It has methods for adding, removing and getting a single componet.
+/// </summary>
+/// <typeparam name="T"></typeparam>
 template <class T>
 class ComponentTypeStorage : public IComponentStorage
 {
@@ -41,6 +50,10 @@ public:
 		delete IndexUsage;
 	}
 
+	/// <summary>
+	/// Creates a new component to the vector.
+	/// </summary>
+	/// <returns>ID of the added component</returns>
 	int AddComponent()
 	{
 		int usedIndex = -1;
@@ -74,21 +87,38 @@ public:
 		return usedIndex;
 	}
 
+	/// <summary>
+	/// Gets a specific component based on given ID.
+	/// </summary>
+	/// <param name="id"></param>
+	/// <returns>Component of given ID, nullptr if the component of that ID was not found or if the component was disabled.</returns>
 	Component* GetComponent(int id)
 	{
 		if (id < static_cast<int>(Components->size()))
 		{
-			return Components->at(id).GetPointer();
+			if (IndexUsage->at(id))
+			{
+				return Components->at(id).GetPointer();
+			}
 		}
 		return nullptr;
 	}
 
+	/// <summary>
+	/// Removes a component with given ID. Note that because the components are stored in a continuous array, the component is only marked
+	/// as disabled, and only overwritten after a new component is added.
+	/// </summary>
+	/// <param name="id"></param>
+	/// <returns>Boolean based on if the component was removed successfully.</returns>
 	bool RemoveComponent(int id)
 	{
 		if (id < static_cast<int>(Components->size()))
 		{
-			IndexUsage->at(id) = false;
-			return true;
+			if (IndexUsage->at(id))
+			{
+				IndexUsage->at(id) = false;
+				return true;
+			}
 		}
 		return false;
 	}

@@ -1,14 +1,13 @@
 #pragma once
 /*
 Author: Albert Uusi-Illikainen [RabbitTortoise]
-5.11.2021
+5.11.2021, Last Edited by RabbitTortoise 18.11.2021
 */
 
-#include <vector>
+#include <map>
 
 class Entity
 {
-	friend class EntityManager;
 public:
 
 	Entity() { ID = -1;  bEnabled = false; };
@@ -17,8 +16,11 @@ public:
 
 	int GetID() { return ID; }
 	bool GetEnabled() { return bEnabled; }
-	std::vector<int>& GetComponents() { return Components; }
-	std::vector<int>& GetComponentTypes() { return ComponentTypes; }
+	/// <summary>
+	/// Return handles to every component the entity has.
+	/// </summary>
+	/// <returns>Map, First: Component ID, Second: Component Type.</returns>
+	std::map<int, int>& GetComponents() { return Components; }
 
 	void SetEnabled(bool enabled) { bEnabled = enabled; }
 	void SetID(int id) { ID = id; }
@@ -26,7 +28,9 @@ public:
 protected:
 	int ID;
 	bool bEnabled;
-	std::vector<int> Components;
-	std::vector<int> ComponentTypes;
+	/// <summary>
+	/// First: Component ID, Second: Component Type
+	/// </summary>
+	std::map<int, int> Components;
 };
 

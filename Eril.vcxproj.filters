@@ -97,12 +97,6 @@
     <ClCompile Include="Engine\external\glfw\deps\glad_gl.c">
       <Filter>Engine\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\ECS\ComponentManager.cpp">
-      <Filter>Engine\ECS</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Core\ECS\Component.cpp">
-      <Filter>Engine\ECS</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Core\ECS\EntityManager.cpp">
       <Filter>Engine\ECS</Filter>
     </ClCompile>

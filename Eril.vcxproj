@@ -203,8 +203,6 @@
   <ItemGroup>
     <ClCompile Include="Engine\Core\BasicTypes.cpp" />
     <ClCompile Include="Engine\Core\Core.cpp" />
-    <ClCompile Include="Engine\Core\ECS\Component.cpp" />
-    <ClCompile Include="Engine\Core\ECS\ComponentManager.cpp" />
     <ClCompile Include="Engine\Core\ECS\ECSWorldManager.cpp" />
     <ClCompile Include="Engine\Core\ECS\Entity.cpp" />
     <ClCompile Include="Engine\Core\ECS\EntityManager.cpp" />

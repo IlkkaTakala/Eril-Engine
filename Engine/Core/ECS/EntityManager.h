@@ -1,17 +1,16 @@
 #pragma once
 /*
 Author: Albert Uusi-Illikainen [RabbitTortoise]
-5.11.2021
+5.11.2021, Last Edited by RabbitTortoise 18.11.2021
 */
 
-#include "Core.h"
-#include "ECS/Entity.h"
-#include "ECS/ComponentManager.h"
+#include <Core.h>
+#include <ECS/Entity.h>
+#include <ECS/ComponentManager.h>
 #include <algorithm>
 
 class EntityManager
 {
-	friend class ECSWorldManager;
 public:
 	EntityManager(ComponentManager& componentManager) : WorldComponentManager(componentManager) {}
 
@@ -29,39 +28,33 @@ public:
 				int componentID = WorldComponentManager.AddComponent(component, typeName);
 				int componentType = WorldComponentManager.GetTypeIdByName(typeName);
 
-				Entities.at(entityIndex)->GetComponents().push_back(componentID);
-				Entities.at(entityIndex)->GetComponentTypes().push_back(componentType);
+				Entities.at(entityIndex)->GetComponents().insert(std::pair<int, int>(componentID, componentType));
+				//Entities.at(entityIndex)->GetComponents().push_back(componentID);
+				//Entities.at(entityIndex)->GetComponentTypes().push_back(componentType);
 				return true;
 			}
 		}
 		return false;
 	}
-	template <typename T>
-	Component* GetComponentFromEntity(int entityIndex, String componentType, T type)
+	//template <typename T>
+	Component* GetComponentFromEntity(int entityIndex, String componentType)
 	{
 		int typeID = WorldComponentManager.GetTypeIdByName(componentType);
 
 		Entity* entity = GetEntity(entityIndex);
 		if (entity != nullptr)
 		{
-			bool componentFound = false;
-			int componentID = 0;
 
-			for (auto c : entity->GetComponentTypes())
+			for (auto &c : entity->GetComponents())
 			{
-				if (c == typeID)
+				if (c.second == typeID)
 				{
-					componentFound = true;
+					Component* component = WorldComponentManager.GetComponent(entity->GetComponents().at(c.first), componentType);
+					if (component != nullptr)
+					{
+						return component;
+					}
 					break;
-				}
-				componentID++;
-			}
-			if (componentFound)
-			{
-				Component* component = WorldComponentManager.GetComponent(entity->GetComponents().at(componentID), componentType, type);
-				if (component != nullptr)
-				{
-					return component;
 				}
 			}
 		}

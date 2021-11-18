@@ -1,9 +1,9 @@
 /*
 Author: Albert Uusi-Illikainen [RabbitTortoise]
-5.11.2021
+5.11.2021, Last Edited by RabbitTortoise 18.11.2021
 */
 
-#include "EntityManager.h"
+#include <ECS/EntityManager.h>
 
 
 Entity* EntityManager::AddEntity()
@@ -32,8 +32,8 @@ Entity* EntityManager::AddEntity()
 		IndexUsage.at(usedIndex) = true;
 	}
 
-	entity->bEnabled = true;
-	entity->ID = usedIndex;
+	entity->SetEnabled(true);
+	entity->SetID(usedIndex);
 
 	return entity;
 }
@@ -143,15 +143,15 @@ std::vector<int> EntityManager::QueryEntitiesByType(std::vector<int> allowedType
 	bool found = false;
 	for (auto e : Entities)
 	{
-		if (e->bEnabled)
+		if (e->GetEnabled())
 		{
-			for (auto t : e->ComponentTypes)
+			for (auto t : e->GetComponents())
 			{
 				for (auto allowed : allowedTypes)
 				{
-					if (allowed == t)
+					if (allowed == t.second)
 					{
-						query.push_back(e->ID);
+						query.push_back(e->GetID());
 						break;
 					}
 				}
