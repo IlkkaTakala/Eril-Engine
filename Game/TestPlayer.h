@@ -81,6 +81,10 @@ private:
 	Ref<InstancedObject> Trees2;
 	Ref<InstancedObject> Grass;
 	Ref<InstancedObject> Flowers;
+	Ref<InstancedObject> Rocks;
+	Ref<InstancedObject> Shacks;
+
+
 	Ref<VisibleObject> Sky;
 
 	Ref<Terrain> terra[4];

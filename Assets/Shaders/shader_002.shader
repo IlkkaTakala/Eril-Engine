@@ -232,6 +232,22 @@ void main()
 				radiance = light.color.rgb * attenuation;
 				
 			} break;
+			
+			case 2:
+			{
+				L = normalize(light.positionAndSize.xyz - fs_in.FragPos.xyz);
+				H = normalize(V + L);
+				
+				float theta = dot(L , normalize(-light.rotation.xyz));
+				
+				if(theta > light.positionAndSize.w){
+					float epsilon = light.positionAndSize.w - (10.0 - light.positionAndSize.w);
+					float intensity = clamp((theta - (10.0 - light.positionAndSize.w)) / epsilon, 0.0, 1.0);
+					radiance = light.color.rgb * intensity;
+				}
+				else radiance = vec3 (0.0);
+			
+			} break;
 		}
 		
 		vec3 F0 = vec3(0.04); 

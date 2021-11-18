@@ -55,8 +55,16 @@ TestPlayer::TestPlayer() : Player()
 	Sky->SetModel(MI->LoadData(Sky, "SkySphere"));
 	Sky->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/Sky"));
 	
+	/*auto SpotLight = SpawnObject<Light>();
+	SpotLight->Data.Location = GetCamera()->GetLocation();
+	SpotLight->Data.Type = LIGHT_SPOT;
+	SpotLight->Data.Size = 0.5f;
+	SpotLight->Data.Intensity = 5.f;
+	SpotLight->Data.Color = Vector(1.f);
+	SpotLight->Data.Rotation = Vector(45.0, 45.0, 45.0);*/
+
 	{
-		/*Trees = SpawnObject<InstancedObject>();
+		Trees = SpawnObject<InstancedObject>();
 		Trees->SetModel(MI->LoadData(Trees, "tree"));
 		Trees->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/tree"));
 		Trees->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Assets/Materials/leaves"));
@@ -73,40 +81,61 @@ TestPlayer::TestPlayer() : Player()
 			arr[i].Scale = Vector(s);
 		}
 		Trees->AddInstances(count, arr);
+		delete[] arr;
 		
-		Trees2 = SpawnObject<InstancedObject>();
-		Trees2->SetModel(MI->LoadData(Trees2, "tree2"));
-		Trees2->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/tree"));
-		Trees2->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Assets/Materials/leaves2"));
-		Trees2->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
+		
+		Rocks = SpawnObject<InstancedObject>();
+		Rocks->SetModel(MI->LoadData(Rocks, "rock"));
+		Rocks->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/rock"));
+		Rocks->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
 
+		count = 20;
+		arr = new Transformation[count]();
 		for (int i = 0; i < count; i++)
 		{
 			float x = rand() % 100 - 50.f;
 			float y = rand() % 100 - 50.f;
-			float s = (1.f - rand() / (float)RAND_MAX * 0.7f) * 1.5f;
-			arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y) - 0.2f);
-			arr[i].Scale = Vector(s);
+			arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y) + 0.6f);
+			arr[i].Scale = Vector(1.0f);
 		}
-		Trees2->AddInstances(count, arr);
+		Rocks->AddInstances(count, arr);
 		delete[] arr;
 
-		Grass = SpawnObject<InstancedObject>();
+
+		Shacks = SpawnObject<InstancedObject>();
+		Shacks->SetModel(MI->LoadData(Shacks, "shack"));
+		Shacks->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/rock"));
+		Shacks->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Assets/Materials/tree"));
+		Shacks->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
+
+		count = 10;
+		arr = new Transformation[count]();
+		for (int i = 0; i < count; i++)
+		{
+			float x = rand() % 100 - 50.f;
+			float y = rand() % 100 - 50.f;
+			arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y) + 0.1f);
+			arr[i].Scale = Vector(1.0f);
+		}
+		Shacks->AddInstances(count, arr);
+		delete[] arr;
+
+
+		/*Grass = SpawnObject<InstancedObject>();
 		Grass->SetModel(MI->LoadData(Grass, "grass"));
 		Grass->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/grass"));
 		Grass->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
 
-		count = 1000;
+		count = 10000;
 		arr = new Transformation[count]();
 
 		for (int i = 0; i < count; i++)
 		{
 			float x = rand() % 100 - 50.f;
 			float y = rand() % 100 - 50.f;
-			float s = (1.f - rand() / (float)RAND_MAX * 0.7f) * 1.5f;
 			Vector normal = terra[0]->GetNormal(x, y);
 			arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y)) - normal * 0.1;
-			arr[i].Scale = Vector(1.f);
+			arr[i].Scale = Vector(0.5f);
 			Vector up(0.f, 0.f, 1.f);
 			Vector axis = Vector::Cross(normal, up).Normalize();
 			float angle = acos(Vector::Dot(up, normal));
@@ -115,13 +144,14 @@ TestPlayer::TestPlayer() : Player()
 		Grass->AddInstances(count, arr);
 		delete[] arr;*/
 
+
 		Flowers = SpawnObject<InstancedObject>();
 		Flowers->SetModel(MI->LoadData(Flowers, "candyCane"));
 		Flowers->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/rock"));
 		Flowers->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
 
-		int count = 100;
-		Transformation* arr = new Transformation[count]();
+		count = 100;
+		arr = new Transformation[count]();
 		for (int i = 0; i < count; i++)
 		{
 			float x = rand() % 100 - 50.f;
