@@ -20,7 +20,7 @@
 
 ## objective
 
-- collect 5 candy canes and feed them to ghost to win
+- collect 5 candy canes and throw them at ghost to win
 
 ## assets
 
@@ -28,9 +28,19 @@
 - add rocks
 - add shack
 
+## scene
+
+- trees, rocks, shacks
+- dark
+
 
 # 2D demo game
 
-- 
+- player is stick man
+- spikes
+- balls
+- get to home
+- falling platforms
+- birds
 
 
