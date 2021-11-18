@@ -290,11 +290,15 @@ struct Vector2D
 
 	Vector2D() { X = 0, Y = 0; }
 	Vector2D(long X, long Y) : X(X), Y(Y) {};
+	Vector2D(uint X, uint Y) : X(X), Y(Y) {};
+	Vector2D(float X, float Y) : X(long(X)), Y(long(Y)) {};
 
 	Vector2D operator+(const Vector2D& obj) { return Vector2D(X + obj.X, Y + obj.Y); }
 	Vector2D operator-(const Vector2D& obj) { return Vector2D(X - obj.X, Y - obj.Y); }
 	Vector2D operator*(const Vector2D& obj) { return Vector2D(X * obj.X, Y * obj.Y); }
-	Vector2D operator/(const Vector2D& obj) { return Vector2D(X / obj.X, Y / obj.Y); }
+	friend Vector2D operator*(const Vector2D& lhs, float rhs) { return Vector2D(lhs.X * rhs, lhs.Y * rhs); }
+	friend Vector2D operator/(const Vector2D& lhs, const Vector2D& rhs) { return Vector2D(lhs.X / rhs.X, lhs.Y / rhs.Y); }
+	friend Vector2D operator/(const Vector2D& lhs, const float rhs) { return Vector2D(lhs.X / rhs, lhs.Y / rhs); }
 
 	friend bool operator==(const Vector2D& obj, const Vector2D& obj2) { return obj2.X == obj.X && obj2.Y == obj.Y; }
 };
