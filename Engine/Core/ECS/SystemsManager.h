@@ -11,7 +11,7 @@ class SystemsManager
 {
 	friend class ECSWorldManager;
 public:
-	SystemsManager(EntityManager& entityManager, ComponentManager& componentManager) 
+	SystemsManager(EntityManager* entityManager, ComponentManager* componentManager) 
 		: WorldEntityManager(entityManager), WorldComponentManager(componentManager) {}
 	int AddSystem(System* system);
 	bool DisableSystem(int systemIndex);
@@ -21,8 +21,8 @@ public:
 
 
 protected:
-	EntityManager& WorldEntityManager;
-	ComponentManager& WorldComponentManager;
+	EntityManager* WorldEntityManager;
+	ComponentManager* WorldComponentManager;
 	std::vector<System*> Systems;
 };
 

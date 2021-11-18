@@ -26,7 +26,7 @@ bool SystemsManager::AddWantedComponentType(int systemIndex, String componentTyp
 {
 	if (systemIndex < Systems.size())
 	{
-		int typeIndex = WorldComponentManager.GetTypeIdByName(componentType);
+		int typeIndex = WorldComponentManager->GetTypeIdByName(componentType);
 		if (typeIndex != -1)
 		{
 			Systems.at(systemIndex)->TypesWanted.push_back(typeIndex);
@@ -42,7 +42,7 @@ void SystemsManager::UpdateSystems(float deltaTime)
 	{
 		if (Systems.at(i)->bEnabled)
 		{
-			Systems.at(i)->Update(deltaTime, WorldEntityManager.QueryEntitiesByType(Systems.at(i)->TypesWanted));
+			Systems.at(i)->Update(deltaTime, WorldEntityManager->QueryEntitiesByType(Systems.at(i)->TypesWanted));
 		}
 	}
 }

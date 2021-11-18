@@ -14,16 +14,14 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 class Component
 {
 public:
-	Component() { Init(); }
+	Component() { ID = -1; Type = -1; Disabled = false;  Console::Log("Component init()"); }
 	~Component() {}
-
-	virtual void Init() { ID = -1; Type = -1; Disabled = false; };
 
 	int GetID() { return ID; }
 	int GetType() { return Type; }
 
-	void SetType(int type) { Type = type; }
 	void SetID(int id) { ID = id; }
+	void SetType(int type) { Type = type; }
 	void SetDisabled(){ Disabled = true; }
 
 	Component* GetPointer() { return this; }

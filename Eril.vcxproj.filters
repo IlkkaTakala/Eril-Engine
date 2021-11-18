@@ -100,16 +100,10 @@
     <ClCompile Include="Engine\Core\ECS\EntityManager.cpp">
       <Filter>Engine\ECS</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\ECS\Entity.cpp">
-      <Filter>Engine\ECS</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Core\ECS\SystemsManager.cpp">
       <Filter>Engine\ECS</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Core\ECS\System.cpp">
-      <Filter>Engine\ECS</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Core\ECS\ECSWorldManager.cpp">
       <Filter>Engine\ECS</Filter>
     </ClCompile>
     <ClCompile Include="Game\ECSTesting.cpp">
@@ -126,6 +120,9 @@
     </ClCompile>
     <ClCompile Include="Engine\Interface\IECS.cpp">
       <Filter>Engine\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\ECS\ComponentManager.cpp">
+      <Filter>Engine\ECS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -276,9 +273,6 @@
       <Filter>Engine\ECS</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\ECS\System.h">
-      <Filter>Engine\ECS</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Core\ECS\ECSWorldManager.h">
       <Filter>Engine\ECS</Filter>
     </ClInclude>
     <ClInclude Include="Game\ECSTesting.h">

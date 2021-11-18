@@ -11,7 +11,7 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 
 ECSTesting::ECSTesting()
 {
-	
+	Console::Log("ECSTesting");
 	EntityManager* ECSEntityManager = IECS::GetEntityManager();
 	ComponentManager* componentManager = IECS::GetComponentManager();
 
@@ -19,36 +19,55 @@ ECSTesting::ECSTesting()
 	componentManager->CreateComponentTypeStorage(component, "PositionComponent");
 
 	Entity* e1 = ECSEntityManager->AddEntity();
-	ECSEntityManager->AddComponentToEntity(e1->GetID(), component, "PositionComponent");
+	int cID = ECSEntityManager->CreateNewComponentToEntity(e1->GetID(), "PositionComponent");
+	Console::Log(std::to_string(cID));
 	
 	//Component* comp;
 	// (e1->GetID(), "PositionComponent");
 	PositionComponent* pos = nullptr;
 	pos = static_cast<PositionComponent*>(ECSEntityManager->GetComponentFromEntity(e1->GetID(), "PositionComponent"));
-	// = static_cast<PositionComponent*>(comp)
+	
+
+	const void* address = static_cast<const void*>(pos);
+	std::stringstream ss;
+	ss << address;
+	std::string name = ss.str();
+
+
 	if (pos != nullptr)
 	{
 		pos->x += 1.0f;
 		pos->y += 1.0f;
 		pos->z += 1.0f;
-		Console::Log( std::to_string(pos->x) + "," + std::to_string(pos->y) + "," + std::to_string(pos->z));
+		Console::Log(name + ": " + std::to_string(pos->x) + "," + std::to_string(pos->y) + "," + std::to_string(pos->z));
 	}
 	
 	Entity* e2 = ECSEntityManager->AddEntity();
-	ECSEntityManager->AddComponentToEntity(e2->GetID(), component, "PositionComponent");
+	cID = ECSEntityManager->CreateNewComponentToEntity(e2->GetID(), "PositionComponent");
+	Console::Log(std::to_string(cID));
+
 	pos = static_cast<PositionComponent*>(ECSEntityManager->GetComponentFromEntity(e2->GetID(), "PositionComponent"));
+
+
+	address = static_cast<const void*>(pos);
+	std::stringstream ss2;
+	ss2 << address;
+	name = ss2.str();
+
 	if (pos != nullptr)
 	{
 		pos->x += 20.0f;
 		pos->y += 20.0f;
 		pos->z += 20.0f;
 
-		Console::Log(std::to_string(pos->x) + "," + std::to_string(pos->y) + "," + std::to_string(pos->z));
+		Console::Log(name + ": " + std::to_string(pos->x) + "," + std::to_string(pos->y) + "," + std::to_string(pos->z));
 	}
 	
 	Entity* e3 = ECSEntityManager->AddEntity();
-	ECSEntityManager->AddComponentToEntity(e3->GetID(), component, "PositionComponent");
+	cID = ECSEntityManager->CreateNewComponentToEntity(e3->GetID(), "PositionComponent");
 	pos = static_cast<PositionComponent*>(ECSEntityManager->GetComponentFromEntity(e3->GetID(), "PositionComponent"));
+	Console::Log(std::to_string(cID));
+
 	if (pos != nullptr)
 	{
 		pos->x += 300.0f;
@@ -59,8 +78,10 @@ ECSTesting::ECSTesting()
 	}
 
 	Entity* e4 = ECSEntityManager->AddEntity();
-	ECSEntityManager->AddComponentToEntity(e4->GetID(), component, "PositionComponent");
+	cID = ECSEntityManager->CreateNewComponentToEntity(e4->GetID(), "PositionComponent");
 	pos = static_cast<PositionComponent*>(ECSEntityManager->GetComponentFromEntity(e4->GetID(), "PositionComponent"));
+	Console::Log(std::to_string(cID));
+
 	if (pos != nullptr)
 	{
 		pos->x += 4000.0f;

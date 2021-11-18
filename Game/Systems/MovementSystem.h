@@ -10,7 +10,10 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 class MovementSystem : public System
 {
 public:
-	MovementSystem(EntityManager& entityManager) : System(entityManager) {}
+	MovementSystem(EntityManager& entityManager) : System(entityManager) 
+	{
+		Console::Log("MovementSystem Constructor");
+	}
 
 	void Update(float deltaTime, std::vector<int> entities) override
 	{
@@ -18,7 +21,6 @@ public:
 
 		for (auto e : entities)
 		{
-			PositionComponent component;
 			PositionComponent* pos = static_cast<PositionComponent*>(WorldEntityManager.GetComponentFromEntity(e, "PositionComponent"));
 			if (pos != nullptr)
 			{
@@ -26,7 +28,7 @@ public:
 				pos->y += 1.0f * deltaTime;
 				pos->z += 1.0f * deltaTime;
 
-				Console::Log(std::to_string(pos->x) + "," + std::to_string(pos->y) + "," + std::to_string(pos->z));
+				//Console::Log(std::to_string(pos->x) + "," + std::to_string(pos->y) + "," + std::to_string(pos->z));
 			}
 			else
 			{
@@ -37,5 +39,4 @@ public:
 
 
 private:
-
 };

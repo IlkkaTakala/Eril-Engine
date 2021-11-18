@@ -50,6 +50,24 @@ Entity* EntityManager::GetEntity(int entityIndex)
 	return nullptr;
 }
 
+
+bool EntityManager::RemoveEntity(Entity*& entity)
+{
+	int id = entity->GetID();
+	for (int i = 0; i < IndexUsage.size(); i++)
+	{
+		if (IndexUsage.at(id))
+		{
+			delete Entities.at(id);
+			Entities.at(id) = nullptr;
+			IndexUsage.at(id) = false;
+			entity = nullptr;
+			return true;
+		}
+	}
+	return false;
+}
+
 bool EntityManager::RemoveEntity(int entityIndex)
 {
 	if (entityIndex < IndexUsage.size())
@@ -65,77 +83,65 @@ bool EntityManager::RemoveEntity(int entityIndex)
 	return false;
 }
 
-bool EntityManager::RemoveEntity(Entity& entity)
-{
-	for (int i = 0; i < IndexUsage.size(); i++)
-	{
-		if (IndexUsage.at(entity.GetID()))
-		{
-			int id = entity.GetID();
-			delete Entities.at(id);
-			Entities.at(id) = nullptr;
-			IndexUsage.at(id) = false;
-			return true;
-		}
-	}
-	return false;
-}
 
-/*
-bool EntityManager::AddComponentToEntity( int entityIndex, Component* component, String typeName)
+int EntityManager::CreateNewComponentToEntity(int entityIndex, String typeName)
 {
-	if (entityIndex < IndexUsage.size())
+	if (entityIndex < static_cast<int>(IndexUsage.size()))
 	{
 		if (IndexUsage.at(entityIndex))
 		{
-			int componentID = WorldComponentManager.AddComponent(component, typeName);
-			int componentType = WorldComponentManager.GetTypeByName(typeName);
-
-			Entities.at(entityIndex)->GetComponents().push_back(componentID);
-			Entities.at(entityIndex)->GetComponentTypes().push_back(componentType);
-			return true;
+			int componentID = WorldComponentManager->CreateNewComponentOfType(typeName);
+			int componentType = WorldComponentManager->GetTypeIdByName(typeName);
+			Entities.at(entityIndex)->GetComponents().insert(std::pair<int, int>(componentID, componentType));
+			return componentID;
 		}
 	}
-	return false;
+	return -1;
+}
+
+int EntityManager::CreateNewComponentToEntity(int entityIndex, int componentTypeID)
+{
+	if (entityIndex < static_cast<int>(IndexUsage.size()))
+	{
+		if (IndexUsage.at(entityIndex))
+		{
+			int componentID = WorldComponentManager->CreateNewComponentOfType(componentTypeID);
+			Entities.at(entityIndex)->GetComponents().insert(std::pair<int, int>(componentID, componentTypeID));
+			return componentID;
+		}
+	}
+	return -1;
 }
 
 
 Component* EntityManager::GetComponentFromEntity(int entityIndex, String componentType)
 {
-	
-	int typeID = WorldComponentManager.GetTypeByName(componentType);
+	int typeID = WorldComponentManager->GetTypeIdByName(componentType);
 
 	Entity* entity = GetEntity(entityIndex);
 	if (entity != nullptr)
 	{
-		bool componentFound = false;
-		for (auto c : entity->GetComponentTypes())
+
+		for (auto& c : entity->GetComponents())
 		{
-			if (c == typeID)
+			if (c.second == typeID)
 			{
-				componentFound = true;
-				break;
-			}
-		}
-		if (componentFound)
-		{
-			for (auto c : entity->GetComponents())
-			{
-				Component* component = WorldComponentManager.GetComponent(c, componentType);
+				Component* component = WorldComponentManager->GetComponent(entity->GetComponents().at(c.first), componentType);
 				if (component != nullptr)
 				{
-					if (component->GetType() == typeID)
-					{
-						return component;
-					}
+					return component;
 				}
+				break;
 			}
 		}
 	}
 	return nullptr;
-	
 }
-*/
+
+bool EntityManager::RemoveComponentFromEntity(int entityIndex, String componentType)
+{
+	return false;
+}
 
 std::vector<int> EntityManager::QueryEntitiesByType(std::vector<int> allowedTypes)
 {
@@ -159,4 +165,15 @@ std::vector<int> EntityManager::QueryEntitiesByType(std::vector<int> allowedType
 		}
 	}
 	return query;
+}
+
+
+/// <summary>
+/// Return typeName as an integer.
+/// </summary>
+/// <param name="typeName"></param>
+/// <returns></returns>
+int EntityManager::GetTypeIdByName(String typeName)
+{
+	return WorldComponentManager->GetTypeIdByName(typeName);
 }

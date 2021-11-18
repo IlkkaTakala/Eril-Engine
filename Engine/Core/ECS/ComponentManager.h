@@ -20,7 +20,6 @@ class ComponentManager
 public:
 	ComponentManager() {};
 	~ComponentManager() {};
-	
 
 	/// <summary>
 	/// Creates a new storage for given type of components. Note that the given typeName is the identifier which can be used to
@@ -32,6 +31,7 @@ public:
 	template <typename T>
 	void CreateComponentTypeStorage(T &baseType, String typeName)
 	{
+		Console::Log("CreateComponentTypeStorage");
 		TypeNames.insert(std::pair<String, int>(typeName, typeCount));
 		componentStorages.push_back(new ComponentTypeStorage<T>(typeCount));
 		typeCount++;
@@ -42,63 +42,25 @@ public:
 	/// </summary>
 	/// <param name="typeName"></param>
 	/// <returns></returns>
-	int GetTypeIdByName(String typeName)
-	{
-		std::map<String, int>::iterator it = TypeNames.find(typeName);
-		if (it != TypeNames.end())
-		{
-			return it->second;
-		}
-		return -1;
-	}
+	int GetTypeIdByName(String typeName);
+	
 
 protected:
 	/// <summary>
 	/// Adds a new component. Note that when adding a new component the system does not copy the component data.
 	/// It only initializes its type and id and calls the component's Init()-method.
 	/// </summary>
-	/// <typeparam name="T">Type of the component</typeparam>
-	/// <param name="component"></param>
 	/// <param name="typeName"></param>
 	/// <returns>ID of the created component.</returns>
-	template <typename T>
-	int AddComponent(T& component, String typeName)
-	{
-		int typeID = GetTypeIdByName(typeName);
-		for (int i = 0; i < componentStorages.size(); i++)
-		{
-			if (componentStorages.at(i)->GetType() == typeID)
-			{
-				//component.Type = componentStorages.at(i)->GetType();
-				ComponentTypeStorage<T>* s = static_cast<ComponentTypeStorage<T>*>(componentStorages.at(i));
-				return s->AddComponent();
-			}
-		}
-		return -1;
-	}
+	int CreateNewComponentOfType(String typeName);
 
 	/// <summary>
 	/// Adds a new component. Note that when adding a new component the system does not copy the component data.
 	/// It only initializes its type and id and calls the component's Init()-method.
 	/// </summary>
-	/// <typeparam name="T">Type of the component</typeparam>
-	/// <param name="component"></param>
 	/// <param name="typeName"></param>
 	/// <returns>ID of the created component.</returns>
-	template <typename T>
-	int AddComponent(T& component, int typeID)
-	{
-		for (int i = 0; i < componentStorages.size(); i++)
-		{
-			if (componentStorages.at(i)->GetType() == typeID)
-			{
-				//component.Type = componentStorages.at(i)->GetType();
-				ComponentTypeStorage<T>* s = static_cast<ComponentTypeStorage<T>*>(componentStorages.at(i));
-				return s->AddComponent();
-			}
-		}
-		return -1;
-	}
+	int CreateNewComponentOfType(int typeID);
 
 	/// <summary>
 	/// Returns the component of given id and type
@@ -106,18 +68,7 @@ protected:
 	/// <param name="id"></param>
 	/// <param name="typeName"></param>
 	/// <returns></returns>
-	Component* GetComponent(int id, String typeName)
-	{
-		int typeID = GetTypeIdByName(typeName);
-		for (int i = 0; i < componentStorages.size(); i++)
-		{
-			if (componentStorages.at(i)->GetType() == typeID)
-			{
-				return componentStorages.at(i)->GetComponent(id);
-			}
-		}
-		return nullptr;
-	}
+	Component* GetComponent(int id, String typeName);
 
 	/// <summary>
 	/// Returns the component of given id and type
@@ -125,17 +76,7 @@ protected:
 	/// <param name="id"></param>
 	/// <param name="typeID"></param>
 	/// <returns></returns>
-	Component* GetComponent(int id, int typeID)
-	{
-		for (int i = 0; i < componentStorages.size(); i++)
-		{
-			if (componentStorages.at(i)->GetType() == typeID)
-			{
-				return componentStorages.at(i)->GetComponent(id);
-			}
-		}
-		return nullptr;
-	}
+	Component* GetComponent(int id, int typeID);
 
 	/// <summary>
 	/// Removes a component with given ID and type. Note that because the components are stored in a continuous array, the component is only marked
@@ -144,18 +85,7 @@ protected:
 	/// <param name="id"></param>
 	/// <param name="typeName"></param>
 	/// <returns></returns>
-	bool RemoveComponent(int id, String typeName)
-	{
-		int typeID = GetTypeIdByName(typeName);
-		for (int i = 0; i < componentStorages.size(); i++)
-		{
-			if (componentStorages.at(i)->GetType() == typeID)
-			{
-				return componentStorages.at(i)->RemoveComponent(id);
-			}
-		}
-		return false;
-	}
+	bool RemoveComponent(int id, String typeName);
 
 	/// <summary>
 	/// Removes a component with given ID and type. Note that because the components are stored in a continuous array, the component is only marked
@@ -164,19 +94,7 @@ protected:
 	/// <param name="id"></param>
 	/// <param name="typeID"></param>
 	/// <returns></returns>
-	bool RemoveComponent(int id, int typeID)
-	{
-		for (int i = 0; i < componentStorages.size(); i++)
-		{
-			if (componentStorages.at(i)->GetType() == typeID)
-			{
-				return componentStorages.at(i)->RemoveComponent(id);
-			}
-		}
-		return false;
-	}
-
-
+	bool RemoveComponent(int id, int typeID);
 
 private:
 	//Storage varables.

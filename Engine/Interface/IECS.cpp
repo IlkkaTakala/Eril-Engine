@@ -26,8 +26,8 @@ namespace IECS
 	void Init()
 	{
 		WorldComponentManager = new ComponentManager();
-		WorldEntityManager = new EntityManager(*WorldComponentManager);
-		WorldSystemsManager = new SystemsManager(*WorldEntityManager, *WorldComponentManager);
+		WorldEntityManager = new EntityManager(WorldComponentManager);
+		WorldSystemsManager = new SystemsManager(WorldEntityManager, WorldComponentManager);
 
 		//In-engine component, entity and system setup
 		LightControllerSystem* lightController = new LightControllerSystem(*WorldEntityManager);

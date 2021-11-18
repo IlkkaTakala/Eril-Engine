@@ -56,9 +56,8 @@ public:
 	/// <returns>ID of the added component</returns>
 	int AddComponent()
 	{
+		Console::Log("Adding components");
 		int usedIndex = -1;
-		T component;
-		component.SetType(Type);
 
 		for (int i = 0; i < static_cast<int>(IndexUsage->size()); i++)
 		{
@@ -71,18 +70,20 @@ public:
 		if (usedIndex == -1)
 		{
 			usedIndex = static_cast<int>(IndexUsage->size());
-			component.SetID(usedIndex);
-			Components->push_back(component);
-			Components->at(usedIndex).Init();
+			Components->emplace_back();
+			Components->at(usedIndex).SetID(usedIndex);
+			Components->at(usedIndex).SetType(Type);
 			IndexUsage->push_back(true);
 		}
 		else
 		{
-			component.SetID(usedIndex);
-			Components->at(usedIndex) = component;
-			Components->at(usedIndex).Init();
-			IndexUsage->at(usedIndex) = true;
+			Components->emplace_back();
+			Components->at(usedIndex).SetID(usedIndex);
+			Components->at(usedIndex).SetType(Type);
+			IndexUsage->push_back(true);
 		}
+
+		Console::Log("Component " + std::to_string(usedIndex) + " created to type " + std::to_string(this->Type));
 		ComponentCount++;
 		return usedIndex;
 	}
