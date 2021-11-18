@@ -52,6 +52,7 @@ public:
 	virtual void BeginPlay() = 0;
 	virtual void OnDestroyed() {};
 	Scene* GetScene() const { return World; }
+	virtual void LoadWithParameters(const String& args) {}
 
 protected:
 	virtual ~BaseObject() {};

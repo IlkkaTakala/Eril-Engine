@@ -26,7 +26,7 @@ void MovementComponent::OnDestroyed()
 
 void MovementComponent::Tick(float time)
 {
-	if (!allowMovement) return;
+	if (!allowMovement || Object == nullptr) return;
 	DesiredState.location = Object->GetLocation();
 	OldState = DesiredState;
 	if (Object == nullptr) return;
@@ -102,6 +102,6 @@ void MovementComponent::SetGround(Terrain* t)
 
 void MovementComponent::ApplyMovement()
 {
-	if (!allowMovement) return;
+	if (!allowMovement || Object == nullptr) return;
 	Object->SetLocation(DesiredState.location);
 }

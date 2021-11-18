@@ -5,7 +5,7 @@
 long ObjectManager::counter = 1;
 RecordInt ObjectManager::Prepared = 0;
 std::map<RecordInt, Record*> ObjectManager::ObjectRecords;
-std::map<String, BaseObject* (*)(uint32, uint, bool, uint16)> ObjectManager::TypeList;
+std::map<String, BaseObject* (*)(const String&, uint32, uint, bool, uint16)> ObjectManager::TypeList;
 std::list<RecordInt> ObjectManager::DeleteList;
 std::mutex ObjectManager::delete_m;
 
@@ -102,7 +102,7 @@ void ObjectManager::DeleteListed()
 	DeleteList.clear();
 }
 
-bool ObjectManager::PrepareRecord(uint32 ID, uint SpawnType, bool isServer, uint16 mod)
+bool ObjectManager::PrepareRecord(const uint32 ID, const uint SpawnType, const bool isServer, const uint16 mod)
 {
 	RecordInt r(ID, SpawnType, isServer, mod);
 	if (ObjectRecords.find(r) == ObjectRecords.end()) {

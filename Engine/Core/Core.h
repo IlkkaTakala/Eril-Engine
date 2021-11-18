@@ -112,15 +112,17 @@ public:
 
 namespace helpers{
 	
-	bool helper(BaseObject* base);
+	bool helper(BaseObject* base, const String& args = "");
 
 	template <typename T>
-	BaseObject* invokeCreate(uint32 ID = 0, uint SpawnType = Constants::Record::SPAWNED, bool isServer = false, uint16 mod = 0) {
-		if (ID != 0) ObjectManager::PrepareRecord(ID, SpawnType, isServer, mod);
+	BaseObject* invokeCreate(const String& args, uint32 ID, uint SpawnType, bool isServer, uint16 mod) {
+		if (ID != 0) {
+			ObjectManager::PrepareRecord(ID, SpawnType, isServer, mod);
+		}
 		Ref<T> next = new T();
 		//ObjectManager::CreateRecord(next, 0, Constants::Record::LOADED);
 		BaseObject* base = dynamic_cast<BaseObject*>(next.GetPointer());
-		if (!helper(base)) next->DestroyObject();
+		if (!helper(base, args)) next->DestroyObject();
 		return next;
 	}
 }
@@ -147,5 +149,7 @@ T* SpawnObject(uint32 ID = 0)
 	if (!helpers::helper(base)) next->DestroyObject();
 	return next;
 }
+
+BaseObject* SpawnObject(String type);
 
 GameState* GetGameState();

@@ -49,9 +49,9 @@ public:
 
 	static void DeleteListed();
 
-	static bool PrepareRecord(uint32 ID, uint SpawnType = Constants::Record::SPAWNED, bool isServer = false, uint16 mod = 0);
+	static bool PrepareRecord(const uint32 ID, const uint SpawnType = Constants::Record::SPAWNED, const bool isServer = false, const uint16 mod = 0);
 
-	static std::map<String, BaseObject* (*)(uint32, uint, bool, uint16)> TypeList;
+	static std::map<String, BaseObject* (*)(const String&, uint32, uint, bool, uint16)> TypeList;
 private:
 	friend class GC;
 	static long counter;

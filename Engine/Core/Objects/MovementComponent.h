@@ -23,9 +23,11 @@ struct State
 
 class MovementComponent : public BaseObject, public Tickable
 {
+	REGISTER(MovementComponent);
 public:
 	MovementComponent();
 
+	virtual void LoadWithParameters(const String& args) override { Console::Log(args); }
 	virtual void OnDestroyed() override;
 
 	virtual void BeginPlay() override {}
