@@ -9,11 +9,7 @@
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
 	WindowManager::SetInstance(hInstance);
-	Console::Init();
-	Console::Log("Hello, startup\n");
-	for (int i = 0; i < 100; i++) {
-		Console::Log("Console line " + std::to_string(i));
-	}
+	Console::Log("Hello, Eril is starting");
 	Console::Error("This world is an error");
 	GameLoop* Game = new GameLoop();
 	if (InterfaceInit()) return 11;
@@ -22,15 +18,15 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	switch (retur)
 	{
 	case 10:
-		Console::Error("Failed to load INI file\n");
+		Console::Error("Failed to load INI file");
 		break;
 	case 11:
-		Console::Error("Render error\n");
+		Console::Error("Render error");
 		break;
 	default:
 		break;
 	}
-	Console::Log("\nGame closed, press enter to continue\n");
+	Console::Log("Game closed, press enter to continue");
 	Console::Close();
 	return retur;
 }

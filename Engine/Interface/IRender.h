@@ -11,6 +11,7 @@ class VisibleObject;
 class LoadedMesh;
 struct LightData;
 struct Vertex;
+class UISpace;
 
 class Camera
 {
@@ -54,6 +55,7 @@ public:
 	virtual void Render(float delta) = 0;
 	virtual void GameStart() = 0;
 	virtual void DestroyWindow() = 0;
+	virtual UISpace* GetUIManager(int screen = 0) const = 0;
 };
 
 class IInput

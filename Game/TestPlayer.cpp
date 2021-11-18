@@ -7,6 +7,11 @@
 #include "Objects/InstancedObject.h"
 #include "Hunter.h"
 #include "ECSTesting.h"
+#include "TestUI.h"
+
+void TestPlayer::OpenConsole(float, bool) {
+	Console::Create();
+}
 
 TestPlayer::TestPlayer() : Player()
 {
@@ -30,6 +35,7 @@ TestPlayer::TestPlayer() : Player()
 	II->RegisterKeyInput(49, &TestPlayer::InputOne, this);
 	II->RegisterKeyInput(50, &TestPlayer::InputTwo, this);
 	II->RegisterKeyInput(256, &TestPlayer::InputExit, this);
+	II->RegisterKeyInput(257, &TestPlayer::OpenConsole, this);
 	II->RegisterMouseInput(0, &TestPlayer::MouseMoved, this);
 
 	Mesh = SpawnObject<VisibleObject>();
@@ -141,6 +147,9 @@ TestPlayer::TestPlayer() : Player()
 	//hunt = SpawnObject<Hunter>();
 	//hunt->SetLocation(Vector(100.f, 0.f, 0.f));
 	//hunt->move->SetGround(terra[0]);
+
+	auto ui = SpawnObject<TestUI>();
+	UI::AddToScreen(ui, this);
 }
 
 void TestPlayer::RunInputW(float delta, bool KeyDown)
@@ -215,11 +224,7 @@ void TestPlayer::Tick(float)
 	Sky->SetLocation(Location);
 }
 
-#include "Objects/Actor.h"
-#include "Objects/VisibleObject.h"
-
 void TimeFunction(float d) {
-	printf("Hello, timer ran\n");
 }
 
 void TestPlayer::BeginPlay()
@@ -232,6 +237,7 @@ void TestPlayer::BeginPlay()
 	DirLight->Data.Color = Vector(1.f);
 	DirLight->Data.Rotation = Vector(0.0, 45.0, -45.0);*/
 
+		printf("Spawned object\n");
 	Timer::CreateTimer(5.f, TimeFunction, false);
 
 	/*
@@ -250,4 +256,9 @@ void TestPlayer::BeginPlay()
 		Lights[i]->Data.Color = Vector(1.f);
 	}
 	*/
+	uint64 l = 0xABCDEF0123456789;
+	uint32 h = (uint32)l;
+	printf("0x%lx\n", h);
+
+	Console::Log("Hello beautiful world");
 }

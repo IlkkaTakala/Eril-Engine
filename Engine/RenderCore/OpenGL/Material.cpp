@@ -21,7 +21,7 @@ void Shader::AddUniforms(const char* const string) {
 	}
 	catch (const std::regex_error& e)
 	{
-		printf("Regex error: %u; %s\n", e.code(), e.what());
+		Console::Log("Regex error: " + std::to_string(e.code()) + " -> " + e.what());
 		throw(std::exception("Regex broke again\n"));
 	}
 	
@@ -41,7 +41,7 @@ Shader::Shader(const char* const vertexShaderString, const char* const fragmentS
 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &Success);
 	if (!Success) {
 		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		printf("ERROR: Shader compilation failed: \"%s\"\n", infoLog);
+		Console::Log("ERROR: Shader compilation failed: " + String(infoLog));
 		return;
 	}
 
@@ -51,7 +51,7 @@ Shader::Shader(const char* const vertexShaderString, const char* const fragmentS
 	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &Success);
 	if (!Success) {
 		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-		printf("ERROR: Shader compilation failed: \"%s\"\n", infoLog);
+		Console::Log("ERROR: Shader compilation failed: " + String(infoLog));
 		return;
 	}
 
@@ -62,7 +62,7 @@ Shader::Shader(const char* const vertexShaderString, const char* const fragmentS
 	glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &Success);
 	if (!Success) {
 		glGetProgramInfoLog(ShaderProgram, 512, NULL, infoLog);
-		printf("ERROR: Shader link failed: \"%s\"\n", infoLog);
+		Console::Log("ERROR: Shader link failed: " + String(infoLog));
 		return;
 	}
 
@@ -87,7 +87,7 @@ Shader::Shader(const char* const vertexShaderString, const char* geomShaderStrin
 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &Success);
 	if (!Success) {
 		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		printf("ERROR: Shader compilation failed: \"%s\"\n", infoLog);
+		Console::Log("ERROR: Shader compilation failed: " + String(infoLog));
 		return;
 	}
 
@@ -97,7 +97,7 @@ Shader::Shader(const char* const vertexShaderString, const char* geomShaderStrin
 	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &Success);
 	if (!Success) {
 		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-		printf("ERROR: Shader compilation failed: \"%s\"\n", infoLog);
+		Console::Log("ERROR: Shader compilation failed: " + String(infoLog));
 		return;
 	}
 
@@ -107,7 +107,7 @@ Shader::Shader(const char* const vertexShaderString, const char* geomShaderStrin
 	glGetShaderiv(geomShader, GL_COMPILE_STATUS, &Success);
 	if (!Success) {
 		glGetShaderInfoLog(geomShader, 512, NULL, infoLog);
-		printf("ERROR: Shader compilation failed: \"%s\"\n", infoLog);
+		Console::Log("ERROR: Shader compilation failed: " + String(infoLog));
 		return;
 	}
 
@@ -119,7 +119,7 @@ Shader::Shader(const char* const vertexShaderString, const char* geomShaderStrin
 	glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &Success);
 	if (!Success) {
 		glGetProgramInfoLog(ShaderProgram, 512, NULL, infoLog);
-		printf("ERROR: Shader link failed: \"%s\"\n", infoLog);
+		Console::Log("ERROR: Shader link failed: " + String(infoLog));
 		return;
 	}
 
@@ -149,7 +149,7 @@ Shader::Shader(int type, const char* const ShaderString)
 		glGetShaderiv(compute, GL_COMPILE_STATUS, &Success);
 		if (!Success) {
 			glGetShaderInfoLog(compute, 512, NULL, infoLog);
-			printf("ERROR: Shader compile failed: \"%s\"\n", infoLog);
+			Console::Log("ERROR: Shader compilation failed: " + String(infoLog));
 			return;
 		}
 		// Create the shader program
@@ -160,7 +160,7 @@ Shader::Shader(int type, const char* const ShaderString)
 		glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &Success);
 		if (!Success) {
 			glGetProgramInfoLog(ShaderProgram, 512, NULL, infoLog);
-			printf("ERROR: Shader link failed: \"%s\"\n", infoLog);
+			Console::Log("ERROR: Shader link failed: " + String(infoLog));
 			return;
 		}
 		AddUniforms(ShaderString);
@@ -179,7 +179,7 @@ Shader::Shader(int type, const char* const ShaderString)
 		glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &Success);
 		if (!Success) {
 			glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-			printf("ERROR: Shader compilation failed: \"%s\"\n", infoLog);
+			Console::Log("ERROR: Shader compilation failed: " + String(infoLog));
 			return;
 		}
 
@@ -189,7 +189,7 @@ Shader::Shader(int type, const char* const ShaderString)
 		glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &Success);
 		if (!Success) {
 			glGetProgramInfoLog(ShaderProgram, 512, NULL, infoLog);
-			printf("ERROR: Shader link failed: \"%s\"\n", infoLog);
+			Console::Log("ERROR: Shader link failed: " + String(infoLog));
 			return;
 		}
 		AddUniforms(ShaderString);
@@ -205,7 +205,7 @@ Shader::Shader(int type, const char* const ShaderString)
 		glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &Success);
 		if (!Success) {
 			glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-			printf("ERROR: Shader compilation failed: \"%s\"\n", infoLog);
+			Console::Log("ERROR: Shader compilation failed: " + String(infoLog));
 			return;
 		}
 
@@ -215,7 +215,7 @@ Shader::Shader(int type, const char* const ShaderString)
 		glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &Success);
 		if (!Success) {
 			glGetProgramInfoLog(ShaderProgram, 512, NULL, infoLog);
-			printf("ERROR: Shader link failed: \"%s\"\n", infoLog);
+			Console::Log("ERROR: Shader link failed: " + String(infoLog));
 			return;
 		}
 		AddUniforms(ShaderString);

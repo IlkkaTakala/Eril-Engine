@@ -134,8 +134,8 @@ bool do_register(String name) {
 #define REGISTER(CLASSNAME)				private: inline static bool Registered = do_register<CLASSNAME>(#CLASSNAME);
 #define REGISTER_NAME(CLASSNAME, NAME)	private: inline static bool Registered = do_register<CLASSNAME>(#NAME);
 
-#define GET_MACRO(_1,_2,_3,NAME,...) NAME
-#define FOO(...) GET_MACRO(__VA_ARGS__, REGISTER_NAME, REGISTER)(__VA_ARGS__)
+//#define GET_MACRO(_1,_2,_3,NAME,...) NAME
+//#define FOO(...) GET_MACRO(__VA_ARGS__, REGISTER_NAME, REGISTER)(__VA_ARGS__)
 
 template <class T = BaseObject>
 T* SpawnObject(uint32 ID = 0)

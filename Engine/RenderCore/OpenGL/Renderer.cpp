@@ -14,6 +14,8 @@
 #include <stdexcept>
 #include <iostream>
 #include <random>
+#include "UI/UISpace.h"
+#include "UI/Panel.h"
 
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/quaternion.hpp>
@@ -114,6 +116,7 @@ Renderer::~Renderer()
 	delete ShadowMapping;
 	delete SkyDomeShader;
 	delete SkyBoxShader;
+	delete UIHolder;
 }
 
 inline float lerp(float a, float b, float f)
@@ -137,7 +140,7 @@ int Renderer::SetupWindow(int width, int height)
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
 
-	printf("Creating window...\n");
+	Console::Log("Creating window...");
 	Window = glfwCreateWindow(width, height, "Eril Engine Demo | Loading...", NULL, NULL);
 	if (!Window) {
 		glfwTerminate();
@@ -157,7 +160,7 @@ int Renderer::SetupWindow(int width, int height)
 		return -1;
 	}
 
-	printf("Allocating buffers...\n");
+	Console::Log("Allocating buffers...");
 	DepthBuffer = new PreDepthBuffer(width, height);
 	PostProcess = new PostBuffer(width, height);
 	SSAORender = new SSAOBuffer(width, height);
@@ -231,7 +234,7 @@ int Renderer::SetupWindow(int width, int height)
 	glViewport(0, 0, width, height);
 	glClearColor(0.f, 0.f, 0.f, 0.f);
 
-	printf("Loading shaders...\n");
+	Console::Log("Loading shaders...");
 	LoadShaders();
 
 	if (LightCullingShader == nullptr || PreDepthShader == nullptr) throw std::exception("Important shaders not found!\n");
@@ -350,6 +353,9 @@ int Renderer::SetupWindow(int width, int height)
 	glBindVertexArray(0);
 
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
+	UIHolder = new UISpace();
+	UIHolder->SetSize(width, height);
 
 	return 0;
 }
@@ -638,7 +644,7 @@ void Renderer::LoadShaders()
 				break;
 			}
 
-			printf("Shader loaded: %s\n", f.path().string().c_str());
+			Console::Log("Shader loaded: " + f.path().string());
 			stre.close();
 		}
 	}
@@ -680,7 +686,7 @@ Material* Renderer::LoadMaterialByName(String name)
 					nMat->VectorParameters.emplace(name, Vector(vec));
 				}
 				BaseMaterials.emplace(name, nMat);
-				printf("Material loaded: %s\n", name.c_str());
+				Console::Log("Material loaded: " + name);
 				return BaseMaterials.find(name)->second;
 			}
 		}
@@ -703,7 +709,7 @@ Texture* Renderer::LoadTextureByName(String name)
 		Texture* next = new Texture(width, height, nrChannels, data, type);
 		stbi_image_free(data);
 		LoadedTextures.emplace(name, next);
-		printf("Texture loaded: %s\n", name.c_str());
+		Console::Log("Texture loaded: " + name);
 		return next;
 	}
 }
@@ -1043,7 +1049,7 @@ void Renderer::Forward(int width, int height)
 
 void Renderer::PreDepth(int width, int height)
 {
-	//glEnable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
 	glDepthFunc(GL_LESS);
 	// Clear the screen
 	glClearColor(0.f, 0.f, 0.f, 0.f);
@@ -1143,6 +1149,7 @@ void Renderer::Render(float delta)
 	//EnvReflection(width, height);
 
 	glViewport(0, 0, width, height);
+	glEnable(GL_DEPTH_TEST);
 	DepthBuffer->Bind();
 
 	PreDepth(width, height);
@@ -1182,6 +1189,8 @@ void Renderer::Render(float delta)
 	glBindVertexArray(ScreenVao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
+
+	UIHolder->Render(0);
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, 0);
 
@@ -1304,7 +1313,7 @@ LoadedMesh* loadMeshes(const std::string& path)
 	//Check for errors
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
-		printf("Error loading model file \"%s\": \"%s\" ", path.c_str(), importer.GetErrorString());
+		Console::Log("Error loading model file " + path + " : " + importer.GetErrorString());
 		delete mesh;
 		return nullptr;
 	}

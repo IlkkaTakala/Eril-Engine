@@ -64,7 +64,7 @@
 #define WM_ADDLOG (WM_USER + 0x0021)
 #define IDC_CMDLINE 2
 
-constexpr int max_line_count = 400;
+constexpr int max_line_count = 1000;
 static HWND m_hwnd = nullptr;
 static bool bQuit = false;
 static std::list<std::wstring> logs;
@@ -73,6 +73,7 @@ static std::mutex logsMutex;
 static int yPos = 0;
 static int yStep = 14;
 static bool ConsoleOpen = false;
+static WNDPROC oldEditProc;
 
 void AddLine(const String& pre, const String& line);
 
@@ -197,7 +198,7 @@ public:
 			);
 
 			m_input = CreateWindowExW(
-				WS_EX_CLIENTEDGE,
+				0,
 				L"EDIT",
 				NULL,
 				WS_VISIBLE | WS_CHILD | WS_BORDER | ES_LEFT,
@@ -210,20 +211,15 @@ public:
 				HINST_THISCOMPONENT,
 				this
 			);
-			/*m_scrollBar = CreateWindowExW(
-				0,
-				L"SCROLLBAR",
-				NULL,
-				WS_VISIBLE | WS_CHILD | SBS_VERT,
-				0,
-				0,
-				0,
-				0,
-				m_hwnd,
-				(HMENU)IDC_CMDLINE,
-				HINST_THISCOMPONENT,
-				this
-			);*/
+
+			::SetWindowLongPtrW(
+				m_input,
+				GWLP_USERDATA,
+				reinterpret_cast<LONG_PTR>(this)
+			);
+
+			oldEditProc = (WNDPROC)SetWindowLongPtr(m_input, GWLP_WNDPROC, (LONG_PTR)subEditProc);
+
 			HFONT font = CreateFontA(
 				14,
 				6,
@@ -256,7 +252,7 @@ public:
 	{
 		MSG msg;
 
-		while (GetMessage(&msg, NULL, 0, 0) && !bQuit)
+		while (GetMessage(&msg, NULL, 0, 0))
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
@@ -405,10 +401,11 @@ private:
 				while (i != logs.end() && round < max_lineCount) {
 					m_pRenderTarget->DrawText(
 						i->c_str(),
-						i->size(),
+						(UINT32)i->size(),
 						m_pTextFormat,
 						D2D1::RectF(0, float(fontSize * round), renderTargetSize.width, float(fontSize + fontSize * round)),
-						i->starts_with(L"[ERROR]") ? m_pRedBrush : i->starts_with(L"[WARN]") ? m_pYellowBrush : m_pBlackBrush
+						i->starts_with(L"[ERROR]") ? m_pRedBrush : i->starts_with(L"[WARN]") ? m_pYellowBrush : m_pBlackBrush,
+						D2D1_DRAW_TEXT_OPTIONS_CLIP
 					);
 					round++;
 					i++;
@@ -472,18 +469,19 @@ private:
 		si.fMask = SIF_RANGE | SIF_PAGE;
 		si.nMin = 0;
 		si.nMax = max_line_count * yStep;
-		si.nPage = point.y * 0.5;
+		si.nPage = (UINT)(point.y * 0.5);
 		SetScrollInfo(m_hwnd, SB_VERT, &si, TRUE);
 	}
 
 	void ScrollDown(int count)
 	{
+		if (m_pRenderTarget == nullptr) return;
 		D2D1_SIZE_F renderTargetSize = m_pRenderTarget->GetSize();
 		float bottom = renderTargetSize.height - 5.f;
 		int fontSize = (int)m_pTextFormat->GetFontSize() + 2;
 		int max_lineCount = int(bottom / fontSize);
 		int row = yPos / fontSize;
-		int test = logs.size() - count - row;
+		int test = (int)logs.size() - count - row;
 		if (test >= 0 && test <= max_lineCount) {
 			if (logs.size() > row + max_lineCount) {
 				SCROLLINFO si = { 0 };
@@ -493,7 +491,6 @@ private:
 				si.nPos = ((int)logs.size() - max_lineCount) * fontSize;
 				yPos = si.nPos;
 				SetScrollInfo(m_hwnd, SB_VERT, &si, TRUE);
-				InvalidateRect(m_logArea, NULL, FALSE);
 			}
 		}
 	}
@@ -506,7 +503,7 @@ private:
 		if (line.size() < 1) return;
 		AddLine("[>>>]", line);
 		SetWindowText(m_input, "");
-		UpdateWindow(m_input);
+		RedrawWindow(m_hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
 	}
 
 	// The windows procedure.
@@ -566,7 +563,7 @@ private:
 					pDemoApp->OnRender();
 				}
 				result = 0;
-				wasHandled = true;
+				wasHandled = false;
 				break;
 
 				case WM_ADDLOG:
@@ -583,6 +580,7 @@ private:
 						}
 					}
 					pDemoApp->ScrollDown(count);
+					RedrawWindow(m_hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
 				}
 				result = 0;
 				wasHandled = true;
@@ -646,17 +644,13 @@ private:
 						break;
 					}
 
-					// Set the position and then retrieve it.  Due to adjustments
-					// by Windows it may not be the same as the value set.
 					si.fMask = SIF_POS;
 					SetScrollInfo(hwnd, SB_VERT, &si, TRUE);
 					GetScrollInfo(hwnd, SB_VERT, &si);
 
-					// If the position has changed, scroll window and update it.
 					if (si.nPos != yPos)
 					{
-						//ScrollWindow(hwnd, 0, yChar * (yPos - si.nPos), NULL, NULL);
-						UpdateWindow(hwnd);
+						RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
 					}
 
 				wasHandled = true;
@@ -671,33 +665,18 @@ private:
 					si.fMask = SIF_ALL;
 					GetScrollInfo(hwnd, SB_VERT, &si);
 					si.nPos -= yStep * (int)(distance / 120.f);
-					yPos = si.nPos;
 					SetScrollInfo(hwnd, SBS_VERT, &si, TRUE);
 					if (si.nPos != yPos)
 					{
-						//ScrollWindow(hwnd, 0, yChar * (yPos - si.nPos), NULL, NULL);
-						UpdateWindow(hwnd);
+						RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
 					}
+					yPos = si.nPos;
 				}
 				wasHandled = true;
 				result = 0;
 				break;
 
-				case WM_KEYDOWN:
-				{
-
-					switch (wParam)
-					{
-					case VK_RETURN:
-						pDemoApp->EnterCommand();
-						break;
-					}
 				}
-				wasHandled = true;
-				result = 0;
-				break;
-				}
-
 			}
 
 			if (!wasHandled)
@@ -706,6 +685,38 @@ private:
 			}
 		}
 
+		return result;
+	}
+
+	static LRESULT CALLBACK subEditProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	{
+		LRESULT result = 0;
+		DemoApp* pDemoApp = reinterpret_cast<DemoApp*>(static_cast<LONG_PTR>(
+			::GetWindowLongPtrW(
+				hwnd,
+				GWLP_USERDATA
+			)));
+		bool wasHandled = false;
+		if (pDemoApp) {
+			switch (msg)
+			{
+			case WM_CHAR:
+			{
+				switch (wParam)
+				{
+				case VK_RETURN:
+					pDemoApp->EnterCommand();
+				case VK_ESCAPE:
+				case VK_TAB:
+					wasHandled = true;
+					result = 0;
+					break;
+				}
+			}
+			}
+		}
+		if (!wasHandled)
+			return CallWindowProc(oldEditProc, hwnd, msg, wParam, lParam);
 		return result;
 	}
 
@@ -734,18 +745,16 @@ void D2D1Init() {
 			}
 		}
 		CoUninitialize();
+		ConsoleOpen = false;
 	}
 }
 
 static std::thread ConsoleThread;
 
-void Console::Init()
-{
-}
-
 void Console::Create()
 {
 	if (!ConsoleOpen) {
+		if (ConsoleThread.joinable()) ConsoleThread.join();
 		ConsoleThread = std::thread(D2D1Init);
 		ConsoleOpen = true;
 	}
@@ -758,9 +767,8 @@ bool Console::IsOpen()
 
 void Console::Close()
 {
-	bQuit = true;
+	SendNotifyMessage(m_hwnd, WM_CLOSE, 0, 0);
 	ConsoleThread.join();
-	ConsoleOpen = false;
 }
 
 void AddLine(const String& pre, const String& line)
@@ -769,10 +777,18 @@ void AddLine(const String& pre, const String& line)
 	char w[10];
 	GetTimeFormatA(LOCALE_NAME_USER_DEFAULT, TIME_NOTIMEMARKER | TIME_FORCE24HOURFORMAT, NULL, NULL, w, 9);
 	std::wstringstream temp;
-	temp << pre.c_str() << " " << w << " | " << line.c_str() << '\n';
 	{
 		std::unique_lock<std::mutex> logs(logsMutex);
+		auto list = split(line, '\n');
+		temp << pre.c_str() << " " << w << " | " << list[0].c_str();
 		logQueue.push(temp.str());
+		if (list.size() > 1) {
+			for (auto it = ++list.begin(); it != list.end(); it++) {
+				temp.str(L"\t");
+				temp << it->c_str();
+				logQueue.push(temp.str());
+			}
+		}
 		logs.unlock();
 	}
 	SendNotifyMessage(m_hwnd, WM_ADDLOG, 0, 0);
@@ -791,4 +807,20 @@ void Console::Error(const String& line)
 void Console::Warning(const String& line)
 {
 	AddLine("[WARN]", line);
+}
+
+void Console::GetLogs(int lines, std::vector<String> data)
+{
+	/*std::vector<String> d;
+	std::stringstream w;
+	int counter = 0;
+	for (auto i = --logs.end(); i != logs.begin(); i--) {
+		w << *i;
+		if (++counter > lines) break;
+	}
+	d.push_back(*i);*/
+}
+
+void Console::Execute(const String& line)
+{
 }
