@@ -11,6 +11,7 @@ class SSAOBuffer;
 class ShadowMapBuffer;
 class ReflectionBuffer;
 struct LightData;
+class UISpace;
 
 struct GLFWwindow;
 
@@ -40,6 +41,8 @@ public:
 	virtual void Render(float delta) override;
 	virtual void GameStart() override;
 	virtual void DestroyWindow() override;
+
+	virtual UISpace* GetUIManager(int screen = 0) const override { return UIHolder; }
 
 private:
 	friend class GLInput;
@@ -77,6 +80,7 @@ private:
 	ShadowMapBuffer* ShadowMapping;
 	ReflectionBuffer* EnvironmentRender;
 	GLCamera* ActiveCamera;
+	UISpace* UIHolder;
 
 	uint ScreenVao;
 	uint ScreenVbo;
