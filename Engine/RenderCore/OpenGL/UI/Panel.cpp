@@ -19,7 +19,7 @@ out vec2 TexCoords;
 void main() {
 	TexCoords = in_texCoord;
 	vec4 loc = model * vec4((in_position + 1.0) / 2.0, 1.0);
-	loc.z = model[3][2];
+	loc.z = model[3][2] - 1.0;
 	gl_Position = vec4(loc.xyz, 1.0);
 }
 )~~~";

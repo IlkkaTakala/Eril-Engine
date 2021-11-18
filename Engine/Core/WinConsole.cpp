@@ -401,7 +401,7 @@ private:
 				while (i != logs.end() && round < max_lineCount) {
 					m_pRenderTarget->DrawText(
 						i->c_str(),
-						i->size(),
+						(UINT32)i->size(),
 						m_pTextFormat,
 						D2D1::RectF(0, float(fontSize * round), renderTargetSize.width, float(fontSize + fontSize * round)),
 						i->starts_with(L"[ERROR]") ? m_pRedBrush : i->starts_with(L"[WARN]") ? m_pYellowBrush : m_pBlackBrush,
@@ -469,7 +469,7 @@ private:
 		si.fMask = SIF_RANGE | SIF_PAGE;
 		si.nMin = 0;
 		si.nMax = max_line_count * yStep;
-		si.nPage = point.y * 0.5;
+		si.nPage = (UINT)(point.y * 0.5);
 		SetScrollInfo(m_hwnd, SB_VERT, &si, TRUE);
 	}
 
@@ -481,7 +481,7 @@ private:
 		int fontSize = (int)m_pTextFormat->GetFontSize() + 2;
 		int max_lineCount = int(bottom / fontSize);
 		int row = yPos / fontSize;
-		int test = logs.size() - count - row;
+		int test = (int)logs.size() - count - row;
 		if (test >= 0 && test <= max_lineCount) {
 			if (logs.size() > row + max_lineCount) {
 				SCROLLINFO si = { 0 };

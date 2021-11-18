@@ -141,10 +141,11 @@ void UISpace::Render(uint target)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glDepthMask(GL_TRUE);
-	glDepthFunc(GL_LESS);
+	glDisable(GL_BLEND);
 	glDisable(GL_MULTISAMPLE);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_ALWAYS);
+	glDisable(GL_CULL_FACE);
 	for (const auto& c : TopLevel) {
 		c->TopLevel->Render();
 	}

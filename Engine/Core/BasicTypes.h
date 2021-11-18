@@ -290,6 +290,8 @@ struct Vector2D
 
 	Vector2D() { X = 0, Y = 0; }
 	Vector2D(long X, long Y) : X(X), Y(Y) {};
+	Vector2D(uint X, uint Y) : X(X), Y(Y) {};
+	Vector2D(float X, float Y) : X(long(X)), Y(long(Y)) {};
 
 	Vector2D operator+(const Vector2D& obj) { return Vector2D(X + obj.X, Y + obj.Y); }
 	Vector2D operator-(const Vector2D& obj) { return Vector2D(X - obj.X, Y - obj.Y); }
