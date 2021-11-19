@@ -84,33 +84,33 @@ bool EntityManager::RemoveEntity(int entityIndex)
 }
 
 
-int EntityManager::CreateNewComponentToEntity(int entityIndex, String typeName)
+Component* EntityManager::CreateNewComponentToEntity(int entityIndex, String typeName)
 {
 	if (entityIndex < static_cast<int>(IndexUsage.size()))
 	{
 		if (IndexUsage.at(entityIndex))
 		{
-			int componentID = WorldComponentManager->CreateNewComponentOfType(typeName);
+			Component* c = WorldComponentManager->CreateNewComponentOfType(typeName);
 			int componentType = WorldComponentManager->GetTypeIdByName(typeName);
-			Entities.at(entityIndex)->GetComponents().insert(std::pair<int, int>(componentID, componentType));
-			return componentID;
+			Entities.at(entityIndex)->GetComponents().insert(std::pair<int, int>(c->GetID(), componentType));
+			return c;
 		}
 	}
-	return -1;
+	return nullptr;
 }
 
-int EntityManager::CreateNewComponentToEntity(int entityIndex, int componentTypeID)
+Component* EntityManager::CreateNewComponentToEntity(int entityIndex, int componentTypeID)
 {
 	if (entityIndex < static_cast<int>(IndexUsage.size()))
 	{
 		if (IndexUsage.at(entityIndex))
 		{
-			int componentID = WorldComponentManager->CreateNewComponentOfType(componentTypeID);
-			Entities.at(entityIndex)->GetComponents().insert(std::pair<int, int>(componentID, componentTypeID));
-			return componentID;
+			Component* c = WorldComponentManager->CreateNewComponentOfType(componentTypeID);
+			Entities.at(entityIndex)->GetComponents().insert(std::pair<int, int>(c->GetID(), componentTypeID));
+			return c;
 		}
 	}
-	return -1;
+	return nullptr;
 }
 
 
@@ -126,9 +126,11 @@ Component* EntityManager::GetComponentFromEntity(int entityIndex, String compone
 		{
 			if (c.second == typeID)
 			{
-				Component* component = WorldComponentManager->GetComponent(entity->GetComponents().at(c.first), componentType);
+				Console::Log(std::to_string(Entities.at(entityIndex)->GetComponents().begin()->first) + "," + std::to_string(Entities.at(entityIndex)->GetComponents().begin()->first));
+				Component* component = WorldComponentManager->GetComponent(entity->GetComponents().at(c.first), typeID);
 				if (component != nullptr)
 				{
+					//Console::Log(std::to_string(component->GetID()));
 					return component;
 				}
 				break;

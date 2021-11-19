@@ -14,7 +14,9 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 class Component
 {
 public:
-	Component() { ID = -1; Type = -1; Disabled = false;  Console::Log("Component init()"); }
+	Component() {}
+	Component(Component const& c) { ID = c.ID; Type = c.Type; Disabled = c.Disabled; }
+
 	~Component() {}
 
 	int GetID() { return ID; }
@@ -22,13 +24,13 @@ public:
 
 	void SetID(int id) { ID = id; }
 	void SetType(int type) { Type = type; }
-	void SetDisabled(){ Disabled = true; }
+	void SetDisabled() { Disabled = true; }
 
 	Component* GetPointer() { return this; }
 
 private:
-	int ID;
-	int Type;
-	bool Disabled;
+	int ID = -1;
+	int Type = -1;
+	bool Disabled = false;
 };
 

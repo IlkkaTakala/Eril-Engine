@@ -20,7 +20,7 @@ public:
 	int GetType() { return Type; }
 	int GetComponentCount() { return ComponentCount; }
 
-	virtual int AddComponent() = 0;
+	virtual Component* AddComponent() = 0;
 	virtual bool RemoveComponent(int id) = 0;
 	virtual Component* GetComponent(int id) = 0;
 
@@ -54,9 +54,8 @@ public:
 	/// Creates a new component to the vector.
 	/// </summary>
 	/// <returns>ID of the added component</returns>
-	int AddComponent()
+	Component* AddComponent()
 	{
-		Console::Log("Adding components");
 		int usedIndex = -1;
 
 		for (int i = 0; i < static_cast<int>(IndexUsage->size()); i++)
@@ -82,10 +81,11 @@ public:
 			Components->at(usedIndex).SetType(Type);
 			IndexUsage->push_back(true);
 		}
-
-		Console::Log("Component " + std::to_string(usedIndex) + " created to type " + std::to_string(this->Type));
 		ComponentCount++;
-		return usedIndex;
+
+		Console::Log("AddComponent: " + std::to_string(Components->at(usedIndex).GetID()));
+
+		return Components->at(usedIndex).GetPointer();
 	}
 
 	/// <summary>

@@ -11,92 +11,34 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 
 ECSTesting::ECSTesting()
 {
-	Console::Log("ECSTesting");
-	EntityManager* ECSEntityManager = IECS::GetEntityManager();
+	//Get Pointers to ECS managers
+	EntityManager* entityManager = IECS::GetEntityManager();
 	ComponentManager* componentManager = IECS::GetComponentManager();
 
-	PositionComponent component;
-	componentManager->CreateComponentTypeStorage(component, "PositionComponent");
-
-	Entity* e1 = ECSEntityManager->AddEntity();
-	int cID = ECSEntityManager->CreateNewComponentToEntity(e1->GetID(), "PositionComponent");
-	Console::Log(std::to_string(cID));
-	
-	//Component* comp;
-	// (e1->GetID(), "PositionComponent");
-	PositionComponent* pos = nullptr;
-	pos = static_cast<PositionComponent*>(ECSEntityManager->GetComponentFromEntity(e1->GetID(), "PositionComponent"));
-	
-
-	const void* address = static_cast<const void*>(pos);
-	std::stringstream ss;
-	ss << address;
-	std::string name = ss.str();
+	//Create Component Storages:
+	PositionComponent pc;
+	componentManager->CreateComponentTypeStorage(pc, "PositionComponent");
 
 
-	if (pos != nullptr)
+	for (int i = 0; i < 2; i++)
 	{
-		pos->x += 1.0f;
-		pos->y += 1.0f;
-		pos->z += 1.0f;
-		Console::Log(name + ": " + std::to_string(pos->x) + "," + std::to_string(pos->y) + "," + std::to_string(pos->z));
-	}
-	
-	Entity* e2 = ECSEntityManager->AddEntity();
-	cID = ECSEntityManager->CreateNewComponentToEntity(e2->GetID(), "PositionComponent");
-	Console::Log(std::to_string(cID));
-
-	pos = static_cast<PositionComponent*>(ECSEntityManager->GetComponentFromEntity(e2->GetID(), "PositionComponent"));
-
-
-	address = static_cast<const void*>(pos);
-	std::stringstream ss2;
-	ss2 << address;
-	name = ss2.str();
-
-	if (pos != nullptr)
-	{
-		pos->x += 20.0f;
-		pos->y += 20.0f;
-		pos->z += 20.0f;
-
-		Console::Log(name + ": " + std::to_string(pos->x) + "," + std::to_string(pos->y) + "," + std::to_string(pos->z));
-	}
-	
-	Entity* e3 = ECSEntityManager->AddEntity();
-	cID = ECSEntityManager->CreateNewComponentToEntity(e3->GetID(), "PositionComponent");
-	pos = static_cast<PositionComponent*>(ECSEntityManager->GetComponentFromEntity(e3->GetID(), "PositionComponent"));
-	Console::Log(std::to_string(cID));
-
-	if (pos != nullptr)
-	{
-		pos->x += 300.0f;
-		pos->y += 300.0f;
-		pos->z += 300.0f;
-
-		Console::Log(std::to_string(pos->x) + "," + std::to_string(pos->y) + "," + std::to_string(pos->z));
+		Entity* entity = entityManager->AddEntity();
+		Component* component = entityManager->CreateNewComponentToEntity(entity->GetID(), "PositionComponent");
+		if (component != nullptr)
+		{
+			PositionComponent* posComponent = static_cast<PositionComponent*>(entityManager->GetComponentFromEntity(entity->GetID(), "PositionComponent"));
+			posComponent->X = 100.0f * i;
+			posComponent->Y = 100.0f * i;
+			posComponent->Z = 100.0f * i;
+			Console::Log(std::to_string(posComponent->Z) + "," + std::to_string(posComponent->Y) + "," + std::to_string(posComponent->Z));
+		}
 	}
 
-	Entity* e4 = ECSEntityManager->AddEntity();
-	cID = ECSEntityManager->CreateNewComponentToEntity(e4->GetID(), "PositionComponent");
-	pos = static_cast<PositionComponent*>(ECSEntityManager->GetComponentFromEntity(e4->GetID(), "PositionComponent"));
-	Console::Log(std::to_string(cID));
-
-	if (pos != nullptr)
-	{
-		pos->x += 4000.0f;
-		pos->y += 4000.0f;
-		pos->z += 4000.0f;
-
-		Console::Log(std::to_string(pos->x) + "," + std::to_string(pos->y) + "," + std::to_string(pos->z));
-	}
-
-
-
-	SystemsManager* ECSSystemsManager = IECS::GetSystemsManager();
-	MovementSystem* movementSystem = new MovementSystem(*ECSEntityManager);
-	int systemIndex = ECSSystemsManager->AddSystem(movementSystem);
-	ECSSystemsManager->AddWantedComponentType(systemIndex, "PositionComponent");
+	//Create new System and set it to handle entities with PositionComponents
+	SystemsManager* systemsManager = IECS::GetSystemsManager();
+	MovementSystem* movementSystem = new MovementSystem(*entityManager);
+	int systemIndex = systemsManager->AddSystem(movementSystem);
+	systemsManager->AddWantedComponentType(systemIndex, "PositionComponent");
 	
 }
 

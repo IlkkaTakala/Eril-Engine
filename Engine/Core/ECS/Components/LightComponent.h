@@ -9,8 +9,22 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 
 struct LightComponent : public Component
 {
-	LightComponent() : Component() {}
-	int Type = 0;
+	LightComponent(){}
+	LightComponent(const LightComponent& c) : Component() 
+	{ 
+		LightType = c.LightType;
+		Intensity = c.Intensity;
+		Size = c.Size;
+		Distance = c.Distance;
+		Falloff = c.Falloff;
+		Color = c.Color;
+		Location = c.Location;
+		Rotation = c.Rotation;
+		State = c.State;
+	}
+
+
+	int LightType = 0;
 	float Intensity = 2.f;
 	float Size = 3.f;
 	float Distance = 0.f;
@@ -25,5 +39,5 @@ struct LightComponent : public Component
 	// 3 = Enabled, Needs Disabling		
 	// 4 = Disabled
 	// 5 = Disabled, Needs Enabling
-	int state = 0;
+	int State = 0;
 };

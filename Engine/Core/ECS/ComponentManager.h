@@ -31,7 +31,6 @@ public:
 	template <typename T>
 	void CreateComponentTypeStorage(T &baseType, String typeName)
 	{
-		Console::Log("CreateComponentTypeStorage");
 		TypeNames.insert(std::pair<String, int>(typeName, typeCount));
 		componentStorages.push_back(new ComponentTypeStorage<T>(typeCount));
 		typeCount++;
@@ -44,6 +43,38 @@ public:
 	/// <returns></returns>
 	int GetTypeIdByName(String typeName);
 	
+	template <typename T>
+	T* AddComponent(T& component, int typeID)
+	{
+		for (int i = 0; i < componentStorages.size(); i++)
+		{
+			if (componentStorages.at(i)->GetType() == typeID)
+			{
+				//component.Type = componentStorages.at(i)->GetType();
+				ComponentTypeStorage<T>* s = static_cast<ComponentTypeStorage<T>*>(componentStorages.at(i));
+				return static_cast<T*>(s->AddComponent())
+			}
+		}
+		return nullptr;
+	}
+
+
+	/*
+	template <typename T>
+	Component* GetComponent(int id, int typeID, T type)
+	{
+		for (int i = 0; i < componentStorages.size(); i++)
+		{
+			if (componentStorages.at(i)->GetType() == typeID)
+			{
+				ComponentTypeStorage<T>* s = static_cast<ComponentTypeStorage<T>*>(componentStorages.at(i));
+				Component* c = s->GetComponent(id);
+				return c;
+			}
+		}
+		return nullptr;
+	}
+	*/
 
 protected:
 	/// <summary>
@@ -51,24 +82,16 @@ protected:
 	/// It only initializes its type and id and calls the component's Init()-method.
 	/// </summary>
 	/// <param name="typeName"></param>
-	/// <returns>ID of the created component.</returns>
-	int CreateNewComponentOfType(String typeName);
+	/// <returns>Pointer to the created component.</returns>
+	Component* CreateNewComponentOfType(String typeName);
 
 	/// <summary>
 	/// Adds a new component. Note that when adding a new component the system does not copy the component data.
 	/// It only initializes its type and id and calls the component's Init()-method.
 	/// </summary>
 	/// <param name="typeName"></param>
-	/// <returns>ID of the created component.</returns>
-	int CreateNewComponentOfType(int typeID);
-
-	/// <summary>
-	/// Returns the component of given id and type
-	/// </summary>
-	/// <param name="id"></param>
-	/// <param name="typeName"></param>
-	/// <returns></returns>
-	Component* GetComponent(int id, String typeName);
+	/// <returns>Pointer to the created component.</returns>
+	Component* CreateNewComponentOfType(int typeID);
 
 	/// <summary>
 	/// Returns the component of given id and type

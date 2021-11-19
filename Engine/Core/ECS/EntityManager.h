@@ -17,14 +17,31 @@ class EntityManager
 public:
 	EntityManager(ComponentManager* componentManager) : WorldComponentManager(componentManager) {}
 
+	/// <summary>
+	/// Adds a new entity to the ECS World
+	/// </summary>
+	/// <returns>The created Entity</returns>
 	Entity* AddEntity();
 	Entity* GetEntity(int entityIndex);
 	bool RemoveEntity(Entity*& entity);
 	bool RemoveEntity(int entityIndex);
 	
+	template <typename T>
+	T* AddComponent(T& component, String typeName)
+	{
+		typeID = WorldComponentManager->GetTypeIdByName(typeName);
+		if (entityIndex < static_cast<int>(IndexUsage.size()))
+		{
+			if (IndexUsage.at(entityIndex))
+			{
+				return WorldComponentManager->AddComponent(component, typeID);
+			}
+		}
+		return nullptr;
+	}
 
-	int CreateNewComponentToEntity(int entityIndex, String componentType);
-	int CreateNewComponentToEntity(int entityIndex, int componentTypeID);
+	Component* CreateNewComponentToEntity(int entityIndex, String componentType);
+	Component* CreateNewComponentToEntity(int entityIndex, int componentTypeID);
 	
 	Component* GetComponentFromEntity(int entityIndex, String componentType);
 	bool RemoveComponentFromEntity(int entityIndex, String componentType);
