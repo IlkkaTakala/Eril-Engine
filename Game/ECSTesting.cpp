@@ -16,13 +16,22 @@ ECSTesting::ECSTesting()
 	ComponentManager* componentManager = IECS::GetComponentManager();
 
 	//Create Component Storages:
-	PositionComponent pc;
-	componentManager->CreateComponentTypeStorage(pc, "PositionComponent");
+	componentManager->CreateComponentTypeStorage<PositionComponent>("PositionComponent");
 
 
 	for (int i = 0; i < 2; i++)
 	{
 		Entity* entity = entityManager->AddEntity();
+		PositionComponent* pos = entityManager->AddComponentToEntity<PositionComponent>(entity->GetID(), "PositionComponent");
+		if (pos != nullptr)
+		{
+			pos->X += 100.0f * (i + 1);
+			pos->Y += 100.0f * (i + 1);
+			pos->Z += 100.0f * (i + 1);
+			Console::Log(pos->GetID() + ": " + std::to_string(pos->Z) + "," + std::to_string(pos->Y) + "," + std::to_string(pos->Z));
+		}
+
+		/*
 		Component* component = entityManager->CreateNewComponentToEntity(entity->GetID(), "PositionComponent");
 		if (component != nullptr)
 		{
@@ -32,6 +41,7 @@ ECSTesting::ECSTesting()
 			posComponent->Z = 100.0f * i;
 			Console::Log(std::to_string(posComponent->Z) + "," + std::to_string(posComponent->Y) + "," + std::to_string(posComponent->Z));
 		}
+		*/
 	}
 
 	//Create new System and set it to handle entities with PositionComponents

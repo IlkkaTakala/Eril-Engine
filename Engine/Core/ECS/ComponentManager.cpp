@@ -14,7 +14,7 @@ int ComponentManager::GetTypeIdByName(String typeName)
 	}
 	return -1;
 }
-
+/*
 Component* ComponentManager::CreateNewComponentOfType(String typeName)
 {
 	int typeID = GetTypeIdByName(typeName);
@@ -39,7 +39,9 @@ Component* ComponentManager::CreateNewComponentOfType(int typeID)
 	}
 	return nullptr;
 }
+*/
 
+/*
 Component* ComponentManager::GetComponent(int id, int typeID)
 {
 	Console::Log("ID + Type: " + std::to_string(id) + "," + std::to_string(id));
@@ -54,6 +56,7 @@ Component* ComponentManager::GetComponent(int id, int typeID)
 	}
 	return nullptr;
 }
+*/
 
 bool ComponentManager::RemoveComponent(int id, String typeName)
 {
@@ -62,7 +65,7 @@ bool ComponentManager::RemoveComponent(int id, String typeName)
 	{
 		if (componentStorages.at(i)->GetType() == typeID)
 		{
-			return componentStorages.at(i)->RemoveComponent(id);
+			//return componentStorages.at(i)->RemoveComponent(id);
 		}
 	}
 	return false;
@@ -74,7 +77,7 @@ bool ComponentManager::RemoveComponent(int id, int typeID)
 	{
 		if (componentStorages.at(i)->GetType() == typeID)
 		{
-			return componentStorages.at(i)->RemoveComponent(id);
+			//return componentStorages.at(i)->RemoveComponent(id);
 		}
 	}
 	return false;

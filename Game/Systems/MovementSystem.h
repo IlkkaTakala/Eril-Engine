@@ -26,14 +26,15 @@ public:
 
 			for (auto e : entities)
 			{
-				PositionComponent* pos = static_cast<PositionComponent*>(WorldEntityManager.GetComponentFromEntity(e, "PositionComponent"));
+				Console::Log("Processing entity " + std::to_string(WorldEntityManager.GetEntity(e)->GetID()));
+				PositionComponent* pos = WorldEntityManager.GetComponentFromEntity<PositionComponent>(WorldEntityManager.GetEntity(e)->GetID(), "PositionComponent");
 				if (pos != nullptr)
 				{
 					pos->X += 10.0f * deltaTime;
 					pos->Y += 10.0f * deltaTime;
 					pos->Z += 10.0f * deltaTime;
 
-					//Console::Log(std::to_string(WorldEntityManager.GetEntity(e)->GetID()) + "," + std::to_string(pos->GetID()) + "," + std::to_string(pos->Z) + "," + std::to_string(pos->Y) + "," + std::to_string(pos->Z));
+					Console::Log(std::to_string(WorldEntityManager.GetEntity(e)->GetID()) + "," + std::to_string(pos->GetID()) + "," + std::to_string(pos->Z) + "," + std::to_string(pos->Y) + "," + std::to_string(pos->Z));
 				}
 				else
 				{

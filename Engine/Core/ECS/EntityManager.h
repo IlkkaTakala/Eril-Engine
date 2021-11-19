@@ -27,23 +27,52 @@ public:
 	bool RemoveEntity(int entityIndex);
 	
 	template <typename T>
-	T* AddComponent(T& component, String typeName)
+	T* AddComponentToEntity(int entityIndex, String typeName)
 	{
-		typeID = WorldComponentManager->GetTypeIdByName(typeName);
+		int typeID = WorldComponentManager->GetTypeIdByName(typeName);
 		if (entityIndex < static_cast<int>(IndexUsage.size()))
 		{
 			if (IndexUsage.at(entityIndex))
 			{
-				return WorldComponentManager->AddComponent(component, typeID);
+				T* c = WorldComponentManager->AddComponent<T>(typeID);
+				Entities.at(entityIndex)->GetComponents().insert(std::pair<int, int>(c->GetID(), typeID));
+				return c;
 			}
 		}
 		return nullptr;
 	}
 
-	Component* CreateNewComponentToEntity(int entityIndex, String componentType);
-	Component* CreateNewComponentToEntity(int entityIndex, int componentTypeID);
+	template <typename T>
+	T* GetComponentFromEntity(int entityIndex, String componentType)
+	{
+		int typeID = WorldComponentManager->GetTypeIdByName(componentType);
+
+		Entity* entity = GetEntity(entityIndex);
+		if (entity != nullptr)
+		{
+			for (auto& c : entity->GetComponents())
+			{
+				if (c.second == typeID)
+				{
+					Console::Log(std::to_string(Entities.at(entityIndex)->GetComponents().begin()->first) + "," + std::to_string(Entities.at(entityIndex)->GetComponents().begin()->second));
+					T* component = WorldComponentManager->GetComponent<T>(entity->GetComponents().at(c.first), typeID);
+					if (component != nullptr)
+					{
+						//Console::Log(std::to_string(component->GetID()));
+						return component;
+					}
+					break;
+				}
+			}
+		}
+		return nullptr;
+	}
+
+
+	//Component* CreateNewComponentToEntity(int entityIndex, String componentType);
+	//Component* CreateNewComponentToEntity(int entityIndex, int componentTypeID);
 	
-	Component* GetComponentFromEntity(int entityIndex, String componentType);
+	//Component* GetComponentFromEntity(int entityIndex, String componentType);
 	bool RemoveComponentFromEntity(int entityIndex, String componentType);
 
 	std::vector<int> QueryEntitiesByType(std::vector<int> allowedTypes);

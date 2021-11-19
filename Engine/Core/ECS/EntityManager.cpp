@@ -83,7 +83,7 @@ bool EntityManager::RemoveEntity(int entityIndex)
 	return false;
 }
 
-
+/*
 Component* EntityManager::CreateNewComponentToEntity(int entityIndex, String typeName)
 {
 	if (entityIndex < static_cast<int>(IndexUsage.size()))
@@ -139,6 +139,8 @@ Component* EntityManager::GetComponentFromEntity(int entityIndex, String compone
 	}
 	return nullptr;
 }
+
+*/
 
 bool EntityManager::RemoveComponentFromEntity(int entityIndex, String componentType)
 {

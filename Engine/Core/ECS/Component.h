@@ -16,6 +16,7 @@ class Component
 public:
 	Component() {}
 	Component(Component const& c) { ID = c.ID; Type = c.Type; Disabled = c.Disabled; }
+	//Component(Component &&c) noexcept { ID = c.ID; Type = c.Type; Disabled = c.Disabled; }
 
 	~Component() {}
 

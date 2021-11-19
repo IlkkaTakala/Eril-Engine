@@ -29,7 +29,7 @@ public:
 	/// <param name="base"></param>
 	/// <param name="typeName"></param>
 	template <typename T>
-	void CreateComponentTypeStorage(T &baseType, String typeName)
+	void CreateComponentTypeStorage(String typeName)
 	{
 		TypeNames.insert(std::pair<String, int>(typeName, typeCount));
 		componentStorages.push_back(new ComponentTypeStorage<T>(typeCount));
@@ -44,7 +44,7 @@ public:
 	int GetTypeIdByName(String typeName);
 	
 	template <typename T>
-	T* AddComponent(T& component, int typeID)
+	T* AddComponent(int typeID)
 	{
 		for (int i = 0; i < componentStorages.size(); i++)
 		{
@@ -52,7 +52,24 @@ public:
 			{
 				//component.Type = componentStorages.at(i)->GetType();
 				ComponentTypeStorage<T>* s = static_cast<ComponentTypeStorage<T>*>(componentStorages.at(i));
-				return static_cast<T*>(s->AddComponent())
+				return s->AddComponent();
+			}
+		}
+		return nullptr;
+	}
+
+	template <typename T>
+	T* GetComponent(int id, int typeID)
+	{
+		Console::Log("ID + Type: " + std::to_string(id) + "," + std::to_string(id));
+		for (int i = 0; i < componentStorages.size(); i++)
+		{
+			if (componentStorages.at(i)->GetType() == typeID)
+			{
+				ComponentTypeStorage<T>* s = static_cast<ComponentTypeStorage<T>*>(componentStorages.at(i));
+				T* cT = s->GetComponent(id);
+				Console::Log(std::to_string(cT->GetID()));
+				return cT;
 			}
 		}
 		return nullptr;
@@ -83,7 +100,7 @@ protected:
 	/// </summary>
 	/// <param name="typeName"></param>
 	/// <returns>Pointer to the created component.</returns>
-	Component* CreateNewComponentOfType(String typeName);
+	//Component* CreateNewComponentOfType(String typeName);
 
 	/// <summary>
 	/// Adds a new component. Note that when adding a new component the system does not copy the component data.
@@ -91,7 +108,7 @@ protected:
 	/// </summary>
 	/// <param name="typeName"></param>
 	/// <returns>Pointer to the created component.</returns>
-	Component* CreateNewComponentOfType(int typeID);
+	//Component* CreateNewComponentOfType(int typeID);
 
 	/// <summary>
 	/// Returns the component of given id and type

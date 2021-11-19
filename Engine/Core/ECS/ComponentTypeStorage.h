@@ -20,14 +20,17 @@ public:
 	int GetType() { return Type; }
 	int GetComponentCount() { return ComponentCount; }
 
-	virtual Component* AddComponent() = 0;
-	virtual bool RemoveComponent(int id) = 0;
-	virtual Component* GetComponent(int id) = 0;
+	//virtual Component* AddComponent() = 0;
+	//virtual bool RemoveComponent(int id) = 0;
+	//virtual Component* GetComponent(int id) = 0;
 
 protected:
 	int Type;
 	int ComponentCount = 0;
 };
+
+
+
 
 /// <summary>
 /// This is used to get to store one type of component. It has methods for adding, removing and getting a single componet.
@@ -40,12 +43,15 @@ public:
 
 	ComponentTypeStorage(int type) : IComponentStorage(type)
 	{ 
+		Array = new T[2];
 		Components = new std::vector<T>;
 		IndexUsage = new std::vector<bool>;
 	}
 
 	~ComponentTypeStorage() 
 	{
+		delete Array;
+
 		delete Components;
 		delete IndexUsage;
 	}
@@ -54,7 +60,7 @@ public:
 	/// Creates a new component to the vector.
 	/// </summary>
 	/// <returns>ID of the added component</returns>
-	Component* AddComponent()
+	T* AddComponent()
 	{
 		int usedIndex = -1;
 
@@ -72,6 +78,10 @@ public:
 			Components->emplace_back();
 			Components->at(usedIndex).SetID(usedIndex);
 			Components->at(usedIndex).SetType(Type);
+
+			AddBack();
+			At(usedIndex)->SetID(usedIndex);
+			At(usedIndex)->SetType(Type);
 			IndexUsage->push_back(true);
 		}
 		else
@@ -79,13 +89,18 @@ public:
 			Components->emplace_back();
 			Components->at(usedIndex).SetID(usedIndex);
 			Components->at(usedIndex).SetType(Type);
+
+			AddBack();
+			At(usedIndex)->SetID(usedIndex);
+			At(usedIndex)->SetType(Type);
 			IndexUsage->push_back(true);
 		}
 		ComponentCount++;
 
-		Console::Log("AddComponent: " + std::to_string(Components->at(usedIndex).GetID()));
+		Console::Log("AddComponent: " + std::to_string(At(usedIndex)->GetID()));
 
-		return Components->at(usedIndex).GetPointer();
+		return At(usedIndex);
+		return &Components->at(usedIndex);
 	}
 
 	/// <summary>
@@ -93,15 +108,19 @@ public:
 	/// </summary>
 	/// <param name="id"></param>
 	/// <returns>Component of given ID, nullptr if the component of that ID was not found or if the component was disabled.</returns>
-	Component* GetComponent(int id)
+	T* GetComponent(int id)
 	{
-		if (id < static_cast<int>(Components->size()))
+		
+		if (id < static_cast<int>(IndexUsage->size()))
 		{
 			if (IndexUsage->at(id))
 			{
-				return Components->at(id).GetPointer();
+				Console::Log(std::to_string(id) + " ::: " + std::to_string(At(id)->GetID()));
+				return At(id);
+				return &Components->at(id);
 			}
 		}
+		
 		return nullptr;
 	}
 
@@ -123,8 +142,38 @@ public:
 		}
 		return false;
 	}
+	
 
 private:
-	std::vector<T>* Components;
+	std::vector<T, std::allocator<T>>* Components;
 	std::vector<bool>* IndexUsage;
+
+
+	T* Array;
+	int CurrentSize = 0;
+	int MaxSize = 1;
+	const int GROWSIZE = 2;
+
+	void AddBack()
+	{
+		if (CurrentSize == MaxSize)
+		{
+			T* temp = new T[MaxSize + GROWSIZE];
+			for (int i = 0; i < MaxSize; i++)
+			{
+				temp[i] = Array[i];
+			}
+			delete[] Array;
+			Array = temp;
+		}
+		Array[CurrentSize] = T();
+		CurrentSize++;
+	}
+
+	T* At(int i)
+	{
+		return &Array[i];
+	}
 };
+
+
