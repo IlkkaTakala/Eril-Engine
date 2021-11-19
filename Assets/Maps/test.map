@@ -2,3 +2,19 @@
 <Hunter id="A0005555" args="Location:100,0,1; ">
 </Hunter>
 <VisibleObject id="A0005553" args="Mesh:tree; Material:0Assets/Materials/tree;" />
+<Terrain id="A0005554" args="" />
+<InstancedObject id="A0005556" args=
+"Instances:
+	1,10,0-0,0,0-1,1,1-
+	2,10,0-0,0,0-1,1,1-
+	3,10,0-0,0,0-1,1,1-
+	4,10,0-0,0,0-1,1,1-
+	5,10,0-0,0,0-1,1,1-
+	6,10,0-0,0,0-1,1,1-
+	7,10,0-0,0,0-1,1,1-
+	8,10,0-0,0,0-1,1,1-
+	9,10,0-0,0,0-1,1,1-
+	10,10,0-0,0,0-1,1,1;
+Mesh:tree;
+Material:0Assets/Materials/tree;"
+/>

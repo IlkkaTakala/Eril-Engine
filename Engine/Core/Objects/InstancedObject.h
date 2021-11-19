@@ -7,6 +7,7 @@ class InstancedObject : public VisibleObject
 	REGISTER(InstancedObject)
 public:
 	InstancedObject();
+	virtual void LoadWithParameters(const String& args) override;
 
 	void AddInstances(int count, Transformation* dispArray);
 };
