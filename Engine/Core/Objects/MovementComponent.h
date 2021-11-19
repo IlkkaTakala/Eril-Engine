@@ -52,7 +52,6 @@ public:
 	State OldState;
 
 private:
-
 	Ref<Actor> Object;
 	RefWeak<Terrain> Terra;
 

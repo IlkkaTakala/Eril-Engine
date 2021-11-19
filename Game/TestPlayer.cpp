@@ -102,7 +102,7 @@ TestPlayer::TestPlayer() : Player()
 		Rocks->AddInstances(count, arr);
 		delete[] arr;
 
-
+		
 		Shacks = SpawnObject<InstancedObject>();
 		Shacks->SetModel(MI->LoadData(Shacks, "shack"));
 		Shacks->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/rock"));
@@ -146,12 +146,12 @@ TestPlayer::TestPlayer() : Player()
 		delete[] arr;*/
 
 
-		Flowers = SpawnObject<InstancedObject>();
-		Flowers->SetModel(MI->LoadData(Flowers, "candyCane"));
-		Flowers->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/rock"));
-		Flowers->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
+		Candy = SpawnObject<InstancedObject>();
+		Candy->SetModel(MI->LoadData(Candy, "candyCane"));
+		Candy->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/rock"));
+		Candy->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
 
-		count = 100;
+		count = 5;
 		arr = new Transformation[count]();
 		for (int i = 0; i < count; i++)
 		{
@@ -166,8 +166,7 @@ TestPlayer::TestPlayer() : Player()
 			float angle = acos(Vector::Dot(up, normal));
 			arr[i].Rotation = Vector::toEuler(axis, angle) * 180.f / PI;
 		}
-		Flowers->AddInstances(count, arr);
-
+		Candy->AddInstances(count, arr);
 		delete[] arr;
 	}
 
@@ -206,9 +205,8 @@ void TestPlayer::RunInputS(float delta, bool KeyDown)
 void TestPlayer::RunInputSpace(float delta, bool KeyDown)
 {
 	if (!Movement->IsInAir() && KeyDown) {
-		//Movement->SetBrake(0.1f);
-		//Movement->SetGravity(0.1f);
-		Movement->AddImpulse(Vector(0.f, 0.f, 0.f));
+		Movement->SetMaxSpeed(100.0f);
+		Movement->AddImpulse(Vector(110.f, 0.f, 20.5f));
 	}
 }
 
@@ -248,7 +246,9 @@ void TestPlayer::ItemThrowQ(float delta, bool KeyDown)
 		if (Items.size() > 0) {
 			auto it = SpawnObject<PlaceableItem>();
 			it->SetLocation(GetLocation());
-			it->Move->AddImpulse(-GetCamera()->GetForwardVector() * 3000.f);
+			it->Move->SetPhysics(true);
+			it->Move->SetMaxSpeed(10.0f);
+			it->Move->AddImpulse(-GetCamera()->GetForwardVector() * 10.f);
 			Items[0]->DestroyObject();
 			Items.erase(Items.begin());
 		}
@@ -322,7 +322,8 @@ void PlaceableItem::BeginPlay()
 {
 	Move = SpawnObject<MovementComponent>();
 	Move->SetTarget(this);
-	Move->SetBrake(0.1f);
+	Move->SetPhysics(true);
+	Move->SetBrake(1.1f);
 	Mesh = SpawnObject<VisibleObject>();
 	AddComponent(Mesh);
 	Mesh->SetModel("candyCane");

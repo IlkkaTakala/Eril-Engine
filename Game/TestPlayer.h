@@ -83,7 +83,7 @@ private:
 	Ref<InstancedObject> Flowers;
 	Ref<InstancedObject> Rocks;
 	Ref<InstancedObject> Shacks;
-
+	Ref<InstancedObject> Candy;
 
 	Ref<VisibleObject> Sky;
 
