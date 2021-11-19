@@ -1,5 +1,6 @@
 #pragma once
 #include <BasicTypes.h>
+#include <map>
 
 class ObjectManager;
 class Scene;
@@ -56,6 +57,8 @@ public:
 
 protected:
 	virtual ~BaseObject() {};
+
+	static const std::map<String, String> ParseOptions(const String& args);
 private:
 	Scene* World;
 };

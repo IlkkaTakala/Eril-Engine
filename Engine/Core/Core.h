@@ -57,7 +57,7 @@ public:
 		return this->DataPtr ? this->DataPtr->GetRecord() : RecordInt(0);
 	}
 
-	T* GetPointer() { return Pointer; }
+	T* GetPointer() const { return Pointer; }
 	
 	Ref(const Ref& old) { 
 		this->bWeak = old.bWeak;
@@ -112,24 +112,24 @@ public:
 
 namespace helpers{
 	
-	bool helper(BaseObject* base, const String& args = "");
-
 	template <typename T>
 	BaseObject* invokeCreate(const String& args, uint32 ID, uint SpawnType, bool isServer, uint16 mod) {
 		if (ID != 0) {
 			ObjectManager::PrepareRecord(ID, SpawnType, isServer, mod);
 		}
 		Ref<T> next = new T();
-		//ObjectManager::CreateRecord(next, 0, Constants::Record::LOADED);
 		BaseObject* base = dynamic_cast<BaseObject*>(next.GetPointer());
-		if (!helper(base, args)) next->DestroyObject();
+		if (base == nullptr) {
+			next->DestroyObject();
+		}
+		if (SpawnType != Constants::Record::LOADED) base->LoadWithParameters(args);
 		return next;
 	}
 }
 
 template <typename T>
 bool do_register(String name) {
-	ObjectManager::TypeList[name] = &helpers::invokeCreate<T>;
+	ObjectManager::TypeList().emplace(name, &helpers::invokeCreate<T>);
 	return true;
 }
 
@@ -140,16 +140,24 @@ bool do_register(String name) {
 //#define FOO(...) GET_MACRO(__VA_ARGS__, REGISTER_NAME, REGISTER)(__VA_ARGS__)
 
 template <class T = BaseObject>
-T* SpawnObject(uint32 ID = 0)
+T* SpawnObject(String args = "", uint32 ID = 0)
 {
 	if (ID != 0) ObjectManager::PrepareRecord(ID);
 	Ref<T> next = new T();
 	//ObjectManager::CreateRecord(next, 0, Constants::Record::SPAWNED);
 	BaseObject* base = dynamic_cast<BaseObject*>(next.GetPointer());
-	if (!helpers::helper(base)) next->DestroyObject();
+	if (base == nullptr) {
+		next->DestroyObject();
+	}
+	base->LoadWithParameters(args);
+	base->BeginPlay();
+	auto t = dynamic_cast<Tickable*>(base);
+	ObjectManager::AddTick(t);
 	return next;
 }
 
 BaseObject* SpawnObject(String type);
 
 GameState* GetGameState();
+
+BaseObject* FindObjectByRecord(const RecordInt& record);

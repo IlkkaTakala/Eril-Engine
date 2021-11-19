@@ -27,15 +27,15 @@ class MovementComponent : public BaseObject, public Tickable
 public:
 	MovementComponent();
 
-	virtual void LoadWithParameters(const String& args) override { Console::Log(args); }
+	virtual void LoadWithParameters(const String& args) override;
 	virtual void OnDestroyed() override;
 
 	virtual void BeginPlay() override {}
 	virtual void Tick(float) override;
 
-	void SetTarget(Actor* t);
+	void SetTarget(SceneComponent* t);
 	void SetGround(Terrain* t);
-	Actor* GetTarget() const { return Object; }
+	SceneComponent* GetTarget() const { return Object; }
 	void SetMass(float m) { mass = m; }
 	void SetMaxSpeed(float speed) { max_speed = speed; }
 	void SetPhysics(bool p) { isPhysics = p; }
@@ -44,7 +44,7 @@ public:
 	bool GetAllowMovement() const { return allowMovement; }
 	void ApplyMovement();
 
-	void AddInput(const Vector& dir) { directions[direction_count++] = dir; }
+	void AddInput(const Vector& dir);
 	void AddImpulse(const Force& f) { forces[force_count++] = f; }
 	void AddImpulse(const Vector& d) { Force f; f.Direction = d; forces[force_count++] = f; }
 	bool IsInAir() { return inAir; }
@@ -54,7 +54,7 @@ public:
 
 private:
 
-	Ref<Actor> Object;
+	Ref<SceneComponent> Object;
 	RefWeak<Terrain> Terra;
 
 	bool isPhysics;

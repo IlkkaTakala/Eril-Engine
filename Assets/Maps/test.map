@@ -1,22 +1,4 @@
 <header version='1.0' />
-<Hunter id="A0005555">
-	<MovementComponent id="A0005522" args="target:A0005555"/>
+<Hunter id="A0005555" args="Location:100,0,1; ">
 </Hunter>
-<VisibleObject mesh="rock" material="Assets/Materials/rock" />
-<InstancedObject 
-	mesh="tree"
-	material="Assets/Materials/tree2"
-	count="100"
-	instances="
-	1,10,0;0,0,0;1,1,1;
-	2,10,0;0,0,0;1,1,1;
-	3,10,0;0,0,0;1,1,1;
-	4,10,0;0,0,0;1,1,1;
-	5,10,0;0,0,0;1,1,1;
-	6,10,0;0,0,0;1,1,1;
-	7,10,0;0,0,0;1,1,1;
-	8,10,0;0,0,0;1,1,1;
-	9,10,0;0,0,0;1,1,1;
-	10,10,0;0,0,0;1,1,1;
-	"
-/>
+<VisibleObject id="A0005553" args="Mesh:tree; Material:0Assets/Materials/tree;" />

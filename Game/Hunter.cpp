@@ -52,5 +52,6 @@ void Hunter::Tick(float delta)
 void Hunter::SetNewTarget(float delta)
 {
 	Console::Log("New target set");
-	targetLoc = GetGameState()->CurrentPlayer->GetLocation();
+	if (GetGameState()->CurrentPlayer != nullptr)
+		targetLoc = GetGameState()->CurrentPlayer->GetLocation();
 }

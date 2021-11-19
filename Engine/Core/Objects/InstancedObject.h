@@ -4,6 +4,7 @@
 
 class InstancedObject : public VisibleObject
 {
+	REGISTER(InstancedObject)
 public:
 	InstancedObject();
 

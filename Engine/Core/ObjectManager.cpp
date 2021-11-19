@@ -5,7 +5,6 @@
 long ObjectManager::counter = 1;
 RecordInt ObjectManager::Prepared = 0;
 std::map<RecordInt, Record*> ObjectManager::ObjectRecords;
-std::map<String, BaseObject* (*)(const String&, uint32, uint, bool, uint16)> ObjectManager::TypeList;
 std::list<RecordInt> ObjectManager::DeleteList;
 std::mutex ObjectManager::delete_m;
 
@@ -111,4 +110,10 @@ bool ObjectManager::PrepareRecord(const uint32 ID, const uint SpawnType, const b
 	}
 	Prepared = 0;
 	return false;
+}
+
+std::map<String, SpawnFunction>& ObjectManager::TypeList()
+{
+	static std::map<String, SpawnFunction> Type;
+	return Type;
 }

@@ -10,25 +10,42 @@ Scene::Scene() : BaseObject()
 	SceneGraph.clear();
 }
 
-void ParseChildren(rapidxml::xml_node<>* node) 
+void ParseChildren(rapidxml::xml_node<>* node, SceneComponent* base) 
 {
 	for (auto n = node->first_node(); n; n = n->next_sibling())
 	{
-		Console::Log(node->name() + String("> found node: ") + n->name());
 		String type = n->name();
-		if (ObjectManager::TypeList.find(type) == ObjectManager::TypeList.end()) continue;
+		if (ObjectManager::TypeList().find(type) == ObjectManager::TypeList().end()) continue;
 
 		uint32 id = 0;
 		String args;
 		auto id_ptr = n->first_attribute("id");
-		if (id_ptr != 0) id = std::stoul(id_ptr->value(), nullptr, 16);
-		auto arg_ptr = n->first_attribute("args");
-		if (arg_ptr != 0) args = arg_ptr->value();
+		if (id_ptr != 0)
+		{
+			id = std::stoul(id_ptr->value(), nullptr, 16);
+			auto arg_ptr = n->first_attribute("args");
+			if (arg_ptr != 0) args = arg_ptr->value();
 
-		BaseObject* obj = ObjectManager::TypeList[type](args, id, Constants::Record::LOADED, false, 0);
-		Console::Log("Spawned object with record: " + obj->GetRecord().ToString());
+			BaseObject* obj = ObjectManager::TypeList()[type](args, id, Constants::Record::LOADED, false, 0);
+			Console::Log("Spawned object with record: " + obj->GetRecord().ToString());
 
-		ParseChildren(n);
+			SceneComponent* scenic = dynamic_cast<SceneComponent*>(obj);
+			if (scenic != nullptr && base != nullptr) base->AddComponent(scenic);
+
+			obj->LoadWithParameters(args);
+			ParseChildren(n, scenic);
+		}
+	}
+}
+
+void LoopSceneChildren(const Ref<SceneComponent>& base) 
+{
+	for (const auto& c : base->GetChildren()) {
+		c->BeginPlay();
+		auto t = dynamic_cast<Tickable*>(base.GetPointer());
+		ObjectManager::AddTick(t);
+
+		LoopSceneChildren(c);
 	}
 }
 
@@ -43,19 +60,18 @@ void Scene::OpenLevel(String map)
 	xml_document<>* doc = new xml_document<>();
 	doc->parse<0>(loaded.data());
 
-	/*Console::Log("Name of my first node is: " + String(doc.first_node()->name()));
-	xml_node<>* node = doc.first_node("foobar");
-	Console::Log("Node foobar has value " + String(node->value()));
-	for (xml_attribute<>* attr = node->first_attribute();
-		attr; attr = attr->next_attribute())
-	{
-		Console::Log("Node foobar has attribute " + String(attr->name()));
-		Console::Log("with value " + String(attr->value()));
-	}*/
-
-	ParseChildren(doc);
+	ParseChildren(doc, nullptr);
 
 	delete doc;
+
+	for (const auto& base : Loop->World->SceneGraph) {
+		base->BeginPlay();
+		auto t = dynamic_cast<Tickable*>(base.GetPointer());
+		ObjectManager::AddTick(t);
+
+		LoopSceneChildren(base);
+	}
+	
 }
 
 void Scene::AddSceneRoot(SceneComponent* obj)
