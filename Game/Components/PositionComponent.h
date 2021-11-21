@@ -10,7 +10,7 @@ class PositionComponent : public Component
 {
 public:
 	PositionComponent() : Component() { Console::Log("PositionComponent()"); }
-	PositionComponent(const PositionComponent& c) : Component() { Console::Log("PositionComponent(const PositionComponent& c)");  X = c.X; Y = c.Y; Z = c.Z; }
+	PositionComponent(const PositionComponent& c) : Component(static_cast<Component>(c)) { Console::Log("PositionComponent(const PositionComponent& c)");  X = c.X; Y = c.Y; Z = c.Z; }
 	//PositionComponent(PositionComponent &&c) noexcept : Component()  { Console::Log("PositionComponent(PositionComponent &&c) ");  X = c.X; Y = c.Y; Z = c.Z; }
 
 

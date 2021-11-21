@@ -61,14 +61,14 @@ public:
 	template <typename T>
 	T* GetComponent(int id, int typeID)
 	{
-		Console::Log("ID + Type: " + std::to_string(id) + "," + std::to_string(id));
+		Console::Log("GetComponent, ID,Type: " + std::to_string(id) + "," + std::to_string(id));
 		for (int i = 0; i < componentStorages.size(); i++)
 		{
 			if (componentStorages.at(i)->GetType() == typeID)
 			{
 				ComponentTypeStorage<T>* s = static_cast<ComponentTypeStorage<T>*>(componentStorages.at(i));
 				T* cT = s->GetComponent(id);
-				Console::Log(std::to_string(cT->GetID()));
+				Console::Log("Found Component with ID: " + std::to_string(cT->GetID()));
 				return cT;
 			}
 		}

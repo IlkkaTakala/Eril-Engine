@@ -54,7 +54,9 @@ public:
 			{
 				if (c.second == typeID)
 				{
-					Console::Log(std::to_string(Entities.at(entityIndex)->GetComponents().begin()->first) + "," + std::to_string(Entities.at(entityIndex)->GetComponents().begin()->second));
+
+					//ERRORI TAPAHTUU TÄSSÄ, JOKO KOMPONENTIN HAKU ENTITYN SISÄLTÄ EI TOIMI TAI SITTEN SITÄ EI VARASTOIDA ENTITYN SISÄLLE OIKEIN!
+					Console::Log("GetComponentFromEntity " + std::to_string(entity->GetID()) + ", ID: " + std::to_string(entity->GetComponents().at(c.first)) + ", Type: " + std::to_string(Entities.at(entityIndex)->GetComponents().begin()->second));
 					T* component = WorldComponentManager->GetComponent<T>(entity->GetComponents().at(c.first), typeID);
 					if (component != nullptr)
 					{

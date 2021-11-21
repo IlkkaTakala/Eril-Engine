@@ -28,7 +28,7 @@ ECSTesting::ECSTesting()
 			pos->X += 100.0f * (i + 1);
 			pos->Y += 100.0f * (i + 1);
 			pos->Z += 100.0f * (i + 1);
-			Console::Log(pos->GetID() + ": " + std::to_string(pos->Z) + "," + std::to_string(pos->Y) + "," + std::to_string(pos->Z));
+			Console::Log(std::to_string(pos->GetID()) + ": " + std::to_string(pos->Z) + "," + std::to_string(pos->Y) + "," + std::to_string(pos->Z));
 		}
 
 		/*

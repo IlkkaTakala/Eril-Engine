@@ -43,15 +43,12 @@ public:
 
 	ComponentTypeStorage(int type) : IComponentStorage(type)
 	{ 
-		Array = new T[2];
 		Components = new std::vector<T>;
 		IndexUsage = new std::vector<bool>;
 	}
 
 	~ComponentTypeStorage() 
 	{
-		delete Array;
-
 		delete Components;
 		delete IndexUsage;
 	}
@@ -76,30 +73,19 @@ public:
 		{
 			usedIndex = static_cast<int>(IndexUsage->size());
 			Components->emplace_back();
-			Components->at(usedIndex).SetID(usedIndex);
-			Components->at(usedIndex).SetType(Type);
-
-			AddBack();
-			At(usedIndex)->SetID(usedIndex);
-			At(usedIndex)->SetType(Type);
 			IndexUsage->push_back(true);
 		}
 		else
 		{
-			Components->emplace_back();
-			Components->at(usedIndex).SetID(usedIndex);
-			Components->at(usedIndex).SetType(Type);
-
-			AddBack();
-			At(usedIndex)->SetID(usedIndex);
-			At(usedIndex)->SetType(Type);
+			Components->at(usedIndex) = T();
 			IndexUsage->push_back(true);
 		}
+		Components->at(usedIndex).SetID(usedIndex);
+		Components->at(usedIndex).SetType(Type);
 		ComponentCount++;
 
-		Console::Log("AddComponent: " + std::to_string(At(usedIndex)->GetID()));
+		Console::Log("AddComponent: " + std::to_string(Components->at(usedIndex).GetID()));
 
-		return At(usedIndex);
 		return &Components->at(usedIndex);
 	}
 
@@ -115,8 +101,7 @@ public:
 		{
 			if (IndexUsage->at(id))
 			{
-				Console::Log(std::to_string(id) + " ::: " + std::to_string(At(id)->GetID()));
-				return At(id);
+				Console::Log("GetComponent, id:type" + std::to_string(id) + ":" + std::to_string(Components->at(id).GetID()));
 				return &Components->at(id);
 			}
 		}
@@ -147,33 +132,6 @@ public:
 private:
 	std::vector<T, std::allocator<T>>* Components;
 	std::vector<bool>* IndexUsage;
-
-
-	T* Array;
-	int CurrentSize = 0;
-	int MaxSize = 1;
-	const int GROWSIZE = 2;
-
-	void AddBack()
-	{
-		if (CurrentSize == MaxSize)
-		{
-			T* temp = new T[MaxSize + GROWSIZE];
-			for (int i = 0; i < MaxSize; i++)
-			{
-				temp[i] = Array[i];
-			}
-			delete[] Array;
-			Array = temp;
-		}
-		Array[CurrentSize] = T();
-		CurrentSize++;
-	}
-
-	T* At(int i)
-	{
-		return &Array[i];
-	}
 };
 
 
