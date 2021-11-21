@@ -15,8 +15,8 @@ class Component
 {
 public:
 	Component() {}
-	Component(Component const& c) { ID = c.ID; Type = c.Type; Disabled = c.Disabled; }
-	//Component(Component &&c) noexcept { ID = c.ID; Type = c.Type; Disabled = c.Disabled; }
+	Component(Component const& c) : ID(c.ID), Type(c.Type), Disabled(c.Disabled) {}
+	//Component(Component &&c) noexcept : ID(std::move(c.ID)), Type(std::move(c.Type)), Disabled(std::move(c.Disabled)) {}
 
 	~Component() {}
 

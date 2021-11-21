@@ -84,7 +84,7 @@ public:
 		Components->at(usedIndex).SetType(Type);
 		ComponentCount++;
 
-		Console::Log("AddComponent: " + std::to_string(Components->at(usedIndex).GetID()));
+		//Console::Log("AddComponent: " + std::to_string(Components->at(usedIndex).GetID()));
 
 		return &Components->at(usedIndex);
 	}
@@ -101,7 +101,7 @@ public:
 		{
 			if (IndexUsage->at(id))
 			{
-				Console::Log("GetComponent, id:type" + std::to_string(id) + ":" + std::to_string(Components->at(id).GetID()));
+				//Console::Log("GetComponent, id:type" + std::to_string(id) + ":" + std::to_string(Components->at(id).GetID()));
 				return &Components->at(id);
 			}
 		}

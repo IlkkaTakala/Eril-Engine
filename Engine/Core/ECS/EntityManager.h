@@ -56,11 +56,12 @@ public:
 				{
 
 					//ERRORI TAPAHTUU TÄSSÄ, JOKO KOMPONENTIN HAKU ENTITYN SISÄLTÄ EI TOIMI TAI SITTEN SITÄ EI VARASTOIDA ENTITYN SISÄLLE OIKEIN!
-					Console::Log("GetComponentFromEntity " + std::to_string(entity->GetID()) + ", ID: " + std::to_string(entity->GetComponents().at(c.first)) + ", Type: " + std::to_string(Entities.at(entityIndex)->GetComponents().begin()->second));
-					T* component = WorldComponentManager->GetComponent<T>(entity->GetComponents().at(c.first), typeID);
+					int componentID = c.first;
+					//Console::Log("GetComponentFromEntity " + std::to_string(entity->GetID()) + ", cID: " + std::to_string(componentID) + ", cType: " + std::to_string(typeID));
+					
+					T* component = WorldComponentManager->GetComponent<T>(c.first, typeID);
 					if (component != nullptr)
 					{
-						//Console::Log(std::to_string(component->GetID()));
 						return component;
 					}
 					break;

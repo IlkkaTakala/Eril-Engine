@@ -19,7 +19,7 @@ ECSTesting::ECSTesting()
 	componentManager->CreateComponentTypeStorage<PositionComponent>("PositionComponent");
 
 
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 50; i++)
 	{
 		Entity* entity = entityManager->AddEntity();
 		PositionComponent* pos = entityManager->AddComponentToEntity<PositionComponent>(entity->GetID(), "PositionComponent");
