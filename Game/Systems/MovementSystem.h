@@ -17,26 +17,31 @@ public:
 
 	void Update(float deltaTime, std::vector<int> entities)
 	{
-		for (auto e : entities)
+		if (!Done)
 		{
-			//Console::Log("Processing entity " + std::to_string(WorldEntityManager.GetEntity(e)->GetID()));
-			PositionComponent* pos = WorldEntityManager.GetComponentFromEntity<PositionComponent>(WorldEntityManager.GetEntity(e)->GetID(), "PositionComponent");
-			if (pos != nullptr)
+			Done = true;
+			for (auto e : entities)
 			{
-				pos->X += 10.0f * deltaTime;
-				pos->Y += 10.0f * deltaTime;
-				pos->Z += 10.0f * deltaTime;
+				//Console::Log("Processing entity " + std::to_string(WorldEntityManager.GetEntity(e)->GetID()));
+				PositionComponent* pos = WorldEntityManager.GetComponentFromEntity<PositionComponent>(WorldEntityManager.GetEntity(e)->GetID(), "PositionComponent");
+				if (pos != nullptr)
+				{
+					pos->X += 10.0f * deltaTime;
+					pos->Y += 10.0f * deltaTime;
+					pos->Z += 10.0f * deltaTime;
 
-				//Console::Log(std::to_string(WorldEntityManager.GetEntity(e)->GetID()) + "," + std::to_string(pos->GetID()) + "," + std::to_string(pos->Z) + "," + std::to_string(pos->Y) + "," + std::to_string(pos->Z));
-			}
-			else
-			{
-				Console::Log("Component NOT FOUND!");
+					Console::Log(std::to_string(WorldEntityManager.GetEntity(e)->GetID()) + "," + std::to_string(pos->GetID()) + "," + std::to_string(pos->Z) + "," + std::to_string(pos->Y) + "," + std::to_string(pos->Z));
+				}
+				else
+				{
+					Console::Log("Component NOT FOUND!");
+				}
 			}
 		}
+		
 	}
 
 
 private:
-
+	bool Done = false;
 };

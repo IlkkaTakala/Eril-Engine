@@ -14,9 +14,11 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 class Component
 {
 public:
-	Component() {}
-	Component(Component const& c) : ID(c.ID), Type(c.Type), Disabled(c.Disabled) {}
-	//Component(Component &&c) noexcept : ID(std::move(c.ID)), Type(std::move(c.Type)), Disabled(std::move(c.Disabled)) {}
+	Component() { Console::Log("Component()"); }
+	Component(Component const& c) : ID(c.ID), Type(c.Type), Disabled(c.Disabled) { Console::Log("Component(Component const& c)"); }
+	Component(Component &&c) noexcept : ID(std::move(c.ID)), Type(std::move(c.Type)), Disabled(std::move(c.Disabled)) { Console::Log("Component(Component &&c) noexcept"); }
+
+	Component& operator=(const Component& c) { ID = c.ID; Type = c.Type; Disabled = c.Disabled; Console::Log("operator=(const Component& c)"); return *this; }
 
 	~Component() {}
 
@@ -29,7 +31,7 @@ public:
 
 	Component* GetPointer() { return this; }
 
-private:
+protected:
 	int ID = -1;
 	int Type = -1;
 	bool Disabled = false;
