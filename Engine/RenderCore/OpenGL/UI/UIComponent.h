@@ -22,14 +22,14 @@ public:
 	UIComponent();
 	virtual ~UIComponent();
 
-	void AddToScreen() const;
-
 	int GetZIndex() const { return z_index; }
 	virtual float GetTreeDepth() const { return realDepth; }
 	virtual void UpdateDepth(float& depth) { realDepth = depth; depth += 0.1f; recalculate = true; }
 	void SetParent(UIComponent* p) { parent = p; }
 	virtual void Render() = 0;
 	virtual void UpdateMatrices(const Vector2D& size);
+
+	
 
 protected:
 	friend class UISpace;

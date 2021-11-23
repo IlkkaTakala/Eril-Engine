@@ -13,8 +13,8 @@ UIComponent::UIComponent()
 	origin = Vector();
 	leftOffset = 0.f;
 	topOffset = 0.f;
-	rightOffset = 0.f;
-	bottomOffset = 0.f;
+	rightOffset = 100.f;
+	bottomOffset = 50.f;
 
 	anchor_v = Vector();
 	anchor_h = Vector();
@@ -45,35 +45,41 @@ UIComponent::~UIComponent()
 	delete matrix;
 }
 
-void UIComponent::AddToScreen() const
-{
-}
-
 void UIComponent::UpdateMatrices(const Vector2D& size)
 {
-	glm::vec2 sizer(size.X, size.Y);
-	glm::mat4 view = glm::ortho(0.f, (float)size.X, (float)size.Y, 0.f, 10.f, 0.1f);;
-	Vector loc = transform.Location;
-	Vector rot = transform.Rotation;
-	Vector sca = transform.Scale;
+	const glm::mat4 view = glm::ortho(0.f, (float)size.X, (float)size.Y, 0.f, 10.f, 0.1f);;
+	const Vector loc = transform.Location;
+	const Vector rot = transform.Rotation;
+	const Vector sca = transform.Scale;
 
-	anchor_h;
-	anchor_v;
-	origin;
-	topOffset = 50.f;
-	rightOffset = 10.f;
-
+	glm::vec3 gloc(0.f);
 	glm::vec3 scale(1.f);
-	if (anchor_v.X == anchor_v.Y)
-		scale.y = topOffset;
-	if (anchor_h.X == anchor_h.Y)
-		scale.x = rightOffset;
+	glm::vec2 bounds = parent == nullptr ? glm::vec2(size.X, size.Y) : glm::vec2(parent->realSize.X, parent->realSize.Y);
 
-	glm::mat4 model = /*glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, (realDepth + 0.1f))) **/ glm::scale(glm::mat4(1.f), scale);
+	if (anchor_v.Y <= anchor_v.X) {
+		scale.y = bottomOffset;
+		gloc.y = bounds.y * anchor_v.X + topOffset - (bottomOffset * origin.Y);
+	}
+	else {
+		gloc.y = anchor_v.X * bounds.y + topOffset;
+		scale.y = (anchor_v.Y * bounds.y - bottomOffset) - gloc.y;
+	}
+	if (anchor_h.Y <= anchor_h.X) {
+		scale.x = rightOffset;
+		gloc.x = bounds.x * anchor_h.X + leftOffset - (rightOffset * origin.X);
+	}
+	else {
+		gloc.x = anchor_h.X * bounds.x + leftOffset;
+		scale.x = (anchor_h.Y * bounds.x - rightOffset) - gloc.x;
+	}
+
+	glm::mat4 model = glm::translate(glm::mat4(1.f), gloc) * glm::scale(glm::mat4(1.f), scale);
 
 	model *= glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Z, 0.f))
 		* glm::toMat4(glm::quat(glm::vec3(glm::radians(rot.X), glm::radians(rot.Z), glm::radians(rot.Y))))
 		* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Z, sca.Y));
 
+	realSize.X = (long)scale.x;
+	realSize.Y = (long)scale.y;
 	matrix->model_m = view * model;
 }

@@ -118,6 +118,9 @@
     <ClCompile Include="Game\TestUI.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\RenderCore\OpenGL\UI\Image.cpp">
+      <Filter>Engine\OpenGL\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -264,6 +267,9 @@
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Panel.h">
+      <Filter>Engine\OpenGL\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Image.h">
       <Filter>Engine\OpenGL\UI</Filter>
     </ClInclude>
   </ItemGroup>

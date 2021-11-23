@@ -14,6 +14,7 @@ public:
 	void SetSize(uint width, uint height);
 	void Render(uint Target);
 	void AddComponent(UI* com);
+	Vector2D GetSize() const { return ScreenSize; }
 
 private:
 

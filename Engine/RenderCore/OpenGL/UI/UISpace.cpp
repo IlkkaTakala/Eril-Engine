@@ -138,21 +138,26 @@ void UISpace::Render(uint target)
 	glBindVertexArray(VAO);
 	
 	glBindFramebuffer(GL_FRAMEBUFFER, UIBuffer);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// TODO: find focus, find hovered, find press
 
 	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);
 	glDisable(GL_MULTISAMPLE);
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_ALWAYS);
+	glDepthFunc(GL_NOTEQUAL);
 	glDisable(GL_CULL_FACE);
 	for (const auto& c : TopLevel) {
 		c->TopLevel->Render();
 	}
 
+	// TODO: draw updates only where depth has changed, clear only when no geometry blocks
+
 	Combiner->Bind();
 	glBindFramebuffer(GL_FRAMEBUFFER, target);
 
+	glDepthFunc(GL_ALWAYS);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
