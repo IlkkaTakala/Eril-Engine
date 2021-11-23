@@ -15,6 +15,7 @@ public:
 	void Render(uint Target);
 	void AddComponent(UI* com);
 	Vector2D GetSize() const { return ScreenSize; }
+	void SetScreen(uint window) { Screen = window; }
 
 private:
 
@@ -24,6 +25,7 @@ private:
 	uint VAO;
 	uint VBO;
 	uint TBO;
+	uint Screen;
 
 	Shader* UIShader;
 	Shader* Combiner;
@@ -31,5 +33,6 @@ private:
 	Vector2D ScreenSize;
 
 	std::list<Ref<UI>> TopLevel;
+	RefWeak<UIComponent> Focused;
 };
 

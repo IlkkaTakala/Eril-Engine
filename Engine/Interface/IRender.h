@@ -86,8 +86,8 @@ protected:
 	std::multimap<int, std::function<void(float, bool)>> KeyCallers;
 	std::multimap<int, std::function<void(float, float)>> MouseCallers;
 
-	double MouseX;
-	double MouseY;
+	float MouseX;
+	float MouseY;
 };
 
 struct AABB

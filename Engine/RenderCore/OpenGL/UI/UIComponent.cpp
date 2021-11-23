@@ -79,7 +79,14 @@ void UIComponent::UpdateMatrices(const Vector2D& size)
 		* glm::toMat4(glm::quat(glm::vec3(glm::radians(rot.X), glm::radians(rot.Z), glm::radians(rot.Y))))
 		* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Z, sca.Y));
 
-	realSize.X = (long)scale.x;
-	realSize.Y = (long)scale.y;
+	realSize.X = (long)(scale.x * sca.X);
+	realSize.Y = (long)(scale.y * sca.Y);
+	topLeft.X = gloc.x + loc.X;
+	topLeft.X = gloc.y + loc.Y;
 	matrix->model_m = view * model;
+}
+
+bool UIComponent::Trace(const Vector2D& point) const
+{
+	return false;
 }

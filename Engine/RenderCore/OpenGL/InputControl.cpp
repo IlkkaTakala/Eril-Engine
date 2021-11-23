@@ -3,6 +3,7 @@
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 #include "Renderer.h"
+#include <Interface/WindowManager.h>
 
 void (*GLInput::KeyInput)(int, int, int, int) = nullptr;
 
@@ -32,6 +33,8 @@ GLInput::~GLInput()
 
 void GLInput::ProcessInputs(float delta)
 {
+	WindowManager::PollEvents();
+
 	for (auto const& [key, value] : Hold) {
 		auto t = KeyCallers.find(key);
 		if (t != KeyCallers.end()) {
@@ -68,8 +71,9 @@ void GLInput::ProcessInputs(float delta)
 		}
 		Inputs.pop();
 	}
-	double x = 0.0, y = 0.0;
-	glfwGetCursorPos(dynamic_cast<Renderer*>(RI)->Window, &x, &y);
+	float x = 0.0, y = 0.0;
+	//glfwGetCursorPos(dynamic_cast<Renderer*>(RI)->Window, &x, &y);
+	WindowManager::GetCursorPosition(dynamic_cast<Renderer*>(RI)->Window, x, y);
 	auto t = MouseCallers.equal_range(0);
 	for (auto it = t.first; it != t.second; it++) {
 		it->second(MouseX - x, MouseY - y);
@@ -80,8 +84,8 @@ void GLInput::ProcessInputs(float delta)
 
 void GLInput::SetInputHandler(void(*Callback) (int, int, int, int))
 {
-	KeyInput = Callback == nullptr ? &InputCallback : Callback;
-	glfwSetKeyCallback(dynamic_cast<Renderer*>(RI)->Window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+	//KeyInput = Callback == nullptr ? &InputCallback : Callback;
+	glfwSetKeyCallback((GLFWwindow*)WindowManager::GetHandle(dynamic_cast<Renderer*>(RI)->Window), [](GLFWwindow* window, int key, int scancode, int action, int mods) {
 		InputCallback(key, scancode, action, mods);
 	});
 }

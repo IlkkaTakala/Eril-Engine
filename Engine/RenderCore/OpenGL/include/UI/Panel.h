@@ -13,6 +13,7 @@ public:
 	virtual void UpdateDepth(float& depth) override;
 	virtual float GetTreeDepth() const override;
 	virtual void UpdateMatrices(const Vector2D& size) override;
+	virtual bool Trace(const Vector2D& point) const override;
 private:
 	std::multimap<int, UIComponent*> children;
 };

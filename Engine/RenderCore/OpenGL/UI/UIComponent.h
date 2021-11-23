@@ -29,7 +29,9 @@ public:
 	virtual void Render() = 0;
 	virtual void UpdateMatrices(const Vector2D& size);
 
-	
+	virtual bool Trace(const Vector2D& point) const;
+
+
 
 protected:
 	friend class UISpace;
@@ -54,6 +56,7 @@ protected:
 	int z_index;
 	float realDepth;
 	Vector2D realSize;
+	Vector2D topLeft;
 
 	Vector basecolor;
 	Vector tint;

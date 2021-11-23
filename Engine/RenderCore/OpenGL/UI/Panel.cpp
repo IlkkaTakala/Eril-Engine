@@ -71,3 +71,8 @@ void Panel::UpdateMatrices(const Vector2D& size)
 		c.second->UpdateMatrices(size);
 	}
 }
+
+bool Panel::Trace(const Vector2D& point) const
+{
+	return false;
+}

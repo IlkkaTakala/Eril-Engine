@@ -4,6 +4,8 @@
 #include "UIComponent.h"
 #include <Material.h>
 #include <glm/gtx/transform.hpp>
+#include <GLFW/glfw3.h>
+#include <Interface/WindowManager.h>
 
 UISpace::UISpace()
 {
@@ -140,7 +142,16 @@ void UISpace::Render(uint target)
 	glBindFramebuffer(GL_FRAMEBUFFER, UIBuffer);
 	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// TODO: find focus, find hovered, find press
+	if (WindowManager::GetShowCursor(Screen)) {
+		float x;
+		float y;
+		WindowManager::GetCursorPosition(Screen, x, y);
+		Vector2D point(x, y);
+
+		for (auto it = TopLevel.rbegin(); it != TopLevel.rend(); it++) {
+			(*it)->TopLevel->Trace(point);
+		}
+	}
 
 	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);
