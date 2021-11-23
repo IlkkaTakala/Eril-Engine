@@ -119,15 +119,16 @@ void WindowManager::GetCursorPosition(uint window, float& x, float& y)
 
 void WindowManager::SetShowCursor(uint window, bool show)
 {
+	uint idx = window == 0 ? Windows.begin()->first : window;
 	if (show) {
-		glfwSetInputMode(Windows[window], GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		glfwSetInputMode(Windows[idx], GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		if (glfwRawMouseMotionSupported())
-			glfwSetInputMode(Windows[window], GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
+			glfwSetInputMode(Windows[idx], GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
 	}
 	else {
-		glfwSetInputMode(Windows[window], GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		glfwSetInputMode(Windows[idx], GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		if (glfwRawMouseMotionSupported())
-			glfwSetInputMode(Windows[window], GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+			glfwSetInputMode(Windows[idx], GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 	}
 }
 

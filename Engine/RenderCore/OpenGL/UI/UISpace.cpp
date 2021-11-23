@@ -149,12 +149,12 @@ void UISpace::Render(uint target)
 		Vector2D point(x, y);
 
 		for (auto it = TopLevel.rbegin(); it != TopLevel.rend(); it++) {
-			(*it)->TopLevel->Trace(point);
+			(*it)->TopLevel->HoverCheck(point);
 		}
 	}
 
 	glDepthMask(GL_TRUE);
-	glDisable(GL_BLEND);
+	//glDisable(GL_BLEND);
 	glDisable(GL_MULTISAMPLE);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_NOTEQUAL);

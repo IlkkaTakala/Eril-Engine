@@ -3,6 +3,7 @@
 #include <Core.h>
 
 class UI;
+class UIComponent;
 class Shader;
 
 class UISpace
@@ -18,6 +19,7 @@ public:
 	void SetScreen(uint window) { Screen = window; }
 
 private:
+	bool hasFocus;
 
 	uint UIBuffer;
 	uint Color;

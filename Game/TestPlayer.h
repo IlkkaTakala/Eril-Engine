@@ -36,6 +36,7 @@ private:
 	void InputExit(float delta, bool) { Exit(); }
 
 	void OpenConsole(float, bool);
+	void UseCursor(float, bool);
 
 	Ref<MovementComponent> Movement;
 	Ref<VisibleObject> Mesh;

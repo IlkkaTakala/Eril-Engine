@@ -19,7 +19,7 @@ UIComponent::UIComponent()
 	anchor_v = Vector();
 	anchor_h = Vector();
 
-	visible = Visibility::Hidden;
+	visible = Visibility::Visible;
 	hits = HitReg::HitTestInvisible;
 
 	z_index = 0;
@@ -31,6 +31,7 @@ UIComponent::UIComponent()
 
 	focusable = false;
 	hasFocus = false;
+	hovered = false;
 
 	parent = nullptr;
 
@@ -81,12 +82,42 @@ void UIComponent::UpdateMatrices(const Vector2D& size)
 
 	realSize.X = (long)(scale.x * sca.X);
 	realSize.Y = (long)(scale.y * sca.Y);
-	topLeft.X = gloc.x + loc.X;
-	topLeft.X = gloc.y + loc.Y;
+	topLeft.X = (long)(gloc.x + loc.X);
+	topLeft.X = (long)(gloc.y + loc.Y);
 	matrix->model_m = view * model;
 }
 
 bool UIComponent::Trace(const Vector2D& point) const
 {
+	if (point.X < 0.f) {
+		return false;
+	}
+	if (point.X >= topLeft.X)
+		if (point.Y >= topLeft.Y)
+			if (point.X <= realSize.X + topLeft.X)
+				if (point.Y <= realSize.Y + topLeft.Y)
+					return true;
 	return false;
+}
+
+void UIComponent::HoverCheck(Vector2D& point)
+{
+	if (hits == HitReg::HitTestVisible && visible == Visibility::Visible) {
+		bool hit = Trace(point);
+		if (hit)
+		{
+			point.X = -1;
+			if (!hovered) {
+				hovered = true;
+				OnEnter();
+			}
+			else OnHover();
+		}
+		else {
+			if (hovered) {
+				hovered = false;
+				OnLeave();
+			}
+		}
+	}
 }

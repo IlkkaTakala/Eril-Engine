@@ -16,6 +16,8 @@ Panel::Panel() : UIComponent()
 	bottomOffset = 0.f;
 	leftOffset = 0.f;
 	rightOffset = 0.f;
+
+	hits = HitReg::HitTestInvisible;
 }
 
 Panel::~Panel()
@@ -40,6 +42,7 @@ Panel* Panel::AddChild(UIComponent* child)
 
 void Panel::Render()
 {
+	if (visible != Visibility::Visible) return;
 	for (auto it = children.rbegin(); it != children.rend(); it++) {
 		it->second->Render();
 	}
@@ -72,7 +75,10 @@ void Panel::UpdateMatrices(const Vector2D& size)
 	}
 }
 
-bool Panel::Trace(const Vector2D& point) const
+void Panel::HoverCheck(Vector2D& point)
 {
-	return false;
+	for (auto it = children.rbegin(); it != children.rend(); it++) {
+		it->second->HoverCheck(point);
+	}
+	UIComponent::HoverCheck(point);
 }

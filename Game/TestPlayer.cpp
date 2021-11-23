@@ -7,9 +7,18 @@
 #include "Objects/InstancedObject.h"
 #include "Hunter.h"
 #include "TestUI.h"
+#include <Interface/WindowManager.h>
 
 void TestPlayer::OpenConsole(float, bool) {
 	Console::Create();
+}
+static bool cursorState = true;
+void TestPlayer::UseCursor(float, bool keydown)
+{
+	if (!keydown) {
+		WindowManager::SetShowCursor(0, cursorState);
+		cursorState = !cursorState;
+	}
 }
 
 TestPlayer::TestPlayer() : Player()
@@ -33,6 +42,7 @@ TestPlayer::TestPlayer() : Player()
 	II->RegisterKeyInput(256, &TestPlayer::InputExit, this);
 	II->RegisterKeyInput(257, &TestPlayer::OpenConsole, this);
 	II->RegisterMouseInput(0, &TestPlayer::MouseMoved, this);
+	II->RegisterKeyInput(69, &TestPlayer::UseCursor, this);
 
 	Mesh = SpawnObject<VisibleObject>();
 	Mesh->SetModel("Cube");
@@ -123,7 +133,7 @@ void TestPlayer::RightMouseDown(float delta, bool KeyDown)
 void TestPlayer::MouseMoved(float X, float Y)
 {
 	const Vector& rot = Rotation;
-	SetRotation(Vector(rot.X + X * mouseSens, rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, rot.Z));
+	if (cursorState) SetRotation(Vector(rot.X + X * mouseSens, rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, rot.Z));
 }
 
 void TestPlayer::Tick(float)

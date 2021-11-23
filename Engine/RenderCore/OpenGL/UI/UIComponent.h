@@ -29,13 +29,15 @@ public:
 	virtual void Render() = 0;
 	virtual void UpdateMatrices(const Vector2D& size);
 
-	virtual bool Trace(const Vector2D& point) const;
+	bool Trace(const Vector2D& point) const;
 
-
+	virtual void OnLeave() {}
+	virtual void OnEnter() {}
+	virtual void OnHover() {}
+	virtual void HoverCheck(Vector2D& point);
 
 protected:
 	friend class UISpace;
-	friend class UIComponent;
 
 	Vector origin;
 	float leftOffset;
@@ -64,6 +66,7 @@ protected:
 
 	bool focusable;
 	bool hasFocus;
+	bool hovered;
 
 	UIComponent* parent;
 

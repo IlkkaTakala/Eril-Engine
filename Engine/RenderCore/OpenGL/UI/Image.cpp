@@ -72,6 +72,8 @@ void main()
 	glBindBuffer(GL_UNIFORM_BUFFER, uniformBuffer);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(UIStyleGLM), &n, GL_STATIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	hits = HitReg::HitTestVisible;
 }
 
 Image::~Image()
@@ -84,6 +86,7 @@ Image::~Image()
 
 void Image::Render()
 {
+	if (visible != Visibility::Visible) return;
 	glBindBufferBase(GL_UNIFORM_BUFFER, 1, uniformBuffer);
 	if (style.texture == nullptr) {
 		solid_shader->Bind();
