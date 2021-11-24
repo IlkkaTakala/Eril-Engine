@@ -38,24 +38,14 @@ TestPlayer::TestPlayer() : Player()
 	Mesh->SetModel("Cube");
 	Mesh->GetModel()->SetAABB(AABB(Vector(-0.5f), Vector(0.5f)));
 
-	for (int y = 0; y < 2; y++) {
-		for (int x = 0; x < 2; x++) {
-			terra[y * 2 + x] = SpawnObject<Terrain>();
-			terra[y * 2 + x]->InitTerrain(100, Vector(100.f, 100.f, 1.f), Vector(-100.f * x, -100.f * y, 0.f));
-		}
-	}
+
 	Movement = SpawnObject<MovementComponent>();
 	Movement->SetTarget(dynamic_cast<Actor*>(this));
 	Movement->SetGravity(true);
-	Movement->SetGround(terra[0]);
 
 	Sky = SpawnObject<VisibleObject>();
 	Sky->SetModel(MI->LoadData(Sky, "SkySphere"));
 	Sky->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/Sky"));
-	
-	hunt = SpawnObject<Hunter>();
-	hunt->SetLocation(Vector(100.f, 0.f, 0.f));
-	hunt->move->SetGround(terra[0]);
 
 	auto ui = SpawnObject<TestUI>();
 	UI::AddToScreen(ui, this);

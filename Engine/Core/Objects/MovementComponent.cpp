@@ -19,6 +19,17 @@ MovementComponent::MovementComponent()
 	Physics::AddMovable(this);
 }
 
+void MovementComponent::LoadWithParameters(const String& args)
+{
+	BaseObject::LoadWithParameters(args);
+	auto data = ParseOptions(args);
+	auto it = data.find("target");
+	if (it != data.end()) {
+		RecordInt id = std::stoul(it->second, nullptr, 16);
+		SetTarget(ObjectManager::GetByRecord<SceneComponent>(id));
+	}
+}
+
 void MovementComponent::OnDestroyed()
 {
 	Physics::RemoveMovable(this);
@@ -26,7 +37,7 @@ void MovementComponent::OnDestroyed()
 
 void MovementComponent::Tick(float time)
 {
-	if (!allowMovement) return;
+	if (!allowMovement || Object == nullptr) return;
 	DesiredState.location = Object->GetLocation();
 	OldState = DesiredState;
 	if (Object == nullptr) return;
@@ -89,7 +100,7 @@ void MovementComponent::Tick(float time)
 
 }
 
-void MovementComponent::SetTarget(Actor* t)
+void MovementComponent::SetTarget(SceneComponent* t)
 {
 	Object = t;
 	//Physics::RemoveStatic(t);
@@ -102,6 +113,16 @@ void MovementComponent::SetGround(Terrain* t)
 
 void MovementComponent::ApplyMovement()
 {
-	if (!allowMovement) return;
+	if (!allowMovement || Object == nullptr) return;
 	Object->SetLocation(DesiredState.location);
+}
+
+void MovementComponent::AddInput(const Vector& dir)
+{
+	if (direction_count < 15) 
+		directions[direction_count++] = dir; 
+	else {
+		direction_count = 0;
+		directions[direction_count++] = dir; 
+	}
 }

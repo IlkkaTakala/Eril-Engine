@@ -775,6 +775,7 @@ void Console::Close()
 
 void AddLine(const String& pre, const String& line)
 {
+	if (line == "") return;
 	LPCSTR format = "hh':'mm':'ss";
 	char w[10];
 	GetTimeFormatA(LOCALE_NAME_USER_DEFAULT, TIME_NOTIMEMARKER | TIME_FORCE24HOURFORMAT, NULL, NULL, w, 9);

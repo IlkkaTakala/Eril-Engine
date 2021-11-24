@@ -71,7 +71,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>Game;Engine\external\assimp\include;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Game;Engine\external\assimp\include;Engine\external\RapidXML;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -115,7 +115,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>Game;Engine\external\assimp\include;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Game;Engine\external\assimp\include;Engine\external\RapidXML;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ExceptionHandling>Sync</ExceptionHandling>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -159,7 +159,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>Game;Engine\external\assimp\include;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Game;Engine\external\assimp\include;Engine\external\RapidXML;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -223,6 +223,7 @@
     <ClCompile Include="Engine\Core\Timer.cpp" />
     <ClCompile Include="Engine\Core\WinConsole.cpp" />
     <ClCompile Include="Engine\external\glfw\deps\glad_gl.c" />
+    <ClCompile Include="Engine\Interface\FileManager.cpp" />
     <ClCompile Include="Engine\Interface\IRender.cpp" />
     <ClCompile Include="Engine\Interface\WindowManager.cpp" />
     <ClCompile Include="Engine\RenderCore\OpenGL\Camera.cpp" />
@@ -261,6 +262,7 @@
     <ClInclude Include="Engine\Core\Timer.h" />
     <ClInclude Include="Engine\Core\WinConsole.h" />
     <ClInclude Include="Engine\external\glfw\deps\glad\gl.h" />
+    <ClInclude Include="Engine\Interface\FileManager.h" />
     <ClInclude Include="Engine\Interface\IRender.h" />
     <ClInclude Include="Engine\Interface\WindowManager.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\include\Camera.h" />
