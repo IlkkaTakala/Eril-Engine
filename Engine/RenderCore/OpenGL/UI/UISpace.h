@@ -19,6 +19,9 @@ public:
 	void SetScreen(uint window) { Screen = window; }
 
 private:
+
+	uint GetGlyphs(String name);
+
 	bool hasFocus;
 
 	uint UIBuffer;

@@ -13,6 +13,8 @@ UISpace::UISpace()
 	Color = 0;
 	Depth = 0;
 	UIShader = nullptr;
+	Screen = 0;
+	hasFocus = false;
 
 	const char* vertexShader = R"~~~(
 #version 430 core
@@ -185,4 +187,9 @@ void UISpace::AddComponent(UI* com)
 		com->TopLevel->UpdateMatrices(ScreenSize);
 	com->PostConstruct();
 	TopLevel.push_back(com);
+}
+
+uint UISpace::GetGlyphs(String name)
+{
+	return uint();
 }
