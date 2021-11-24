@@ -203,9 +203,7 @@
   <ItemGroup>
     <ClCompile Include="Engine\Core\BasicTypes.cpp" />
     <ClCompile Include="Engine\Core\Core.cpp" />
-    <ClCompile Include="Engine\Core\ECS\ComponentManager.cpp" />
     <ClCompile Include="Engine\Core\ECS\EntityManager.cpp" />
-    <ClCompile Include="Engine\Core\ECS\System.cpp" />
     <ClCompile Include="Engine\Core\ECS\SystemsManager.cpp" />
     <ClCompile Include="Engine\Core\GameLoop.cpp" />
     <ClCompile Include="Engine\Core\Gameplay\GameState.cpp" />

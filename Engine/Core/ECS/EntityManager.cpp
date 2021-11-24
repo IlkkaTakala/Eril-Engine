@@ -1,6 +1,6 @@
 /*
 Author: Albert Uusi-Illikainen [RabbitTortoise]
-5.11.2021, Last Edited by RabbitTortoise 18.11.2021
+5.11.2021, Last Edited by RabbitTortoise 24.11.2021
 */
 
 #include <ECS/EntityManager.h>
@@ -50,7 +50,6 @@ Entity* EntityManager::GetEntity(int entityIndex)
 	return nullptr;
 }
 
-
 bool EntityManager::RemoveEntity(Entity*& entity)
 {
 	int id = entity->GetID();
@@ -83,69 +82,6 @@ bool EntityManager::RemoveEntity(int entityIndex)
 	return false;
 }
 
-/*
-Component* EntityManager::CreateNewComponentToEntity(int entityIndex, String typeName)
-{
-	if (entityIndex < static_cast<int>(IndexUsage.size()))
-	{
-		if (IndexUsage.at(entityIndex))
-		{
-			Component* c = WorldComponentManager->CreateNewComponentOfType(typeName);
-			int componentType = WorldComponentManager->GetTypeIdByName(typeName);
-			Entities.at(entityIndex)->GetComponents().insert(std::pair<int, int>(c->GetID(), componentType));
-			return c;
-		}
-	}
-	return nullptr;
-}
-
-Component* EntityManager::CreateNewComponentToEntity(int entityIndex, int componentTypeID)
-{
-	if (entityIndex < static_cast<int>(IndexUsage.size()))
-	{
-		if (IndexUsage.at(entityIndex))
-		{
-			Component* c = WorldComponentManager->CreateNewComponentOfType(componentTypeID);
-			Entities.at(entityIndex)->GetComponents().insert(std::pair<int, int>(c->GetID(), componentTypeID));
-			return c;
-		}
-	}
-	return nullptr;
-}
-
-
-Component* EntityManager::GetComponentFromEntity(int entityIndex, String componentType)
-{
-	int typeID = WorldComponentManager->GetTypeIdByName(componentType);
-
-	Entity* entity = GetEntity(entityIndex);
-	if (entity != nullptr)
-	{
-
-		for (auto& c : entity->GetComponents())
-		{
-			if (c.second == typeID)
-			{
-				Console::Log(std::to_string(Entities.at(entityIndex)->GetComponents().begin()->first) + "," + std::to_string(Entities.at(entityIndex)->GetComponents().begin()->first));
-				Component* component = WorldComponentManager->GetComponent(entity->GetComponents().at(c.first), typeID);
-				if (component != nullptr)
-				{
-					//Console::Log(std::to_string(component->GetID()));
-					return component;
-				}
-				break;
-			}
-		}
-	}
-	return nullptr;
-}
-
-*/
-
-bool EntityManager::RemoveComponentFromEntity(int entityIndex, String componentType)
-{
-	return false;
-}
 
 std::vector<int> EntityManager::QueryEntitiesByType(std::vector<int> allowedTypes)
 {
@@ -171,12 +107,6 @@ std::vector<int> EntityManager::QueryEntitiesByType(std::vector<int> allowedType
 	return query;
 }
 
-
-/// <summary>
-/// Return typeName as an integer.
-/// </summary>
-/// <param name="typeName"></param>
-/// <returns></returns>
 int EntityManager::GetTypeIdByName(String typeName)
 {
 	return WorldComponentManager->GetTypeIdByName(typeName);

@@ -1,6 +1,6 @@
 /*
 Author: Albert Uusi-Illikainen [RabbitTortoise]
-5.11.2021
+5.11.2021, Last Edited by RabbitTortoise 24.11.2021
 */
 
 #include "SystemsManager.h"
@@ -12,24 +12,24 @@ int SystemsManager::AddSystem(System* system)
 	return(static_cast<int>(Systems.size())-1);
 }
 
-bool SystemsManager::DisableSystem(int systemIndex)
+bool SystemsManager::DisableSystem(int systemID)
 {
-	if (systemIndex < Systems.size())
+	if (systemID < static_cast<int>(Systems.size()))
 	{
-		Systems.at(systemIndex)->bEnabled = false;
+		Systems.at(systemID)->bEnabled = false;
 		return true;
 	}
 	return false;
 }
 
-bool SystemsManager::AddWantedComponentType(int systemIndex, String componentType)
+bool SystemsManager::AddWantedComponentType(int systemID, String componentTypeName)
 {
-	if (systemIndex < Systems.size())
+	if (systemID < static_cast<int>(Systems.size()))
 	{
-		int typeIndex = WorldComponentManager->GetTypeIdByName(componentType);
+		int typeIndex = WorldComponentManager->GetTypeIdByName(componentTypeName);
 		if (typeIndex != -1)
 		{
-			Systems.at(systemIndex)->TypesWanted.push_back(typeIndex);
+			Systems.at(systemID)->TypesWanted.push_back(typeIndex);
 			return true;
 		}
 	}

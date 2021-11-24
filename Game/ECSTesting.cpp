@@ -1,6 +1,6 @@
 /*
 Author: Albert Uusi-Illikainen [RabbitTortoise]
-5.11.2021
+5.11.2021, Last Edited by RabbitTortoise 24.11.2021
 */
 
 #include "ECSTesting.h"
@@ -30,18 +30,6 @@ ECSTesting::ECSTesting()
 			pos->Z += 100.0f * (i + 1);
 			Console::Log(std::to_string(pos->GetID()) + ": " + std::to_string(pos->Z) + "," + std::to_string(pos->Y) + "," + std::to_string(pos->Z));
 		}
-
-		/*
-		Component* component = entityManager->CreateNewComponentToEntity(entity->GetID(), "PositionComponent");
-		if (component != nullptr)
-		{
-			PositionComponent* posComponent = static_cast<PositionComponent*>(entityManager->GetComponentFromEntity(entity->GetID(), "PositionComponent"));
-			posComponent->X = 100.0f * i;
-			posComponent->Y = 100.0f * i;
-			posComponent->Z = 100.0f * i;
-			Console::Log(std::to_string(posComponent->Z) + "," + std::to_string(posComponent->Y) + "," + std::to_string(posComponent->Z));
-		}
-		*/
 	}
 
 	//Create new System and set it to handle entities with PositionComponents

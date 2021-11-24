@@ -1,7 +1,7 @@
 #pragma once
 /*
 Author: Albert Uusi-Illikainen [RabbitTortoise]
-5.11.2021
+5.11.2021, Last Edited by RabbitTortoise 24.11.2021
 */
 
 #include <vector>
@@ -14,7 +14,18 @@ class System
 public:
 	System(EntityManager& entityManager) : WorldEntityManager(entityManager) { bEnabled = false; }
 	~System() {}
+
+	/// <summary>
+	/// This is called once per frame.
+	/// </summary>
+	/// <param name="deltaTime">Time between frames</param>
+	/// <param name="entities">Entities to go through</param>
 	virtual void Update(float deltaTime, std::vector<int> entities) = 0;
+
+	/// <summary>
+	/// Set System to be enabled or disabled.
+	/// </summary>
+	/// <param name="enabled">True/False</param>
 	void SetEnabled(bool enabled) { bEnabled = enabled; }
 	
 protected:
@@ -22,6 +33,5 @@ protected:
 	EntityManager& WorldEntityManager;
 	std::vector<int> TypesWanted;
 	std::vector<int> TypesNotAllowed;
-
 };
 

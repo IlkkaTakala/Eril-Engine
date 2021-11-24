@@ -1,13 +1,13 @@
 #pragma once
 /*
 Author: Albert Uusi-Illikainen [RabbitTortoise]
-11.11.2021, Last Edited by RabbitTortoise 18.11.2021
+11.11.2021, Last Edited by RabbitTortoise 24.11.2021
 */
-
-
 
 #include <vector>
 #include <ECS/Component.h>
+
+
 
 /// <summary>
 /// This is used in storing all the components in different vectors.
@@ -20,15 +20,10 @@ public:
 	int GetType() { return Type; }
 	int GetComponentCount() { return ComponentCount; }
 
-	//virtual Component* AddComponent() = 0;
-	//virtual bool RemoveComponent(int id) = 0;
-	//virtual Component* GetComponent(int id) = 0;
-
 protected:
 	int Type;
 	int ComponentCount = 0;
 };
-
 
 
 
@@ -56,11 +51,10 @@ public:
 	/// <summary>
 	/// Creates a new component to the vector.
 	/// </summary>
-	/// <returns>ID of the added component</returns>
-	T* AddComponent()
+	/// <returns>Pointer of the added component</returns>
+	T* CreateComponent()
 	{
 		int usedIndex = -1;
-
 		for (int i = 0; i < static_cast<int>(IndexUsage->size()); i++)
 		{
 			if (!(IndexUsage->at(i)))
@@ -84,28 +78,26 @@ public:
 		Components->at(usedIndex).SetType(Type);
 		ComponentCount++;
 
-		//Console::Log("AddComponent: " + std::to_string(Components->at(usedIndex).GetID()));
-
 		return &Components->at(usedIndex);
 	}
 
 	/// <summary>
 	/// Gets a specific component based on given ID.
 	/// </summary>
-	/// <param name="id"></param>
+	/// <param name="id">ID of the Component</param>
 	/// <returns>Component of given ID, nullptr if the component of that ID was not found or if the component was disabled.</returns>
 	T* GetComponent(int id)
 	{
-		
 		if (id < static_cast<int>(IndexUsage->size()))
 		{
 			if (IndexUsage->at(id))
 			{
-				//Console::Log("GetComponent, id:type" + std::to_string(id) + ":" + std::to_string(Components->at(id).GetID()));
-				return &Components->at(id);
+				if (!Components->at(id).GetDisabled())
+				{
+					return &Components->at(id);
+				}
 			}
 		}
-		
 		return nullptr;
 	}
 
@@ -113,7 +105,7 @@ public:
 	/// Removes a component with given ID. Note that because the components are stored in a continuous array, the component is only marked
 	/// as disabled, and only overwritten after a new component is added.
 	/// </summary>
-	/// <param name="id"></param>
+	/// <param name="id">ID of the component</param>
 	/// <returns>Boolean based on if the component was removed successfully.</returns>
 	bool RemoveComponent(int id)
 	{
@@ -122,13 +114,13 @@ public:
 			if (IndexUsage->at(id))
 			{
 				IndexUsage->at(id) = false;
+				ComponentCount--;
 				return true;
 			}
 		}
 		return false;
 	}
 	
-
 private:
 	std::vector<T, std::allocator<T>>* Components;
 	std::vector<bool>* IndexUsage;

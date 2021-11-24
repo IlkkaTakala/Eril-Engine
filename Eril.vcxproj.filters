@@ -100,9 +100,6 @@
     <ClCompile Include="Engine\Core\ECS\SystemsManager.cpp">
       <Filter>Engine\ECS</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\ECS\System.cpp">
-      <Filter>Engine\ECS</Filter>
-    </ClCompile>
     <ClCompile Include="Game\ECSTesting.cpp">
       <Filter>Game</Filter>
     </ClCompile>
@@ -117,9 +114,6 @@
     </ClCompile>
     <ClCompile Include="Engine\Interface\IECS.cpp">
       <Filter>Engine\Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Core\ECS\ComponentManager.cpp">
-      <Filter>Engine\ECS</Filter>
     </ClCompile>
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\UIComponent.cpp">
       <Filter>Engine\OpenGL\UI</Filter>

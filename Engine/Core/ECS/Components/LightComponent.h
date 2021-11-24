@@ -10,7 +10,7 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 struct LightComponent : public Component
 {
 	LightComponent(){}
-	LightComponent(const LightComponent& c) : Component() 
+	LightComponent(const LightComponent& c) : Component(static_cast<Component>(c)) 
 	{ 
 		LightType = c.LightType;
 		Intensity = c.Intensity;
