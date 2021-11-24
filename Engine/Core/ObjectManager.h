@@ -5,6 +5,8 @@
 #include <Objects/BaseObject.h>
 #include <mutex>
 
+typedef BaseObject* (*SpawnFunction)(const String&, uint32, uint, bool, uint16);
+
 struct Record
 {
 	Record(Data* o) : object(o), protection(0), checkCount(0) {}
@@ -22,7 +24,7 @@ class ObjectManager
 public:
 	template <class T>
 	static T* GetByRecord(RecordInt record) {
-		return dynamic_cast<T>(ObjectRecords.find(record)->second.object);
+		return dynamic_cast<T*>(ObjectRecords.find(record)->second->object);
 	}
 
 	static void AddRef(const RecordInt record, const RefHold* obj);
@@ -49,9 +51,10 @@ public:
 
 	static void DeleteListed();
 
-	static bool PrepareRecord(uint32 ID, uint SpawnType = Constants::Record::SPAWNED, bool isServer = false, uint16 mod = 0);
+	static bool PrepareRecord(const uint32 ID, const uint SpawnType = Constants::Record::SPAWNED, const bool isServer = false, const uint16 mod = 0);
 
-	static std::map<String, BaseObject* (*)(uint32, uint, bool, uint16)> TypeList;
+	static std::map<String, SpawnFunction>& TypeList();
+
 private:
 	friend class GC;
 	static long counter;
