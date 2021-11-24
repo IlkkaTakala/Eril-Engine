@@ -140,14 +140,14 @@ Font loadFont(String name)
 
 	glGenTextures(1, &f.kerningTexture);
 	glBindTexture(GL_TEXTURE_2D, f.kerningTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, 256, 256, 0, GL_RED, GL_INT, kernData);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R8I, 256, 256, 0, GL_RED_INTEGER, GL_INT, kernData);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 
 	glGenBuffers(1, &f.charBuffer);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, f.charBuffer);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glyphs), glyphs, GL_STATIC_READ);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(Glyph) * 256, glyphs, GL_STATIC_DRAW);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	delete[] glyphs;
@@ -177,4 +177,6 @@ void Text::Render()
 	glBindTexture(GL_TEXTURE_2D, fonts[font].kerningTexture);
 
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, fonts[font].charBuffer);
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
