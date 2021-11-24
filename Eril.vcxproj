@@ -234,6 +234,7 @@
     <ClCompile Include="Engine\RenderCore\OpenGL\Texture.cpp" />
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\Image.cpp" />
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\Panel.cpp" />
+    <ClCompile Include="Engine\RenderCore\OpenGL\UI\Text.cpp" />
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\UI.cpp" />
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\UIComponent.cpp" />
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\UISpace.cpp" />
@@ -273,6 +274,7 @@
     <ClInclude Include="Engine\RenderCore\OpenGL\include\Texture.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Image.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Panel.h" />
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Text.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\UI.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\UI\UIComponent.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\UI\UISpace.h" />

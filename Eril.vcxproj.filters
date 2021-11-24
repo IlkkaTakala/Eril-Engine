@@ -121,6 +121,9 @@
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\Image.cpp">
       <Filter>Engine\OpenGL\UI</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\RenderCore\OpenGL\UI\Text.cpp">
+      <Filter>Engine\OpenGL\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -128,9 +131,6 @@
     </Filter>
     <Filter Include="Engine\Public">
       <UniqueIdentifier>{8edf9179-3f4e-4d90-8608-b5cafe1caf30}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\UI">
-      <UniqueIdentifier>{b865335b-fcd6-4165-a7ae-ae54e9eb89e4}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\Private">
       <UniqueIdentifier>{d29e673c-6876-44f2-8a94-2f97f6779534}</UniqueIdentifier>
@@ -270,6 +270,9 @@
       <Filter>Engine\OpenGL\UI</Filter>
     </ClInclude>
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Image.h">
+      <Filter>Engine\OpenGL\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Text.h">
       <Filter>Engine\OpenGL\UI</Filter>
     </ClInclude>
   </ItemGroup>
