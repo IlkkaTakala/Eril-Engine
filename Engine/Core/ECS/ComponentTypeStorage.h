@@ -72,11 +72,13 @@ public:
 		else
 		{
 			Components->at(usedIndex) = T();
-			IndexUsage->push_back(true);
+			IndexUsage->at(usedIndex) = true;
 		}
 		Components->at(usedIndex).SetID(usedIndex);
 		Components->at(usedIndex).SetType(Type);
 		ComponentCount++;
+
+		//Console::Log("Added Component of type "+ std::to_string(Type) + " To ID: " + std::to_string(usedIndex));
 
 		return &Components->at(usedIndex);
 	}
