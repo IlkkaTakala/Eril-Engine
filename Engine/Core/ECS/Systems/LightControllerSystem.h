@@ -4,6 +4,8 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 11.11.2021
 */
 
+/* NOT YET IN USE, COMMENTED OUT
+
 #include "ECS/SystemsManager.h"
 #include "ECS/Components/LightComponent.h"
 
@@ -25,3 +27,6 @@ public:
 private:
 
 };
+
+
+*/
