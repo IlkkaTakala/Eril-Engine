@@ -21,6 +21,20 @@ void SceneComponent::OnDestroyed()
 	}
 }
 
+void SceneComponent::LoadWithParameters(const String& args)
+{
+	BaseObject::LoadWithParameters(args);
+	auto data = ParseOptions(args);
+
+	auto loc = data.find("Location");
+	auto rot = data.find("Rotation");
+	auto scale = data.find("Scale");
+
+	if (loc != data.end()) SetLocation(Vector(loc->second));
+	if (rot != data.end()) SetRotation(Vector(rot->second));
+	if (scale != data.end()) SetScale(Vector(scale->second));
+}
+
 void SceneComponent::SetLocation(const Vector& NewLocation)
 {
 	Location = NewLocation;

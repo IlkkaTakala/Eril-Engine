@@ -5,7 +5,7 @@
 
 GameState* EngineInterface::CreateDefaults()
 {
-    Scene::OpenLevel("test");
+    Scene::OpenLevel("Assets/Maps/test");
     Ref<GameState> State = SpawnObject<GameState>();
     TestPlayer* pla = SpawnObject<TestPlayer>();
     State->SetPlayer<TestPlayer>(pla);
