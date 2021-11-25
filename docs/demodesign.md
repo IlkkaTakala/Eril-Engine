@@ -2,7 +2,7 @@
 
 ## Ghost forest
 
-Player is in forest trying to escape from ghost chasing him. Player has flashlight with him to make the ghost flee for (?) seconds. Flashlight has (10?) second cooldown. There is a way to beat the ghost by throwing candy canes at him. Five of them and ghost will die and player wins. If ghost manages to touch player, he dies.
+Player is in forest trying to escape from ghost chasing him. Player has flashlight with him to make the ghost flee for (?) seconds. Flashlight has (10?) second cooldown. There is a way to beat the ghost by throwing candy canes at him. Five of them and ghost will die and player wins. If ghost manages to catch player, he dies.
 
 #### Items needed
 
@@ -18,11 +18,11 @@ Player is in forest trying to escape from ghost chasing him. Player has flashlig
 
 - Ghost chases player, and player dies if touched.
 - Use flashlight to make ghost flee.
-- Flashlight to have cooldown.
+- Flashlight should have a cooldown.
 - Pick up and store candy canes in inventory.
 - Throw Candy canes at ghost.
 - Game ends when 5 candy canes are thrown at ghost.
-- Crosshair for aiming throwing and picking candy canes.
+- Crosshair for aiming, throwing and picking candy canes.
 - Text to pick up candy cane.
 - Ui to show flashlight cooldown and candy cane amount. 
 
@@ -31,20 +31,33 @@ Player is in forest trying to escape from ghost chasing him. Player has flashlig
 - Trees, rocks, shacks, candy canes.
 - Materials for shack and candy cane.
 - Mesh and material for ghost.
-- Moonlight?
 
 #### Sounds needed
 
-- Ghost scream when fleeing and dying.
-- Player scream when dies.
+- Ghost screams when fleeing and dying.
+- Player screams when dies.
 
-## 2D demo game
+## Way to home
 
-- player is stick man
-- spikes
-- balls
-- get to home
-- falling platforms
-- birds
+Player is stick man that is going home from work. There are obstacles on the way: spikes, rolling balls, birds and falling platforms. 
+
+#### Mechanics needed
+
+- Jumping, double jump
+- Hitting spikes, bird, ball will kill player.
+- Some platforms fall after 1 second when player jumps on them.
+
+#### Scene needs 
+
+- City on the background.
+- Platforms to jump on.
+- Spikes, birds, balls.
+
+#### Sounds needed
+
+- Bird sounds.
+- Dying sound for player.
+- Winning sound.
+
 
 
