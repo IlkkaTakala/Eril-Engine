@@ -69,6 +69,7 @@ protected:
 	bool hovered;
 
 	UIComponent* parent;
+	UISpace* space;
 
 	bool redraw;
 	bool recalculate;

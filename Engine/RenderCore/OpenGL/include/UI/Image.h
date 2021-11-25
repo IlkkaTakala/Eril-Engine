@@ -30,7 +30,7 @@ public:
 
 	Image* SetStyle(const UIStyle& s);
 
-private:
+protected:
 	Shader* solid_shader;
 	Shader* texture_shader;
 	uint uniformBuffer;

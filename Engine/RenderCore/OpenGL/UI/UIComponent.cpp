@@ -34,6 +34,7 @@ UIComponent::UIComponent()
 	hovered = false;
 
 	parent = nullptr;
+	space = nullptr;
 
 	redraw = true;
 	recalculate = true;

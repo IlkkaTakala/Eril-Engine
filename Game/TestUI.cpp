@@ -9,7 +9,7 @@ void TestUI::Construct()
 		Create<Panel>()->AddChild(
 			Create<Image>()->SetStyle(UIStyle(Vector(1.f, 0.f, 0.f), 1.0f, RI->LoadTextureByName("Assets/Textures/trees2/Leaves_d.png")))
 		)->AddChild(
-			Create<Text>()
+			Create<Text>()->SetStyle(UIStyle(Vector(1.f, 1.f, 1.f), 1.0f, nullptr))
 		)
 	);
 }

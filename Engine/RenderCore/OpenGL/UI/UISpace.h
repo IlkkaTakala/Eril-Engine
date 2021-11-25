@@ -18,9 +18,10 @@ public:
 	Vector2D GetSize() const { return ScreenSize; }
 	void SetScreen(uint window) { Screen = window; }
 
-private:
+	uint GetColor() const { return Color; }
+	uint GetDepth() const { return Depth; }
 
-	uint GetGlyphs(String name);
+private:
 
 	bool hasFocus;
 

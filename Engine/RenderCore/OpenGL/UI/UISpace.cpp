@@ -188,8 +188,3 @@ void UISpace::AddComponent(UI* com)
 	com->PostConstruct();
 	TopLevel.push_back(com);
 }
-
-uint UISpace::GetGlyphs(String name)
-{
-	return uint();
-}

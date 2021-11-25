@@ -1,8 +1,8 @@
 #pragma once
 #include <Core.h>
-#include "../../OpenGL/UI/UIComponent.h"
+#include <UI/Image.h>
 
-class Text : public UIComponent
+class Text : public Image
 {
 public:
 	Text();
@@ -11,5 +11,8 @@ public:
 
 protected:
 	String font;
+	uint StringBuffer;
+	String text;
+	int fontSize;
 };
 
