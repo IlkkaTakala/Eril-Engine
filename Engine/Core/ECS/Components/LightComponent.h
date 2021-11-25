@@ -4,6 +4,8 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 11.11.2021
 */
 
+/* NOT YET IN USE, COMMENTED OUT
+
 #include "Core.h"
 #include "ECS/Component.h"
 
@@ -41,3 +43,6 @@ struct LightComponent : public Component
 	// 5 = Disabled, Needs Enabling
 	int State = 0;
 };
+
+
+*/
