@@ -1,40 +1,44 @@
-# Demo game plans
+# Demo plans
 
-## items
+## Ghost forest
 
-- flashlight
-- candy cane
+Player is in forest trying to escape from ghost chasing him. Player has flashlight with him to make the ghost flee for (?) seconds. Flashlight has (10?) second cooldown. There is a way to beat the ghost by throwing candy canes at him. Five of them and ghost will die and player wins. If ghost manages to touch player, he dies.
 
-## entities
+#### Items needed
 
-- player
-- ghost
+- Flashlight
+- Candy cane
 
-## mechanics
+#### Entities needed
 
-- ghost chases player, and player dies if touched
-- use flashlight to repel ghost
-- flashlight battery depletes while on and refills while off
-- store candy canes in inventory
-- throw items
+- Player
+- Ghost
 
-## objective
+#### Mechanics needed
 
-- collect 5 candy canes and throw them at ghost to win
+- Ghost chases player, and player dies if touched.
+- Use flashlight to make ghost flee.
+- Flashlight to have cooldown.
+- Pick up and store candy canes in inventory.
+- Throw Candy canes at ghost.
+- Game ends when 5 candy canes are thrown at ghost.
+- Crosshair for aiming throwing and picking candy canes.
+- Text to pick up candy cane.
+- Ui to show flashlight cooldown and candy cane amount. 
 
-## assets
+#### Scene needs 
 
-- use Ilkka's trees and other
-- add rocks
-- add shack
+- Trees, rocks, shacks, candy canes.
+- Materials for shack and candy cane.
+- Mesh and material for ghost.
+- Moonlight?
 
-## scene
+#### Sounds needed
 
-- trees, rocks, shacks
-- dark
+- Ghost scream when fleeing and dying.
+- Player scream when dies.
 
-
-# 2D demo game
+## 2D demo game
 
 - player is stick man
 - spikes
