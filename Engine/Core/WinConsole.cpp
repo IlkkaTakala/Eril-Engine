@@ -388,10 +388,11 @@ private:
 			int max_lineCount = int(bottom / fontSize);
 
 			SCROLLINFO si = { 0 };
-			si.cbSize = sizeof(si);
+			si.cbSize = sizeof(si); 
+			si.fMask = SIF_POS;
 			GetScrollInfo(m_hwnd, SBS_VERT, &si);
 
-			int start = yPos / fontSize;
+			int start = si.nPos / fontSize;
 
 			std::wstring text;
 			int round = 0;
@@ -572,12 +573,12 @@ private:
 					if (!logQueue.empty())
 					{
 						std::unique_lock<std::mutex> logLock(logsMutex);
-						while (!logQueue.empty()) {
+						//while (!logQueue.empty()) {
 							logs.push_back(logQueue.front());
 							logQueue.pop();
 							if (logs.size() > max_line_count) logs.pop_front();
 							count++;
-						}
+						//}
 					}
 					pDemoApp->ScrollDown(count);
 					RedrawWindow(m_hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
@@ -651,6 +652,7 @@ private:
 					if (si.nPos != yPos)
 					{
 						RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
+						yPos = si.nPos;
 					}
 
 				wasHandled = true;
@@ -773,6 +775,7 @@ void Console::Close()
 
 void AddLine(const String& pre, const String& line)
 {
+	if (line == "") return;
 	LPCSTR format = "hh':'mm':'ss";
 	char w[10];
 	GetTimeFormatA(LOCALE_NAME_USER_DEFAULT, TIME_NOTIMEMARKER | TIME_FORCE24HOURFORMAT, NULL, NULL, w, 9);

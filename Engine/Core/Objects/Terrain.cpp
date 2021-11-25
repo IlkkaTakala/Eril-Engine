@@ -211,7 +211,28 @@ Terrain::Terrain()
 	Mesh = SpawnObject<VisibleObject>();
 }
 
-void Terrain::InitTerrain(int r, Vector scale, Vector location)
+void Terrain::LoadWithParameters(const String& args)
+{
+	BaseObject::LoadWithParameters(args);
+	auto data = ParseOptions(args);
+
+	auto res = data.find("Resolution");
+	auto sca = data.find("Scale");
+	auto loc = data.find("Location");
+	auto mat = data.find("Material");
+	int Resolution = 100;
+	Vector Scale = Vector(1.f);
+	Vector Location = Vector();
+	String Material = "Assets/Materials/ground";
+	if (res != data.end()) Resolution = atoi(res->second.c_str());
+	if (sca != data.end()) Scale = Vector(sca->second);
+	if (loc != data.end()) Location = Vector(loc->second);
+	if (mat != data.end()) Material = mat->second;
+
+	InitTerrain(Resolution, Scale, Location, Material);
+}
+
+void Terrain::InitTerrain(int r, Vector scale, Vector location, String material)
 {
 	resolution = r;
 	Scale = scale / r;
@@ -263,7 +284,7 @@ void Terrain::InitTerrain(int r, Vector scale, Vector location)
 	tangents.resize(pos.size());
 
 	Mesh->SetModel(MI->CreateProcedural(Mesh, "Terrain_" + std::to_string(GetRecord()), pos, uvs, normals, tangents, inds));
-	Mesh->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/ground"));
+	Mesh->GetModel()->SetMaterial(0, RI->LoadMaterialByName(material == "" ? "Assets/Materials/ground" : material));
 }
 
 float Terrain::GetHeight(float x, float y)
