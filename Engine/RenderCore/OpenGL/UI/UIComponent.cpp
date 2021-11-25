@@ -77,7 +77,7 @@ void UIComponent::UpdateMatrices(const Vector2D& size)
 
 	glm::mat4 model = glm::translate(glm::mat4(1.f), gloc) * glm::scale(glm::mat4(1.f), scale);
 
-	model *= glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Z, 0.f))
+	model *= glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Z, realDepth))
 		* glm::toMat4(glm::quat(glm::vec3(glm::radians(rot.X), glm::radians(rot.Z), glm::radians(rot.Y))))
 		* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Z, sca.Y));
 

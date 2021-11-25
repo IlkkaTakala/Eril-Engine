@@ -159,7 +159,7 @@ void UISpace::Render(uint target)
 	//glDisable(GL_BLEND);
 	glDisable(GL_MULTISAMPLE);
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_NOTEQUAL);
+	glDepthFunc(GL_GREATER);
 	glDisable(GL_CULL_FACE);
 	for (const auto& c : TopLevel) {
 		c->TopLevel->Render();

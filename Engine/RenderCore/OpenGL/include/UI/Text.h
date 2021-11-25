@@ -8,11 +8,11 @@ public:
 	Text();
 
 	virtual void Render() override;
-
+	void SetText(const String& text);
 protected:
 	String font;
 	uint StringBuffer;
-	String text;
+	String value;
 	int fontSize;
 };
 
