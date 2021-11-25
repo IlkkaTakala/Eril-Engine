@@ -27,6 +27,18 @@ Feature list of Eril v0.1
 | Oskari | UI workflow design |
 | Leevi | Audio framework |
 
+**Updated responsibilities**
+
+| Name   | Task |
+| ---    | ---  |
+| Ilkka  | Project lead, design, programming |
+| Albert | Producer, programming |
+| Matti  | Demo design, programming |
+| Susanne| Documentation, design assistant, bug fixing |
+| Markus | Research, collision programming |
+| Oskari | Compiler warning fixing |
+| Leevi | TBA |
+
 ## Features
 
 These are the features we will add on top of the existing features:
@@ -70,7 +82,7 @@ section Ilkka
 Scene graph             :done  ,  ides1, 05-11, 5d
 Console                 :done,    ides2, after ides1, 12d
 UI Framework            :active,  ides6, 13-11, 14d 
-Level Loading           :         ides5, after ides1, 20d
+Level Loading           :done,    ides5, after ides1, 14d
 Git control             :         ides3, 04-11, 17-12
 Lead dev/assistance     :         ides4, 04-11, 17-12
 ```
@@ -80,7 +92,7 @@ dateFormat  DD-MM
 
 section Albert
 Audio System            :         ades1, 12-11, 28d
-ECS Implementation Desing:active, ades2, 04-11, 13d
+ECS Implementation Desing:done,   ades2, 04-11, 13d
 ECS System              :active,  ades3, 10-11, 09-12
 ECS Example             :         ades4, 03-12, 09-12
 Video Presentation      :         ades5, 09-12, 17-12
@@ -102,8 +114,6 @@ dateFormat  DD-MM
 
 section Susanne
 TDD set up              :done,    sdes1, 04-11, 06-11
-Light fix  Desing       :         sdes2, after sdes1, 18-11
-Light fix implementation:active,  sdes3, 10-11, 10-12
 Commenting code         :active,  sdes4, 04-11, 03-12
 ECS Implementation Desing:        sdes5, 04-11, 18-11
 TDD documentation finish:         sdes6, after sdes1, 17-12
@@ -113,9 +123,8 @@ gantt
 dateFormat  DD-MM
 
 section Markus
-Menu System/UI          :         mades1, 19-11, 16-12
-Scripting               :         mades2, 10-11, 09-12
-Collision               :active,  mades3, 05-11, 19-11
+Scripting               :         mades2, after mades3, 09-12
+Collision               :active,  mades3, 05-11, 01-12
 Information research    :active,  mades6, 04-11, 11-11
 Debugging               :         mades8, 10-12, 17-12
 Documentation Info      :         mades9, 03-12, 17-12
@@ -126,7 +135,6 @@ dateFormat  DD-MM
 
 section Oskari
 Skeletal animations     :active, odes1, 12-11, 10-12
-UI framework            :        odes2, 05-11, 26-11
 Research                :active, odes3, 04-11, 18-11
 Documentation           :        odes4, 26-11, 09-12
 
