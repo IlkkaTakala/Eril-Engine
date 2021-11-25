@@ -114,7 +114,7 @@ protected:
 			if (componentStorages.at(i)->GetType() == typeID)
 			{
 				ComponentTypeStorage<T>* s = static_cast<ComponentTypeStorage<T>*>(componentStorages.at(i));
-				s->RemoveComponent(id);
+				return s->RemoveComponent(id);
 			}
 		}
 		return false;

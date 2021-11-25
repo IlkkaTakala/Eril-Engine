@@ -32,6 +32,7 @@ Entity* EntityManager::AddEntity()
 		IndexUsage.at(usedIndex) = true;
 	}
 
+	//Console::Log("Added Entity To ID: " + std::to_string(usedIndex));
 	entity->SetEnabled(true);
 	entity->SetID(usedIndex);
 
@@ -57,6 +58,11 @@ bool EntityManager::RemoveEntity(Entity*& entity)
 	{
 		if (IndexUsage.at(id))
 		{
+			for (auto &c : entity->GetComponents())
+			{
+				WorldComponentManager->RemoveComponent<Component>(c.first, c.second);
+			}
+
 			delete Entities.at(id);
 			Entities.at(id) = nullptr;
 			IndexUsage.at(id) = false;
@@ -67,15 +73,20 @@ bool EntityManager::RemoveEntity(Entity*& entity)
 	return false;
 }
 
-bool EntityManager::RemoveEntity(int entityIndex)
+bool EntityManager::RemoveEntity(int entityID)
 {
-	if (entityIndex < IndexUsage.size())
+	if (entityID < IndexUsage.size())
 	{
-		if (IndexUsage.at(entityIndex))
+		if (IndexUsage.at(entityID))
 		{
-			delete Entities.at(entityIndex);
-			Entities.at(entityIndex) = nullptr;
-			IndexUsage.at(entityIndex) = false;
+			for (auto& c : GetEntity(entityID)->GetComponents())
+			{
+				WorldComponentManager->RemoveComponent<Component>(c.first, c.second);
+			}
+
+			delete Entities.at(entityID);
+			Entities.at(entityID) = nullptr;
+			IndexUsage.at(entityID) = false;
 			return true;
 		}
 	}
@@ -87,18 +98,22 @@ std::vector<int> EntityManager::QueryEntitiesByType(std::vector<int> allowedType
 {
 	std::vector<int> query;
 	bool found = false;
-	for (auto e : Entities)
+	for (int i = 0; i < static_cast<int>(Entities.size()); i++)
 	{
-		if (e->GetEnabled())
+		if (IndexUsage.at(i))
 		{
-			for (auto t : e->GetComponents())
+			Entity* e = Entities.at(i);
+			if (e->GetEnabled())
 			{
-				for (auto allowed : allowedTypes)
+				for (auto t : e->GetComponents())
 				{
-					if (allowed == t.second)
+					for (auto allowed : allowedTypes)
 					{
-						query.push_back(e->GetID());
-						break;
+						if (allowed == t.second)
+						{
+							query.push_back(e->GetID());
+							break;
+						}
 					}
 				}
 			}

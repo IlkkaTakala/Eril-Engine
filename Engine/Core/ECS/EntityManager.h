@@ -130,10 +130,16 @@ public:
 			{
 				if (c.second == typeID)
 				{
-					return WorldComponentManager->RemoveComponent<T>(c.first, typeID);
+					if (WorldComponentManager->RemoveComponent<T>(c.first, typeID))
+					{
+						//Console::Log("Removed Component of type" + std::to_string(typeID) + " from Entity " + std::to_string(entity->GetID()));
+						entity->GetComponents().erase(c.first);
+						return true;
+					}
 				}
 			}
 		}
+		return false;
 	}
 	
 private:
