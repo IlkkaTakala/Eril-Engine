@@ -212,6 +212,7 @@ uniform sampler2D depthMap;
 uniform float depthValue;
 uniform ivec2 topLeft;
 uniform int fontsize;
+uniform int weight;
 layout (binding=0, rgba16f) uniform image2D colorDest;
 layout (binding=4, r8) readonly uniform image2D fontAtlas;
 layout (binding=5, r8i) readonly uniform iimage2D kerning;
@@ -231,8 +232,8 @@ layout(std430, binding = 3) readonly buffer CharBuffer {
 
 shared float scale;
 
-const float width = 0.3;
-const float fade = 0.2;
+shared float width;
+const float fade = 0.1;
 
 #define TILE_SIZE 64
 layout(local_size_x = TILE_SIZE, local_size_y = 1, local_size_z = 1) in;
@@ -242,6 +243,7 @@ void main()
 	
 	if (gl_LocalInvocationIndex == 0) {
 		scale = fontsize / 90.0;
+		width = 0.3 - (weight / 100.0 - 1.0) * 0.1;
 	}
 
 	uint threadCount = TILE_SIZE;
@@ -278,8 +280,6 @@ void main()
 	if (solid_shader != nullptr) delete solid_shader;
 	solid_shader = new Shader(0, solidShader);
 
-	SetStyle(UIStyle(Vector(1.f, 0.f, 0.f)));
-
 	hits = HitReg::HitTestVisible;
 
 	font = "Assets/Fonts/arial";
@@ -288,9 +288,9 @@ void main()
 	if (it == fonts.end()) fonts[font] = loadFont(font);
 
 	fontSize = 30;
+	weight = 100;
 
 	SetText("Hello World");
-	Console::Log("Text first");
 }
 
 Text::~Text()
@@ -311,6 +311,7 @@ void Text::Render()
 	solid_shader->SetUniform("fontsize", fontSize);
 	solid_shader->SetUniform("model", matrix->model_m);
 	solid_shader->SetUniform("depthValue", realDepth);
+	solid_shader->SetUniform("weight", weight);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, RI->GetUIManager()->GetDepth());

@@ -15,5 +15,6 @@ protected:
 	uint StringBuffer;
 	String value;
 	int fontSize;
+	int weight;
 };
 

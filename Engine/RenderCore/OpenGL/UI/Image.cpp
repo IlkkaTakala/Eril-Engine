@@ -64,8 +64,6 @@ void main()
 }
 )~~~";
 
-	Console::Log("Been here");
-
 	solid_shader = new Shader(vertexShader, solidShader);
 	texture_shader = new Shader(vertexShader, textureShader);
 
