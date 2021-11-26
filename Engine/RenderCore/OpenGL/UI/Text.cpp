@@ -229,7 +229,7 @@ layout(std430, binding = 3) readonly buffer CharBuffer {
 	CharData charBuffer[];
 };
 
-shared uint epoch;
+shared float scale;
 
 const float width = 0.3;
 const float fade = 0.2;
@@ -241,7 +241,7 @@ void main()
 	uint character = 0;
 	
 	if (gl_LocalInvocationIndex == 0) {
-		epoch = 0;
+		scale = fontsize / 90.0;
 	}
 
 	uint threadCount = TILE_SIZE;
@@ -254,16 +254,18 @@ void main()
 
 		uint letter = stringBuffer[stringIndex].letter;
 		ivec2 size = charBuffer[letter].size;
-		uint xoffset = topLeft.x + stringBuffer[stringIndex].offset + charBuffer[letter].offset.y;
+		uint xoffset = topLeft.x + stringBuffer[stringIndex].offset + charBuffer[letter].offset.x;
 		uint yoffset = topLeft.y + charBuffer[letter].offset.y;
 		ivec2 dataLoc = charBuffer[letter].topLeft;
 		vec4 result = vec4(1.0);
 		for (int y = 0; y < size.y; y++) {
 			for (int x = 0; x < size.x; x++) {
-				ivec2 loc = ivec2(xoffset + x, screenSize.y - (yoffset + y));
+				vec2 screenLoc = vec2(xoffset + x, yoffset + y) * scale;
+				ivec2 loc = ivec2(screenLoc.x, screenSize.y - screenLoc.y);
 				//if (texture(depthMap, loc / vec2(screenSize)).r == depthValue) {
 					float fontValue = imageLoad(fontAtlas, dataLoc + ivec2(x, y)).r;
 					result.a = smoothstep(width, width + fade, fontValue);
+					result *= color * tint;
 					vec4 ogColor = imageLoad(colorDest, loc);
 					imageStore(colorDest, loc, vec4(ogColor.xyz * (1.0 - result.a) + result.xyz * result.a, ogColor.a + result.a));
 				//}
@@ -273,9 +275,10 @@ void main()
 }
 )~~~";
 
+	if (solid_shader != nullptr) delete solid_shader;
 	solid_shader = new Shader(0, solidShader);
 
-	SetStyle(style);
+	SetStyle(UIStyle(Vector(1.f, 0.f, 0.f)));
 
 	hits = HitReg::HitTestVisible;
 
@@ -284,9 +287,15 @@ void main()
 	auto it = fonts.find(font);
 	if (it == fonts.end()) fonts[font] = loadFont(font);
 
-	fontSize = 12;
+	fontSize = 30;
 
 	SetText("Hello World");
+	Console::Log("Text first");
+}
+
+Text::~Text()
+{
+
 }
 
 void Text::Render()
@@ -338,4 +347,6 @@ void Text::SetText(const String& text)
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, StringBuffer);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(Letter) * value.size(), storage, GL_STATIC_DRAW);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+	delete[] storage;
 }

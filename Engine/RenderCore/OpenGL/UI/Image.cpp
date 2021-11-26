@@ -64,6 +64,8 @@ void main()
 }
 )~~~";
 
+	Console::Log("Been here");
+
 	solid_shader = new Shader(vertexShader, solidShader);
 	texture_shader = new Shader(vertexShader, textureShader);
 
@@ -110,7 +112,6 @@ Image* Image::SetStyle(const UIStyle& s)
 	glBindBuffer(GL_UNIFORM_BUFFER, uniformBuffer);
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(UIStyleGLM), &n);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-	glBindBufferBase(GL_UNIFORM_BUFFER, 1, uniformBuffer);
 
 	return this;
 }

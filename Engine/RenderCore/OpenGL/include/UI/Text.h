@@ -6,6 +6,7 @@ class Text : public Image
 {
 public:
 	Text();
+	virtual ~Text();
 
 	virtual void Render() override;
 	void SetText(const String& text);
