@@ -234,25 +234,38 @@ void TestPlayer::BeginPlay()
 		printf("Spawned object\n");
 	Timer::CreateTimer(5.f, TimeFunction, false);
 
+	
+
+	uint64 l = 0xABCDEF0123456789;
+	uint32 h = (uint32)l;
+	printf("0x%lx\n", h);
+	
+	Lights[0] = SpawnObject<Light>();
+
+	Lights[0]->Data.Location = Vector(2, 2, 0.2f);
+	Lights[0]->Data.Type = LIGHT_POINT;
+	Lights[0]->Data.Size = 10.f;
+	Lights[0]->Data.Intensity = 20.f;
+	Lights[0]->Data.Color = Vector(1.f);
+
 	/*
-	for (int i = 0; i < 0; i++) {
+	for (int i = 1; i < 10; i++) {
 
 		float x = rand() % 100 - 50.f;
 		float y = rand() % 100 - 50.f;
-		float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
+		//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
 
 		Lights[i] = SpawnObject<Light>();
 
-		Lights[i]->Data.Location = Vector(x, y, terra[0]->GetHeight(x, y) + 0.2f);
+		Lights[i]->Data.Location = Vector(x, y, 1.0f + 0.2f);
 		Lights[i]->Data.Type = LIGHT_POINT;
 		Lights[i]->Data.Size = 5.f;
 		Lights[i]->Data.Intensity = rand() / (float)RAND_MAX * 20.f;
 		Lights[i]->Data.Color = Vector(1.f);
 	}
 	*/
-	uint64 l = 0xABCDEF0123456789;
-	uint32 h = (uint32)l;
-	printf("0x%lx\n", h);
+
+	
 
 	Console::Log("Hello beautiful world");
 }
