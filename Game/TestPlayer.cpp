@@ -240,30 +240,33 @@ void TestPlayer::BeginPlay()
 	uint32 h = (uint32)l;
 	printf("0x%lx\n", h);
 	
+	/*
 	Lights[0] = SpawnObject<Light>();
 
-	Lights[0]->Data.Location = Vector(2, 2, 0.2f);
+	Lights[0]->Data.Location = Vector(70, 70, 1.2f);
 	Lights[0]->Data.Type = LIGHT_POINT;
-	Lights[0]->Data.Size = 10.f;
-	Lights[0]->Data.Intensity = 20.f;
+	Lights[0]->Data.Size = 80.f;
+	Lights[0]->Data.Intensity = 50.f;
 	Lights[0]->Data.Color = Vector(1.f);
+	*/
+	
+	Terrain* terrain = ObjectManager::GetByRecord<Terrain>(0xA0005554);
 
-	/*
-	for (int i = 1; i < 10; i++) {
+	for (int i = 0; i < 100; i++) {
 
-		float x = rand() % 100 - 50.f;
-		float y = rand() % 100 - 50.f;
+		float x = rand() % 100;
+		float y = rand() % 100;
 		//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
 
 		Lights[i] = SpawnObject<Light>();
 
-		Lights[i]->Data.Location = Vector(x, y, 1.0f + 0.2f);
+		Lights[i]->Data.Location = Vector(x, y, terrain->GetHeight(x,y) + 0.5f);
 		Lights[i]->Data.Type = LIGHT_POINT;
 		Lights[i]->Data.Size = 5.f;
-		Lights[i]->Data.Intensity = rand() / (float)RAND_MAX * 20.f;
+		Lights[i]->Data.Intensity = rand() / (float)RAND_MAX * 20.f + 10;
 		Lights[i]->Data.Color = Vector(1.f);
 	}
-	*/
+	
 
 	
 
