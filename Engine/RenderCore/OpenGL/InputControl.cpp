@@ -20,6 +20,19 @@ void InputCallback(int key, int code, int action, int mods)
 	in->Inputs.push(next);
 }
 
+void MouseInputCallback(int button, int action, int mods)
+{
+	GLInput* in = dynamic_cast<GLInput*>(II);
+
+	KeyAction next;
+	next.key = button;
+	next.scancode = 0;
+	next.action = action;
+	next.mods = mods;
+
+	in->Inputs.push(next);
+}
+
 GLInput::GLInput() : IInput()
 {
 	KeyInput = &InputCallback;
@@ -36,8 +49,8 @@ void GLInput::ProcessInputs(float delta)
 	WindowManager::PollEvents();
 
 	for (auto const& [key, value] : Hold) {
-		auto t = KeyCallers.find(key);
-		if (t != KeyCallers.end()) {
+		auto t = KeyCallersHold.find(key);
+		if (t != KeyCallersHold.end()) {
 			t->second(delta, true);
 		}
 	}
@@ -46,18 +59,32 @@ void GLInput::ProcessInputs(float delta)
 		switch (key.action)
 		{
 		case GLFW_PRESS:
-			if (Hold.find(key.key) == Hold.end()) {
-				auto t = KeyCallers.find(key.key);
-				if (t != KeyCallers.end()) {
+			if (KeyCallers.find(key.key) != KeyCallers.end()) {
+				auto it = KeyCallers.equal_range(key.key);
+				while (it.first != it.second) {
+					it.first->second(true);
+					it.first++;
+				}
+			}
+			else if (Hold.find(key.key) == Hold.end()) {
+				auto t = KeyCallersHold.find(key.key);
+				if (t != KeyCallersHold.end()) {
 					t->second(delta, true);
 				}
 				Hold[key.key] = key;
 			}
 			break;
 		case GLFW_RELEASE:
+			if (KeyCallers.find(key.key) != KeyCallers.end()) {
+				auto it = KeyCallers.equal_range(key.key);
+				while (it.first != it.second) {
+					it.first->second(false);
+					it.first++;
+				}
+			}
 			if (Hold.find(key.key) != Hold.end()) {
-				auto t = KeyCallers.find(key.key);
-				if (t != KeyCallers.end()) {
+				auto t = KeyCallersHold.find(key.key);
+				if (t != KeyCallersHold.end()) {
 					t->second(delta, false);
 				}
 				Hold.erase(key.key);
@@ -87,5 +114,9 @@ void GLInput::SetInputHandler(void(*Callback) (int, int, int, int))
 	//KeyInput = Callback == nullptr ? &InputCallback : Callback;
 	glfwSetKeyCallback((GLFWwindow*)WindowManager::GetHandle(dynamic_cast<Renderer*>(RI)->Window), [](GLFWwindow* window, int key, int scancode, int action, int mods) {
 		InputCallback(key, scancode, action, mods);
+	});
+
+	glfwSetMouseButtonCallback((GLFWwindow*)WindowManager::GetHandle(dynamic_cast<Renderer*>(RI)->Window), [](GLFWwindow* window, int key, int action, int mods) {
+		MouseInputCallback(key, action, mods);
 	});
 }

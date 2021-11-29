@@ -233,6 +233,7 @@
     <ClCompile Include="Engine\RenderCore\OpenGL\RenderBuffer.cpp" />
     <ClCompile Include="Engine\RenderCore\OpenGL\Renderer.cpp" />
     <ClCompile Include="Engine\RenderCore\OpenGL\Texture.cpp" />
+    <ClCompile Include="Engine\RenderCore\OpenGL\UI\Button.cpp" />
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\Image.cpp" />
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\Panel.cpp" />
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\Text.cpp" />
@@ -274,6 +275,7 @@
     <ClInclude Include="Engine\RenderCore\OpenGL\include\RenderBuffer.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\include\Renderer.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\include\Texture.h" />
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Button.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Image.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Panel.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Text.h" />

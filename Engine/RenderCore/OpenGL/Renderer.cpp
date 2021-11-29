@@ -124,11 +124,33 @@ inline float lerp(float a, float b, float f)
 	return a + f * (b - a);
 }
 
+void GLAPIENTRY
+MessageCallback(GLenum source,
+	GLenum type,
+	GLuint id,
+	GLenum severity,
+	GLsizei length,
+	const GLchar* message,
+	const void* userParam)
+{
+	if (severity == GL_DEBUG_SEVERITY_NOTIFICATION) return;
+	char hex_string1[20];
+	char hex_string2[20];
+	sprintf(hex_string1, "%X", type);
+	sprintf(hex_string2, "%X", severity);
+	if (severity == GL_DEBUG_SEVERITY_LOW) Console::Warning(String("OpenGL Error: type = ") + hex_string1 + ", severity = " + hex_string2 + ", message = " + message);
+	else Console::Error(String("OpenGL Error: type = ") + hex_string1 + ", severity = " + hex_string2 + ", message = " + message);
+}
+
 int Renderer::SetupWindow(int width, int height)
 {
 	if (width < 640 || width > 2048 || height < 480 || height > 2048) throw std::exception("Unsupported resolution!\n");
 
 	Window = WindowManager::CreateMainWindow(width, height);
+
+	// During init, enable debug output
+	glEnable(GL_DEBUG_OUTPUT);
+	glDebugMessageCallback(MessageCallback, 0);
 
 	Console::Log("Allocating buffers...");
 	DepthBuffer = new PreDepthBuffer(width, height);

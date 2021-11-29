@@ -31,7 +31,7 @@ Panel* Panel::AddChild(UIComponent* child)
 {
 	child->SetParent(this);
 	auto it = children.emplace(child->GetZIndex(), child);
-	float depth = realDepth;
+	float depth = realDepth + 0.1f;
 
 	for (auto i = children.begin(); i != children.end(); i++) {
 		i->second->UpdateDepth(depth);

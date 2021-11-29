@@ -70,10 +70,12 @@ void main()
 	UIStyleGLM n(style);
 	glGenBuffers(1, &uniformBuffer);
 	glBindBuffer(GL_UNIFORM_BUFFER, uniformBuffer);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(UIStyleGLM), &n, GL_STATIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(UIStyleGLM), &n, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	hits = HitReg::HitTestVisible;
+
+	Console::Log("Texture created");
 }
 
 Image::~Image()
@@ -82,6 +84,8 @@ Image::~Image()
 	delete texture_shader;
 
 	delete style.texture;
+
+	glDeleteBuffers(1, &uniformBuffer);
 }
 
 void Image::Render()

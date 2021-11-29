@@ -15,6 +15,7 @@ UISpace::UISpace()
 	UIShader = nullptr;
 	Screen = 0;
 	hasFocus = false;
+	Hovered = nullptr;
 
 	const char* vertexShader = R"~~~(
 #version 430 core
@@ -75,6 +76,8 @@ void main()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindVertexArray(0);
+
+	II->RegisterKeyInput(0, &UISpace::LeftClick, this);
 }
 
 UISpace::~UISpace()
@@ -142,7 +145,6 @@ void UISpace::Render(uint target)
 	glBindVertexArray(VAO);
 	
 	glBindFramebuffer(GL_FRAMEBUFFER, UIBuffer);
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	if (WindowManager::GetShowCursor(Screen)) {
 		float x;
@@ -159,8 +161,9 @@ void UISpace::Render(uint target)
 	//glDisable(GL_BLEND);
 	glDisable(GL_MULTISAMPLE);
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_GREATER);
+	glDepthFunc(GL_LESS);
 	glDisable(GL_CULL_FACE);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	for (const auto& c : TopLevel) {
 		c->TopLevel->Render();
 	}
@@ -187,4 +190,18 @@ void UISpace::AddComponent(UI* com)
 		com->TopLevel->UpdateMatrices(ScreenSize);
 	com->PostConstruct();
 	TopLevel.push_back(com);
+}
+
+void UISpace::LeftClick(bool down)
+{
+	if (Hovered)
+	{
+		if (down) {
+			Hovered->OnMouseDown();
+		}
+		else
+		{
+			Hovered->OnMouseUp();
+		}
+	}
 }

@@ -2,6 +2,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/quaternion.hpp>
+#include "UISpace.h"
 
 struct UIMatrix
 {
@@ -84,8 +85,20 @@ void UIComponent::UpdateMatrices(const Vector2D& size)
 	realSize.X = (long)(scale.x * sca.X);
 	realSize.Y = (long)(scale.y * sca.Y);
 	topLeft.X = (long)(gloc.x + loc.X);
-	topLeft.X = (long)(gloc.y + loc.Y);
+	topLeft.Y = (long)(gloc.y + loc.Y);
 	matrix->model_m = view * model;
+}
+
+UIComponent* UIComponent::SetTransform(float left, float right, float top, float bottom, Vector anchor_vert, Vector anchor_hor)
+{
+	leftOffset = left;
+	rightOffset = right;
+	topOffset = top;
+	bottomOffset = bottom;
+	anchor_v = anchor_vert;
+	anchor_h = anchor_hor;
+
+	return this;
 }
 
 bool UIComponent::Trace(const Vector2D& point) const
@@ -103,6 +116,7 @@ bool UIComponent::Trace(const Vector2D& point) const
 
 void UIComponent::HoverCheck(Vector2D& point)
 {
+	if (point.X == -1) return;
 	if (hits == HitReg::HitTestVisible && visible == Visibility::Visible) {
 		bool hit = Trace(point);
 		if (hit)
@@ -110,6 +124,7 @@ void UIComponent::HoverCheck(Vector2D& point)
 			point.X = -1;
 			if (!hovered) {
 				hovered = true;
+				RI->GetUIManager()->Hovered = this;
 				OnEnter();
 			}
 			else OnHover();
@@ -117,6 +132,7 @@ void UIComponent::HoverCheck(Vector2D& point)
 		else {
 			if (hovered) {
 				hovered = false;
+				if (RI->GetUIManager()->Hovered == this) RI->GetUIManager()->Hovered = nullptr;
 				OnLeave();
 			}
 		}

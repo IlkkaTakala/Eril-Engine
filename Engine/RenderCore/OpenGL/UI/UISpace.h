@@ -22,6 +22,9 @@ public:
 	uint GetDepth() const { return Depth; }
 
 private:
+	friend UIComponent;
+
+	void LeftClick(bool);
 
 	bool hasFocus;
 
@@ -40,5 +43,6 @@ private:
 
 	std::list<Ref<UI>> TopLevel;
 	RefWeak<UIComponent> Focused;
+	UIComponent* Hovered;
 };
 

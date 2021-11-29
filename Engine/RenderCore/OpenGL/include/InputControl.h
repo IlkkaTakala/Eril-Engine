@@ -23,6 +23,7 @@ public:
 
 private:
 	friend void InputCallback(int, int, int, int);
+	friend void MouseInputCallback(int, int, int);
 
 	static void (*KeyInput)(int, int, int, int);
 

@@ -16,6 +16,8 @@ enum class HitReg
 	HitTestVisible
 };
 
+
+
 class UIComponent
 {
 public:
@@ -28,12 +30,15 @@ public:
 	void SetParent(UIComponent* p) { parent = p; }
 	virtual void Render() = 0;
 	virtual void UpdateMatrices(const Vector2D& size);
+	UIComponent* SetTransform(float left = 0.f, float right = 0.f, float top = 0.f, float bottom = 0.f, Vector anchor_vert = Vector(), Vector anchor_hor = Vector());
 
 	bool Trace(const Vector2D& point) const;
 
 	virtual void OnLeave() {}
 	virtual void OnEnter() {}
 	virtual void OnHover() {}
+	virtual void OnMouseDown() {}
+	virtual void OnMouseUp() {}
 	virtual void HoverCheck(Vector2D& point);
 
 protected:

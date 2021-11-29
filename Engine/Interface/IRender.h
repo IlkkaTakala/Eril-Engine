@@ -65,12 +65,20 @@ public:
 	virtual void ProcessInputs(float delta) = 0;
 
 	template <class UserClass>
-	void RegisterKeyInput(int Key, void (UserClass::* Callback)(float, bool), UserClass* Caller)
+	void RegisterKeyContinuousInput(int Key, void (UserClass::* Callback)(float, bool), UserClass* Caller)
 	{
 		using std::placeholders::_1;
 		using std::placeholders::_2;
 		std::function<void(float, bool)> f = std::bind(Callback, Caller, _1, _2);
-		KeyCallers.insert(std::pair<int, std::function<void(float, bool)>>(Key, f));
+		KeyCallersHold.insert(std::pair<int, std::function<void(float, bool)>>(Key, f));
+	}
+
+	template <class UserClass>
+	void RegisterKeyInput(int Key, void (UserClass::* Callback)(bool), UserClass* Caller)
+	{
+		using std::placeholders::_1;
+		std::function<void(bool)> f = std::bind(Callback, Caller, _1);
+		KeyCallers.insert(std::pair<int, std::function<void(bool)>>(Key, f));
 	}
 
 	template <class UserClass>
@@ -83,7 +91,8 @@ public:
 	}
 
 protected:
-	std::multimap<int, std::function<void(float, bool)>> KeyCallers;
+	std::multimap<int, std::function<void(float, bool)>> KeyCallersHold;
+	std::multimap<int, std::function<void(bool)>> KeyCallers;
 	std::multimap<int, std::function<void(float, float)>> MouseCallers;
 
 	float MouseX;

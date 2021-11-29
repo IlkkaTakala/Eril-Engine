@@ -127,6 +127,9 @@
     <ClCompile Include="Game\EngineInterface.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\RenderCore\OpenGL\UI\Button.cpp">
+      <Filter>Engine\OpenGL\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -280,6 +283,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Interface\FileManager.h">
       <Filter>Engine\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Button.h">
+      <Filter>Engine\OpenGL\UI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
