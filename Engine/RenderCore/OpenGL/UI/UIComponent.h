@@ -64,6 +64,7 @@ protected:
 	float realDepth;
 	Vector2D realSize;
 	Vector2D topLeft;
+	Vector2D desiredSize;
 
 	Vector basecolor;
 	Vector tint;

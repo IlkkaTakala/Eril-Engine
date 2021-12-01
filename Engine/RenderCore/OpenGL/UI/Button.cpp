@@ -52,6 +52,8 @@ Button::~Button()
 	glDeleteBuffers(1, &normalBuffer);
 	glDeleteBuffers(1, &hoverBuffer);
 	glDeleteBuffers(1, &pressBuffer);
+
+	delete child;
 }
 
 Button* Button::SetHoverStyle(const UIStyle& s)
@@ -125,6 +127,8 @@ void Button::Render()
 	}
 
 	Image::Render();
+
+	if (child != nullptr) child->Render();
 }
 
 void Button::UpdateDepth(float& depth)
@@ -145,7 +149,10 @@ void Button::UpdateMatrices(const Vector2D& size)
 {
 	Image::UpdateMatrices(size);
 
-	if (child != nullptr) child->UpdateMatrices(size);
+	if (child != nullptr) {
+		child->SetTransform(0.f, 0.f, 0.f, 0.f, Vector(0.f, 1.f, 0.f), Vector(0.f, 1.f, 0.f));
+		child->UpdateMatrices(realSize);
+	}
 }
 
 void Button::HoverCheck(Vector2D& point)

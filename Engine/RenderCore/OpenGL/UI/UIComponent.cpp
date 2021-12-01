@@ -25,6 +25,7 @@ UIComponent::UIComponent()
 
 	z_index = 0;
 	realDepth = 0.f;
+	desiredSize = Vector2D();
 
 	basecolor = Vector(1.f);
 	tint = Vector(1.f);
@@ -50,29 +51,30 @@ UIComponent::~UIComponent()
 
 void UIComponent::UpdateMatrices(const Vector2D& size)
 {
-	const glm::mat4 view = glm::ortho(0.f, (float)size.X, (float)size.Y, 0.f, 10.f, 0.1f);;
+	const Vector2D ScreenSize = RI->GetUIManager()->GetSize();
+	const glm::mat4 view = glm::ortho(0.f, (float)ScreenSize.X, (float)ScreenSize.Y, 0.f, 10.f, 0.1f);;
 	const Vector loc = transform.Location;
 	const Vector rot = transform.Rotation;
 	const Vector sca = transform.Scale;
 
-	glm::vec3 gloc(0.f);
+	glm::vec3 gloc = parent == nullptr ? glm::vec3(0.f) : glm::vec3(parent->topLeft.X, parent->topLeft.Y, 0.f);
 	glm::vec3 scale(1.f);
-	glm::vec2 bounds = parent == nullptr ? glm::vec2(size.X, size.Y) : glm::vec2(parent->realSize.X, parent->realSize.Y);
+	glm::vec2 bounds = glm::vec2(size.X, size.Y);
 
 	if (anchor_v.Y <= anchor_v.X) {
 		scale.y = bottomOffset;
-		gloc.y = bounds.y * anchor_v.X + topOffset - (bottomOffset * origin.Y);
+		gloc.y += bounds.y * anchor_v.X + topOffset - (bottomOffset * origin.Y);
 	}
 	else {
-		gloc.y = anchor_v.X * bounds.y + topOffset;
+		gloc.y += anchor_v.X * bounds.y + topOffset;
 		scale.y = (anchor_v.Y * bounds.y - bottomOffset) - gloc.y;
 	}
 	if (anchor_h.Y <= anchor_h.X) {
 		scale.x = rightOffset;
-		gloc.x = bounds.x * anchor_h.X + leftOffset - (rightOffset * origin.X);
+		gloc.x += bounds.x * anchor_h.X + leftOffset - (rightOffset * origin.X);
 	}
 	else {
-		gloc.x = anchor_h.X * bounds.x + leftOffset;
+		gloc.x += anchor_h.X * bounds.x + leftOffset;
 		scale.x = (anchor_h.Y * bounds.x - rightOffset) - gloc.x;
 	}
 

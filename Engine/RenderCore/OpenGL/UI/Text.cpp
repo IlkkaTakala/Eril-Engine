@@ -38,6 +38,7 @@ struct Font
 		charBuffer = 0;
 		charCount = 0;
 		kerningCount = 0;
+		originalSize = 0;
 	}
 	~Font() {
 	}
@@ -53,6 +54,7 @@ struct Font
 	std::map<char, std::map<char, int>> kernings;
 	uint charBuffer;
 	uint kerningTexture;
+	uint originalSize;
 };
 
 static std::map<String, Font> fonts;
@@ -114,6 +116,7 @@ Font loadFont(String name)
 
 	Font f;
 	int line = 0;
+	f.originalSize = atoi(readParamOnLine("size", line, data).c_str());
 	for (int i = 0; i < 2; i++) {
 		line = readLine(line, data);
 	}
@@ -211,11 +214,10 @@ layout (std140, binding = 0) uniform Globals
 uniform sampler2D depthMap;
 uniform float depthValue;
 uniform ivec2 topLeft;
-uniform int fontsize;
+uniform float fontsize;
 uniform int weight;
 layout (binding=0, rgba16f) uniform image2D colorDest;
 layout (binding=4, r8) readonly uniform image2D fontAtlas;
-layout (binding=5, r8i) readonly uniform iimage2D kerning;
 layout (std140, binding = 1) uniform style
 {
 	vec4 color;
@@ -230,8 +232,6 @@ layout(std430, binding = 3) readonly buffer CharBuffer {
 	CharData charBuffer[];
 };
 
-shared float scale;
-
 shared float width;
 const float fade = 0.1;
 
@@ -242,7 +242,6 @@ void main()
 	uint character = 0;
 	
 	if (gl_LocalInvocationIndex == 0) {
-		scale = fontsize / 90.0;
 		width = 0.3 - (weight / 100.0 - 1.0) * 0.1;
 	}
 
@@ -256,14 +255,14 @@ void main()
 
 		uint letter = stringBuffer[stringIndex].letter;
 		ivec2 size = charBuffer[letter].size;
-		uint xoffset = topLeft.x + stringBuffer[stringIndex].offset + charBuffer[letter].offset.x;
-		uint yoffset = topLeft.y + charBuffer[letter].offset.y;
+		uint xoffset = stringBuffer[stringIndex].offset + charBuffer[letter].offset.x;
+		uint yoffset = charBuffer[letter].offset.y;
 		ivec2 dataLoc = charBuffer[letter].topLeft;
 		vec4 result = vec4(1.0);
 		for (int y = 0; y < size.y; y++) {
 			for (int x = 0; x < size.x; x++) {
-				vec2 screenLoc = vec2(xoffset + x, yoffset + y) * scale;
-				ivec2 loc = ivec2(screenLoc.x, screenSize.y - screenLoc.y);
+				vec2 screenLoc = vec2(xoffset + x, yoffset + y) * fontsize;
+				ivec2 loc = ivec2(screenLoc.x + topLeft.x, screenSize.y - (topLeft.y + screenLoc.y));
 				//if (texture(depthMap, loc / vec2(screenSize)).r == depthValue) {
 					float fontValue = imageLoad(fontAtlas, dataLoc + ivec2(x, y)).r;
 					result.a = smoothstep(width, width + fade, fontValue);
@@ -280,7 +279,7 @@ void main()
 	if (solid_shader != nullptr) delete solid_shader;
 	solid_shader = new Shader(0, solidShader);
 
-	hits = HitReg::HitTestVisible;
+	hits = HitReg::HitTestInvisible;
 
 	font = "Assets/Fonts/arial";
 
@@ -301,6 +300,39 @@ Text::~Text()
 void Text::Render()
 {
 	if (visible != Visibility::Visible) return;
+
+	if (textChanged) {
+		float ratio = fontSize / (float)fonts[font].originalSize;
+		Letter* storage = new Letter[value.size()]();
+		for (int i = 0; i < value.size(); i++) {
+			char letter = value[i];
+			storage[i].letter = letter;
+			if (i > 0) {
+				storage[i].offset = storage[i - 1].offset + uint(fonts[font].glyphs[storage[i - 1].letter].advance - 20);
+				if (fonts[font].kernings.count(storage[i - 1].letter) > 0) {
+					if (fonts[font].kernings[storage[i - 1].letter].count(letter) > 0)
+						storage[i].offset += (int)(fonts[font].kernings[storage[i - 1].letter][letter]);
+				}
+			}
+			else {
+				storage[i].offset = 0;
+			}
+		}
+		int total_length = storage[value.size() - 1].offset + fonts[font].glyphs[storage[value.size() - 1].letter].advance;
+		int center = ((realSize.X - total_length * ratio) / 2) / ratio;
+
+		for (int i = 0; i < value.size(); i++) {
+			storage[i].offset += center;
+		}
+
+		glGenBuffers(1, &StringBuffer);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, StringBuffer);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(Letter) * value.size(), storage, GL_STATIC_DRAW);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+		delete[] storage;
+	}
+
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, fonts[font].charBuffer);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, StringBuffer);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 1, uniformBuffer);
@@ -308,7 +340,7 @@ void Text::Render()
 	solid_shader->Bind();
 
 	solid_shader->SetUniform("topLeft", topLeft.X, topLeft.Y);
-	solid_shader->SetUniform("fontsize", fontSize);
+	solid_shader->SetUniform("fontsize", fontSize / (float)fonts[font].originalSize);
 	solid_shader->SetUniform("model", matrix->model_m);
 	solid_shader->SetUniform("depthValue", realDepth);
 	solid_shader->SetUniform("weight", weight);
@@ -318,36 +350,17 @@ void Text::Render()
 
 	glBindImageTexture(0, RI->GetUIManager()->GetColor(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16F);
 	glBindImageTexture(4, fonts[font].tex->GetTextureID(), 0, GL_FALSE, 0, GL_READ_ONLY, GL_R8);
-	glBindImageTexture(5, fonts[font].kerningTexture, 0, GL_FALSE, 0, GL_READ_ONLY, GL_R8I);
 
 	glDispatchCompute(1, 1, 1);
 	glMemoryBarrier(GL_FRAMEBUFFER_BARRIER_BIT);
 	//glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-void Text::SetText(const String& text)
+Text* Text::SetText(const String& text, int size)
 {
 	value = text;
-	Letter* storage = new Letter[value.size()]();
-	for (int i = 0; i < value.size(); i++) {
-		char letter = value[i];
-		storage[i].letter = letter;
-		if (i > 0) {
-			storage[i].offset = storage[i - 1].offset + fonts[font].glyphs[storage[i - 1].letter].advance;
-			if (fonts[font].kernings.count(storage[i - 1].letter) > 0) {
-				if (fonts[font].kernings[storage[i - 1].letter].count(letter) > 0)
-					storage[i].offset += (int)fonts[font].kernings[storage[i - 1].letter][letter];
-			}
-		}
-		else {
-			storage[i].offset = 0;
-		}
-	}
+	textChanged = true;
+	if (size != 0) fontSize = size;
 
-	glGenBuffers(1, &StringBuffer);
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, StringBuffer);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(Letter) * value.size(), storage, GL_STATIC_DRAW);
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-	delete[] storage;
+	return this;
 }

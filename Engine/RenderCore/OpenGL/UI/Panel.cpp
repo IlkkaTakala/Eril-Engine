@@ -71,7 +71,7 @@ void Panel::UpdateMatrices(const Vector2D& size)
 	UIComponent::UpdateMatrices(size);
 
 	for (const auto& c : children) {
-		c.second->UpdateMatrices(size);
+		c.second->UpdateMatrices(realSize);
 	}
 }
 
