@@ -20,6 +20,7 @@ Button::Button()
 	hoverBuffer = 0;
 	pressBuffer = 0;
 	state = ButtonState::Neutral;
+	child = nullptr;
 
 	glDeleteBuffers(1, &uniformBuffer);
 
@@ -131,7 +132,7 @@ void Button::UpdateDepth(float& depth)
 	realDepth = depth;
 	depth += 0.1f;
 
-	child->UpdateDepth(depth);
+	if (child != nullptr) child->UpdateDepth(depth);
 }
 
 float Button::GetTreeDepth() const
@@ -144,12 +145,12 @@ void Button::UpdateMatrices(const Vector2D& size)
 {
 	Image::UpdateMatrices(size);
 
-	child->UpdateMatrices(size);
+	if (child != nullptr) child->UpdateMatrices(size);
 }
 
 void Button::HoverCheck(Vector2D& point)
 {
-	child->HoverCheck(point);
+	if (child != nullptr) child->HoverCheck(point);
 	Image::HoverCheck(point);
 }
 
