@@ -9,6 +9,7 @@
 #include "ECSTesting.h"
 #include "TestUI.h"
 #include <Interface/WindowManager.h>
+#include <Interface/IECS.h>
 
 void TestPlayer::OpenConsole(bool) {
 	Console::Create();
@@ -25,7 +26,7 @@ void TestPlayer::UseCursor(bool keydown)
 TestPlayer::TestPlayer() : Player()
 {
 	//ECS TEST
-	//ecsTest = SpawnObject<ECSTesting>();
+	ecsTest = SpawnObject<ECSTesting>();
 
 	mouseSens = 0.5f;
 	Speed = 5.f;

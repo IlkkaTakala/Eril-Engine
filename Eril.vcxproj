@@ -244,6 +244,7 @@
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\UI.cpp" />
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\UIComponent.cpp" />
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\UISpace.cpp" />
+    <ClCompile Include="Game\ECSTesting.cpp" />
     <ClCompile Include="Game\EngineInterface.cpp" />
     <ClCompile Include="Game\Hunter.cpp" />
     <ClCompile Include="Game\TestPlayer.cpp" />
