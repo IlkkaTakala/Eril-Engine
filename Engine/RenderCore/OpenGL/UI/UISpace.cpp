@@ -10,6 +10,8 @@
 
 UISpace::UISpace()
 {
+	Combiner = nullptr;
+
 	UIBuffer = 0;
 	Color = 0;
 	Depth = 0;

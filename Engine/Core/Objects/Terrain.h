@@ -14,6 +14,7 @@ public:
 	void InitTerrain(int r, Vector scale = Vector(1.f), Vector location = Vector(0.f), String material = "");
 	float GetHeight(float x, float y);
 	Vector GetNormal(float x, float y);
+	Vector GetTangent(float x, float y, Vector normal);
 
 private:
 	virtual ~Terrain() {};

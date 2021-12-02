@@ -11,7 +11,7 @@ class Terrain;
 class Hunter;
 
 //ECS TEST
-class ECSTesting;
+//class ECSTesting;
 
 class TestPlayer : public Player
 {
@@ -24,6 +24,8 @@ private:
 	float mouseSens;
 	float Speed;
 
+	void RunInputQ(float delta, bool KeyDown);
+	void RunInputZ(float delta, bool KeyDown);
 	void RunInputW(float delta, bool KeyDown);
 	void RunInputA(float delta, bool KeyDown);
 	void RunInputD(float delta, bool KeyDown);
@@ -57,7 +59,7 @@ private:
 
 
 	//ECS TEST
-	Ref<ECSTesting> ecsTest;
+	//Ref<ECSTesting> ecsTest;
 
 	int spawnCounter;
 };

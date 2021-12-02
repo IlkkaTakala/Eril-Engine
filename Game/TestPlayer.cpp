@@ -25,7 +25,7 @@ void TestPlayer::UseCursor(bool keydown)
 TestPlayer::TestPlayer() : Player()
 {
 	//ECS TEST
-	ecsTest = SpawnObject<ECSTesting>();
+	//ecsTest = SpawnObject<ECSTesting>();
 
 	mouseSens = 0.5f;
 	Speed = 5.f;
@@ -34,6 +34,8 @@ TestPlayer::TestPlayer() : Player()
 	//GetCamera()->SetLocation(INI->GetValue("Player", "Start"));
 	//GetCamera()->SetRotation(INI->GetValue("Player", "Direction"));
 
+	II->RegisterKeyContinuousInput(81, &TestPlayer::RunInputQ, this);
+	II->RegisterKeyContinuousInput(90, &TestPlayer::RunInputZ, this);
 	II->RegisterKeyContinuousInput(87, &TestPlayer::RunInputW, this);
 	II->RegisterKeyContinuousInput(65, &TestPlayer::RunInputA, this);
 	II->RegisterKeyContinuousInput(83, &TestPlayer::RunInputS, this);
@@ -156,6 +158,17 @@ TestPlayer::TestPlayer() : Player()
 	UI::AddToScreen(ui, this);
 }
 
+void TestPlayer::RunInputQ(float delta, bool KeyDown)
+{
+	Vector dir(0.0,0.0,1.0);
+	Movement->AddInput(dir.Normalize());
+}
+void TestPlayer::RunInputZ(float delta, bool KeyDown)
+{
+	Vector dir(0.0, 0.0, -1.0);
+	Movement->AddInput(dir.Normalize());
+}
+
 void TestPlayer::RunInputW(float delta, bool KeyDown)
 {
 	Vector dir = -GetCamera()->GetForwardVector();
@@ -250,31 +263,55 @@ void TestPlayer::BeginPlay()
 	uint32 h = (uint32)l;
 	printf("0x%lx\n", h);
 	
+	/*
 	Lights[0] = SpawnObject<Light>();
 
-	Lights[0]->Data.Location = Vector(2, 2, 0.2f);
+	Lights[0]->Data.Location = Vector(70, 70, 1.2f);
 	Lights[0]->Data.Type = LIGHT_POINT;
-	Lights[0]->Data.Size = 10.f;
-	Lights[0]->Data.Intensity = 20.f;
+	Lights[0]->Data.Size = 80.f;
+	Lights[0]->Data.Intensity = 50.f;
 	Lights[0]->Data.Color = Vector(1.f);
+	*/
+	
+	Terrain* terrain = ObjectManager::GetByRecord<Terrain>(0xA0005554);
 
-	/*
-	for (int i = 1; i < 10; i++) {
+	for (int i = 0; i < 1; i++) {
 
-		float x = rand() % 100 - 50.f;
-		float y = rand() % 100 - 50.f;
+		float x = rand() % 100;
+		float y = rand() % 100;
 		//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
 
 		Lights[i] = SpawnObject<Light>();
 
-		Lights[i]->Data.Location = Vector(x, y, 1.0f + 0.2f);
+		Lights[i]->Data.Location = Vector(x, y, terrain->GetHeight(x,y) + 0.5f);
 		Lights[i]->Data.Type = LIGHT_POINT;
 		Lights[i]->Data.Size = 5.f;
-		Lights[i]->Data.Intensity = rand() / (float)RAND_MAX * 20.f;
+		Lights[i]->Data.Intensity = rand() / (float)RAND_MAX * 20.f + 10;
 		Lights[i]->Data.Color = Vector(1.f);
 	}
-	*/
+	
+	float x = 9;
+	float y = 5;
+	//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
 
+	Lights[0] = SpawnObject<Light>();
+
+	Lights[0]->Data.Location = Vector(x, y, terrain->GetHeight(x, y) + 0.5f);
+	Lights[0]->Data.Type = LIGHT_POINT;
+	Lights[0]->Data.Size = 15.f;
+	Lights[0]->Data.Intensity = 50.0f;
+	Lights[0]->Data.Color = Vector(1.0, 0.0, 0.0);
+
+	/*
+	Lights[1] = SpawnObject<Light>();
+
+	Lights[1]->Data.Location = Vector(x, y, terrain->GetHeight(x, y) + 0.5f);
+	Lights[1]->Data.Type = LIGHT_DIRECTIONAL;
+	Lights[1]->Data.Size = 15.f;
+	Lights[1]->Data.Intensity = 10.0f;
+	Lights[1]->Data.Color = Vector(1.0, 1.0, 1.0);
+	Lights[1]->Data.Rotation = Vector(0.5, 0.5, 0.5);
+	*/
 	
 
 	Console::Log("Hello beautiful world");
