@@ -1,7 +1,7 @@
 #include "Material.h"
 #include <glad/gl.h>
-#include <GLFW/glfw3.h>
 #include "Core.h"
+#include <Interface/WindowManager.h>
 #include "Renderer.h"
 #include "Camera.h"
 #include "Mesh.h"
@@ -58,7 +58,7 @@ Renderer::Renderer()
 {
 	DepthBuffer = nullptr;
 	BlurRender = nullptr;
-	Window = nullptr;
+	Window = 0;
 	ActiveCamera = nullptr;
 	PreDepthShader = nullptr;
 	LightCullingShader = nullptr;
@@ -136,41 +136,33 @@ inline float lerp(float a, float b, float f)
 	return a + f * (b - a);
 }
 
+void GLAPIENTRY
+MessageCallback(GLenum source,
+	GLenum type,
+	GLuint id,
+	GLenum severity,
+	GLsizei length,
+	const GLchar* message,
+	const void* userParam)
+{
+	if (severity == GL_DEBUG_SEVERITY_NOTIFICATION) return;
+	char hex_string1[20];
+	char hex_string2[20];
+	sprintf(hex_string1, "%X", type);
+	sprintf(hex_string2, "%X", severity);
+	if (severity == GL_DEBUG_SEVERITY_LOW) Console::Warning(String("OpenGL Error: type = ") + hex_string1 + ", severity = " + hex_string2 + ", message = " + message);
+	else Console::Error(String("OpenGL Error: type = ") + hex_string1 + ", severity = " + hex_string2 + ", message = " + message);
+}
+
 int Renderer::SetupWindow(int width, int height)
 {
 	if (width < 640 || width > 2048 || height < 480 || height > 2048) throw std::exception("Unsupported resolution!\n");
 
-	if (!glfwInit()) {
-		return -1;
-	}
-	fpsCounter = INI->GetValue("Engine", "ShowFps") == "true";
+	Window = WindowManager::CreateMainWindow(width, height);
 
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
-	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-	glfwWindowHint(GLFW_SAMPLES, 4);
-
-	Console::Log("Creating window...");
-	Window = glfwCreateWindow(width, height, "Eril Engine Demo | Loading...", NULL, NULL);
-	if (!Window) {
-		glfwTerminate();
-		return -1;
-	}
-	if (INI->GetValue("Render", "ResolutionY").c_str() == "false")
-		glfwSetWindowAttrib(Window, GLFW_DECORATED, GLFW_FALSE);
-	glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	glfwSetInputMode(Window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
-	if (glfwRawMouseMotionSupported())
-		glfwSetInputMode(Window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
-
-	glfwMakeContextCurrent(Window);
-	if (INI->GetValue("Render", "VSync") == "false") glfwSwapInterval(0);
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		std::cout << "Failed to initialize OpenGL context" << std::endl;
-		return -1;
-	}
+	// During init, enable debug output
+	glEnable(GL_DEBUG_OUTPUT);
+	glDebugMessageCallback(MessageCallback, 0);
 
 	Console::Log("Allocating buffers...");
 	DepthBuffer = new PreDepthBuffer(width, height);
@@ -368,13 +360,13 @@ int Renderer::SetupWindow(int width, int height)
 
 	UIHolder = new UISpace();
 	UIHolder->SetSize(width, height);
-
+	UIHolder->SetScreen(Window);
 	return 0;
 }
 
 void Renderer::CleanRenderer()
 {
-	glfwDestroyWindow(Window);
+	WindowManager::CloseWindow(Window);
 
 	glDeleteBuffers(1, &LightBuffer);
 	glDeleteBuffers(1, &VisibleLightIndicesBuffer);
@@ -388,7 +380,7 @@ void Renderer::CleanRenderer()
 	glDeleteVertexArrays(1, &ScreenVao);
 	glDeleteVertexArrays(1, &EnvironmentVAO);
 
-	glfwTerminate();
+	WindowManager::Terminate();
 }
 
 Camera* Renderer::CreateCamera(VisibleObject* parent)
@@ -728,8 +720,7 @@ Texture* Renderer::LoadTextureByName(String name)
 
 void Renderer::Update()
 {
-	glfwPollEvents();
-	if (glfwWindowShouldClose(Window)) Exit();
+	if (WindowManager::GetShouldWindowClose(Window)) Exit();
 }
 
 void Renderer::EnvReflection(int width, int height)
@@ -740,7 +731,7 @@ void Renderer::EnvReflection(int width, int height)
 	glm::mat3(glm::vec3(1.0), glm::vec3(1.0), glm::vec3(1.0));
 	SkyDomeShader->Bind();
 	SkyDomeShader->SetUniform("P", ShadowProj);
-	SkyDomeShader->SetUniform("time", (float)glfwGetTime() * 1.f);
+	SkyDomeShader->SetUniform("time", WindowManager::GetWindowTime() * 1.f);
 	glBindVertexArray(ScreenVao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
@@ -1133,13 +1124,13 @@ void Renderer::UpdateTransforms() {
 
 void Renderer::Render(float delta)
 {
-	int width, height;
-
 	if (ActiveCamera == nullptr) return;
 
-	UpdateTransforms();
+	Vector2D size = WindowManager::GetWindowSize(Window);
+	int width = size.X;
+	int height = size.Y;
 
-	glfwGetFramebufferSize(Window, &width, &height);
+	UpdateTransforms();
 
 	GlobalVariables.Projection = ActiveCamera->GetProjectionMatrix();
 	GlobalVariables.View = glm::inverse(ActiveCamera->GetViewMatrix());
@@ -1210,19 +1201,19 @@ void Renderer::Render(float delta)
 	char sbuffer[32];
 	if (fpsCounter) {
 		sprintf_s(sbuffer, 32, "Eril Engine Demo | FPS: %.1f", fps);
-		glfwSetWindowTitle(Window, sbuffer);
+		WindowManager::SetWindowTitle(Window, sbuffer);
 	}
-	glfwSwapBuffers(Window);
+	WindowManager::UpdateWindow(Window);
 }
 
 void Renderer::GameStart()
 {
-	glfwSetWindowTitle(Window, "Eril Engine Demo");
+	WindowManager::SetWindowTitle(Window, "Eril Engine Demo");
 }
 
 void Renderer::DestroyWindow()
 {
-	glfwDestroyWindow(Window);
+	WindowManager::CloseWindow(Window);
 }
 
 GLMesh::GLMesh()
