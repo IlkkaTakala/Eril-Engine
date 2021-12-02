@@ -96,7 +96,11 @@ void ObjectManager::DeleteListed()
 {
 	std::unique_lock<std::mutex> lock(delete_m);
 	for (const auto& r : DeleteList) {
-		DeleteRecord(r);
+		auto o = GetByRecord<Data>(r);
+		if (o != nullptr) {
+			o->DestroyObject();
+			Console::Log("Removed record: " + r.ToString() + ". No active references");
+		}
 	}
 	DeleteList.clear();
 }

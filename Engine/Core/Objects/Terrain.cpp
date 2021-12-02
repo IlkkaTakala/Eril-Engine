@@ -208,34 +208,32 @@ Terrain::Terrain()
 	noise_scale = 0.010f;
 	amplitude = 10.0f;
 	Mesh = SpawnObject<VisibleObject>();
+	AddComponent(Mesh);
 }
 
 void Terrain::LoadWithParameters(const String& args)
 {
-	BaseObject::LoadWithParameters(args);
+	SceneComponent::LoadWithParameters(args);
 	auto data = ParseOptions(args);
 
 	auto res = data.find("Resolution");
 	auto sca = data.find("Scale");
-	auto loc = data.find("Location");
 	auto mat = data.find("Material");
 	int Resolution = 100;
 	Vector Scale = Vector(1.f);
-	Vector Location = Vector();
 	String Material = "Assets/Materials/ground";
 	if (res != data.end()) Resolution = atoi(res->second.c_str());
 	if (sca != data.end()) Scale = Vector(sca->second);
-	if (loc != data.end()) Location = Vector(loc->second);
 	if (mat != data.end()) Material = mat->second;
 
-	InitTerrain(Resolution, Scale, Location, Material);
+	InitTerrain(Resolution, Scale, Material);
 }
 
-void Terrain::InitTerrain(int r, Vector scale, Vector location, String material)
+void Terrain::InitTerrain(int r, Vector scale, String material)
 {
 	resolution = r;
-	Scale = scale / r;
-	Mesh->SetLocation(location);
+	Scale = Vector(1.f);
+	Vector tScale = scale / r;
 
 	std::vector<Vector> pos;
 	std::vector<Vector> uvs;
@@ -252,13 +250,13 @@ void Terrain::InitTerrain(int r, Vector scale, Vector location, String material)
 
 	for (int32 y = 0; y < r + 1; y++) {
 		for (int32 x = 0; x < r + 1; x++) {
-			pos.emplace_back(Vector(Scale.X * x, Scale.Y * y, GetHeight(Scale.X * x + location.X, Scale.Y * y + location.Y)));
+			pos.emplace_back(Vector(tScale.X * x, tScale.Y * y, GetHeight(tScale.X * x + Location.X, tScale.Y * y + Location.Y)));
 			uvs.emplace_back(Vector((x - 1) / (float)r, (y - 1) / (float)r, 0.f) * 10.f);
 
-			Vector normal = GetNormal(Scale.X * x + location.X, Scale.Y * y + location.Y);
+			Vector normal = GetNormal(tScale.X * x + Location.X, tScale.Y * y + Location.Y);
 			normals.emplace_back(normal);
 
-			Vector tangent = GetTangent(Scale.X * x + location.X, Scale.Y * y + location.Y, normal);
+			Vector tangent = GetTangent(Scale.X * x + Location.X, Scale.Y * y + Location.Y, normal);
 			tangents.emplace_back(tangent);
 
 			if (y < r && x < r) {
