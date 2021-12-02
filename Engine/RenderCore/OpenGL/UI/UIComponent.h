@@ -39,6 +39,8 @@ public:
 	virtual void OnHover() {}
 	virtual void OnMouseDown() {}
 	virtual void OnMouseUp() {}
+	virtual void OnFocus() {}
+	virtual void OnLostFocus() {}
 	virtual void HoverCheck(Vector2D& point);
 
 protected:

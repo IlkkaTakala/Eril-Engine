@@ -6,6 +6,7 @@
 #include <glm/gtx/transform.hpp>
 #include <GLFW/glfw3.h>
 #include <Interface/WindowManager.h>
+#include <UI/TextBox.h>
 
 UISpace::UISpace()
 {
@@ -16,6 +17,7 @@ UISpace::UISpace()
 	Screen = 0;
 	hasFocus = false;
 	Hovered = nullptr;
+	Focused = nullptr;
 
 	const char* vertexShader = R"~~~(
 #version 430 core
@@ -78,6 +80,8 @@ void main()
 	glBindVertexArray(0);
 
 	II->RegisterKeyInput(0, &UISpace::LeftClick, this);
+
+	II->RegisterTextInput(&UISpace::GetTextInput, this);
 }
 
 UISpace::~UISpace()
@@ -197,11 +201,31 @@ void UISpace::LeftClick(bool down)
 	if (Hovered)
 	{
 		if (down) {
+			if (Hovered->hits == HitReg::HitTestVisible && Hovered->focusable) {
+				if (Focused) Focused->OnLostFocus();
+				Focused = Hovered;
+				Focused->OnFocus();
+			}
 			Hovered->OnMouseDown();
 		}
 		else
 		{
 			Hovered->OnMouseUp();
 		}
+	}
+	else
+	{
+		Focused->OnLostFocus();
+		Focused = nullptr;
+	}
+}
+
+void UISpace::GetTextInput(uint input)
+{
+	auto e = dynamic_cast<TextBox*>(Focused);
+	if (e != nullptr) {
+		String s = e->GetText();
+		s += (char)input;
+		e->SetText(s);
 	}
 }

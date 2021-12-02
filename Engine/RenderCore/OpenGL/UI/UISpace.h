@@ -25,6 +25,7 @@ private:
 	friend UIComponent;
 
 	void LeftClick(bool);
+	void GetTextInput(uint);
 
 	bool hasFocus;
 
@@ -42,7 +43,7 @@ private:
 	Vector2D ScreenSize;
 
 	std::list<Ref<UI>> TopLevel;
-	RefWeak<UIComponent> Focused;
+	UIComponent* Focused;
 	UIComponent* Hovered;
 };
 

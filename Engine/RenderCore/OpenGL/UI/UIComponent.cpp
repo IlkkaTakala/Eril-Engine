@@ -67,7 +67,7 @@ void UIComponent::UpdateMatrices(const Vector2D& size)
 	}
 	else {
 		gloc.y += anchor_v.X * bounds.y + topOffset;
-		scale.y = (anchor_v.Y * bounds.y - bottomOffset) - gloc.y;
+		scale.y = (anchor_v.Y * bounds.y - bottomOffset);
 	}
 	if (anchor_h.Y <= anchor_h.X) {
 		scale.x = rightOffset;
@@ -75,7 +75,7 @@ void UIComponent::UpdateMatrices(const Vector2D& size)
 	}
 	else {
 		gloc.x += anchor_h.X * bounds.x + leftOffset;
-		scale.x = (anchor_h.Y * bounds.x - rightOffset) - gloc.x;
+		scale.x = (anchor_h.Y * bounds.x - rightOffset);
 	}
 
 	glm::mat4 model = glm::translate(glm::mat4(1.f), gloc) * glm::scale(glm::mat4(1.f), scale);
@@ -118,7 +118,14 @@ bool UIComponent::Trace(const Vector2D& point) const
 
 void UIComponent::HoverCheck(Vector2D& point)
 {
-	if (point.X == -1) return;
+	if (point.X == -1) {
+		if (hovered) {
+			hovered = false;
+			if (RI->GetUIManager()->Hovered == this) RI->GetUIManager()->Hovered = nullptr;
+			OnLeave();
+		}
+		return;
+	}
 	if (hits == HitReg::HitTestVisible && visible == Visibility::Visible) {
 		bool hit = Trace(point);
 		if (hit)

@@ -3,6 +3,7 @@
 #include <UI/Image.h>
 #include <UI/Text.h>
 #include <UI/Button.h>
+#include <UI/TextBox.h>
 
 void TestUI::Construct()
 {
@@ -16,7 +17,9 @@ void TestUI::Construct()
 			->AddChild(
 				Create<Text>()->SetText("Button", 30)->SetStyle(UIStyle(Vector(0.f, 0.f, 0.f), 1.0f, nullptr))
 			)
-			->SetTransform(100, 110, 300, 30)
+			->SetTransform(0, 110, 300, 30)
+		)->AddChild(
+			Create<TextBox>()->SetTransform(0, 110, 400, 50)
 		)
 	);
 }

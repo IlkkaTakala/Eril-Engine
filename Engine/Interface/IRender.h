@@ -63,6 +63,7 @@ class IInput
 public:
 	virtual void SetInputHandler(void(*Callback)(int, int, int, int) = 0) = 0;
 	virtual void ProcessInputs(float delta) = 0;
+	void SetTextMode(bool mode) { isText = mode; }
 
 	template <class UserClass>
 	void RegisterKeyContinuousInput(int Key, void (UserClass::* Callback)(float, bool), UserClass* Caller)
@@ -82,6 +83,14 @@ public:
 	}
 
 	template <class UserClass>
+	void RegisterTextInput(void (UserClass::* Callback)(uint), UserClass* Caller)
+	{
+		using std::placeholders::_1;
+		std::function<void(uint)> f = std::bind(Callback, Caller, _1);
+		TextCallers.push_back(std::function<void(uint)>(f));
+	}
+
+	template <class UserClass>
 	void RegisterMouseInput(int Key, void (UserClass::* Callback)(float, float), UserClass* Caller)
 	{
 		using std::placeholders::_1;
@@ -93,10 +102,13 @@ public:
 protected:
 	std::multimap<int, std::function<void(float, bool)>> KeyCallersHold;
 	std::multimap<int, std::function<void(bool)>> KeyCallers;
+	std::list<std::function<void(uint)>> TextCallers;
 	std::multimap<int, std::function<void(float, float)>> MouseCallers;
 
 	float MouseX;
 	float MouseY;
+
+	bool isText;
 };
 
 struct AABB

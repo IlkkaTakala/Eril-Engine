@@ -27,7 +27,7 @@ struct Glyph
 struct Letter
 {
 	uint offset;
-	uint letter;
+	uint8 letter;
 };
 
 struct Font
@@ -288,6 +288,7 @@ void main()
 
 	fontSize = 30;
 	weight = 100;
+	just = Justify::Left;
 
 	SetText("Hello World");
 }
@@ -319,10 +320,24 @@ void Text::Render()
 			}
 		}
 		int total_length = storage[value.size() - 1].offset + fonts[font].glyphs[storage[value.size() - 1].letter].advance;
-		int center = ((realSize.X - total_length * ratio) / 2) / ratio;
+		int center = (realSize.X - total_length * ratio) / 2;
 
-		for (int i = 0; i < value.size(); i++) {
-			storage[i].offset += center;
+		switch (just)
+		{
+		case Justify::Left:
+			break;
+		case Justify::Centre:
+			for (int i = 0; i < value.size(); i++) {
+				storage[i].offset += int(center / ratio);
+			}
+			break;
+		case Justify::Right:
+			for (int i = 0; i < value.size(); i++) {
+				storage[i].offset += center;
+			}
+			break;
+		default:
+			break;
 		}
 
 		glGenBuffers(1, &StringBuffer);
@@ -331,6 +346,8 @@ void Text::Render()
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 		delete[] storage;
+
+		textChanged = false;
 	}
 
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, fonts[font].charBuffer);

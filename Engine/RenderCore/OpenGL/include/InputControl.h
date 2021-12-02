@@ -24,9 +24,11 @@ public:
 private:
 	friend void InputCallback(int, int, int, int);
 	friend void MouseInputCallback(int, int, int);
+	friend void TextInputCallback(uint);
 
 	static void (*KeyInput)(int, int, int, int);
 
 	std::queue<KeyAction> Inputs;
+	std::queue<uint> Chars;
 	std::map<int, KeyAction> Hold;
 };

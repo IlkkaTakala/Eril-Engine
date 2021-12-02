@@ -33,9 +33,17 @@ void MouseInputCallback(int button, int action, int mods)
 	in->Inputs.push(next);
 }
 
+void TextInputCallback(uint character)
+{
+	GLInput* in = dynamic_cast<GLInput*>(II);
+
+	in->Chars.push(character);
+}
+
 GLInput::GLInput() : IInput()
 {
 	KeyInput = &InputCallback;
+	isText = false;
 }
 
 GLInput::~GLInput()
@@ -56,48 +64,57 @@ void GLInput::ProcessInputs(float delta)
 	}
 	while (!Inputs.empty()) {
 		KeyAction key = Inputs.front();
-		switch (key.action)
-		{
-		case GLFW_PRESS:
-			if (KeyCallers.find(key.key) != KeyCallers.end()) {
-				auto it = KeyCallers.equal_range(key.key);
-				while (it.first != it.second) {
-					it.first->second(true);
-					it.first++;
+		if (!isText || (isText && (key.key >= 96 || key.key <= 32 || key.key <= 6))) {
+			switch (key.action)
+			{
+			case GLFW_PRESS:
+				if (KeyCallers.find(key.key) != KeyCallers.end()) {
+					auto it = KeyCallers.equal_range(key.key);
+					while (it.first != it.second) {
+						it.first->second(true);
+						it.first++;
+					}
 				}
-			}
-			else if (Hold.find(key.key) == Hold.end()) {
-				auto t = KeyCallersHold.find(key.key);
-				if (t != KeyCallersHold.end()) {
-					t->second(delta, true);
+				else if (Hold.find(key.key) == Hold.end()) {
+					auto t = KeyCallersHold.find(key.key);
+					if (t != KeyCallersHold.end()) {
+						t->second(delta, true);
+					}
+					Hold[key.key] = key;
 				}
-				Hold[key.key] = key;
-			}
-			break;
-		case GLFW_RELEASE:
-			if (KeyCallers.find(key.key) != KeyCallers.end()) {
-				auto it = KeyCallers.equal_range(key.key);
-				while (it.first != it.second) {
-					it.first->second(false);
-					it.first++;
+				break;
+			case GLFW_RELEASE:
+				if (KeyCallers.find(key.key) != KeyCallers.end()) {
+					auto it = KeyCallers.equal_range(key.key);
+					while (it.first != it.second) {
+						it.first->second(false);
+						it.first++;
+					}
 				}
-			}
-			if (Hold.find(key.key) != Hold.end()) {
-				auto t = KeyCallersHold.find(key.key);
-				if (t != KeyCallersHold.end()) {
-					t->second(delta, false);
+				if (Hold.find(key.key) != Hold.end()) {
+					auto t = KeyCallersHold.find(key.key);
+					if (t != KeyCallersHold.end()) {
+						t->second(delta, false);
+					}
+					Hold.erase(key.key);
 				}
-				Hold.erase(key.key);
-			}
-			break;
-		case GLFW_REPEAT:
+				break;
+			case GLFW_REPEAT:
 
-			break;
-		default:
-			break;
+				break;
+			default:
+				break;
+			}
 		}
 		Inputs.pop();
 	}
+	while (!Chars.empty() && isText) {
+		for (const auto& c : TextCallers) {
+			c(Chars.front());
+		}
+		Chars.pop();
+	}
+	while (!Chars.empty()) Chars.pop();
 	float x = 0.0, y = 0.0;
 	//glfwGetCursorPos(dynamic_cast<Renderer*>(RI)->Window, &x, &y);
 	WindowManager::GetCursorPosition(dynamic_cast<Renderer*>(RI)->Window, x, y);
@@ -118,5 +135,9 @@ void GLInput::SetInputHandler(void(*Callback) (int, int, int, int))
 
 	glfwSetMouseButtonCallback((GLFWwindow*)WindowManager::GetHandle(dynamic_cast<Renderer*>(RI)->Window), [](GLFWwindow* window, int key, int action, int mods) {
 		MouseInputCallback(key, action, mods);
+	});
+
+	glfwSetCharCallback((GLFWwindow*)WindowManager::GetHandle(dynamic_cast<Renderer*>(RI)->Window), [](GLFWwindow* window, uint key) {
+		TextInputCallback(key);
 	});
 }

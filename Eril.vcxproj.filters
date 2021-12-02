@@ -130,6 +130,9 @@
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\Button.cpp">
       <Filter>Engine\OpenGL\UI</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\RenderCore\OpenGL\UI\TextBox.cpp">
+      <Filter>Engine\OpenGL\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -285,6 +288,9 @@
       <Filter>Engine\Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Button.h">
+      <Filter>Engine\OpenGL\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\TextBox.h">
       <Filter>Engine\OpenGL\UI</Filter>
     </ClInclude>
   </ItemGroup>

@@ -43,7 +43,7 @@ Panel* Panel::AddChild(UIComponent* child)
 void Panel::Render()
 {
 	if (visible != Visibility::Visible) return;
-	for (auto it = children.rbegin(); it != children.rend(); it++) {
+	for (auto it = children.begin(); it != children.end(); it++) {
 		it->second->Render();
 	}
 }

@@ -1,6 +1,7 @@
 #include <UI/Button.h>
 #include "Material.h"
 #include "Texture.h"
+#include <UI/Text.h>
 
 struct UIStyleGLM
 {
@@ -21,20 +22,24 @@ Button::Button()
 	pressBuffer = 0;
 	state = ButtonState::Neutral;
 	child = nullptr;
+	focusable = true;
 
 	glDeleteBuffers(1, &uniformBuffer);
 
+	normal = UIStyle(Vector(1.f));
 	UIStyleGLM n(style);
 	glGenBuffers(1, &normalBuffer);
 	glBindBuffer(GL_UNIFORM_BUFFER, normalBuffer);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(UIStyleGLM), &n, GL_DYNAMIC_DRAW);
 
-	UIStyleGLM h(style);
+	hovered = UIStyle(Vector(0.8f));
+	UIStyleGLM h(hovered);
 	glGenBuffers(1, &hoverBuffer);
 	glBindBuffer(GL_UNIFORM_BUFFER, hoverBuffer);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(UIStyleGLM), &h, GL_DYNAMIC_DRAW);
 
-	UIStyleGLM p(style);
+	pressed = UIStyle(Vector(0.5f));
+	UIStyleGLM p(pressed);
 	glGenBuffers(1, &pressBuffer);
 	glBindBuffer(GL_UNIFORM_BUFFER, pressBuffer);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(UIStyleGLM), &p, GL_DYNAMIC_DRAW);
@@ -164,6 +169,8 @@ void Button::HoverCheck(Vector2D& point)
 Button* Button::AddChild(UIComponent* c)
 {
 	child = c;
+	Text* t = dynamic_cast<Text*>(child);
+	if (t != nullptr) t->SetJustification(Justify::Centre);
 	child->SetParent(this);
 	float depth = realDepth + 0.1f;
 	child->UpdateDepth(depth);
