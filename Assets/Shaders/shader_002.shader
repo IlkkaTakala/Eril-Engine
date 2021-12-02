@@ -346,8 +346,8 @@ void main()
 	vec3 ambient = vec3(0.01, 0.02, 0.06) * albedo * AO;// * SSAO;
 	
 	vec3 Lo = vec3(0.0);
-
-	mat3 TBN = mat3(fs_in.Normals, fs_in.BiTangents, fs_in.Tangents);
+	
+	mat3 TBN = mat3(fs_in.Tangents, fs_in.BiTangents, fs_in.Normals);
 
 
 	vec3 N = normalize(TBN * normal);

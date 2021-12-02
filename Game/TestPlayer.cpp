@@ -25,7 +25,7 @@ void TestPlayer::UseCursor(bool keydown)
 TestPlayer::TestPlayer() : Player()
 {
 	//ECS TEST
-	ecsTest = SpawnObject<ECSTesting>();
+	//ecsTest = SpawnObject<ECSTesting>();
 
 	mouseSens = 0.5f;
 	Speed = 5.f;
@@ -34,12 +34,12 @@ TestPlayer::TestPlayer() : Player()
 	//GetCamera()->SetLocation(INI->GetValue("Player", "Start"));
 	//GetCamera()->SetRotation(INI->GetValue("Player", "Direction"));
 
-	II->RegisterKeyInput(81, &TestPlayer::RunInputQ, this);
-	II->RegisterKeyInput(90, &TestPlayer::RunInputZ, this);
-	II->RegisterKeyInput(87, &TestPlayer::RunInputW, this);
-	II->RegisterKeyInput(65, &TestPlayer::RunInputA, this);
-	II->RegisterKeyInput(83, &TestPlayer::RunInputS, this);
-	II->RegisterKeyInput(68, &TestPlayer::RunInputD, this);
+	II->RegisterKeyContinuousInput(81, &TestPlayer::RunInputQ, this);
+	II->RegisterKeyContinuousInput(90, &TestPlayer::RunInputZ, this);
+	II->RegisterKeyContinuousInput(87, &TestPlayer::RunInputW, this);
+	II->RegisterKeyContinuousInput(65, &TestPlayer::RunInputA, this);
+	II->RegisterKeyContinuousInput(83, &TestPlayer::RunInputS, this);
+	II->RegisterKeyContinuousInput(68, &TestPlayer::RunInputD, this);
 	II->RegisterKeyInput(32, &TestPlayer::RunInputSpace, this);
 	II->RegisterKeyInput(340, &TestPlayer::RunInputShift, this);
 	II->RegisterKeyInput(0, &TestPlayer::LeftMouseDown, this);
