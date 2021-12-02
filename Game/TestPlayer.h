@@ -41,6 +41,9 @@ public:
 };
 
 
+//ECS TEST
+class ECSTesting;
+
 class TestPlayer : public Player
 {
 public:
@@ -86,10 +89,12 @@ private:
 	Ref<InstancedObject> Candy;
 
 	Ref<VisibleObject> Sky;
-
 	Ref<Terrain> terra[4];
-
 	Ref<Hunter> hunt;
+
+
+	//ECS TEST
+	Ref<ECSTesting> ecsTest;
 
 	int spawnCounter;
 	std::vector<Ref<Item>> Items;

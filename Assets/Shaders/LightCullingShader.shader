@@ -133,7 +133,7 @@ void main() {
 		{
 			bool inFrustum = true;
 			if (p.type.x != 0) {
-				for (uint i = 3; i >= 0 && inFrustum; i--)
+				for (uint i = 3; i > -1 && inFrustum; i--)
 				{
 					float dist = dot(frustumPlanes[i], pos);
 					inFrustum = (-rad <= dist);

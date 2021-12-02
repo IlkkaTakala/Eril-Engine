@@ -91,14 +91,26 @@
     <ClCompile Include="Engine\external\glfw\deps\glad_gl.c">
       <Filter>Engine\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\Gameplay\Scene.cpp">
-      <Filter>Engine\GamePlay</Filter>
+    <ClCompile Include="Engine\Core\ECS\EntityManager.cpp">
+      <Filter>Engine\ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\ECS\SystemsManager.cpp">
+      <Filter>Engine\ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\ECSTesting.cpp">
+      <Filter>Game</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Interface\IRender.cpp">
-      <Filter>Engine\Interfaces</Filter>
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Gameplay\Scene.cpp">
+      <Filter>Engine\Private</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Interface\WindowManager.cpp">
-      <Filter>Engine\Interfaces</Filter>
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Interface\IECS.cpp">
+      <Filter>Engine\Interface</Filter>
     </ClCompile>
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\UIComponent.cpp">
       <Filter>Engine\OpenGL\UI</Filter>
@@ -147,8 +159,17 @@
     <Filter Include="Engine\OpenGL">
       <UniqueIdentifier>{1a8dd4f1-9c5c-40d8-8a15-89a92e8920dd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Interfaces">
-      <UniqueIdentifier>{a9b01a03-e735-4af0-a8ab-0cc6cc9019f6}</UniqueIdentifier>
+    <Filter Include="Engine\ECS">
+      <UniqueIdentifier>{ee669dbc-1437-4613-b8e8-9420e11f382e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\ECS\Systems">
+      <UniqueIdentifier>{d736ca87-ac68-4580-9866-30ec99950895}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\ECS\Components">
+      <UniqueIdentifier>{2e41f838-8014-47c1-8a2d-e5a2d8acb614}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Interface">
+      <UniqueIdentifier>{c027575f-3d8c-4b86-b7f2-5185d17ad1a3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\OpenGL\UI">
       <UniqueIdentifier>{3244437c-caa9-4877-ba7a-a047bf86f946}</UniqueIdentifier>
@@ -245,14 +266,53 @@
     <ClInclude Include="Engine\external\glfw\deps\glad\gl.h">
       <Filter>Engine\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\Gameplay\Scene.h">
-      <Filter>Engine\GamePlay</Filter>
+    <ClInclude Include="Engine\Core\ECS\ComponentManager.h">
+      <Filter>Engine\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\ECS\Component.h">
+      <Filter>Engine\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\ECS\EntityManager.h">
+      <Filter>Engine\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\ECS\Entity.h">
+      <Filter>Engine\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\ECS\SystemsManager.h">
+      <Filter>Engine\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\ECS\System.h">
+      <Filter>Engine\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\ECSTesting.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Components\PositionComponent.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Systems\MovementSystem.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\ECS\Components\LightComponent.h">
+      <Filter>Engine\ECS\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\ECS\Systems\LightControllerSystem.h">
+      <Filter>Engine\ECS\Systems</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Interface\IRender.h">
-      <Filter>Engine\Interfaces</Filter>
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Gameplay\Scene.h">
+      <Filter>Engine\Public</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Interface\WindowManager.h">
-      <Filter>Engine\Interfaces</Filter>
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\ECS\ComponentTypeStorage.h">
+      <Filter>Engine\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Interface\IECS.h">
+      <Filter>Engine\Interface</Filter>
     </ClInclude>
     <ClInclude Include="Engine\RenderCore\OpenGL\UI\UIComponent.h">
       <Filter>Engine\OpenGL\UI</Filter>

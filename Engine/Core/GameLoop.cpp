@@ -9,6 +9,7 @@
 #include "Physics.h"
 #include "Timer.h"
 #include <GamePlay/Scene.h>
+#include <Interface/IECS.h>
 
 using namespace std;
 
@@ -34,6 +35,7 @@ GameLoop::~GameLoop()
 	delete MI;
 	delete RI;
 	delete Collector;
+	IECS::Destroy();
 }
 
 int GameLoop::Start()
@@ -59,6 +61,9 @@ int GameLoop::Start()
 		RI->DestroyWindow();
 		return 11;
 	}
+
+	//Initialize ECS World
+	IECS::Init();
 	
 	Console::Log("Creating defaults...");
 	State = EngineInterface::CreateDefaults();
@@ -98,6 +103,9 @@ int GameLoop::MainLoop()
 			if (found) continue;
 			t->Tick(duration.count());
 		}
+
+		SystemsManager* ECSWorldSystemsManager = IECS::GetSystemsManager();
+		ECSWorldSystemsManager->UpdateSystems(duration.count());
 
 		Timer::UpdateTimers(duration.count());
 		Physics::CheckCollisions();
