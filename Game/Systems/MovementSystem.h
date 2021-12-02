@@ -7,10 +7,10 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 #include "ECS/SystemsManager.h"
 #include "Components/PositionComponent.h"
 
-class MovementSystem : public System
+class MovementSystem : public IEntityQuerySystem
 {
 public:
-	MovementSystem(EntityManager& entityManager) : System(entityManager) 
+	MovementSystem(EntityManager& entityManager) : IEntityQuerySystem(entityManager)
 	{
 		Console::Log("MovementSystem Constructor");
 	}

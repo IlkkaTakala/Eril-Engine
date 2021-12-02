@@ -140,7 +140,7 @@
       <Filter>Engine\OpenGL\UI</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Interface\FileManager.cpp" />
-    <ClCompile Include="Game\ECSTesting.cpp">
+    <ClCompile Include="Game\FPSCounter.cpp">
       <Filter>Game</Filter>
     </ClCompile>
   </ItemGroup>
@@ -343,5 +343,8 @@
       <Filter>Engine\OpenGL\UI</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Interface\FileManager.h" />
+    <ClInclude Include="Game\FPSCounter.h">
+      <Filter>Game</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

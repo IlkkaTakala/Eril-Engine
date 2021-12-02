@@ -704,14 +704,25 @@ Texture* Renderer::LoadTextureByName(String name)
 		return LoadedTextures.find(name)->second;
 	}
 	else {
+		Texture* next = nullptr;
 		int width, height, nrChannels;
-		float* data = stbi_loadf(name.c_str(), &width, &height, &nrChannels, 0);
-		if (data == nullptr) return nullptr;
-		int type = 0;
-		if (name.rbegin()[4] == 'd' || name.rbegin()[5] == 'd') type = 0;
-		else if (name.rbegin()[4] == 'n' || name.rbegin()[5] == 'n') type = 1;
-		Texture* next = new Texture(width, height, nrChannels, data, type);
-		stbi_image_free(data);
+		if (stbi_is_hdr(name.c_str())) {
+			float* data = stbi_loadf(name.c_str(), &width, &height, &nrChannels, 0);
+			if (data == nullptr) return nullptr;
+			next = new Texture(width, height, nrChannels, data);
+			stbi_image_free(data);
+		}
+		else
+		{
+			uint8* data = stbi_load(name.c_str(), &width, &height, &nrChannels, 0);
+			if (data == nullptr) return nullptr;
+			int type = 0;
+			if (name.rbegin()[4] == 'd' || name.rbegin()[5] == 'd') type = 0;
+			else if (name.rbegin()[4] == 'n' || name.rbegin()[5] == 'n') type = 1;
+			next = new Texture(width, height, nrChannels, data, type);
+			stbi_image_free(data);
+		}
+		
 		LoadedTextures.emplace(name, next);
 		Console::Log("Texture loaded: " + name);
 		return next;
@@ -1284,7 +1295,7 @@ void processMesh(LoadedMesh* meshHolder, aiMesh* mesh)
 	section->vertices = new Vertex[vertices.size() * sizeof(Vertex)];
 	memcpy(section->vertices, vertices.data(), vertices.size() * sizeof(Vertex));*/
 
-	//section->Instance = RI->LoadMaterialByName("Shaders/test");
+	section->Instance = RI->LoadMaterialByName("Assets/Materials/default");
 
 	meshHolder->HolderCount++;
 	meshHolder->Holders.push_back(section);

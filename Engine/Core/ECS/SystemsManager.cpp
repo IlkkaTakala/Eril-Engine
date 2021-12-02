@@ -42,7 +42,11 @@ void SystemsManager::UpdateSystems(float deltaTime)
 	{
 		if (Systems.at(i)->bEnabled)
 		{
-			Systems.at(i)->Update(deltaTime, WorldEntityManager->QueryEntitiesByType(Systems.at(i)->TypesWanted));
+			IEntityQuerySystem* system = static_cast<IEntityQuerySystem*>(Systems.at(i));
+			if (system != nullptr)
+			{
+				system->Update(deltaTime, WorldEntityManager->QueryEntitiesByType(Systems.at(i)->TypesWanted));
+			}
 		}
 	}
 }

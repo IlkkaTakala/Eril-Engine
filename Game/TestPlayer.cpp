@@ -155,8 +155,8 @@ TestPlayer::TestPlayer() : Player()
 	//hunt->SetLocation(Vector(100.f, 0.f, 0.f));
 	//hunt->move->SetGround(terra[0]);
 
-	auto ui = SpawnObject<TestUI>();
-	UI::AddToScreen(ui, this);
+	//auto ui = SpawnObject<TestUI>();
+	//UI::AddToScreen(ui, this);
 }
 
 void TestPlayer::RunInputQ(float delta, bool KeyDown)
@@ -276,7 +276,7 @@ void TestPlayer::BeginPlay()
 	
 	Terrain* terrain = ObjectManager::GetByRecord<Terrain>(0xA0005554);
 
-	for (int i = 0; i < 1; i++) {
+	for (int i = 1; i < 1; i++) {
 
 		float x = rand() % 100;
 		float y = rand() % 100;
@@ -300,8 +300,8 @@ void TestPlayer::BeginPlay()
 	Lights[0]->Data.Location = Vector(x, y, terrain->GetHeight(x, y) + 0.5f);
 	Lights[0]->Data.Type = LIGHT_POINT;
 	Lights[0]->Data.Size = 15.f;
-	Lights[0]->Data.Intensity = 50.0f;
-	Lights[0]->Data.Color = Vector(1.0, 0.0, 0.0);
+	Lights[0]->Data.Intensity = 14.0f;
+	Lights[0]->Data.Color = Vector(1.0, 1.0, 1.0);
 
 	/*
 	Lights[1] = SpawnObject<Light>();
