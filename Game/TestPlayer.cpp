@@ -265,7 +265,7 @@ void TestPlayer::BeginPlay()
 	
 	Terrain* terrain = ObjectManager::GetByRecord<Terrain>(0xA0005554);
 
-	for (int i = 0; i < 100; i++) {
+	for (int i = 0; i < 1; i++) {
 
 		float x = rand() % 100;
 		float y = rand() % 100;
@@ -280,7 +280,28 @@ void TestPlayer::BeginPlay()
 		Lights[i]->Data.Color = Vector(1.f);
 	}
 	
+	float x = 9;
+	float y = 5;
+	//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
 
+	Lights[0] = SpawnObject<Light>();
+
+	Lights[0]->Data.Location = Vector(x, y, terrain->GetHeight(x, y) + 0.5f);
+	Lights[0]->Data.Type = LIGHT_POINT;
+	Lights[0]->Data.Size = 15.f;
+	Lights[0]->Data.Intensity = 50.0f;
+	Lights[0]->Data.Color = Vector(1.0, 0.0, 0.0);
+
+	/*
+	Lights[1] = SpawnObject<Light>();
+
+	Lights[1]->Data.Location = Vector(x, y, terrain->GetHeight(x, y) + 0.5f);
+	Lights[1]->Data.Type = LIGHT_DIRECTIONAL;
+	Lights[1]->Data.Size = 15.f;
+	Lights[1]->Data.Intensity = 10.0f;
+	Lights[1]->Data.Color = Vector(1.0, 1.0, 1.0);
+	Lights[1]->Data.Rotation = Vector(0.5, 0.5, 0.5);
+	*/
 	
 
 	Console::Log("Hello beautiful world");

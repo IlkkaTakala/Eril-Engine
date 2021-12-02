@@ -206,8 +206,7 @@ Terrain::Terrain()
 
 	resolution = 0;
 	noise_scale = 0.010f;
-	amplitude = 0.1f;
-
+	amplitude = 10.0f;
 	Mesh = SpawnObject<VisibleObject>();
 }
 
@@ -291,16 +290,6 @@ float Terrain::GetHeight(float x, float y)
 
 Vector Terrain::GetNormal(float x, float y)
 {
-	/*
-	Vector first(x - 0.1f, y - 0.1f, 0.f);
-	Vector second(x + 0.1f, y + 0.1f, 0.f);
-
-	Vector x_dir(0.2f, 0.f, GetHeight(second.X, y) - GetHeight(first.X, y));
-	Vector y_dir(0.f, 0.2f, GetHeight(x, second.Y) - GetHeight(x, first.Y));
-
-	return Vector::Cross(x_dir.Normalize(), y_dir.Normalize());
-	*/
-
 	float res = 0.1f;
 	Vector l(x - res, y, GetHeight(x - res, y));
 	Vector r(x + res, y, GetHeight(x + res, y));
@@ -309,41 +298,18 @@ Vector Terrain::GetNormal(float x, float y)
 
 	Vector firstDir = r - l;
 	Vector secondDir = u - d;
-
 	return Vector::Cross(firstDir.Normalize(), secondDir.Normalize());
 }
 
 Vector Terrain::GetTangent(float x, float y, Vector normal)
 {
-	/*
-	Vector tangent;
-	Vector t1 = Vector::Cross(normal, Vector(1.f, 0.f, 0.f));
-	Vector t2 = Vector::Cross(normal, Vector(0.f, 1.f, 0.f));
-	if (t1.Length() > t2.Length())
-	{
-		tangent = t1;
-	}
-	else
-	{
-		tangent = t2;
-	}
-	
-	return tangent;
-	*/
-
 	float res = 0.1f;
-	Vector l(x - res, y, GetHeight(x - res, y));
-	Vector r(x + res, y, GetHeight(x + res, y));
 	Vector u(x, y + res, GetHeight(x, y + res));
 	Vector d(x, y - res, GetHeight(x, y - res));
 
-	Vector firstDir = r - l;
 	Vector secondDir = u - d;
-
-	//Vector l((br.Y + bl.Y) / 2.0f, br.X, GetHeight((br.Y + bl.Y) / 2.0f, br.X));
 
 	Vector curPos = (x, y, GetHeight(x, y));
 
-	Vector newTangent = secondDir;
-	return newTangent.Normalize();
+	return secondDir.Normalize();
 }

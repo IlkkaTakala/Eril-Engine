@@ -34,7 +34,7 @@ void main()
 	vs_out.TexCoords = in_texCoord;
 	
 	vec3 T = normalize(mat3(Model * in_disp) * in_tangent).xyz;
-	vec3 N = normalizemat3(Model * in_disp) * in_normal).xyz;
+	vec3 N = normalize(mat3(Model * in_disp) * in_normal).xyz;
 	T = normalize(T - dot(T, N) * N);
 	vec3 B = cross(N, T);
 
@@ -42,6 +42,16 @@ void main()
 	vs_out.BiTangents = B;
 	vs_out.Tangents = T;
 	//vs_out.normal = normalize(mat3(Model * in_disp) * in_normal).xyz;
+
+	/*
+	//vec3 T = (Model * in_disp * vec4(in_tangent, 1.0f)).xyz;
+	//vec3 N = (Model * in_disp * vec4(in_normal, 1.0f)).xyz;
+	vec3 T = (Model * in_disp * vec4(in_tangent, 0.0f)).xyz;
+	vec3 N = (Model * in_disp * vec4(in_normal, 0.0f)).xyz;
+	T = normalize(T);
+	N = normalize(N);
+	
+	*/
 }
 ###END_VERTEX###
 
