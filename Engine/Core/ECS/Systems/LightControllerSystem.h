@@ -20,19 +20,13 @@ public:
 
 	void ComponentArrayQueryUpdate(float deltaTime, std::vector<LightComponent>* components)
 	{
-		if (!done)
+		for (LightComponent& light : *components)
 		{
-			done = true;
-			for (LightComponent& light : *components)
-			{
-				int s = static_cast<int>(light.State);
-				Console::Log("Light State " + std::to_string(s));
-			}
-
+			int s = static_cast<int>(light.State);
 		}
+
 	}
 
 
 private:
-	bool done = false;
 };

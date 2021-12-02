@@ -29,7 +29,7 @@ ECSTesting::ECSTesting()
 	{
 		for (int i = 0; i < 100; i++) 
 		{
-			Console::Log("Light addded " + std::to_string(i));
+			//Console::Log("Light addded " + std::to_string(i));
 			float x = rand() % 100;
 			float y = rand() % 100;
 			//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
