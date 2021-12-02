@@ -74,6 +74,8 @@ Renderer::Renderer()
 	EnvironmentRender = nullptr;
 	SkyDomeShader = nullptr;
 	SkyBoxShader = nullptr;
+	UIHolder = nullptr;
+	SkyFilterShader = nullptr;
 
 	MaxLightCount = 1024;
 
@@ -86,6 +88,16 @@ Renderer::Renderer()
 
 	EnvSizeX = 1024;
 	EnvSizeY = 1024;
+
+	GlobalUniforms = 0;
+	LightBuffer = 0;
+	SSAOKernelBuffer = 0;
+	SSAONoise = 0;
+	VisibleLightIndicesBuffer = 0;
+	WorkGroupsX = 0;
+	WorkGroupsY = 0;
+	fpsCounter = 0;
+
 }
 
 Renderer::~Renderer()

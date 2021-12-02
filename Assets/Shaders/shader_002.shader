@@ -1,4 +1,4 @@
-2;0;0;
+3;0;0;
 ###VERTEX###
 #version 430 core
 layout (location = 0) in vec3 in_position;
@@ -19,7 +19,9 @@ layout (std140, binding = 0) uniform Globals
 out VS_OUT {
 	vec2 TexCoords;
 	vec4 FragPos;
-	mat3 TBN;
+	vec3 Normals;
+	vec3 BiTangents;
+	vec3 Tangents;
 } vs_out;
 
 uniform mat4 Model;
@@ -36,11 +38,63 @@ void main()
 	T = normalize(T - dot(T, N) * N);
 	vec3 B = cross(N, T);
 
-	mat3 TBN = mat3(T, B, N);
-	vs_out.TBN = TBN;
+	vs_out.Normals = N;
+	vs_out.BiTangents = B;
+	vs_out.Tangents = T;
 	//vs_out.normal = normalize(mat3(Model * in_disp) * in_normal).xyz;
 }
 ###END_VERTEX###
+
+###GEOMETRY###
+#version 430 core
+
+// Shader storage buffer objects
+layout(std140, binding = 0) uniform Globals
+{
+	mat4 projection;
+	mat4 view;
+	vec4 viewPos;
+	ivec2 screenSize;
+	int sceneLightCount;
+};
+
+//uniform float normal_length;
+//uniform mat4 gxl3d_ModelViewProjectionMatrix;
+
+
+in VS_OUT{
+	vec2 TexCoords;
+	vec4 FragPos;
+	//vec3 normal;
+	vec3 Normals;
+	vec3 BiTangents;
+	vec3 Tangents;
+} gs_in[];
+
+out GS_OUT{
+	vec2 TexCoords;
+	vec4 FragPos;
+	vec3 Normals;
+	vec3 BiTangents;
+	vec3 Tangents;
+} gs_out;
+
+void main()							 
+{				
+	/*
+	int i;
+	for (i = 0; i < gl_in.length(); i++)
+	{
+		vec3 P = gl_in[i].gl_Position.xyz;
+		vec3 N = gs_in[i].normal.xyz;
+	}	 
+	*/
+}
+
+
+
+###END_GEOMETRY###
+
 ###FRAGMENT###
 #version 430 core
 
@@ -78,11 +132,13 @@ layout (location = 1) out vec4 BloomBuffer;
 layout (location = 2) out vec4 accum;
 layout (location = 3) out float reveal;
 
-in VS_OUT {
+in GS_OUT {
 	vec2 TexCoords;
 	vec4 FragPos;
 	//vec3 normal;
-	mat3 TBN;
+	vec3 Normals;
+	vec3 BiTangents;
+	vec3 Tangents;
 } fs_in;
 
 uniform sampler2D Albedo;
@@ -195,7 +251,10 @@ void main()
 	
 	vec3 Lo = vec3(0.0);
 
-	vec3 N = normalize(fs_in.TBN * normal); 
+	mat3 TBN = mat3(fs_in.Normals, fs_in.BiTangents, fs_in.Tangents);
+
+
+	vec3 N = normalize(TBN * normal);
     vec3 V = normalize(viewPos - fs_in.FragPos).xyz;
 
 	uint offset = index * 1024;
