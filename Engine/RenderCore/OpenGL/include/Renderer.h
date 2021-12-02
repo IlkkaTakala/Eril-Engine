@@ -72,7 +72,7 @@ private:
 	Shader* SkyDomeShader;
 	Shader* SkyFilterShader;
 	Shader* SkyBoxShader;
-	GLFWwindow* Window;
+	uint Window;
 	PreDepthBuffer* DepthBuffer;
 	PostBuffer* PostProcess;
 	BlurBuffer* BlurRender;

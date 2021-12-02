@@ -2,8 +2,6 @@
 #include <Core.h>
 #include "../../OpenGL/UI/UIComponent.h"
 
-class Shader;
-
 class Panel : public UIComponent
 {
 public:
@@ -15,8 +13,8 @@ public:
 	virtual void UpdateDepth(float& depth) override;
 	virtual float GetTreeDepth() const override;
 	virtual void UpdateMatrices(const Vector2D& size) override;
+	virtual void HoverCheck(Vector2D& point) override;
 private:
-	Shader* temp_shader;
 	std::multimap<int, UIComponent*> children;
 };
 

@@ -8,9 +8,18 @@
 #include "Hunter.h"
 #include "ECSTesting.h"
 #include "TestUI.h"
+#include <Interface/WindowManager.h>
 
-void TestPlayer::OpenConsole(float, bool) {
+void TestPlayer::OpenConsole(bool) {
 	Console::Create();
+}
+static bool cursorState = true;
+void TestPlayer::UseCursor(bool keydown)
+{
+	if (!keydown) {
+		WindowManager::SetShowCursor(0, cursorState);
+		cursorState = !cursorState;
+	}
 }
 
 TestPlayer::TestPlayer() : Player()
@@ -25,18 +34,19 @@ TestPlayer::TestPlayer() : Player()
 	//GetCamera()->SetLocation(INI->GetValue("Player", "Start"));
 	//GetCamera()->SetRotation(INI->GetValue("Player", "Direction"));
 
-	II->RegisterKeyInput(87, &TestPlayer::RunInputW, this);
-	II->RegisterKeyInput(65, &TestPlayer::RunInputA, this);
-	II->RegisterKeyInput(83, &TestPlayer::RunInputS, this);
-	II->RegisterKeyInput(68, &TestPlayer::RunInputD, this);
+	II->RegisterKeyContinuousInput(87, &TestPlayer::RunInputW, this);
+	II->RegisterKeyContinuousInput(65, &TestPlayer::RunInputA, this);
+	II->RegisterKeyContinuousInput(83, &TestPlayer::RunInputS, this);
+	II->RegisterKeyContinuousInput(68, &TestPlayer::RunInputD, this);
 	II->RegisterKeyInput(32, &TestPlayer::RunInputSpace, this);
 	II->RegisterKeyInput(340, &TestPlayer::RunInputShift, this);
-	II->RegisterKeyInput(0x01, &TestPlayer::LeftMouseDown, this);
+	II->RegisterKeyInput(0, &TestPlayer::LeftMouseDown, this);
 	II->RegisterKeyInput(49, &TestPlayer::InputOne, this);
 	II->RegisterKeyInput(50, &TestPlayer::InputTwo, this);
 	II->RegisterKeyInput(256, &TestPlayer::InputExit, this);
 	II->RegisterKeyInput(257, &TestPlayer::OpenConsole, this);
 	II->RegisterMouseInput(0, &TestPlayer::MouseMoved, this);
+	II->RegisterKeyInput(69, &TestPlayer::UseCursor, this);
 
 	Mesh = SpawnObject<VisibleObject>();
 	Mesh->SetModel("Cube");
@@ -170,37 +180,37 @@ void TestPlayer::RunInputS(float delta, bool KeyDown)
 	Movement->AddInput(dir.Normalize());
 }
 
-void TestPlayer::RunInputSpace(float delta, bool KeyDown)
+void TestPlayer::RunInputSpace(bool KeyDown)
 {
 	if (!Movement->IsInAir() && KeyDown)
 		Movement->AddImpulse(Vector(0.f, 0.f, 300.f));
 }
 
-void TestPlayer::InputOne(float delta, bool KeyDown)
+void TestPlayer::InputOne(bool KeyDown)
 {
 	if (KeyDown)
 		InputMode = !InputMode;
 }
 
-void TestPlayer::InputTwo(float delta, bool KeyDown)
+void TestPlayer::InputTwo(bool KeyDown)
 {
 	if (KeyDown)
 		InputMode = !InputMode;
 }
 
-void TestPlayer::RunInputShift(float delta, bool KeyDown)
+void TestPlayer::RunInputShift(bool KeyDown)
 {
 	if (KeyDown) Movement->SetMaxSpeed(10.f);
 	else Movement->SetMaxSpeed(5.f);
 }
 
 
-void TestPlayer::LeftMouseDown(float delta, bool)
+void TestPlayer::LeftMouseDown(bool)
 {
 
 }
 
-void TestPlayer::RightMouseDown(float delta, bool KeyDown)
+void TestPlayer::RightMouseDown(bool KeyDown)
 {
 
 }
@@ -208,7 +218,7 @@ void TestPlayer::RightMouseDown(float delta, bool KeyDown)
 void TestPlayer::MouseMoved(float X, float Y)
 {
 	const Vector& rot = Rotation;
-	SetRotation(Vector(rot.X + X * mouseSens, rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, rot.Z));
+	if (cursorState) SetRotation(Vector(rot.X + X * mouseSens, rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, rot.Z));
 }
 
 void TestPlayer::Tick(float)
