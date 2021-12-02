@@ -24,6 +24,8 @@ private:
 	float mouseSens;
 	float Speed;
 
+	void RunInputQ(float delta, bool KeyDown);
+	void RunInputZ(float delta, bool KeyDown);
 	void RunInputW(float delta, bool KeyDown);
 	void RunInputA(float delta, bool KeyDown);
 	void RunInputD(float delta, bool KeyDown);

@@ -25,6 +25,8 @@ TestPlayer::TestPlayer() : Player()
 	//GetCamera()->SetLocation(INI->GetValue("Player", "Start"));
 	//GetCamera()->SetRotation(INI->GetValue("Player", "Direction"));
 
+	II->RegisterKeyInput(81, &TestPlayer::RunInputQ, this);
+	II->RegisterKeyInput(90, &TestPlayer::RunInputZ, this);
 	II->RegisterKeyInput(87, &TestPlayer::RunInputW, this);
 	II->RegisterKeyInput(65, &TestPlayer::RunInputA, this);
 	II->RegisterKeyInput(83, &TestPlayer::RunInputS, this);
@@ -144,6 +146,17 @@ TestPlayer::TestPlayer() : Player()
 
 	auto ui = SpawnObject<TestUI>();
 	UI::AddToScreen(ui, this);
+}
+
+void TestPlayer::RunInputQ(float delta, bool KeyDown)
+{
+	Vector dir(0.0,0.0,1.0);
+	Movement->AddInput(dir.Normalize());
+}
+void TestPlayer::RunInputZ(float delta, bool KeyDown)
+{
+	Vector dir(0.0, 0.0, -1.0);
+	Movement->AddInput(dir.Normalize());
 }
 
 void TestPlayer::RunInputW(float delta, bool KeyDown)

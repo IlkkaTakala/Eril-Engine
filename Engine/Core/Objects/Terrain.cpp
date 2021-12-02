@@ -206,7 +206,7 @@ Terrain::Terrain()
 
 	resolution = 0;
 	noise_scale = 0.010f;
-	amplitude = 10.0f;
+	amplitude = 0.1f;
 
 	Mesh = SpawnObject<VisibleObject>();
 }
@@ -245,6 +245,8 @@ void Terrain::InitTerrain(int r, Vector scale, Vector location, String material)
 	std::vector<uint32> inds;
 
 	pos.reserve(r * r);
+	normals.reserve(r * r);
+	tangents.reserve(r * r);
 
 	Vector offset = scale / 2;
 	offset.Z = 0.f;
@@ -298,7 +300,8 @@ Vector Terrain::GetNormal(float x, float y)
 
 	return Vector::Cross(x_dir.Normalize(), y_dir.Normalize());
 	*/
-	float res = 0.01f;
+
+	float res = 0.1f;
 	Vector l(x - res, y, GetHeight(x - res, y));
 	Vector r(x + res, y, GetHeight(x + res, y));
 	Vector u(x, y + res, GetHeight(x, y + res));
@@ -328,7 +331,7 @@ Vector Terrain::GetTangent(float x, float y, Vector normal)
 	return tangent;
 	*/
 
-	float res = 0.01f;
+	float res = 0.1f;
 	Vector l(x - res, y, GetHeight(x - res, y));
 	Vector r(x + res, y, GetHeight(x + res, y));
 	Vector u(x, y + res, GetHeight(x, y + res));
@@ -341,6 +344,6 @@ Vector Terrain::GetTangent(float x, float y, Vector normal)
 
 	Vector curPos = (x, y, GetHeight(x, y));
 
-	Vector newTangent = firstDir;
+	Vector newTangent = secondDir;
 	return newTangent.Normalize();
 }
