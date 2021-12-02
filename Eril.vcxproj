@@ -203,6 +203,8 @@
   <ItemGroup>
     <ClCompile Include="Engine\Core\BasicTypes.cpp" />
     <ClCompile Include="Engine\Core\Core.cpp" />
+    <ClCompile Include="Engine\Core\ECS\EntityManager.cpp" />
+    <ClCompile Include="Engine\Core\ECS\SystemsManager.cpp" />
     <ClCompile Include="Engine\Core\GameLoop.cpp" />
     <ClCompile Include="Engine\Core\Gameplay\GameState.cpp" />
     <ClCompile Include="Engine\Core\Gameplay\PlayerController.cpp" />
@@ -223,6 +225,7 @@
     <ClCompile Include="Engine\Core\Timer.cpp" />
     <ClCompile Include="Engine\Core\WinConsole.cpp" />
     <ClCompile Include="Engine\external\glfw\deps\glad_gl.c" />
+    <ClCompile Include="Engine\Interface\IECS.cpp" />
     <ClCompile Include="Engine\Interface\FileManager.cpp" />
     <ClCompile Include="Engine\Interface\IRender.cpp" />
     <ClCompile Include="Engine\Interface\WindowManager.cpp" />
@@ -247,6 +250,17 @@
     <ClCompile Include="Game\TestUI.cpp" />
     <ClInclude Include="Engine\Core\BasicTypes.h" />
     <ClInclude Include="Engine\Core\Core.h" />
+    <ClInclude Include="Engine\Core\ECS\Component.h" />
+    <ClInclude Include="Engine\Core\ECS\ComponentManager.h" />
+    <ClInclude Include="Engine\Core\ECS\Components\LightComponent.h" />
+    <ClInclude Include="Engine\Core\ECS\ComponentTypeStorage.h" />
+    <ClInclude Include="Engine\Core\ECS\Entity.h" />
+    <ClInclude Include="Engine\Core\ECS\EntityManager.h" />
+    <ClInclude Include="Engine\Core\ECS\Systems\LightControllerSystem.h" />
+    <ClInclude Include="Engine\Interface\IECS.h" />
+    <ClInclude Include="Game\Components\PositionComponent.h" />
+    <ClInclude Include="Engine\Core\ECS\System.h" />
+    <ClInclude Include="Engine\Core\ECS\SystemsManager.h" />
     <ClInclude Include="Engine\Core\GameLoop.h" />
     <ClInclude Include="Engine\Core\Gameplay\GameState.h" />
     <ClInclude Include="Engine\Core\Gameplay\PlayerController.h" />
@@ -276,8 +290,7 @@
     <ClInclude Include="Engine\RenderCore\OpenGL\include\RenderBuffer.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\include\Renderer.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\include\Texture.h" />
-    <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Button.h" />
-    <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Image.h" />
+    <ClInclude Include="Game\ECSTesting.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Panel.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Text.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\TextBox.h" />
@@ -286,6 +299,7 @@
     <ClInclude Include="Engine\RenderCore\OpenGL\UI\UISpace.h" />
     <ClInclude Include="Game\EngineInterface.h" />
     <ClInclude Include="Game\Hunter.h" />
+    <ClInclude Include="Game\Systems\MovementSystem.h" />
     <ClInclude Include="Game\TestPlayer.h" />
     <ClInclude Include="Game\TestUI.h" />
   </ItemGroup>

@@ -1,8 +1,6 @@
 <header version='1.0' />
-<Hunter id="A0005555" args="Location:100,0,1; ">
-</Hunter>
 <VisibleObject id="A0005553" args="Mesh:tree; Material:0Assets/Materials/tree;" />
-<Terrain id="A0005554" args="" />
+<Terrain id="A0005554" args="Scale:100,100,1" />
 <InstancedObject id="A0005556" args=
 "Instances:
 	1,10,0-0,0,0-1,1,1-

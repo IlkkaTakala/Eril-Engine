@@ -7,6 +7,7 @@
 class GameState;
 class GC;
 class Input;
+class ECSWorldManager;
 
 class GameLoop
 {

@@ -10,6 +10,9 @@ class MovementComponent;
 class Terrain;
 class Hunter;
 
+//ECS TEST
+class ECSTesting;
+
 class TestPlayer : public Player
 {
 public:
@@ -49,10 +52,12 @@ private:
 	Ref<InstancedObject> Grass;
 	Ref<InstancedObject> Flowers;
 	Ref<VisibleObject> Sky;
-
 	Ref<Terrain> terra[4];
-
 	Ref<Hunter> hunt;
+
+
+	//ECS TEST
+	Ref<ECSTesting> ecsTest;
 
 	int spawnCounter;
 };
