@@ -18,7 +18,7 @@ Hunter::Hunter() : Actor()
 	move = SpawnObject<MovementComponent>();
 	move->SetTarget(this);
 	move->SetGravity(true);
-	move->SetMaxSpeed(6.f);
+	move->SetMaxSpeed(1.f);
 	caught = false;
 
 	time = 0.f;
@@ -32,11 +32,11 @@ void Hunter::Tick(float delta)
 	Mesh->GetModel()->GetMaterial(0)->SetParameter("delta", time);
 	Mesh->GetModel()->GetMaterial(0)->SetParameter("velocity", move->DesiredState.velocity);
 
-
 	Vector playerLoc = GetGameState()->CurrentPlayer->GetLocation();
-	Vector playerRot = GetGameState()->CurrentPlayer->GetRotation();
 	
 	if (!caught) {
+		//SetRotation(Rotation.RotateByAxis(Location, playerLoc.X, 90.f));
+
 		if ((targetLoc - Location).Length() < 1.f) SetNewTarget(0.f);
 		move->AddInput(targetLoc - Location);
 
@@ -49,11 +49,6 @@ void Hunter::Tick(float delta)
 	else {
 		SetLocation(playerLoc + Vector(0.f, 0.f, 1.f));
 	}
-
-	if (targetRot != Rotation) {
-		SetRotation(playerRot + Vector(0.f, 0.f, 0.f));
-	}
-
 }
 
 void Hunter::SetNewTarget(float delta)

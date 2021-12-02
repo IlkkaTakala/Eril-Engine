@@ -41,135 +41,129 @@ TestPlayer::TestPlayer() : Player()
 	Mesh->SetModel("Cube");
 	Mesh->GetModel()->SetAABB(AABB(Vector(-0.5f), Vector(0.5f)));
 
+	for (int y = 0; y < 2; y++) {
+		for (int x = 0; x < 2; x++) {
+			terra[y * 2 + x] = SpawnObject<Terrain>();
+			terra[y * 2 + x]->InitTerrain(100, Vector(100.f, 100.f, 1.f), Vector(-100.f * x, -100.f * y, 0.f));
+		}
+	}
 
 	Movement = SpawnObject<MovementComponent>();
 	Movement->SetTarget(dynamic_cast<Actor*>(this));
 	Movement->SetGravity(true);
+	Movement->SetGround(terra[0]);
 
 	Sky = SpawnObject<VisibleObject>();
 	Sky->SetModel(MI->LoadData(Sky, "SkySphere"));
 	Sky->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/Sky"));
-	
-	/*auto SpotLight = SpawnObject<Light>();
-	SpotLight->Data.Location = GetCamera()->GetLocation();
-	SpotLight->Data.Type = LIGHT_SPOT;
-	SpotLight->Data.Size = 0.5f;
-	SpotLight->Data.Intensity = 5.f;
-	SpotLight->Data.Color = Vector(1.f);
-	SpotLight->Data.Rotation = Vector(45.0, 45.0, 45.0);*/
 
-	//{
-	//	Trees = SpawnObject<InstancedObject>();
-	//	Trees->SetModel(MI->LoadData(Trees, "tree"));
-	//	Trees->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/tree"));
-	//	Trees->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Assets/Materials/leaves"));
-	//	Trees->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
+	{
+		Trees = SpawnObject<InstancedObject>();
+		Trees->SetModel(MI->LoadData(Trees, "tree"));
+		Trees->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/tree"));
+		Trees->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Assets/Materials/leaves"));
+		Trees->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
 
-	//	int count = 100;
-	//	Transformation* arr = new Transformation[count]();
-	//	for (int i = 0; i < count; i++)
-	//	{
-	//		float x = rand() % 100 - 50.f;
-	//		float y = rand() % 100 - 50.f;
-	//		float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
-	//		arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y) - 0.2f);
-	//		arr[i].Scale = Vector(s);
-	//	}
-	//	Trees->AddInstances(count, arr);
-	//	delete[] arr;
-	//	
-	//	
-	//	Rocks = SpawnObject<InstancedObject>();
-	//	Rocks->SetModel(MI->LoadData(Rocks, "rock"));
-	//	Rocks->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/rock"));
-	//	Rocks->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
+		int count = 100;
+		Transformation* arr = new Transformation[count]();
+		for (int i = 0; i < count; i++)
+		{
+			float x = rand() % 100 - 50.f;
+			float y = rand() % 100 - 50.f;
+			float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
+			arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y) - 0.2f);
+			arr[i].Scale = Vector(s);
+		}
+		Trees->AddInstances(count, arr);
+		delete[] arr;
+		
+		Rocks = SpawnObject<InstancedObject>();
+		Rocks->SetModel(MI->LoadData(Rocks, "rock"));
+		Rocks->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/rock"));
+		Rocks->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
 
-	//	count = 20;
-	//	arr = new Transformation[count]();
-	//	for (int i = 0; i < count; i++)
-	//	{
-	//		float x = rand() % 100 - 50.f;
-	//		float y = rand() % 100 - 50.f;
-	//		arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y) + 0.6f);
-	//		arr[i].Scale = Vector(1.0f);
-	//	}
-	//	Rocks->AddInstances(count, arr);
-	//	delete[] arr;
+		count = 20;
+		arr = new Transformation[count]();
+		for (int i = 0; i < count; i++)
+		{
+			float x = rand() % 100 - 50.f;
+			float y = rand() % 100 - 50.f;
+			arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y) + 0.6f);
+			arr[i].Scale = Vector(1.0f);
+		}
+		Rocks->AddInstances(count, arr);
+		delete[] arr;
+		
+		Shacks = SpawnObject<InstancedObject>();
+		Shacks->SetModel(MI->LoadData(Shacks, "shack"));
+		Shacks->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/shack"));
+		Shacks->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Assets/Materials/shack"));
+		Shacks->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
 
-	//	
-	//	Shacks = SpawnObject<InstancedObject>();
-	//	Shacks->SetModel(MI->LoadData(Shacks, "shack"));
-	//	Shacks->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/rock"));
-	//	Shacks->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Assets/Materials/tree"));
-	//	Shacks->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
+		count = 3;
+		arr = new Transformation[count]();
+		for (int i = 0; i < count; i++)
+		{
+			float x = rand() % 100 - 50.f;
+			float y = rand() % 100 - 50.f;
+			arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y) + 0.1f);
+			arr[i].Scale = Vector(1.0f);
+		}
+		Shacks->AddInstances(count, arr);
+		delete[] arr;
 
-	//	count = 10;
-	//	arr = new Transformation[count]();
-	//	for (int i = 0; i < count; i++)
-	//	{
-	//		float x = rand() % 100 - 50.f;
-	//		float y = rand() % 100 - 50.f;
-	//		arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y) + 0.1f);
-	//		arr[i].Scale = Vector(1.0f);
-	//	}
-	//	Shacks->AddInstances(count, arr);
-	//	delete[] arr;
+		Grass = SpawnObject<InstancedObject>();
+		Grass->SetModel(MI->LoadData(Grass, "grass"));
+		Grass->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/grass"));
+		Grass->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
 
+		count = 1000;
+		arr = new Transformation[count]();
 
-	//	Grass = SpawnObject<InstancedObject>();
-	//	Grass->SetModel(MI->LoadData(Grass, "grass"));
-	//	Grass->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/grass"));
-	//	Grass->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
-
-	//	count = 10000;
-	//	arr = new Transformation[count]();
-
-	//	for (int i = 0; i < count; i++)
-	//	{
-	//		float x = rand() % 100 - 50.f;
-	//		float y = rand() % 100 - 50.f;
-	//		Vector normal = terra[0]->GetNormal(x, y);
-	//		arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y)) - normal * 0.1;
-	//		arr[i].Scale = Vector(0.5f);
-	//		Vector up(0.f, 0.f, 1.f);
-	//		Vector axis = Vector::Cross(normal, up).Normalize();
-	//		float angle = acos(Vector::Dot(up, normal));
-	//		arr[i].Rotation = Vector::toEuler(axis, angle) * 180.f / PI;
-	//	}
-	//	Grass->AddInstances(count, arr);
-	//	delete[] arr;
+		for (int i = 0; i < count; i++)
+		{
+			float x = rand() % 100 - 50.f;
+			float y = rand() % 100 - 50.f;
+			Vector normal = terra[0]->GetNormal(x, y);
+			arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y)) - normal * 0.1;
+			arr[i].Scale = Vector(0.6f);
+			Vector up(0.f, 0.f, 1.f);
+			Vector axis = Vector::Cross(normal, up).Normalize();
+			float angle = acos(Vector::Dot(up, normal));
+			arr[i].Rotation = Vector::toEuler(axis, angle) * 180.f / PI;
+		}
+		Grass->AddInstances(count, arr);
+		delete[] arr;
 
 
-	//	Candy = SpawnObject<InstancedObject>();
-	//	Candy->SetModel(MI->LoadData(Candy, "candyCane"));
-	//	Candy->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/rock"));
-	//	Candy->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
+		Candy = SpawnObject<InstancedObject>();
+		Candy->SetModel(MI->LoadData(Candy, "candyCane"));
+		Candy->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/candy"));
+		Candy->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
 
-	//	count = 5;
-	//	arr = new Transformation[count]();
-	//	for (int i = 0; i < count; i++)
-	//	{
-	//		float x = rand() % 100 - 50.f;
-	//		float y = rand() % 100 - 50.f;
-	//		float s = (1.f - rand() / (float)RAND_MAX * 0.4f);
-	//		Vector normal = terra[0]->GetNormal(x, y);
-	//		arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y) + 0.8f);
-	//		arr[i].Scale = Vector(0.2f);
-	//		Vector up(0.f, 1.f, 0.f);
-	//		Vector axis = Vector::Cross(normal, up).Normalize();
-	//		float angle = acos(Vector::Dot(up, normal));
-	//		arr[i].Rotation = Vector::toEuler(axis, angle) * 180.f / PI;
-	//	}
-	//	Candy->AddInstances(count, arr);
-	//	delete[] arr;
-	//}
+		count = 50;
+		arr = new Transformation[count]();
+		for (int i = 0; i < count; i++)
+		{
+			float x = rand() % 100 - 50.f;
+			float y = rand() % 100 - 50.f;
+			float s = (1.f - rand() / (float)RAND_MAX * 0.4f);
+			Vector normal = terra[0]->GetNormal(x, y);
+			arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y) + 0.8f);
+			arr[i].Scale = Vector(0.2f);
+			Vector up(0.f, 1.f, 0.f);
+			Vector axis = Vector::Cross(normal, up).Normalize();
+			float angle = acos(Vector::Dot(up, normal));
+			arr[i].Rotation = Vector::toEuler(axis, angle) * 180.f / PI;
+		}
+		Candy->AddInstances(count, arr);
+		delete[] arr;
+	}
 
-	/*hunt = SpawnObject<Hunter>();
-	hunt->SetLocation(Vector(100.f, 0.f, 0.f));
+	hunt = SpawnObject<Hunter>();
+	hunt->SetLocation(Vector(10.f, 0.f, 0.f));
 	hunt->move->SetGround(terra[0]);
-
-	auto ui = SpawnObject<TestUI>();
-	UI::AddToScreen(ui, this);*/
+	
 }
 
 void TestPlayer::RunInputW(float delta, bool KeyDown)
@@ -199,8 +193,7 @@ void TestPlayer::RunInputS(float delta, bool KeyDown)
 void TestPlayer::RunInputSpace(float delta, bool KeyDown)
 {
 	if (!Movement->IsInAir() && KeyDown) {
-		Movement->SetMaxSpeed(100.0f);
-		Movement->AddImpulse(Vector(110.f, 0.f, 20.5f));
+		Movement->AddImpulse(Vector(0.f, 0.f, 200.f));
 	}
 }
 
@@ -239,7 +232,8 @@ void TestPlayer::ItemThrowQ(float delta, bool KeyDown)
 	{
 		if (Items.size() > 0) {
 			auto it = SpawnObject<PlaceableItem>();
-			it->SetLocation(GetLocation());
+			it->SetLocation(GetLocation() + Vector(0.f, 0.f, 1.f));
+			it->SetScale(0.2f);
 			it->Move->SetPhysics(true);
 			it->Move->SetMaxSpeed(10.0f);
 			it->Move->AddImpulse(-GetCamera()->GetForwardVector() * 10.f);
