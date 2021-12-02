@@ -18,23 +18,23 @@ Light::Light() : BaseObject()
 	Data = LightData();
 	Enabled = true;
 
-	RI->CreateLight(&Data);
+	//RI->CreateLight(&Data);
 }
 
 Light::~Light()
 {
-	RI->RemoveLight(&Data);
+	//RI->RemoveLight(&Data);
 }
 
 void Light::OnDestroyed()
 {
-	RI->RemoveLight(&Data);
+	//RI->RemoveLight(&Data);
 }
 
 void Light::Enable()
 {
 	if (!Enabled) {
-		RI->CreateLight(&Data);
+		//RI->CreateLight(&Data);
 		Enabled = true;
 	}
 }
@@ -42,7 +42,7 @@ void Light::Enable()
 void Light::Disable()
 {
 	if (Enabled) {
-		RI->RemoveLight(&Data);
+		//RI->RemoveLight(&Data);
 		Enabled = false;
 	}
 }

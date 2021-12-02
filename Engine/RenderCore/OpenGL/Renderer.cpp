@@ -26,6 +26,10 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include <Interface/IECS.h>
+#include <Core/ECS/System.h>
+#include <Core/ECS/Components/LightComponent.h>
+
 struct Globals
 {
 	glm::mat4 Projection;
@@ -394,6 +398,7 @@ void Renderer::SetActiveCamera(Camera* cam)
 	ActiveCamera = dynamic_cast<GLCamera*>(cam);
 }
 
+/*
 void Renderer::CreateLight(const LightData* light)
 {
 	Lights.push_back(light);
@@ -411,18 +416,22 @@ void Renderer::RemoveLight(const LightData* light)
 	}
 	LightCullingShader->SetUniform("lightCount", (int)Lights.size());
 }
+*/
+
 
 void Renderer::UpdateLights()
 {
+	std::vector<LightComponent>*  lights = static_cast<IComponentArrayQuerySystem<LightComponent>*>(IECS::GetSystemsManager()->GetSystemByName("LightControllerSystem"))->GetComponentVector("LightComponent");
+
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, LightBuffer);
 	GLM_Light* mapped = reinterpret_cast<GLM_Light*>(glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, MaxLightCount * sizeof(GLM_Light), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
-	for (int i = 0; i < Lights.size(); i++) {
+	for (int i = 0; i < lights->size(); i++) {
 		GLM_Light light;
-		light.locationAndSize = glm::vec4(Lights[i]->Location.X, Lights[i]->Location.Z, Lights[i]->Location.Y, Lights[i]->Size);
-		glm::mat4 rot = glm::mat4(1.0) * glm::toMat4(glm::quat(glm::vec3(glm::radians(Lights[i]->Rotation.X), glm::radians(Lights[i]->Rotation.Y), glm::radians(Lights[i]->Rotation.Z))));
+		light.locationAndSize = glm::vec4(lights->at(i).Location.X, lights->at(i).Location.Z, lights->at(i).Location.Y, lights->at(i).Size);
+		glm::mat4 rot = glm::mat4(1.0) * glm::toMat4(glm::quat(glm::vec3(glm::radians(lights->at(i).Rotation.X), glm::radians(lights->at(i).Rotation.Y), glm::radians(lights->at(i).Rotation.Z))));
 		light.rotation = rot * glm::vec4(0.0, -1.0, 0.0, 0.0);
-		light.color = glm::vec4(Lights[i]->Color.X, Lights[i]->Color.Y, Lights[i]->Color.Z, 1.0) * Lights[i]->Intensity;
-		light.type.x = Lights[i]->Type;
+		light.color = glm::vec4(lights->at(i).Color.X, lights->at(i).Color.Y, lights->at(i).Color.Z, 1.0) * lights->at(i).Intensity;
+		light.type.x = lights->at(i).LightType;
 		mapped[i] = light;
 	}
 	int result = glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
@@ -849,11 +858,15 @@ void Renderer::Shadows(int width, int height)
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glDepthFunc(GL_LESS);
 	ShadowColorShader->Bind();
-	for (const LightData* l : Lights) {
-		if (l->Type != 0) continue;
+
+	std::vector<LightComponent>* lights = static_cast<IComponentArrayQuerySystem<LightComponent>*>(IECS::GetSystemsManager()->GetSystemByName("LightControllerSystem"))->GetComponentVector("LightComponent");
+
+
+	for (const LightComponent &l : *lights) {
+		if (l.LightType != 0) continue;
 		glm::vec3 loc = glm::vec3(ActiveCamera->GetLocation().X, ActiveCamera->GetLocation().Z, ActiveCamera->GetLocation().Y);
-		glm::vec3 dir = glm::toMat4(glm::quat(glm::vec3(glm::radians(l->Rotation.X), glm::radians(l->Rotation.Y), glm::radians(l->Rotation.Z)))) * glm::vec4(0.0, -1.0, 0.0, 0.0);
-		glm::vec3 up = glm::toMat4(glm::quat(glm::vec3(glm::radians(l->Rotation.X), glm::radians(l->Rotation.Y), glm::radians(l->Rotation.Z)))) * glm::vec4(1.0, 0.0, 0.0, 0.0);
+		glm::vec3 dir = glm::toMat4(glm::quat(glm::vec3(glm::radians(l.Rotation.X), glm::radians(l.Rotation.Y), glm::radians(l.Rotation.Z)))) * glm::vec4(0.0, -1.0, 0.0, 0.0);
+		glm::vec3 up = glm::toMat4(glm::quat(glm::vec3(glm::radians(l.Rotation.X), glm::radians(l.Rotation.Y), glm::radians(l.Rotation.Z)))) * glm::vec4(1.0, 0.0, 0.0, 0.0);
 		glm::vec3 newLoc = loc + (-dir * 70.f);
 		glm::mat4 view = glm::lookAt(newLoc, newLoc + dir, up);
 
@@ -1143,12 +1156,15 @@ void Renderer::Render(float delta)
 
 	UpdateTransforms();
 
+	std::vector<LightComponent>* lights = static_cast<IComponentArrayQuerySystem<LightComponent>*>(IECS::GetSystemsManager()->GetSystemByName("LightControllerSystem"))->GetComponentVector("LightComponent");
+
+
 	GlobalVariables.Projection = ActiveCamera->GetProjectionMatrix();
 	GlobalVariables.View = glm::inverse(ActiveCamera->GetViewMatrix());
 	const Vector& loc = ActiveCamera->GetLocation();
 	GlobalVariables.ViewPoint = glm::vec4(loc.X, loc.Z, loc.Y, 1.f);
 	GlobalVariables.ScreenSize = glm::ivec2(width, height);
-	GlobalVariables.SceneLightCount = (int)Lights.size();
+	GlobalVariables.SceneLightCount = (int)lights->size();
 
 	glBindBuffer(GL_UNIFORM_BUFFER, GlobalUniforms);
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Globals), &GlobalVariables);
@@ -1156,7 +1172,7 @@ void Renderer::Render(float delta)
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, GlobalUniforms);
 
 
-	if (Lights.size() != 0) UpdateLights();
+	if (lights->size() != 0) UpdateLights();
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, LightBuffer);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, VisibleLightIndicesBuffer);
 

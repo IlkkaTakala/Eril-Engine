@@ -7,21 +7,32 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 #include "ECS/SystemsManager.h"
 #include "ECS/Components/LightComponent.h"
 
-class LightControllerSystem : public IEntityQuerySystem
+class LightControllerSystem : public IComponentArrayQuerySystem<LightComponent>
 {
 public:
-	LightControllerSystem(EntityManager& entityManager) : IEntityQuerySystem(entityManager) {}
+	LightControllerSystem(EntityManager* entityManager, ComponentManager* componentManager) : IComponentArrayQuerySystem<LightComponent>(entityManager, componentManager) {}
 
-	void Update(float deltaTime, std::vector<int> entities) override
+	void Update(float deltaTime)
 	{
 		
-		for (auto e : entities)
+		ComponentArrayQueryUpdate(deltaTime, GetComponentVector("LightComponent"));
+	}
+
+	void ComponentArrayQueryUpdate(float deltaTime, std::vector<LightComponent>* components)
+	{
+		if (!done)
 		{
-			//
+			done = true;
+			for (LightComponent& light : *components)
+			{
+				int s = static_cast<int>(light.State);
+				Console::Log("Light State " + std::to_string(s));
+			}
+
 		}
 	}
 
 
 private:
-
+	bool done = false;
 };

@@ -5,11 +5,14 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 
 #include "SystemsManager.h"
 
-int SystemsManager::AddSystem(System* system)
+int SystemsManager::AddSystem(System* system, String systemName)
 {
 	system->bEnabled = true;
 	Systems.push_back(system);
-	return(static_cast<int>(Systems.size())-1);
+	system->SetID(static_cast<int>(Systems.size()) - 1);
+	SystemNames.insert(std::pair<String, int>(systemName, system->GetID()));
+
+	return(system->GetID());
 }
 
 bool SystemsManager::DisableSystem(int systemID)
@@ -42,11 +45,41 @@ void SystemsManager::UpdateSystems(float deltaTime)
 	{
 		if (Systems.at(i)->bEnabled)
 		{
-			IEntityQuerySystem* system = static_cast<IEntityQuerySystem*>(Systems.at(i));
-			if (system != nullptr)
+			if (Systems.at(i)->GetType() == System::SystemType::IEntityQuerySystem)
 			{
-				system->Update(deltaTime, WorldEntityManager->QueryEntitiesByType(Systems.at(i)->TypesWanted));
+				IEntityQuerySystem* eqSys = static_cast<IEntityQuerySystem*>(Systems.at(i));
+				eqSys->EntityQueryUpdate(deltaTime, WorldEntityManager->QueryEntitiesByType(eqSys->TypesWanted));
+				continue;
 			}
+			
+			if (Systems.at(i)->GetType() == System::SystemType::IComponentArrayQuerySystem)
+			{
+				/*
+				IComponentArrayQuerySystem<* caSys = static_cast<IComponentArrayQuerySystem*>(Systems.at(i));
+				if (caSys->TypesWanted.size() > 0)
+				{
+					caSys->ComponentArrayQueryUpdate(deltaTime, WorldComponentManager->GetComponentVector<Component>(caSys->TypesWanted.at(0)));
+				}
+				*/
+				Systems.at(i)->Update(deltaTime);
+
+				continue;
+			}	
 		}
 	}
 }
+
+System* SystemsManager::GetSystemByName(String systemName)
+{
+	int id = -1;
+	id = SystemNames.find(systemName)->second;
+	for (System* s : Systems)
+	{
+		if (s->GetID() == id)
+		{
+			return s;
+		}
+	}
+	return nullptr;
+}
+

@@ -43,8 +43,10 @@ public:
 
 	virtual Camera* CreateCamera(VisibleObject* parent = nullptr) = 0;
 	virtual void SetActiveCamera(Camera*) = 0;
+	/*
 	virtual void CreateLight(const LightData*) = 0;
 	virtual void RemoveLight(const LightData*) = 0;
+	*/
 
 	virtual void LoadShaders() = 0;
 	virtual Material* GetMaterialByName(String name) const = 0;

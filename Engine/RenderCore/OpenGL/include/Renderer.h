@@ -28,8 +28,10 @@ public:
 
 	virtual Camera* CreateCamera(VisibleObject* parent = nullptr) override;
 	virtual void SetActiveCamera(Camera*) override;
+	/*
 	virtual void CreateLight(const LightData*) override;
 	virtual void RemoveLight(const LightData*) override;
+	*/
 	void UpdateLights();
 
 	virtual void LoadShaders() override;
@@ -59,7 +61,7 @@ private:
 	std::map<String, Shader*> Shaders;
 	std::map<String, Material*> BaseMaterials;
 	std::map<String, Texture*> LoadedTextures;
-	std::vector<const LightData*> Lights;
+	//std::vector<const LightData*> Lights;
 
 	Shader* LightCullingShader;
 	Shader* PreDepthShader;

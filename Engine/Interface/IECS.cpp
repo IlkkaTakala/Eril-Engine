@@ -29,10 +29,13 @@ namespace IECS
 		WorldEntityManager = new EntityManager(WorldComponentManager);
 		WorldSystemsManager = new SystemsManager(WorldEntityManager, WorldComponentManager);
 
-		//In-engine component, entity and system setup NOT YET IN USE
-		//LightControllerSystem* lightController = new LightControllerSystem(*WorldEntityManager);
-		//int systemIndex = WorldSystemsManager->AddSystem(lightController);
-		//WorldSystemsManager->AddWantedComponentType(systemIndex, "LightComponent");
+		//In-engine component, entity and system setup
+		//Create Component Storages:
+		WorldComponentManager->CreateComponentTypeStorage<LightComponent>("LightComponent");
+
+		LightControllerSystem* lightController = new LightControllerSystem(WorldEntityManager, WorldComponentManager);
+		int systemIndex = WorldSystemsManager->AddSystem(lightController, "LightControllerSystem");
+		WorldSystemsManager->AddWantedComponentType(systemIndex, "LightComponent");
 	}
 
 	void Destroy()

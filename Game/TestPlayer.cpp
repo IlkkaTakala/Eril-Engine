@@ -276,7 +276,7 @@ void TestPlayer::BeginPlay()
 	
 	Terrain* terrain = ObjectManager::GetByRecord<Terrain>(0xA0005554);
 
-	for (int i = 1; i < 1; i++) {
+	for (int i = 1; i < 2; i++) {
 
 		float x = rand() % 100;
 		float y = rand() % 100;

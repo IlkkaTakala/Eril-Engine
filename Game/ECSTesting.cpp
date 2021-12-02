@@ -8,6 +8,8 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 
 #include "Components/PositionComponent.h"
 #include "Systems/MovementSystem.h"
+#include <Core/ECS/Components/LightComponent.h>
+#include <Core.h>
 
 ECSTesting::ECSTesting()
 {
@@ -15,11 +17,37 @@ ECSTesting::ECSTesting()
 	EntityManager* entityManager = IECS::GetEntityManager();
 	ComponentManager* componentManager = IECS::GetComponentManager();
 
+	
+	//Lights Testing
+	SystemsManager* systemsManager = IECS::GetSystemsManager();
+	IComponentArrayQuerySystem<LightComponent>* lightSystem = static_cast<IComponentArrayQuerySystem<LightComponent>*> (systemsManager->GetSystemByName("LightControllerSystem"));
+	//MovementSystem* movementSystem = new MovementSystem(*entityManager);
+	//int systemIndex = systemsManager->GetSystem(movementSystem);
+	//systemsManager->AddWantedComponentType(systemIndex, "PositionComponent");
+
+	if (lightSystem != nullptr)
+	{
+		for (int i = 0; i < 100; i++) 
+		{
+			Console::Log("Light addded " + std::to_string(i));
+			float x = rand() % 100;
+			float y = rand() % 100;
+			//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
+
+			LightComponent* light = lightSystem->AddComponentToSystem("LightComponent");
+			light->Location = Vector(x, y, 2.5f);
+			light->LightType = 1;
+			light->Size = 5.f;
+			light->Intensity = rand() / (float)RAND_MAX * 20.f;
+			light->Color = Vector(x, y, 2.5f);
+		}
+	}
+
 	//Create Component Storages:
 	componentManager->CreateComponentTypeStorage<PositionComponent>("PositionComponent");
 
 
-	int debugSize = 10;
+	int debugSize = 0;
 
 	for (int i = 0; i < debugSize; i++)
 	{
@@ -103,9 +131,9 @@ ECSTesting::ECSTesting()
 
 
 	//Create new System and set it to handle entities with PositionComponents
-	SystemsManager* systemsManager = IECS::GetSystemsManager();
-	MovementSystem* movementSystem = new MovementSystem(*entityManager);
-	int systemIndex = systemsManager->AddSystem(movementSystem);
+	
+	MovementSystem* movementSystem = new MovementSystem(entityManager);
+	int systemIndex = systemsManager->AddSystem(movementSystem, "MovementSystem");
 	systemsManager->AddWantedComponentType(systemIndex, "PositionComponent");
 	
 }
