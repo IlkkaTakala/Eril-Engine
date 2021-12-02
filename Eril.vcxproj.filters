@@ -127,11 +127,12 @@
     <ClCompile Include="Game\TestUI.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Interface\FileManager.cpp">
-      <Filter>Engine\Interfaces</Filter>
-    </ClCompile>
     <ClCompile Include="Game\EngineInterface.cpp">
       <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Interface\FileManager.cpp" />
+    <ClCompile Include="Audio.cpp">
+      <Filter>Engine\Audio</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -173,6 +174,9 @@
     </Filter>
     <Filter Include="Engine\OpenGL\UI">
       <UniqueIdentifier>{3244437c-caa9-4877-ba7a-a047bf86f946}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Audio">
+      <UniqueIdentifier>{299c4543-92c2-43e1-a2be-76aea3550718}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -329,8 +333,9 @@
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Panel.h">
       <Filter>Engine\OpenGL\UI</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Interface\FileManager.h">
-      <Filter>Engine\Interfaces</Filter>
+    <ClInclude Include="Engine\Interface\FileManager.h" />
+    <ClInclude Include="Audio.h">
+      <Filter>Engine\Audio</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
