@@ -1,6 +1,7 @@
 <header version='1.0' />
-<Terrain id="A0001111" args="Scale:1000,1000,1; Location:-50,-50,0; Material:Assets/Materials/ground; Resolution:100" />
-<InstancedObject id="A0001112" args="Randomize:100;   Mesh:tree; Material:0Assets/Materials/tree"  />
-<InstancedObject id="A0001113" args="Randomize:20; Mesh:rock; Material:0Assets/Materials/rock" />
-<InstancedObject id="A0001114" args="Randomize:10; Mesh:shack; Material:1Assets/Materials/shack" />
-<InstancedObject id="A0001115" args="Randomize:50; InRotation:90,180,0; InScale:0.2,0.2,0.2; Mesh:candyCane; Material:0Assets/Materials/candy" />
+<Terrain id="A0001111" args="Scale:1000,1000,1; Location:-50,-50,0; Material:Assets/Materials/ground; Resolution:100;" />
+<InstancedObject id="A0001112" args="Randomize:100; InTerrain:A0001111; Mesh:tree;		Material1:Assets/Materials/tree;  Material2:Assets/Materials/leaves;"  />
+<InstancedObject id="A0001113" args="Randomize:20;  InTerrain:A0001111; Mesh:rock;		Material1:Assets/Materials/rock;" />
+<InstancedObject id="A0001114" args="Randomize:10;  InTerrain:A0001111; Mesh:shack;		Material1:Assets/Materials/shack; Material2:Assets/Materials/shack;" />
+<InstancedObject id="A0001115" args="Randomize:50;  InTerrain:A0001111; Mesh:candyCane; Material1:Assets/Materials/candy; InScale:0.3,0.3,0.3;" />
+<Hunter id="A0001116" args="Location:25,25,0;" />

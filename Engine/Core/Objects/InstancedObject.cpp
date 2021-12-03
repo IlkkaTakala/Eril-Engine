@@ -1,4 +1,5 @@
 #include "InstancedObject.h"
+#include "Terrain.h"
 
 InstancedObject::InstancedObject() : VisibleObject()
 {
@@ -14,17 +15,19 @@ void InstancedObject::LoadWithParameters(const String& args)
 	auto ran = data.find("Randomize");
 	auto sca = data.find("InScale");
 	auto rot = data.find("InRotation");
+	auto ter = data.find("InTerrain");
 
 	int randCount = 0;
 	int instanceCount = 0;
 	std::vector<String> it;
 	Vector Scale = Vector(1, 1, 1);
 	Vector Rotation = Vector(0, 0, 0);
-	
+	Terrain* Terra = nullptr;
 
 	if (ran != data.end()) randCount = atoi(ran->second.c_str());
 	if (sca != data.end()) Scale = Vector(sca->second);
-	if (rot != data.end()) Rotation = Vector(rot->second);;
+	if (rot != data.end()) Rotation = Vector(rot->second);
+	if (ter != data.end()) Terra = ObjectManager::GetByRecord<Terrain>(std::stoul(ter->second, nullptr, 16));
 	if (ins != data.end()) {
 		it = split(ins->second, '-');
 		instanceCount = it.size() / 3;
@@ -35,7 +38,7 @@ void InstancedObject::LoadWithParameters(const String& args)
 			float x = rand() % 100 - 50.f;
 			float y = rand() % 100 - 50.f;
 
-			arr[i].Location = Vector(x, y, 0.f);
+			arr[i].Location = Vector(x, y, Terra == nullptr ? 0.f : Terra->GetHeight(x, y));
 			arr[i].Scale = Scale;
 			arr[i].Rotation = Rotation;
 		}

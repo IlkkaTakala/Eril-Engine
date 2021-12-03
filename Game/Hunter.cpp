@@ -18,6 +18,7 @@ Hunter::Hunter() : Actor()
 	move = SpawnObject<MovementComponent>();
 	move->SetTarget(this);
 	move->SetGravity(true);
+	//move->SetGround(ObjectManager::GetByRecord<Terrain>(0xA0001111));
 	move->SetMaxSpeed(1.f);
 	caught = false;
 

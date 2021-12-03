@@ -51,7 +51,7 @@ TestPlayer::TestPlayer() : Player()
 	Movement = SpawnObject<MovementComponent>();
 	Movement->SetTarget(dynamic_cast<Actor*>(this));
 	Movement->SetGravity(true);
-	//Movement->SetGround(terra[0]);
+	Movement->SetGround(ObjectManager::GetByRecord<Terrain>(0xA0001111));
 
 	Sky = SpawnObject<VisibleObject>();
 	Sky->SetModel(MI->LoadData(Sky, "SkySphere"));
