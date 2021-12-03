@@ -258,6 +258,8 @@
     <ClInclude Include="Engine\Core\ECS\EntityManager.h" />
     <ClInclude Include="Engine\Core\ECS\Systems\LightControllerSystem.h" />
     <ClInclude Include="Engine\Interface\IECS.h" />
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Button.h" />
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Image.h" />
     <ClInclude Include="Game\Components\PositionComponent.h" />
     <ClInclude Include="Engine\Core\ECS\System.h" />
     <ClInclude Include="Engine\Core\ECS\SystemsManager.h" />

@@ -16,7 +16,21 @@ enum class HitReg
 	HitTestVisible
 };
 
+namespace Constants
+{
+	namespace UI 
+	{
+		constexpr uint	UI_ON_LEAVE = 0;
+		constexpr uint	UI_ON_ENTER = 1;
+		constexpr uint	UI_ON_HOVER = 2;
+		constexpr uint	UI_ON_MOUSE_DOWN = 3;
+		constexpr uint	UI_ON_MOUSE_UP = 4;
+		constexpr uint	UI_ON_FOCUS = 5;
+		constexpr uint	UI_ON_LOST_FOCUS = 6;
 
+		typedef void (*UIEventCallback)(void);
+	}
+}
 
 class UIComponent
 {
@@ -34,13 +48,16 @@ public:
 
 	bool Trace(const Vector2D& point) const;
 
-	virtual void OnLeave() {}
-	virtual void OnEnter() {}
-	virtual void OnHover() {}
-	virtual void OnMouseDown() {}
-	virtual void OnMouseUp() {}
-	virtual void OnFocus() {}
-	virtual void OnLostFocus() {}
+	virtual void OnLeave() { if (callbacks[Constants::UI::UI_ON_LEAVE] != nullptr) callbacks[Constants::UI::UI_ON_LEAVE](); }
+	virtual void OnEnter() { if (callbacks[Constants::UI::UI_ON_ENTER] != nullptr) callbacks[Constants::UI::UI_ON_ENTER](); }
+	virtual void OnHover() { if (callbacks[Constants::UI::UI_ON_HOVER] != nullptr) callbacks[Constants::UI::UI_ON_HOVER](); }
+	virtual void OnMouseDown() { if (callbacks[Constants::UI::UI_ON_MOUSE_DOWN] != nullptr) callbacks[Constants::UI::UI_ON_MOUSE_DOWN](); }
+	virtual void OnMouseUp() { if (callbacks[Constants::UI::UI_ON_MOUSE_UP] != nullptr) callbacks[Constants::UI::UI_ON_MOUSE_UP](); }
+	virtual void OnFocus() { if (callbacks[Constants::UI::UI_ON_FOCUS] != nullptr) callbacks[Constants::UI::UI_ON_FOCUS](); }
+	virtual void OnLostFocus() { if (callbacks[Constants::UI::UI_ON_LOST_FOCUS] != nullptr) callbacks[Constants::UI::UI_ON_LOST_FOCUS](); }
+
+	UIComponent* SetEventCallback(uint event, Constants::UI::UIEventCallback call);
+
 	virtual void HoverCheck(Vector2D& point);
 
 protected:
@@ -81,5 +98,9 @@ protected:
 
 	bool redraw;
 	bool recalculate;
+
+private:
+
+	Constants::UI::UIEventCallback callbacks[7];
 };
 

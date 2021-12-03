@@ -42,6 +42,14 @@ UIComponent::UIComponent()
 	recalculate = true;
 
 	matrix = new UIMatrix();
+
+	callbacks[0] = nullptr;
+	callbacks[1] = nullptr;
+	callbacks[2] = nullptr;
+	callbacks[3] = nullptr;
+	callbacks[4] = nullptr;
+	callbacks[5] = nullptr;
+	callbacks[6] = nullptr;
 }
 
 UIComponent::~UIComponent()
@@ -114,6 +122,12 @@ bool UIComponent::Trace(const Vector2D& point) const
 				if (point.Y <= realSize.Y + topLeft.Y)
 					return true;
 	return false;
+}
+
+UIComponent* UIComponent::SetEventCallback(uint event, Constants::UI::UIEventCallback call)
+{
+	callbacks[event] = call;
+	return this;  
 }
 
 void UIComponent::HoverCheck(Vector2D& point)
