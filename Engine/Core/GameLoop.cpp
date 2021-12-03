@@ -66,7 +66,7 @@ int GameLoop::Start()
 	IECS::Init();
 	
 	Console::Log("Creating defaults...");
-	State = EngineInterface::CreateDefaults();
+	EngineInterface::CreateDefaults();
 	Collector = new GC();
 
 	Console::Log("Loading finished");

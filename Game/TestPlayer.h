@@ -15,6 +15,7 @@ class Hunter;
 
 class TestPlayer : public Player
 {
+	REGISTER(TestPlayer);
 public:
 	TestPlayer();
 	virtual ~TestPlayer() { /*INI->SetValue("Player", "Start", CameraPoint.ToString()); INI->SetValue("Player", "Direction", CameraDirection.ToString());*/ }

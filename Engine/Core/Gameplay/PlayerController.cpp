@@ -1,4 +1,6 @@
 #include "PlayerController.h"
+#include <GameLoop.h>
+#include <Gameplay/GameState.h>
 
 Player::Player() : Actor()
 {
@@ -9,4 +11,11 @@ Player::Player() : Actor()
 
 void Player::Tick(float)
 {
+}
+
+void Player::LoadWithParameters(const String& args)
+{
+	Actor::LoadWithParameters(args);
+
+	Loop->State->CurrentPlayer = this;
 }

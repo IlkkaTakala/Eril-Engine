@@ -3,6 +3,7 @@
 #include "GameLoop.h"
 #include <Interface/FileManager.h>
 #include <RapidXML.hpp>
+#include <Gameplay/GameState.h>
 
 Scene::Scene() : BaseObject()
 {
@@ -53,7 +54,13 @@ void Scene::OpenLevel(String map)
 {
 	if (Loop->World != nullptr) ObjectManager::CleanObjects();
 	using namespace rapidxml;
+
+	ObjectManager::PrepareRecord(1, Constants::Record::LOADED);
 	Loop->World = SpawnObject<Scene>();
+
+	ObjectManager::PrepareRecord(2, Constants::Record::LOADED);
+	Ref<GameState> State = SpawnObject<GameState>();
+	Loop->State = State;
 
 	String loaded;
 	FileManager::RequestData(map + ".map", loaded);

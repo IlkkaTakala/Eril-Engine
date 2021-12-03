@@ -210,6 +210,7 @@ void TestPlayer::InputTwo(bool KeyDown)
 {
 	if (KeyDown)
 		InputMode = !InputMode;
+	Scene::OpenLevel("Assets/Maps/test");
 }
 
 void TestPlayer::RunInputShift(bool KeyDown)
@@ -221,7 +222,6 @@ void TestPlayer::RunInputShift(bool KeyDown)
 
 void TestPlayer::LeftMouseDown(bool)
 {
-	Scene::OpenLevel("Assets/Maps/test2");
 }
 
 void TestPlayer::RightMouseDown(bool KeyDown)
