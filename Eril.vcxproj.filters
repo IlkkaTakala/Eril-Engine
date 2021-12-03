@@ -201,9 +201,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Game\EngineInterface.h">
-      <Filter>Engine\Public</Filter>
-    </ClInclude>
     <ClInclude Include="Game\TestPlayer.h">
       <Filter>Game</Filter>
     </ClInclude>
@@ -372,6 +369,9 @@
     </ClInclude>
     <ClInclude Include="Game\ECS_Examples\Components\PositionComponent.h">
       <Filter>Game\ECSExamples\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\EngineInterface.h">
+      <Filter>Engine\Interface</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

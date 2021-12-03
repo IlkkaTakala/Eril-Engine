@@ -65,6 +65,7 @@ public:
 	{
 		SetType(SystemType::IComponentArrayQuerySystem);
 		SystemComponentReferenceEntity = entityManager->AddEntity();
+		SystemComponentReferenceEntity->SetProtected(true);
 	}
 
 	virtual void Update(float deltaTime) = 0;
@@ -78,7 +79,6 @@ public:
 
 	T* AddComponentToSystem(String componentType)
 	{
-		Console::Log("TEST");
 		return WorldEntityManager->AddComponentToEntity<T>(SystemComponentReferenceEntity->GetID(), componentType);
 	}
 

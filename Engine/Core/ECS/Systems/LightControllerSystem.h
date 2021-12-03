@@ -7,10 +7,14 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 #include "ECS/SystemsManager.h"
 #include "ECS/Components/LightComponent.h"
 
+constexpr int LIGHT_DIRECTIONAL = 0;
+constexpr int LIGHT_POINT = 1;
+
 class LightControllerSystem : public IComponentArrayQuerySystem<LightComponent>
 {
 public:
 	LightControllerSystem(EntityManager* entityManager, ComponentManager* componentManager) : IComponentArrayQuerySystem<LightComponent>(entityManager, componentManager) {}
+
 
 	void Update(float deltaTime)
 	{
