@@ -1,5 +1,4 @@
 .vs/
 build/
-!Engine/external/openal-soft/build/
 *.zip
 *.mtl
