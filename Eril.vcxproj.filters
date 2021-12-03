@@ -139,6 +139,9 @@
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\TextBox.cpp">
       <Filter>Engine\OpenGL\UI</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Interface\FileManager.cpp">
+      <Filter>Engine\Interface</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\Interface\FileManager.cpp" />
     <ClCompile Include="Game\FPSCounter.cpp">
       <Filter>Game</Filter>
@@ -340,6 +343,15 @@
       <Filter>Engine\OpenGL\UI</Filter>
     </ClInclude>
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\TextBox.h">
+      <Filter>Engine\OpenGL\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Interface\FileManager.h">
+      <Filter>Engine\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Button.h">
+      <Filter>Engine\OpenGL\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Image.h">
       <Filter>Engine\OpenGL\UI</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Interface\FileManager.h" />
