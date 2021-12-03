@@ -8,10 +8,10 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 #include <Objects/Actor.h>
 
 
-class ECSTesting : public Actor
+class ECSExample : public Actor
 {
 public:
-	ECSTesting();
+	ECSExample();
 	virtual void Tick(float) override;
 private:
 

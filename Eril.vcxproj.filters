@@ -55,12 +55,6 @@
     <ClCompile Include="Engine\Core\WinConsole.cpp">
       <Filter>Engine\Private</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\ObjectManager.cpp">
-      <Filter>Engine\Private</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Core\LightData.cpp">
-      <Filter>Engine\Private</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Core\Launch.cpp">
       <Filter>Engine\Private</Filter>
     </ClCompile>
@@ -97,9 +91,6 @@
     <ClCompile Include="Engine\Core\ECS\SystemsManager.cpp">
       <Filter>Engine\ECS</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Interface\IRender.cpp">
-      <Filter>Engine\Private</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Core\Gameplay\Scene.cpp">
       <Filter>Engine\Private</Filter>
     </ClCompile>
@@ -130,21 +121,33 @@
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\Text.cpp">
       <Filter>Engine\OpenGL\UI</Filter>
     </ClCompile>
-    <ClCompile Include="Game\EngineInterface.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\Button.cpp">
       <Filter>Engine\OpenGL\UI</Filter>
     </ClCompile>
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\TextBox.cpp">
       <Filter>Engine\OpenGL\UI</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Interface\FileManager.cpp">
-      <Filter>Engine\Interface</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Interface\FileManager.cpp" />
     <ClCompile Include="Game\FPSCounter.cpp">
       <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\ObjectManager.cpp">
+      <Filter>Engine\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Interface\FileManager.cpp">
+      <Filter>Engine\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Interface\IRender.cpp">
+      <Filter>Engine\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\EngineInterface.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\LightData.cpp">
+      <Filter>Engine\Deprecated</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\ECS_Examples\ECSExample.cpp">
+      <Filter>Game\ECSExamples</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -183,6 +186,18 @@
     </Filter>
     <Filter Include="Engine\OpenGL\UI">
       <UniqueIdentifier>{3244437c-caa9-4877-ba7a-a047bf86f946}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Deprecated">
+      <UniqueIdentifier>{81affc60-0a93-4279-86e2-3f0b96432cee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\ECSExamples">
+      <UniqueIdentifier>{c8e82cee-858e-4003-9acc-8d4f0c477561}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\ECSExamples\Components">
+      <UniqueIdentifier>{9396e3fc-5c63-4a13-906f-db6658fb8090}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\ECSExamples\Systems">
+      <UniqueIdentifier>{79204ca8-a3de-490a-8718-506adad13f46}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -229,12 +244,6 @@
       <Filter>Engine\Public</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\GarbageCollector.h">
-      <Filter>Engine\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Core\LightData.h">
-      <Filter>Engine\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Core\ObjectManager.h">
       <Filter>Engine\Public</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\Physics.h">
@@ -294,23 +303,11 @@
     <ClInclude Include="Engine\Core\ECS\System.h">
       <Filter>Engine\ECS</Filter>
     </ClInclude>
-    <ClInclude Include="Game\ECSTesting.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\Components\PositionComponent.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\Systems\MovementSystem.h">
-      <Filter>Game</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Core\ECS\Components\LightComponent.h">
       <Filter>Engine\ECS\Components</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\ECS\Systems\LightControllerSystem.h">
       <Filter>Engine\ECS\Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Interface\IRender.h">
-      <Filter>Engine\Public</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\Gameplay\Scene.h">
       <Filter>Engine\Public</Filter>
@@ -345,9 +342,6 @@
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\TextBox.h">
       <Filter>Engine\OpenGL\UI</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Interface\FileManager.h">
-      <Filter>Engine\Interface</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Button.h">
       <Filter>Engine\OpenGL\UI</Filter>
     </ClInclude>
@@ -357,6 +351,27 @@
     <ClInclude Include="Engine\Interface\FileManager.h" />
     <ClInclude Include="Game\FPSCounter.h">
       <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Interface\IRender.h">
+      <Filter>Engine\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Interface\FileManager.h">
+      <Filter>Engine\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\ObjectManager.h">
+      <Filter>Engine\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\LightData.h">
+      <Filter>Engine\Deprecated</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\ECS_Examples\ECSExample.h">
+      <Filter>Game\ECSExamples</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\ECS_Examples\Systems\MovementSystem.h">
+      <Filter>Game\ECSExamples\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\ECS_Examples\Components\PositionComponent.h">
+      <Filter>Game\ECSExamples\Components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

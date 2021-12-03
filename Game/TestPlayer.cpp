@@ -1,15 +1,19 @@
 #include "Interface/IRender.h"
-#include "LightData.h"
 #include "TestPlayer.h"
 #include "Objects/MovementComponent.h"
 #include "Objects/Terrain.h"
 #include "Timer.h"
 #include "Objects/InstancedObject.h"
 #include "Hunter.h"
-#include "ECSTesting.h"
 #include "TestUI.h"
 #include <Interface/WindowManager.h>
+
+//ECS
 #include <Interface/IECS.h>
+#include <ECS_Examples/ECSExample.h>
+#include <ECS/Components/LightComponent.h>
+#include <ECS/Systems/LightControllerSystem.h>
+
 
 void TestPlayer::OpenConsole(bool) {
 	Console::Create();
@@ -25,8 +29,8 @@ void TestPlayer::UseCursor(bool keydown)
 
 TestPlayer::TestPlayer() : Player()
 {
-	//ECS TEST
-	ecsTest = SpawnObject<ECSTesting>();
+	//ECS Example
+	ecsExample = SpawnObject<ECSExample>();
 
 	mouseSens = 0.5f;
 	Speed = 5.f;
@@ -264,56 +268,30 @@ void TestPlayer::BeginPlay()
 	uint32 h = (uint32)l;
 	printf("0x%lx\n", h);
 	
-	/*
-	Lights[0] = SpawnObject<Light>();
-
-	Lights[0]->Data.Location = Vector(70, 70, 1.2f);
-	Lights[0]->Data.Type = LIGHT_POINT;
-	Lights[0]->Data.Size = 80.f;
-	Lights[0]->Data.Intensity = 50.f;
-	Lights[0]->Data.Color = Vector(1.f);
-	*/
 	
 	Terrain* terrain = ObjectManager::GetByRecord<Terrain>(0xA0005554);
 
-	for (int i = 1; i < 2; i++) {
+	//Lights Testing
+	SystemsManager* systemsManager = IECS::GetSystemsManager();
+	IComponentArrayQuerySystem<LightComponent>* lightSystem = static_cast<IComponentArrayQuerySystem<LightComponent>*> (systemsManager->GetSystemByName("LightControllerSystem"));
 
-		float x = rand() % 100;
-		float y = rand() % 100;
-		//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
+	if (lightSystem != nullptr)
+	{
+		for (int i = 0; i < 1; i++)
+		{
+			//Console::Log("Light addded " + std::to_string(i));
+			float x = rand() % 100;
+			float y = rand() % 100;
+			//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
 
-		Lights[i] = SpawnObject<Light>();
-
-		Lights[i]->Data.Location = Vector(x, y, terrain->GetHeight(x,y) + 0.5f);
-		Lights[i]->Data.Type = LIGHT_POINT;
-		Lights[i]->Data.Size = 5.f;
-		Lights[i]->Data.Intensity = rand() / (float)RAND_MAX * 20.f + 10;
-		Lights[i]->Data.Color = Vector(1.f);
+			LightComponent* light = lightSystem->AddComponentToSystem("LightComponent");
+			Console::Log("TEST");
+			light->Location = Vector(x, y, terrain->GetHeight(x, y));
+			light->LightType = 1;
+			light->Size = 5.f;
+			light->Intensity = rand() / (float)RAND_MAX * 20.f;
+			light->Color = Vector(x, y, 2.5f);
+		}
 	}
-	
-	float x = 9;
-	float y = 5;
-	//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
-
-	Lights[0] = SpawnObject<Light>();
-
-	Lights[0]->Data.Location = Vector(x, y, terrain->GetHeight(x, y) + 0.5f);
-	Lights[0]->Data.Type = LIGHT_POINT;
-	Lights[0]->Data.Size = 15.f;
-	Lights[0]->Data.Intensity = 14.0f;
-	Lights[0]->Data.Color = Vector(1.0, 1.0, 1.0);
-
-	/*
-	Lights[1] = SpawnObject<Light>();
-
-	Lights[1]->Data.Location = Vector(x, y, terrain->GetHeight(x, y) + 0.5f);
-	Lights[1]->Data.Type = LIGHT_DIRECTIONAL;
-	Lights[1]->Data.Size = 15.f;
-	Lights[1]->Data.Intensity = 10.0f;
-	Lights[1]->Data.Color = Vector(1.0, 1.0, 1.0);
-	Lights[1]->Data.Rotation = Vector(0.5, 0.5, 0.5);
-	*/
-	
-
 	Console::Log("Hello beautiful world");
 }

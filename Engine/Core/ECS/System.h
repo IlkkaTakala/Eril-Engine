@@ -78,6 +78,7 @@ public:
 
 	T* AddComponentToSystem(String componentType)
 	{
+		Console::Log("TEST");
 		return WorldEntityManager->AddComponentToEntity<T>(SystemComponentReferenceEntity->GetID(), componentType);
 	}
 

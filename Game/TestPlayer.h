@@ -11,7 +11,7 @@ class Terrain;
 class Hunter;
 
 //ECS TEST
-class ECSTesting;
+class ECSExample;
 
 class TestPlayer : public Player
 {
@@ -59,7 +59,7 @@ private:
 
 
 	//ECS TEST
-	Ref<ECSTesting> ecsTest;
+	Ref<ECSExample> ecsExample;
 
 	int spawnCounter;
 };

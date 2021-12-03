@@ -16,6 +16,7 @@ public:
 
 	int GetID() { return ID; }
 	bool GetEnabled() { return bEnabled; }
+	bool GetProtected() { return bProtected; }
 
 	/// <summary>
 	/// Return handles to every component the entity has.
@@ -25,10 +26,12 @@ public:
 
 	void SetID(int id) { ID = id; }
 	void SetEnabled(bool enabled) { bEnabled = enabled; }
+	void SetProtected(bool isProjected) { bProtected = isProjected; }
 
 protected:
 	int ID;
 	bool bEnabled;
+	bool bProtected;
 
 	/// <summary>
 	/// First: Component ID, Second: Component Type

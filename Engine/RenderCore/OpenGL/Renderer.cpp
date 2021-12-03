@@ -8,7 +8,7 @@
 #include "Texture.h"
 #include "RenderBuffer.h"
 #include <Objects/VisibleObject.h>
-#include "LightData.h"
+//#include "LightData.h" //Lights have been moved to be handled by the ECS-system.
 #include "Settings.h"
 #include <filesystem>
 #include <stdexcept>
@@ -398,7 +398,7 @@ void Renderer::SetActiveCamera(Camera* cam)
 	ActiveCamera = dynamic_cast<GLCamera*>(cam);
 }
 
-/*
+/* //Lights have been moved to be handled by the ECS-system.
 void Renderer::CreateLight(const LightData* light)
 {
 	Lights.push_back(light);

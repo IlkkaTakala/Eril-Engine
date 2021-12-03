@@ -9,7 +9,7 @@ class Texture;
 class RenderObject;
 class VisibleObject;
 class LoadedMesh;
-struct LightData;
+//struct LightData; //Lights have been moved to be handled by the ECS-system.
 struct Vertex;
 class UISpace;
 
@@ -43,10 +43,10 @@ public:
 
 	virtual Camera* CreateCamera(VisibleObject* parent = nullptr) = 0;
 	virtual void SetActiveCamera(Camera*) = 0;
-	/*
-	virtual void CreateLight(const LightData*) = 0;
-	virtual void RemoveLight(const LightData*) = 0;
-	*/
+	
+	//virtual void CreateLight(const LightData*) = 0; //Lights have been moved to be handled by the ECS-system.
+	//virtual void RemoveLight(const LightData*) = 0; //Lights have been moved to be handled by the ECS-system.
+	
 
 	virtual void LoadShaders() = 0;
 	virtual Material* GetMaterialByName(String name) const = 0;
