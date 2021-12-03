@@ -1,5 +1,4 @@
 #include "Interface/IRender.h"
-#include "LightData.h"
 #include "TestPlayer.h"
 #include "Objects/MovementComponent.h"
 #include "Objects/Terrain.h"
@@ -8,27 +7,48 @@
 #include "Hunter.h"
 #include "Objects/Actor.h"
 #include "TestUI.h"
+#include <Interface/WindowManager.h>
 
-void TestPlayer::OpenConsole(float, bool) {
+//ECS
+#include <Interface/IECS.h>
+#include <ECS_Examples/ECSExample.h>
+#include <ECS/Components/LightComponent.h>
+#include <ECS/Systems/LightControllerSystem.h>
+
+
+void TestPlayer::OpenConsole(bool) {
 	Console::Create();
+}
+static bool cursorState = true;
+void TestPlayer::UseCursor(bool keydown)
+{
+	if (!keydown) {
+		WindowManager::SetShowCursor(0, cursorState);
+		cursorState = !cursorState;
+	}
 }
 
 TestPlayer::TestPlayer() : Player()
 {
 	mouseSens = 0.2f;
 	Speed = 15.f;
+
 	InputMode = true;
 	spawnCounter = 0;
+
 	//GetCamera()->SetLocation(INI->GetValue("Player", "Start"));
 	//GetCamera()->SetRotation(INI->GetValue("Player", "Direction"));
 
-	II->RegisterKeyInput(87, &TestPlayer::RunInputW, this);
-	II->RegisterKeyInput(65, &TestPlayer::RunInputA, this);
-	II->RegisterKeyInput(83, &TestPlayer::RunInputS, this);
-	II->RegisterKeyInput(68, &TestPlayer::RunInputD, this);
+	//Reqister used Inputs
+	//II->RegisterKeyContinuousInput(81, &TestPlayer::RunInputQ, this);
+	//II->RegisterKeyContinuousInput(90, &TestPlayer::RunInputZ, this);
+	II->RegisterKeyContinuousInput(87, &TestPlayer::RunInputW, this);
+	II->RegisterKeyContinuousInput(65, &TestPlayer::RunInputA, this);
+	II->RegisterKeyContinuousInput(83, &TestPlayer::RunInputS, this);
+	II->RegisterKeyContinuousInput(68, &TestPlayer::RunInputD, this);
 	II->RegisterKeyInput(32, &TestPlayer::RunInputSpace, this);
 	II->RegisterKeyInput(340, &TestPlayer::RunInputShift, this);
-	II->RegisterKeyInput(0x01, &TestPlayer::LeftMouseDown, this);
+	II->RegisterKeyInput(0, &TestPlayer::LeftMouseDown, this);
 	II->RegisterKeyInput(49, &TestPlayer::InputOne, this);
 	II->RegisterKeyInput(50, &TestPlayer::InputTwo, this);
 	II->RegisterKeyInput(256, &TestPlayer::InputExit, this);
@@ -37,6 +57,8 @@ TestPlayer::TestPlayer() : Player()
 	II->RegisterKeyInput(69, &TestPlayer::ItemPickE, this);
 	II->RegisterKeyInput(81, &TestPlayer::ItemThrowQ, this);
 
+
+	//Player Model
 	Mesh = SpawnObject<VisibleObject>();
 	Mesh->SetModel("Cube");
 	Mesh->GetModel()->SetAABB(AABB(Vector(-0.5f), Vector(0.5f)));
@@ -48,11 +70,13 @@ TestPlayer::TestPlayer() : Player()
 		}
 	}*/
 
+
 	Movement = SpawnObject<MovementComponent>();
 	Movement->SetTarget(dynamic_cast<Actor*>(this));
 	Movement->SetGravity(true);
 	Movement->SetGround(ObjectManager::GetByRecord<Terrain>(0xA0001111));
 
+	//Skybox
 	Sky = SpawnObject<VisibleObject>();
 	Sky->SetModel(MI->LoadData(Sky, "SkySphere"));
 	Sky->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/Sky"));
@@ -164,7 +188,21 @@ TestPlayer::TestPlayer() : Player()
 	hunt->SetLocation(Vector(10.f, 0.f, 0.f));
 	hunt->move->SetGround(terra[0]);*/
 	
+
 }
+
+
+//Handle Inputs
+//void TestPlayer::RunInputQ(float delta, bool KeyDown)
+//{
+//	Vector dir(0.0,0.0,1.0);
+//	Movement->AddInput(dir.Normalize());
+//}
+//void TestPlayer::RunInputZ(float delta, bool KeyDown)
+//{
+//	Vector dir(0.0, 0.0, -1.0);
+//	Movement->AddInput(dir.Normalize());
+//}
 
 void TestPlayer::RunInputW(float delta, bool KeyDown)
 {
@@ -190,43 +228,43 @@ void TestPlayer::RunInputS(float delta, bool KeyDown)
 	Movement->AddInput(dir.Normalize());
 }
 
-void TestPlayer::RunInputSpace(float delta, bool KeyDown)
+void TestPlayer::RunInputSpace(bool KeyDown)
 {
 	if (!Movement->IsInAir() && KeyDown) {
 		Movement->AddImpulse(Vector(0.f, 0.f, 200.f));
 	}
 }
 
-void TestPlayer::InputOne(float delta, bool KeyDown)
+void TestPlayer::InputOne(bool KeyDown)
 {
 	if (KeyDown)
 		InputMode = !InputMode;
 }
 
-void TestPlayer::InputTwo(float delta, bool KeyDown)
+void TestPlayer::InputTwo(bool KeyDown)
 {
 	if (KeyDown)
 		InputMode = !InputMode;
 }
 
-void TestPlayer::RunInputShift(float delta, bool KeyDown)
+void TestPlayer::RunInputShift(bool KeyDown)
 {
 	if (KeyDown) Movement->SetMaxSpeed(10.f);
 	else Movement->SetMaxSpeed(5.f);
 }
 
 
-void TestPlayer::LeftMouseDown(float delta, bool)
+void TestPlayer::LeftMouseDown(bool)
 {
 
 }
 
-void TestPlayer::RightMouseDown(float delta, bool KeyDown)
+void TestPlayer::RightMouseDown(bool KeyDown)
 {
 	
 }
 
-void TestPlayer::ItemThrowQ(float delta, bool KeyDown)
+void TestPlayer::ItemThrowQ(bool KeyDown)
 {
 	if (!KeyDown)
 	{
@@ -244,7 +282,7 @@ void TestPlayer::ItemThrowQ(float delta, bool KeyDown)
 	}
 }
 
-void TestPlayer::ItemPickE(float delta, bool KeyDown)
+void TestPlayer::ItemPickE(bool KeyDown)
 {
 	if (!KeyDown) {
 		Items.push_back(SpawnObject<Item>());
@@ -256,7 +294,7 @@ void TestPlayer::ItemPickE(float delta, bool KeyDown)
 void TestPlayer::MouseMoved(float X, float Y)
 {
 	const Vector& rot = Rotation;
-	SetRotation(Vector(rot.X + X * mouseSens, rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, rot.Z));
+	if (cursorState) SetRotation(Vector(rot.X + X * mouseSens, rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, rot.Z));
 }
 
 void TestPlayer::Tick(float)
@@ -270,10 +308,14 @@ void TimeFunction(float d) {
 	Console::Log("Hello, timer ran");
 }
 
+
+
+
 void TestPlayer::BeginPlay()
 {
 	Timer::CreateTimer(2.f, &TimeFunction, true);
 	RecordInt r = GetRecord();//0xABCDEF0123456789;
+
 	
 
 	if (r.GetSpawnState() == Constants::Record::SPAWNED) {
@@ -316,9 +358,45 @@ void PlaceableItem::BeginPlay()
 	AddComponent(Mesh);
 	Mesh->SetModel("candyCane");
 	Mesh->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/rock"));
+	/*
+	printf("0x%lx\n", h);
+
+
+	Terrain* terrain = ObjectManager::GetByRecord<Terrain>(0xA0005554);
+
+	//Lights Testing
+	SystemsManager* systemsManager = IECS::GetSystemsManager();
+	IComponentArrayQuerySystem<LightComponent>* lightSystem = static_cast<IComponentArrayQuerySystem<LightComponent>*> (systemsManager->GetSystemByName("LightControllerSystem"));
+
+	if (lightSystem != nullptr)
+	{
+		LightComponent* DirLight = lightSystem->AddComponentToSystem("LightComponent");
+		DirLight->Location = Vector(0.f, 0.f, 1.f);
+		DirLight->LightType = LIGHT_DIRECTIONAL;
+		DirLight->Size = 3.f;
+		DirLight->Intensity = 1.f;
+		DirLight->Color = Vector(1.f);
+		DirLight->Rotation = Vector(0.5, 0.5, -0.5);
+
+		for (int i = 0; i < 10; i++)
+		{
+			//Console::Log("Light addded " + std::to_string(i));
+			float x = rand() % 100;
+			float y = rand() % 100;
+			//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
+
+			LightComponent* light = lightSystem->AddComponentToSystem("LightComponent");
+			light->Location = Vector(x, y, terrain->GetHeight(x, y));
+			light->LightType = LIGHT_POINT;
+			light->Size = 5.f;
+			light->Intensity = rand() / (float)RAND_MAX * 20.f;
+			light->Color = Vector(x, y, 2.5f);
+		}
+	}*/
+	Console::Log("Hello beautiful world");
 }
 
 void PlaceableItem::DestroyObject()
 {
-
+	
 }

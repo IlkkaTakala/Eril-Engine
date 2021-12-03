@@ -19,7 +19,7 @@ public:
 	/// </summary>
 	/// <param name="system">Pointer to system to be added.</param>
 	/// <returns>System's ID</returns>
-	int AddSystem(System* system);
+	int AddSystem(System* system, String systemName);
 
 	/// <summary>
 	/// Disables the system with given ID.
@@ -43,9 +43,18 @@ public:
 	void UpdateSystems(float deltaTime);
 
 
+	System* GetSystemByName(String systemName);
+	
+
+
 protected:
 	EntityManager* WorldEntityManager;
 	ComponentManager* WorldComponentManager;
 	std::vector<System*> Systems;
+	
+	/// <summary>
+	/// First: System Name, Second: System ID
+	/// </summary>
+	std::map<String, int> SystemNames;
 };
 

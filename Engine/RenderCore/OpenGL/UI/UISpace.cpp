@@ -4,13 +4,22 @@
 #include "UIComponent.h"
 #include <Material.h>
 #include <glm/gtx/transform.hpp>
+#include <GLFW/glfw3.h>
+#include <Interface/WindowManager.h>
+#include <UI/TextBox.h>
 
 UISpace::UISpace()
 {
+	Combiner = nullptr;
+
 	UIBuffer = 0;
 	Color = 0;
 	Depth = 0;
 	UIShader = nullptr;
+	Screen = 0;
+	hasFocus = false;
+	Hovered = nullptr;
+	Focused = nullptr;
 
 	const char* vertexShader = R"~~~(
 #version 430 core
@@ -71,6 +80,10 @@ void main()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindVertexArray(0);
+
+	II->RegisterKeyInput(0, &UISpace::LeftClick, this);
+
+	II->RegisterTextInput(&UISpace::GetTextInput, this);
 }
 
 UISpace::~UISpace()
@@ -138,21 +151,35 @@ void UISpace::Render(uint target)
 	glBindVertexArray(VAO);
 	
 	glBindFramebuffer(GL_FRAMEBUFFER, UIBuffer);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	if (WindowManager::GetShowCursor(Screen)) {
+		float x;
+		float y;
+		WindowManager::GetCursorPosition(Screen, x, y);
+		Vector2D point(x, y);
+
+		for (auto it = TopLevel.rbegin(); it != TopLevel.rend(); it++) {
+			(*it)->TopLevel->HoverCheck(point);
+		}
+	}
 
 	glDepthMask(GL_TRUE);
-	glDisable(GL_BLEND);
+	//glDisable(GL_BLEND);
 	glDisable(GL_MULTISAMPLE);
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_ALWAYS);
+	glDepthFunc(GL_LESS);
 	glDisable(GL_CULL_FACE);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	for (const auto& c : TopLevel) {
 		c->TopLevel->Render();
 	}
 
+	// TODO: draw updates only where depth has changed, clear only when no geometry blocks
+
 	Combiner->Bind();
 	glBindFramebuffer(GL_FRAMEBUFFER, target);
 
+	glDepthFunc(GL_ALWAYS);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -169,4 +196,38 @@ void UISpace::AddComponent(UI* com)
 		com->TopLevel->UpdateMatrices(ScreenSize);
 	com->PostConstruct();
 	TopLevel.push_back(com);
+}
+
+void UISpace::LeftClick(bool down)
+{
+	if (Hovered)
+	{
+		if (down) {
+			if (Hovered->hits == HitReg::HitTestVisible && Hovered->focusable) {
+				if (Focused) Focused->OnLostFocus();
+				Focused = Hovered;
+				Focused->OnFocus();
+			}
+			Hovered->OnMouseDown();
+		}
+		else
+		{
+			Hovered->OnMouseUp();
+		}
+	}
+	else
+	{
+		if (Focused) Focused->OnLostFocus();
+		Focused = nullptr;
+	}
+}
+
+void UISpace::GetTextInput(uint input)
+{
+	auto e = dynamic_cast<TextBox*>(Focused);
+	if (e != nullptr) {
+		String s = e->GetText();
+		s += (char)input;
+		e->SetText(s);
+	}
 }

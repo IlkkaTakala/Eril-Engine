@@ -9,7 +9,7 @@ class Texture;
 class RenderObject;
 class VisibleObject;
 class LoadedMesh;
-struct LightData;
+//struct LightData; //Lights have been moved to be handled by the ECS-system.
 struct Vertex;
 class UISpace;
 
@@ -43,8 +43,10 @@ public:
 
 	virtual Camera* CreateCamera(VisibleObject* parent = nullptr) = 0;
 	virtual void SetActiveCamera(Camera*) = 0;
-	virtual void CreateLight(const LightData*) = 0;
-	virtual void RemoveLight(const LightData*) = 0;
+	
+	//virtual void CreateLight(const LightData*) = 0; //Lights have been moved to be handled by the ECS-system.
+	//virtual void RemoveLight(const LightData*) = 0; //Lights have been moved to be handled by the ECS-system.
+	
 
 	virtual void LoadShaders() = 0;
 	virtual Material* GetMaterialByName(String name) const = 0;
@@ -63,14 +65,31 @@ class IInput
 public:
 	virtual void SetInputHandler(void(*Callback)(int, int, int, int) = 0) = 0;
 	virtual void ProcessInputs(float delta) = 0;
+	void SetTextMode(bool mode) { isText = mode; }
 
 	template <class UserClass>
-	void RegisterKeyInput(int Key, void (UserClass::* Callback)(float, bool), UserClass* Caller)
+	void RegisterKeyContinuousInput(int Key, void (UserClass::* Callback)(float, bool), UserClass* Caller)
 	{
 		using std::placeholders::_1;
 		using std::placeholders::_2;
 		std::function<void(float, bool)> f = std::bind(Callback, Caller, _1, _2);
-		KeyCallers.insert(std::pair<int, std::function<void(float, bool)>>(Key, f));
+		KeyCallersHold.insert(std::pair<int, std::function<void(float, bool)>>(Key, f));
+	}
+
+	template <class UserClass>
+	void RegisterKeyInput(int Key, void (UserClass::* Callback)(bool), UserClass* Caller)
+	{
+		using std::placeholders::_1;
+		std::function<void(bool)> f = std::bind(Callback, Caller, _1);
+		KeyCallers.insert(std::pair<int, std::function<void(bool)>>(Key, f));
+	}
+
+	template <class UserClass>
+	void RegisterTextInput(void (UserClass::* Callback)(uint), UserClass* Caller)
+	{
+		using std::placeholders::_1;
+		std::function<void(uint)> f = std::bind(Callback, Caller, _1);
+		TextCallers.push_back(std::function<void(uint)>(f));
 	}
 
 	template <class UserClass>
@@ -83,11 +102,15 @@ public:
 	}
 
 protected:
-	std::multimap<int, std::function<void(float, bool)>> KeyCallers;
+	std::multimap<int, std::function<void(float, bool)>> KeyCallersHold;
+	std::multimap<int, std::function<void(bool)>> KeyCallers;
+	std::list<std::function<void(uint)>> TextCallers;
 	std::multimap<int, std::function<void(float, float)>> MouseCallers;
 
-	double MouseX;
-	double MouseY;
+	float MouseX;
+	float MouseY;
+
+	bool isText;
 };
 
 struct AABB

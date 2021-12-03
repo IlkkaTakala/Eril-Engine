@@ -56,7 +56,7 @@ bool EntityManager::RemoveEntity(Entity*& entity)
 	int id = entity->GetID();
 	for (int i = 0; i < IndexUsage.size(); i++)
 	{
-		if (IndexUsage.at(id))
+		if (IndexUsage.at(id) && !entity->GetProtected())
 		{
 			for (auto &c : entity->GetComponents())
 			{
@@ -77,7 +77,7 @@ bool EntityManager::RemoveEntity(int entityID)
 {
 	if (entityID < IndexUsage.size())
 	{
-		if (IndexUsage.at(entityID))
+		if (IndexUsage.at(entityID) && !Entities.at(entityID)->GetProtected())
 		{
 			for (auto& c : GetEntity(entityID)->GetComponents())
 			{

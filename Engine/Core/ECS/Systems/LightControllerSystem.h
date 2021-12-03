@@ -4,29 +4,33 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 11.11.2021
 */
 
-/* NOT YET IN USE, COMMENTED OUT
-
 #include "ECS/SystemsManager.h"
 #include "ECS/Components/LightComponent.h"
 
-class LightControllerSystem : public System
+constexpr int LIGHT_DIRECTIONAL = 0;
+constexpr int LIGHT_POINT = 1;
+
+class LightControllerSystem : public IComponentArrayQuerySystem<LightComponent>
 {
 public:
-	LightControllerSystem(EntityManager& entityManager) : System(entityManager) {}
+	LightControllerSystem(EntityManager* entityManager, ComponentManager* componentManager) : IComponentArrayQuerySystem<LightComponent>(entityManager, componentManager) {}
 
-	void Update(float deltaTime, std::vector<int> entities) override
+
+	void Update(float deltaTime)
 	{
 		
-		for (auto e : entities)
+		ComponentArrayQueryUpdate(deltaTime, GetComponentVector("LightComponent"));
+	}
+
+	void ComponentArrayQueryUpdate(float deltaTime, std::vector<LightComponent>* components)
+	{
+		for (LightComponent& light : *components)
 		{
-			//
+			int s = static_cast<int>(light.State);
 		}
+
 	}
 
 
 private:
-
 };
-
-
-*/

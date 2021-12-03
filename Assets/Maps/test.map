@@ -5,3 +5,4 @@
 <InstancedObject id="A0001114" args="Randomize:10;  InTerrain:A0001111; Mesh:shack;		Material1:Assets/Materials/shack; Material2:Assets/Materials/shack;" />
 <InstancedObject id="A0001115" args="Randomize:50;  InTerrain:A0001111; Mesh:candyCane; Material1:Assets/Materials/candy; InScale:0.3,0.3,0.3;" />
 <Hunter id="A0001116" args="Location:25,25,0;" />
+

@@ -1,4 +1,5 @@
 #include "LightData.h"
+/* Lights have been moved to be handled by the ECS-system. This is kept here if the code is needed later.
 
 LightData::LightData()
 {
@@ -46,3 +47,5 @@ void Light::Disable()
 		Enabled = false;
 	}
 }
+
+*/

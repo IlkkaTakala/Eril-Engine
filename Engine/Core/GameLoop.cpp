@@ -45,6 +45,9 @@ int GameLoop::Start()
 	INI = new INISettings("Settings.ini");
 	if (!INI->IsValid()) return 10;
 
+	//Initialize ECS World
+	IECS::Init();
+
 	try
 	{
 		if (INI->GetValue("Engine", "Console") == "true") 
@@ -62,8 +65,7 @@ int GameLoop::Start()
 		return 11;
 	}
 
-	//Initialize ECS World
-	IECS::Init();
+	
 	
 	Console::Log("Creating defaults...");
 	State = EngineInterface::CreateDefaults();

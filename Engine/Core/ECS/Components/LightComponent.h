@@ -4,8 +4,6 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 11.11.2021
 */
 
-/* NOT YET IN USE, COMMENTED OUT
-
 #include "Core.h"
 #include "ECS/Component.h"
 
@@ -25,6 +23,32 @@ struct LightComponent : public Component
 		State = c.State;
 	}
 
+	LightComponent(LightComponent&& c) noexcept : Component(std::move(c))
+	{
+		LightType = std::move(c.LightType);
+		Intensity = std::move(c.Intensity);
+		Size = std::move(c.Size);
+		Distance = std::move(c.Distance);
+		Falloff = std::move(c.Falloff);
+		Color = std::move(c.Color);
+		Location = std::move(c.Location);
+		Rotation = std::move(c.Rotation);
+		State = std::move(c.State);
+	}
+
+	LightComponent& operator=(const LightComponent& c) 
+	{
+		LightType = c.LightType;
+		Intensity = c.Intensity;
+		Size = c.Size;
+		Distance = c.Distance;
+		Falloff = c.Falloff;
+		Color = c.Color;
+		Location = c.Location;
+		Rotation = c.Rotation;
+		State = c.State;
+		return *this; 
+	}
 
 	int LightType = 0;
 	float Intensity = 2.f;
@@ -36,13 +60,6 @@ struct LightComponent : public Component
 	Vector Location = Vector(0.f, 0.f, 0.f);
 	Vector Rotation = Vector(0.f, 0.f, 0.f);
 
-	// 0 = Not initialized
-	// 1 = Enabled
-	// 3 = Enabled, Needs Disabling		
-	// 4 = Disabled
-	// 5 = Disabled, Needs Enabling
-	int State = 0;
+	enum class State { NotInitialized = 0, Enabled, NeedsDisabling, Disabled, NeedsEnabling };
+	State State = State::NotInitialized;
 };
-
-
-*/
