@@ -14,6 +14,7 @@ public:
 	void Render() override;
 	virtual void OnFocus() override;
 	virtual void OnLostFocus() override;
+	virtual void OnMouseDown() override;
 
 protected:
 	Text* value;

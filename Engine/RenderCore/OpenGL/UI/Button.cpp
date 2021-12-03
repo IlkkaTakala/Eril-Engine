@@ -100,21 +100,25 @@ Button* Button::SetStyle(const UIStyle& s)
 void Button::OnEnter()
 {
 	state = ButtonState::Hovered;
+	Image::OnEnter();
 }
 
 void Button::OnLeave()
 {
 	state = ButtonState::Neutral;
+	Image::OnLeave();
 }
 
 void Button::OnMouseDown()
 {
 	state = ButtonState::Pressed;
+	Image::OnMouseDown();
 }
 
 void Button::OnMouseUp()
 {
 	state = ButtonState::Hovered;
+	Image::OnMouseUp();
 }
 
 void Button::Render()

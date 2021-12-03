@@ -16,7 +16,10 @@ void TestUI::Construct()
 			Create<Button>()->SetStyle(UIStyle(Vector(1.f)))->SetHoverStyle(UIStyle(Vector(0.8f)))->SetPressStyle(UIStyle(Vector(0.5f)))
 			->AddChild(
 				Create<Text>()->SetText("Button", 30)->SetStyle(UIStyle(Vector(0.f, 0.f, 0.f), 1.0f, nullptr))
-			)
+			)->SetEventCallback(Constants::UI::UI_ON_MOUSE_DOWN,
+				[]() {
+					Console::Log("Clicked a button!");
+				})
 			->SetTransform(0, 110, 300, 30)
 		)->AddChild(
 			Create<TextBox>()->SetTransform(0, 110, 400, 50)
