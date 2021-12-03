@@ -11,6 +11,7 @@ class SSAOBuffer;
 class ShadowMapBuffer;
 class ReflectionBuffer;
 //struct LightData; //Lights have been moved to be handled by the ECS-system.
+class LightComponent;
 class UISpace;
 
 struct GLFWwindow;
@@ -105,6 +106,8 @@ private:
 	uint WorkGroupsY;
 
 	bool fpsCounter;
+
+	std::vector<LightComponent>* Lights;
 };
 
 class GLMesh : public IMesh

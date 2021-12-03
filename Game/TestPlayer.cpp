@@ -195,11 +195,11 @@ void TestPlayer::BeginPlay()
 		DirLight->Location = Vector(0.f, 0.f, 1.f);
 		DirLight->LightType = LIGHT_DIRECTIONAL;
 		DirLight->Size = 3.f;
-		DirLight->Intensity = 5.f;
+		DirLight->Intensity = 1.f;
 		DirLight->Color = Vector(1.f);
 		DirLight->Rotation = Vector(0.5, 0.5, -0.5); 
 
-		for (int i = 0; i < 1000; i++)
+		for (int i = 0; i < 10; i++)
 		{
 			//Console::Log("Light addded " + std::to_string(i));
 			float x = rand() % 100;

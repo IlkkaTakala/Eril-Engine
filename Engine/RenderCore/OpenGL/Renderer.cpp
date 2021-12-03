@@ -365,6 +365,10 @@ int Renderer::SetupWindow(int width, int height)
 	UIHolder = new UISpace();
 	UIHolder->SetSize(width, height);
 	UIHolder->SetScreen(Window);
+
+
+	Lights = static_cast<IComponentArrayQuerySystem<LightComponent>*>(IECS::GetSystemsManager()->GetSystemByName("LightControllerSystem"))->GetComponentVector("LightComponent");
+
 	return 0;
 }
 
@@ -421,17 +425,15 @@ void Renderer::RemoveLight(const LightData* light)
 
 void Renderer::UpdateLights()
 {
-	std::vector<LightComponent>*  lights = static_cast<IComponentArrayQuerySystem<LightComponent>*>(IECS::GetSystemsManager()->GetSystemByName("LightControllerSystem"))->GetComponentVector("LightComponent");
-
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, LightBuffer);
 	GLM_Light* mapped = reinterpret_cast<GLM_Light*>(glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, MaxLightCount * sizeof(GLM_Light), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
-	for (int i = 0; i < lights->size(); i++) {
+	for (int i = 0; i < Lights->size(); i++) {
 		GLM_Light light;
-		light.locationAndSize = glm::vec4(lights->at(i).Location.X, lights->at(i).Location.Z, lights->at(i).Location.Y, lights->at(i).Size);
-		glm::mat4 rot = glm::mat4(1.0) * glm::toMat4(glm::quat(glm::vec3(glm::radians(lights->at(i).Rotation.X), glm::radians(lights->at(i).Rotation.Y), glm::radians(lights->at(i).Rotation.Z))));
+		light.locationAndSize = glm::vec4(Lights->at(i).Location.X, Lights->at(i).Location.Z, Lights->at(i).Location.Y, Lights->at(i).Size);
+		glm::mat4 rot = glm::mat4(1.0) * glm::toMat4(glm::quat(glm::vec3(glm::radians(Lights->at(i).Rotation.X), glm::radians(Lights->at(i).Rotation.Y), glm::radians(Lights->at(i).Rotation.Z))));
 		light.rotation = rot * glm::vec4(0.0, -1.0, 0.0, 0.0);
-		light.color = glm::vec4(lights->at(i).Color.X, lights->at(i).Color.Y, lights->at(i).Color.Z, 1.0) * lights->at(i).Intensity;
-		light.type.x = lights->at(i).LightType;
+		light.color = glm::vec4(Lights->at(i).Color.X, Lights->at(i).Color.Y, Lights->at(i).Color.Z, 1.0) * Lights->at(i).Intensity;
+		light.type.x = Lights->at(i).LightType;
 		mapped[i] = light;
 	}
 	int result = glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
@@ -859,10 +861,7 @@ void Renderer::Shadows(int width, int height)
 	glDepthFunc(GL_LESS);
 	ShadowColorShader->Bind();
 
-	std::vector<LightComponent>* lights = static_cast<IComponentArrayQuerySystem<LightComponent>*>(IECS::GetSystemsManager()->GetSystemByName("LightControllerSystem"))->GetComponentVector("LightComponent");
-
-
-	for (const LightComponent &l : *lights) {
+	for (const LightComponent &l : *Lights) {
 		if (l.LightType != 0) continue;
 		glm::vec3 loc = glm::vec3(ActiveCamera->GetLocation().X, ActiveCamera->GetLocation().Z, ActiveCamera->GetLocation().Y);
 		glm::vec3 dir = glm::toMat4(glm::quat(glm::vec3(glm::radians(l.Rotation.X), glm::radians(l.Rotation.Y), glm::radians(l.Rotation.Z)))) * glm::vec4(0.0, -1.0, 0.0, 0.0);
@@ -1158,15 +1157,12 @@ void Renderer::Render(float delta)
 
 	UpdateTransforms();
 
-	std::vector<LightComponent>* lights = static_cast<IComponentArrayQuerySystem<LightComponent>*>(IECS::GetSystemsManager()->GetSystemByName("LightControllerSystem"))->GetComponentVector("LightComponent");
-
-
 	GlobalVariables.Projection = ActiveCamera->GetProjectionMatrix();
 	GlobalVariables.View = glm::inverse(ActiveCamera->GetViewMatrix());
 	const Vector& loc = ActiveCamera->GetLocation();
 	GlobalVariables.ViewPoint = glm::vec4(loc.X, loc.Z, loc.Y, 1.f);
 	GlobalVariables.ScreenSize = glm::ivec2(width, height);
-	GlobalVariables.SceneLightCount = (int)lights->size();
+	GlobalVariables.SceneLightCount = (int)Lights->size();
 
 	glBindBuffer(GL_UNIFORM_BUFFER, GlobalUniforms);
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Globals), &GlobalVariables);
@@ -1174,7 +1170,7 @@ void Renderer::Render(float delta)
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, GlobalUniforms);
 
 
-	if (lights->size() != 0) UpdateLights();
+	if (Lights->size() != 0) UpdateLights();
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, LightBuffer);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, VisibleLightIndicesBuffer);
 
