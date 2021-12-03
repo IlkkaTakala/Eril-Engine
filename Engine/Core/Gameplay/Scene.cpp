@@ -51,6 +51,7 @@ void LoopSceneChildren(const Ref<SceneComponent>& base)
 
 void Scene::OpenLevel(String map)
 {
+	if (Loop->World != nullptr) ObjectManager::CleanObjects();
 	using namespace rapidxml;
 	Loop->World = SpawnObject<Scene>();
 
@@ -72,6 +73,14 @@ void Scene::OpenLevel(String map)
 		LoopSceneChildren(base);
 	}
 	
+}
+
+void Scene::OnDestroyed()
+{
+	for (const auto& c : SceneGraph) {
+		c->DestroyObject();
+	}
+	Loop->World = nullptr;
 }
 
 void Scene::AddSceneRoot(SceneComponent* obj)

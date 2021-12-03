@@ -61,7 +61,7 @@ public:
 	
 	Ref(const Ref& old) { 
 		this->bWeak = old.bWeak;
-		ObjectManager::AddRef(old->GetRecord(), this);
+		if (old != nullptr) ObjectManager::AddRef(old->GetRecord(), this);
 		//if (this->DataPtr != nullptr && this->DataPtr == this->Pointer) ObjectManager::RemoveRef(this->GetRecord(), this);
 		this->Pointer = old.Pointer;
 		this->DataPtr = old.DataPtr;
@@ -69,7 +69,7 @@ public:
 
 	Ref& operator=(const Ref& old) {
 		this->bWeak = old.bWeak;
-		ObjectManager::AddRef(old->GetRecord(), this);
+		if (old != nullptr) ObjectManager::AddRef(old->GetRecord(), this);
 		if (this->DataPtr != nullptr && this->DataPtr == this->Pointer) ObjectManager::RemoveRef(this->GetRecord(), this);
 		this->Pointer = old.Pointer;
 		this->DataPtr = old.DataPtr;
@@ -94,7 +94,7 @@ public:
 
 	RefWeak(const RefWeak& old) {
 		this->bWeak = old.bWeak;
-		ObjectManager::AddRef(old->GetRecord(), this);
+		if (old != nullptr) ObjectManager::AddRef(old->GetRecord(), this);
 		//if (this->DataPtr != nullptr) ObjectManager::RemoveRef(this->GetRecord(), this);
 		this->Pointer = old.Pointer;
 		this->DataPtr = old.DataPtr;
@@ -102,7 +102,7 @@ public:
 
 	RefWeak& operator=(const RefWeak& old) {
 		this->bWeak = old.bWeak;
-		ObjectManager::AddRef(old->GetRecord(), this);
+		if (old != nullptr) ObjectManager::AddRef(old->GetRecord(), this);
 		if (this->DataPtr != nullptr) ObjectManager::RemoveRef(this->GetRecord(), this);
 		this->Pointer = old.Pointer;
 		this->DataPtr = old.DataPtr;

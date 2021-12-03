@@ -12,6 +12,7 @@ public:
 
 	static void OpenLevel(String map);
 
+	void OnDestroyed() override;
 	void AddSceneRoot(SceneComponent*);
 	void RemoveSceneRoot(SceneComponent*);
 

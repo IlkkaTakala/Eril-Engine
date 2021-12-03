@@ -9,6 +9,7 @@
 #include "ECSTesting.h"
 #include "TestUI.h"
 #include <Interface/WindowManager.h>
+#include <GamePlay/Scene.h>
 
 void TestPlayer::OpenConsole(bool) {
 	Console::Create();
@@ -220,7 +221,7 @@ void TestPlayer::RunInputShift(bool KeyDown)
 
 void TestPlayer::LeftMouseDown(bool)
 {
-
+	Scene::OpenLevel("Assets/Maps/test2");
 }
 
 void TestPlayer::RightMouseDown(bool KeyDown)
