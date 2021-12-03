@@ -45,7 +45,7 @@ void GC::CleanRunner()
 		}
 		for (RecordInt d : removal) {
 			ObjectManager::ThreadSafeDelete(d);
-			Console::Log("Removed record: " + d.ToString() + ". No active references");
+			Console::Log("Record " + d.ToString() + " is pending destroy");
 		}
 
 		duration = std::chrono::steady_clock::now() - start;

@@ -7,15 +7,16 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 #include "ECS/SystemsManager.h"
 #include "Components/PositionComponent.h"
 
-class MovementSystem : public System
+class MovementSystem : public IEntityQuerySystem
 {
 public:
-	MovementSystem(EntityManager& entityManager) : System(entityManager) 
+	MovementSystem(EntityManager* entityManager) : IEntityQuerySystem(entityManager)
 	{
 		Console::Log("MovementSystem Constructor");
 	}
 
-	void Update(float deltaTime, std::vector<int> entities)
+
+	void EntityQueryUpdate(float deltaTime, std::vector<int> entities)
 	{
 		if (!Done)
 		{
@@ -25,7 +26,7 @@ public:
 		for (auto e : entities)
 		{
 			//Console::Log("Processing entity " + std::to_string(WorldEntityManager.GetEntity(e)->GetID()));
-			PositionComponent* pos = WorldEntityManager.GetComponentFromEntity<PositionComponent>(WorldEntityManager.GetEntity(e)->GetID(), "PositionComponent");
+			PositionComponent* pos = WorldEntityManager->GetComponentFromEntity<PositionComponent>(WorldEntityManager->GetEntity(e)->GetID(), "PositionComponent");
 			if (pos != nullptr)
 			{
 				pos->X += 10.0f * deltaTime;

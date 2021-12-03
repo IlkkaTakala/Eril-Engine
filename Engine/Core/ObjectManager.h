@@ -9,13 +9,14 @@ typedef BaseObject* (*SpawnFunction)(const String&, uint32, uint, bool, uint16);
 
 struct Record
 {
-	Record(Data* o) : object(o), protection(0), checkCount(0) {}
-	Record(Data* o, short p) : object(o), protection(p), checkCount(0) {}
+	Record(Data* o) : object(o), protection(0), checkCount(0), pendingDestroy(false) {}
+	Record(Data* o, short p) : object(o), protection(p), checkCount(0), pendingDestroy(false) {}
 	~Record();
 	std::list<const RefHold*> pointerRefs;
 	std::list<const RefHold*> weakRefs;
 	short protection;
 	short checkCount;
+	bool pendingDestroy;
 	Data* object;
 };
 
@@ -23,8 +24,12 @@ class ObjectManager
 {
 public:
 	template <class T>
-	static T* GetByRecord(RecordInt record) {
-		return dynamic_cast<T*>(ObjectRecords.find(record)->second->object);
+	static T* GetByRecord(const RecordInt record) {
+		auto a = ObjectRecords.find(record);
+		if (a != ObjectRecords.end())
+			return dynamic_cast<T*>(a->second->object);
+		else 
+			return nullptr;
 	}
 
 	static void AddRef(const RecordInt record, const RefHold* obj);
