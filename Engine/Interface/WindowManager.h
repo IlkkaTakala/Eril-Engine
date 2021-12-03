@@ -1,16 +1,32 @@
 #pragma once
+#include <BasicTypes.h>
 
-class WindowImplementation;
+typedef void (*CallbackKey)(int, int, int, int);
 
-class WindowManager
+namespace WindowManager
 {
-public:
-	static void AddWindow();
+	void AddWindow();
 
-	static void SetInstance(void* instance);
-	static void* GetInstance();
+	void SetInstance(void* instance);
+	void* GetInstance();
 
-private:
-	static WindowImplementation* Impl;
+	uint CreateMainWindow(int width, int height);
+	void UpdateWindow(uint window);
+	void CloseWindow(uint window);
+	void Terminate();
+	void* GetHandle(uint window);
+
+	Vector2D GetWindowSize(uint window);
+	void SetWindowTitle(uint window, String title);
+
+	float GetWindowTime();
+	bool GetShouldWindowClose(uint window);
+
+	void PollEvents();
+
+	void GetCursorPosition(uint window, float& x, float& y);
+
+	void SetShowCursor(uint window, bool show);
+	bool GetShowCursor(uint window);
 };
 

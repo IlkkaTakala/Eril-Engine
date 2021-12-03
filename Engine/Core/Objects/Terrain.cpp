@@ -207,36 +207,33 @@ Terrain::Terrain()
 	resolution = 0;
 	noise_scale = 0.010f;
 	amplitude = 10.0f;
-
 	Mesh = SpawnObject<VisibleObject>();
+	AddComponent(Mesh);
 }
 
 void Terrain::LoadWithParameters(const String& args)
 {
-	BaseObject::LoadWithParameters(args);
+	SceneComponent::LoadWithParameters(args);
 	auto data = ParseOptions(args);
 
 	auto res = data.find("Resolution");
 	auto sca = data.find("Scale");
-	auto loc = data.find("Location");
 	auto mat = data.find("Material");
 	int Resolution = 100;
 	Vector Scale = Vector(1.f);
-	Vector Location = Vector();
 	String Material = "Assets/Materials/ground";
 	if (res != data.end()) Resolution = atoi(res->second.c_str());
 	if (sca != data.end()) Scale = Vector(sca->second);
-	if (loc != data.end()) Location = Vector(loc->second);
 	if (mat != data.end()) Material = mat->second;
 
-	InitTerrain(Resolution, Scale, Location, Material);
+	InitTerrain(Resolution, Scale, Material);
 }
 
-void Terrain::InitTerrain(int r, Vector scale, Vector location, String material)
+void Terrain::InitTerrain(int r, Vector scale, String material)
 {
 	resolution = r;
-	Scale = scale / r;
-	Mesh->SetLocation(location);
+	Scale = Vector(1.f);
+	Vector tScale = scale / r;
 
 	std::vector<Vector> pos;
 	std::vector<Vector> uvs;
@@ -245,29 +242,23 @@ void Terrain::InitTerrain(int r, Vector scale, Vector location, String material)
 	std::vector<uint32> inds;
 
 	pos.reserve(r * r);
+	normals.reserve(r * r);
+	tangents.reserve(r * r);
 
 	Vector offset = scale / 2;
 	offset.Z = 0.f;
 
 	for (int32 y = 0; y < r + 1; y++) {
 		for (int32 x = 0; x < r + 1; x++) {
-			pos.emplace_back(Vector(Scale.X * x, Scale.Y * y, GetHeight(Scale.X * x + location.X, Scale.Y * y + location.Y)));
+			pos.emplace_back(Vector(tScale.X * x, tScale.Y * y, GetHeight(tScale.X * x + Location.X, tScale.Y * y + Location.Y)));
 			uvs.emplace_back(Vector((x - 1) / (float)r, (y - 1) / (float)r, 0.f) * 10.f);
-			Vector normal = GetNormal(Scale.X * x + location.X, Scale.Y * y + location.Y);
-			normals.emplace_back(normal);
-			Vector tangent;
-			Vector t1 = Vector::Cross(normal, Vector(1.f, 0.f, 0.f));
-			Vector t2 = Vector::Cross(normal, Vector(0.f, 1.f, 0.f));
-			if (t1.Length() > t2.Length())
-			{
-				tangent = t1;
-			}
-			else
-			{
-				tangent = t2;
-			}
 
+			Vector normal = GetNormal(tScale.X * x + Location.X, tScale.Y * y + Location.Y);
+			normals.emplace_back(normal);
+
+			Vector tangent = GetTangent(Scale.X * x + Location.X, Scale.Y * y + Location.Y, normal);
 			tangents.emplace_back(tangent);
+
 			if (y < r && x < r) {
 				inds.emplace_back(y * (r + 1) + x);
 				inds.emplace_back((y + 1) * (r + 1) + x);
@@ -297,11 +288,26 @@ float Terrain::GetHeight(float x, float y)
 
 Vector Terrain::GetNormal(float x, float y)
 {
-	Vector first(x - 0.1f, y - 0.1f, 0.f);
-	Vector second(x + 0.1f, y + 0.1f, 0.f);
+	float res = 0.1f;
+	Vector l(x - res, y, GetHeight(x - res, y));
+	Vector r(x + res, y, GetHeight(x + res, y));
+	Vector u(x, y + res, GetHeight(x, y + res));
+	Vector d(x, y - res, GetHeight(x, y - res));
 
-	Vector x_dir(0.2f, 0.f, GetHeight(second.X, y) - GetHeight(first.X, y));
-	Vector y_dir(0.f, 0.2f, GetHeight(x, second.Y) - GetHeight(x, first.Y));
+	Vector firstDir = r - l;
+	Vector secondDir = u - d;
+	return Vector::Cross(firstDir.Normalize(), secondDir.Normalize());
+}
 
-	return Vector::Cross(x_dir.Normalize(), y_dir.Normalize());
+Vector Terrain::GetTangent(float x, float y, Vector normal)
+{
+	float res = 0.1f;
+	Vector u(x, y + res, GetHeight(x, y + res));
+	Vector d(x, y - res, GetHeight(x, y - res));
+
+	Vector secondDir = u - d;
+
+	Vector curPos = (x, y, GetHeight(x, y));
+
+	return secondDir.Normalize();
 }

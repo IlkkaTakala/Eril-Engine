@@ -573,12 +573,12 @@ private:
 					if (!logQueue.empty())
 					{
 						std::unique_lock<std::mutex> logLock(logsMutex);
-						//while (!logQueue.empty()) {
+						for (int i = logQueue.size(); i > 0; i--) {
 							logs.push_back(logQueue.front());
 							logQueue.pop();
 							if (logs.size() > max_line_count) logs.pop_front();
 							count++;
-						//}
+						}
 					}
 					pDemoApp->ScrollDown(count);
 					RedrawWindow(m_hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);

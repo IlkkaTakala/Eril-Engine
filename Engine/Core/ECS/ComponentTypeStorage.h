@@ -122,6 +122,15 @@ public:
 		}
 		return false;
 	}
+
+	/// <summary>
+	/// Returns a pointer to the component container
+	/// </summary>
+	/// <returns>Component vector</returns>
+	std::vector<T, std::allocator<T>>* GetComponentVector()
+	{
+		return Components;
+	}
 	
 private:
 	std::vector<T, std::allocator<T>>* Components;

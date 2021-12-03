@@ -141,6 +141,36 @@ public:
 		}
 		return false;
 	}
+
+	/// <summary>
+	/// Removes a component from an Entity. Returns false if something goes wrong.
+	/// </summary>
+	/// <typeparam name="T">Component type</typeparam>
+	/// <param name="entityID">ID of the entity</param>
+	/// <param name="componentTypeName">Component's type as string</param>
+	/// <returns>True if removing was successful</returns>
+	template <typename T>
+	bool RemoveComponentFromEntity(int entityID, String componentTypeName, int componentID)
+	{
+		int typeID = WorldComponentManager->GetTypeIdByName(componentTypeName);
+		Entity* entity = GetEntity(entityID);
+		if (entity != nullptr)
+		{
+			for (auto& c : entity->GetComponents())
+			{
+				if (c.first == componentID && c.second == typeID)
+				{
+					if (WorldComponentManager->RemoveComponent<T>(componentID, typeID))
+					{
+						//Console::Log("Removed Component of type" + std::to_string(typeID) + " from Entity " + std::to_string(entity->GetID()));
+						entity->GetComponents().erase(c.first);
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
 	
 private:
 

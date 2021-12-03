@@ -1,7 +1,7 @@
 #include "Texture.h"
 #include <glad/gl.h>
 
-Texture::Texture(int width, int height, int nrChannels, const float* data, int type)
+Texture::Texture(int width, int height, int nrChannels, const uint8* data, int type)
 {
 	ID = 0;
 	Type = type;
@@ -10,13 +10,13 @@ Texture::Texture(int width, int height, int nrChannels, const float* data, int t
 	switch (nrChannels)
 	{
 	case 1:
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_FLOAT, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, data);
 		break;
 	case 3:
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGB, GL_FLOAT, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 		break;
 	case 4:
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_FLOAT, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		break;
 	default:
 		break;
@@ -58,6 +58,37 @@ Texture::Texture(int width, int height, int nrChannels, const float* data, int t
 	default:
 		break;
 	}
+}
+
+Texture::Texture(int width, int height, int nrChannels, const float* data)
+{
+	ID = 0;
+	Type = 0;
+	glGenTextures(1, &ID);
+	glBindTexture(GL_TEXTURE_2D, ID);
+	switch (nrChannels)
+	{
+	case 1:
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_FLOAT, data);
+		break;
+	case 3:
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGB, GL_FLOAT, data);
+		break;
+	case 4:
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, data);
+		break;
+	default:
+		break;
+	}
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	GLfloat value, max_anisotropy = 16.0f;
+	glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &value);
+
+	value = (value > max_anisotropy) ? max_anisotropy : value;
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, value);
 }
 
 Texture::Texture(int width, int height, bool isDepthTexture)

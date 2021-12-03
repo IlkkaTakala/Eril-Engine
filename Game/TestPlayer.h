@@ -11,7 +11,7 @@ class Terrain;
 class Hunter;
 
 //ECS TEST
-class ECSTesting;
+class ECSExample;
 
 class TestPlayer : public Player
 {
@@ -24,21 +24,24 @@ private:
 	float mouseSens;
 	float Speed;
 
+	void RunInputQ(float delta, bool KeyDown);
+	void RunInputZ(float delta, bool KeyDown);
 	void RunInputW(float delta, bool KeyDown);
 	void RunInputA(float delta, bool KeyDown);
 	void RunInputD(float delta, bool KeyDown);
 	void RunInputS(float delta, bool KeyDown);
-	void RunInputSpace(float delta, bool KeyDown);
-	void InputOne(float delta, bool KeyDown);
-	void InputTwo(float delta, bool KeyDown);
-	void RunInputShift(float delta, bool KeyDown);
-	void LeftMouseDown(float delta, bool KeyDown);
-	void RightMouseDown(float delta, bool KeyDown);
+	void RunInputSpace(bool KeyDown);
+	void InputOne(bool KeyDown);
+	void InputTwo(bool KeyDown);
+	void RunInputShift(bool KeyDown);
+	void LeftMouseDown(bool KeyDown);
+	void RightMouseDown(bool KeyDown);
 	void MouseMoved(float X, float Y);
 
-	void InputExit(float delta, bool) { Exit(); }
+	void InputExit(bool) { Exit(); }
 
-	void OpenConsole(float, bool);
+	void OpenConsole(bool);
+	void UseCursor(bool);
 
 	Ref<MovementComponent> Movement;
 	Ref<VisibleObject> Mesh;
@@ -56,7 +59,7 @@ private:
 
 
 	//ECS TEST
-	Ref<ECSTesting> ecsTest;
+	Ref<ECSExample> ecsExample;
 
 	int spawnCounter;
 };

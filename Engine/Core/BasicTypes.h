@@ -49,9 +49,9 @@ struct RecordInt {
 		record = 0;
 	}
 
-	String ToString() {
+	String ToString() const {
 		char hex_string[24];
-		sprintf_s(hex_string, "0x%llX", record);
+		sprintf_s(hex_string, "0x%015llX", record);
 		return hex_string;
 	}
 
@@ -291,6 +291,7 @@ struct Vector2D
 	Vector2D() { X = 0, Y = 0; }
 	Vector2D(long X, long Y) : X(X), Y(Y) {};
 	Vector2D(uint X, uint Y) : X(X), Y(Y) {};
+	Vector2D(int X, int Y) : X(X), Y(Y) {};
 	Vector2D(float X, float Y) : X(long(X)), Y(long(Y)) {};
 
 	Vector2D operator+(const Vector2D& obj) { return Vector2D(X + obj.X, Y + obj.Y); }

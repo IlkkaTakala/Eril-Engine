@@ -51,6 +51,20 @@ public:
 		typeCount++;
 	}
 
+	template <typename T>
+	std::vector<T>* GetComponentVector(int typeID)
+	{
+		for (int i = 0; i < componentStorages.size(); i++)
+		{
+			if (componentStorages.at(i)->GetType() == typeID)
+			{
+				ComponentTypeStorage<T>* s = static_cast<ComponentTypeStorage<T>*>(componentStorages.at(i));
+				return s->GetComponentVector();
+			}
+		}
+		return nullptr;
+	}
+
 protected:
 
 	/// <summary>
@@ -119,6 +133,8 @@ protected:
 		}
 		return false;
 	}
+
+	
 
 private:
 	//Storage varables.
