@@ -99,10 +99,11 @@ UISpace::~UISpace()
 		glDeleteTextures(1, &Color);
 		glDeleteFramebuffers(1, &UIBuffer);
 	}
-
+	
 	for (const auto& t : TopLevel) {
-		delete t;
+		t->DestroyObject();
 	}
+	TopLevel.clear();
 }
 
 void UISpace::SetSize(uint width, uint height)
@@ -198,6 +199,11 @@ void UISpace::AddComponent(UI* com)
 	TopLevel.push_back(com);
 }
 
+void UISpace::RemoveComponent(UI* com)
+{
+	TopLevel.remove(com);
+}
+
 void UISpace::LeftClick(bool down)
 {
 	if (Hovered)
@@ -217,11 +223,7 @@ void UISpace::LeftClick(bool down)
 	}
 	else
 	{
-<<<<<<< HEAD
-		if (Focused != nullptr) Focused->OnLostFocus();
-=======
 		if (Focused) Focused->OnLostFocus();
->>>>>>> origin/master
 		Focused = nullptr;
 	}
 }
