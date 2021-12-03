@@ -1,4 +1,4 @@
 [Shader]
 name=shader_002
 [Textures]
-Albedo=Assets/Textures/grass/candy_cane.png
+Albedo=Assets/Textures/candy_cane.png

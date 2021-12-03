@@ -1,1 +1,6 @@
 <header version='1.0' />
+<Terrain id="A0001111" args="Scale:1000,1000,1; Location:-50,-50,0; Material:Assets/Materials/ground; Resolution:100" />
+<InstancedObject id="A0001112" args="Randomize:100;   Mesh:tree; Material:0Assets/Materials/tree"  />
+<InstancedObject id="A0001113" args="Randomize:20; Mesh:rock; Material:0Assets/Materials/rock" />
+<InstancedObject id="A0001114" args="Randomize:10; Mesh:shack; Material:1Assets/Materials/shack" />
+<InstancedObject id="A0001115" args="Randomize:50; InRotation:90,180,0; InScale:0.2,0.2,0.2; Mesh:candyCane; Material:0Assets/Materials/candy" />
