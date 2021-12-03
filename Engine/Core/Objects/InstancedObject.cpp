@@ -1,5 +1,6 @@
 #include "InstancedObject.h"
 #include "Terrain.h"
+#include "Mesh.h"
 
 InstancedObject::InstancedObject() : VisibleObject()
 {

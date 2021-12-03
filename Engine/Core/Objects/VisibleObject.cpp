@@ -1,5 +1,6 @@
 #include "VisibleObject.h"
 #include "Physics.h"
+#include "Mesh.h"
 
 VisibleObject::VisibleObject() : SceneComponent()
 {
