@@ -131,7 +131,7 @@
       <Filter>Game</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Interface\FileManager.cpp" />
-    <ClCompile Include="Audio.cpp">
+    <ClCompile Include="Engine\Core\Audio\Audio.cpp">
       <Filter>Engine\Audio</Filter>
     </ClCompile>
   </ItemGroup>
@@ -334,7 +334,7 @@
       <Filter>Engine\OpenGL\UI</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Interface\FileManager.h" />
-    <ClInclude Include="Audio.h">
+    <ClInclude Include="Engine\Core\Audio\Audio.h">
       <Filter>Engine\Audio</Filter>
     </ClInclude>
   </ItemGroup>

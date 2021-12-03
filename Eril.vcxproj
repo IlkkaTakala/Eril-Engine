@@ -71,7 +71,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>Game;Engine\external\assimp\include;Engine\external\RapidXML;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>A:\Delion\Git\tiimi2\Engine\external\openal-soft\include;Game;Engine\external\assimp\include;Engine\external\RapidXML;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -115,7 +115,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>Game;Engine\external\assimp\include;Engine\external\RapidXML;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>A:\Delion\Git\tiimi2\Engine\external\openal-soft\include;Game;Engine\external\assimp\include;Engine\external\RapidXML;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ExceptionHandling>Sync</ExceptionHandling>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -159,7 +159,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>Game;Engine\external\assimp\include;Engine\external\RapidXML;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>A:\Delion\Git\tiimi2\Engine\external\openal-soft\include;Game;Engine\external\assimp\include;Engine\external\RapidXML;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -201,7 +201,7 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Audio.cpp" />
+    <ClCompile Include="Engine\Core\Audio\Audio.cpp" />
     <ClCompile Include="Engine\Core\BasicTypes.cpp" />
     <ClCompile Include="Engine\Core\Core.cpp" />
     <ClCompile Include="Engine\Core\ECS\EntityManager.cpp" />
@@ -246,7 +246,7 @@
     <ClCompile Include="Game\Hunter.cpp" />
     <ClCompile Include="Game\TestPlayer.cpp" />
     <ClCompile Include="Game\TestUI.cpp" />
-    <ClInclude Include="Audio.h" />
+    <ClInclude Include="Engine\Core\Audio\Audio.h" />
     <ClInclude Include="Engine\Core\BasicTypes.h" />
     <ClInclude Include="Engine\Core\Core.h" />
     <ClInclude Include="Engine\Core\ECS\Component.h" />

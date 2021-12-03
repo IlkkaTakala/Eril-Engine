@@ -11,7 +11,7 @@ char* audio::loadWAV(const char* filename, int& ochannels, int& osampleRate, int
 	in.read(tmpBuffer, 4);
 	if (strncmp(tmpBuffer, "RIFF", 4) != 0)
 	{
-		std::cout << "This is not a valid WAV file (1) " << tmpBuffer[0] << tmpBuffer[1] << tmpBuffer[2] << tmpBuffer[3] << tmpBuffer[4] << '\n';
+		Console::Warning("This is not a valid WAV file (1) ");
 		return 0;
 	}
 	in.read(tmpBuffer, 4);
@@ -19,27 +19,27 @@ char* audio::loadWAV(const char* filename, int& ochannels, int& osampleRate, int
 	in.read(tmpBuffer, 4);
 	if (strncmp(tmpBuffer, "WAVE", 4) != 0)
 	{
-		std::cout << "This is not a valid WAV file (2) " << tmpBuffer[0] << tmpBuffer[1] << tmpBuffer[2] << tmpBuffer[3] << tmpBuffer[4] << '\n';
+		Console::Warning("This is not a valid WAV file (2) ");
 		return 0;
 	}
 	in.read(tmpBuffer, 4);
 	if (strncmp(tmpBuffer, "fmt ", 4) != 0)
 	{
-		std::cout << "This is not a valid WAV file (3) " << tmpBuffer[0] << tmpBuffer[1] << tmpBuffer[2] << tmpBuffer[3] << tmpBuffer[4] << '\n';
+		Console::Warning("This is not a valid WAV file (3) ");
 		return 0;
 	}
 	in.read(tmpBuffer, 4);
 	int fmtSize = convertToInt(tmpBuffer, 4);
 	if (fmtSize != 16)
 	{
-		std::cout << "Sorry only PCM (not compressed WAV)" << fmtSize << '\n';
+		Console::Warning("Sorry only PCM (not compressed WAV)");
 		return 0;
 	}
 	in.read(tmpBuffer, 2);
 	int PCM = convertToInt(tmpBuffer, 2);
 	if (PCM != 1)
 	{
-		std::cout << "Sorry only PCM (not compressed WAV)\n";
+		Console::Warning("Sorry only PCM (not compressed WAV)");
 		return 0;
 	}
 	in.read(tmpBuffer, 2);
@@ -55,19 +55,18 @@ char* audio::loadWAV(const char* filename, int& ochannels, int& osampleRate, int
 	in.read(tmpBuffer, 4);
 	if (strncmp(tmpBuffer, "data", 4) != 0)
 	{
-		std::cout << "This is not a valid WAV file (4) " << tmpBuffer[0] << tmpBuffer[1] << tmpBuffer[2] << tmpBuffer[3] << '\n';
+		Console::Warning("This is not a valid WAV file (4) ");
 		//	return 0;
 	}
 	in.read(tmpBuffer, 4);
 	int dataSize = convertToInt(tmpBuffer, 4);
 	if (dataSize <= 0)
 	{
-		std::cout << "This is not a valid WAV file (4) " << dataSize << '\n';
+		Console::Warning("This is not a valid WAV file (4) ");
 		return 0;
 	}
 	char* data = new char[dataSize];
 	in.read(data, dataSize);
-	std::cout << sizeInBytes << ' ' << fmtSize << ' ' << channels << ' ' << samples << ' ' << byteRate << ' ' << blockAlign << ' ' << bitsPerSample << ' ' << dataSize << std::endl;
 	ochannels = channels;
 	osampleRate = bitsPerSample;
 	osamplesPerSecond = samples;
@@ -99,14 +98,14 @@ audio::audio()
 	device = alcOpenDevice(NULL);
 	if (device == NULL)
 	{
-		std::cout << "couldn't open device" << std::endl;
+		Console::Warning("couldn't open device");
 		context = NULL;
 		return;
 	}
 	context = alcCreateContext(device, NULL);
 	if (context == NULL)
 	{
-		std::cout << "couldn't open context" << std::endl;
+		Console::Warning("couldn't open context");
 		return;
 	}
 	alcMakeContextCurrent(context);
@@ -175,24 +174,24 @@ void audio::playAudio(unsigned int id)
 	alSourcePlay(id);
 }
 
-void audio::playAudio(unsigned int id, const vector3d& position)
+void audio::playAudio(unsigned int id, const Vector& position)
 {
-	alSource3f(id, AL_POSITION, position.x, position.y, position.z);
+	alSource3f(id, AL_POSITION, position.X, position.Y, position.Z);
 	alSourcePlay(id);
 
 }
 
-void audio::playAudio(unsigned int id, const vector3d& position, const vector3d& velocity)
+void audio::playAudio(unsigned int id, const Vector& position, const Vector& velocity)
 {
-	alSource3f(id, AL_POSITION, position.x, position.y, position.z);
-	alSource3f(id, AL_VELOCITY, velocity.x, velocity.y, velocity.z);
+	alSource3f(id, AL_POSITION, position.X, position.Y, position.Z);
+	alSource3f(id, AL_VELOCITY, velocity.X, velocity.Y, velocity.Z);
 	alSourcePlay(id);
 }
 
-void audio::playAudio(unsigned int id, const vector3d& position, const vector3d& velocity, float gain, bool loop)
+void audio::playAudio(unsigned int id, const Vector& position, const Vector& velocity, float gain, bool loop)
 {
-	alSource3f(id, AL_POSITION, position.x, position.y, position.z);
-	alSource3f(id, AL_VELOCITY, velocity.x, velocity.y, velocity.z);
+	alSource3f(id, AL_POSITION, position.X, position.Y, position.Z);
+	alSource3f(id, AL_VELOCITY, velocity.X, velocity.Y, velocity.Z);
 	alSourcef(id, AL_GAIN, gain);
 	alSourcePlay(id);
 }
@@ -202,10 +201,10 @@ void audio::stopAudio(unsigned int id)
 	alSourceStop(id); //this stops the audio when it should (i know, dont worry guys i got you)
 }
 
-void audio::setListener(const vector3d& position, const vector3d& orientation)
+void audio::setListener(const Vector& position, const Vector& orientation)
 {
-	alListener3f(AL_POSITION, position.x, position.y, position.z);
-	float f[] = { orientation.x,orientation.y,orientation.z,0,1,0 };
+	alListener3f(AL_POSITION, position.X, position.Y, position.Z);
+	float f[] = { orientation.X,orientation.Y,orientation.Z,0,1,0 };
 	alListenerfv(AL_ORIENTATION, f);
 }
 

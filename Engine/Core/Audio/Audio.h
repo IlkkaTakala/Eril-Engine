@@ -1,14 +1,12 @@
-#ifndef Audio.h
-#define Audio.h
+#pragma once
 
-#include <iostream>
 #include <AL/al.h>                     //AL libary wont load :)
 #include <AL/alc.h>
 #include <fstream>
 #include <cstring>
 #include <string>
 #include <vector>
-#include "vector3d.h"
+#include <Core.h>
 
 
 
@@ -34,13 +32,10 @@ public:
 	unsigned int loadAudio(const char* filename, float minGain = 0, float maxGain = 1.0);
 	void deleteAudio(unsigned int id);
 	void playAudio(unsigned int id);
-	void playAudio(unsigned int id, const vector3d& position);           //Vector3d for to get the position? 
-	void playAudio(unsigned int id, const vector3d& position, const vector3d& velocity);
-	void playAudio(unsigned int id, const vector3d& position, const vector3d& velocity, float gain, bool loop);
+	void playAudio(unsigned int id, const Vector& position);           //Vector for to get the position? 
+	void playAudio(unsigned int id, const Vector& position, const Vector& velocity);
+	void playAudio(unsigned int id, const Vector& position, const Vector& velocity, float gain, bool loop);
 	void stopAudio(unsigned int id);
-	void setListener(const vector3d& position, const vector3d& orientation); //Orientation meaning where are we looking
+	void setListener(const Vector& position, const Vector& orientation); //Orientation meaning where are we looking
 
 };
-
-#endif
-
