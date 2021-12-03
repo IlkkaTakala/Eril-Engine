@@ -1,10 +1,12 @@
 #include "Hunter.h"
 #include "Material.h"
+#include <Objects/Terrain.h>
 #include <Objects/MovementComponent.h>
 #include <Timer.h>
 #include <Gameplay/GameState.h>
 #include <Gameplay/PlayerController.h>
 #include <Objects/VisibleObject.h>
+
 
 Hunter::Hunter() : Actor()
 {
@@ -18,7 +20,7 @@ Hunter::Hunter() : Actor()
 	move = SpawnObject<MovementComponent>();
 	move->SetTarget(this);
 	move->SetGravity(true);
-	//move->SetGround(ObjectManager::GetByRecord<Terrain>(0xA0001111));
+	move->SetGround(ObjectManager::GetByRecord<Terrain>(0xA0001111));
 	move->SetMaxSpeed(1.f);
 	caught = false;
 

@@ -59,11 +59,11 @@ TestPlayer::TestPlayer() : Player()
 
 
 	//Player Model
-	Mesh = SpawnObject<VisibleObject>();
+	/*Mesh = SpawnObject<VisibleObject>();
 	Mesh->SetModel("Cube");
 	Mesh->GetModel()->SetAABB(AABB(Vector(-0.5f), Vector(0.5f)));
 
-	/*for (int y = 0; y < 2; y++) {
+	for (int y = 0; y < 2; y++) {
 		for (int x = 0; x < 2; x++) {
 			terra[y * 2 + x] = SpawnObject<Terrain>();
 			terra[y * 2 + x]->InitTerrain(100, Vector(100.f, 100.f, 1.f), Vector(-100.f * x, -100.f * y, 0.f));

@@ -1,4 +1,5 @@
 #include "Terrain.h"
+#include "Mesh.h"
 
 namespace Noise {
 	/* coherent noise function over 1, 2 or 3 dimensions */
