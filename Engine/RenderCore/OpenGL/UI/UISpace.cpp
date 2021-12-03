@@ -217,7 +217,11 @@ void UISpace::LeftClick(bool down)
 	}
 	else
 	{
+<<<<<<< HEAD
 		if (Focused != nullptr) Focused->OnLostFocus();
+=======
+		if (Focused) Focused->OnLostFocus();
+>>>>>>> origin/master
 		Focused = nullptr;
 	}
 }

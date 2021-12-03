@@ -8,7 +8,7 @@
 #include "Texture.h"
 #include "RenderBuffer.h"
 #include <Objects/VisibleObject.h>
-#include "LightData.h"
+//#include "LightData.h" //Lights have been moved to be handled by the ECS-system.
 #include "Settings.h"
 #include <filesystem>
 #include <stdexcept>
@@ -25,6 +25,10 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+
+#include <Interface/IECS.h>
+#include <Core/ECS/System.h>
+#include <Core/ECS/Components/LightComponent.h>
 
 struct Globals
 {
@@ -361,6 +365,10 @@ int Renderer::SetupWindow(int width, int height)
 	UIHolder = new UISpace();
 	UIHolder->SetSize(width, height);
 	UIHolder->SetScreen(Window);
+
+
+	Lights = static_cast<IComponentArrayQuerySystem<LightComponent>*>(IECS::GetSystemsManager()->GetSystemByName("LightControllerSystem"))->GetComponentVector("LightComponent");
+
 	return 0;
 }
 
@@ -394,6 +402,7 @@ void Renderer::SetActiveCamera(Camera* cam)
 	ActiveCamera = dynamic_cast<GLCamera*>(cam);
 }
 
+/* //Lights have been moved to be handled by the ECS-system.
 void Renderer::CreateLight(const LightData* light)
 {
 	Lights.push_back(light);
@@ -411,18 +420,20 @@ void Renderer::RemoveLight(const LightData* light)
 	}
 	LightCullingShader->SetUniform("lightCount", (int)Lights.size());
 }
+*/
+
 
 void Renderer::UpdateLights()
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, LightBuffer);
 	GLM_Light* mapped = reinterpret_cast<GLM_Light*>(glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, MaxLightCount * sizeof(GLM_Light), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
-	for (int i = 0; i < Lights.size(); i++) {
+	for (int i = 0; i < Lights->size(); i++) {
 		GLM_Light light;
-		light.locationAndSize = glm::vec4(Lights[i]->Location.X, Lights[i]->Location.Z, Lights[i]->Location.Y, Lights[i]->Size);
-		glm::mat4 rot = glm::mat4(1.0) * glm::toMat4(glm::quat(glm::vec3(glm::radians(Lights[i]->Rotation.X), glm::radians(Lights[i]->Rotation.Y), glm::radians(Lights[i]->Rotation.Z))));
+		light.locationAndSize = glm::vec4(Lights->at(i).Location.X, Lights->at(i).Location.Z, Lights->at(i).Location.Y, Lights->at(i).Size);
+		glm::mat4 rot = glm::mat4(1.0) * glm::toMat4(glm::quat(glm::vec3(glm::radians(Lights->at(i).Rotation.X), glm::radians(Lights->at(i).Rotation.Y), glm::radians(Lights->at(i).Rotation.Z))));
 		light.rotation = rot * glm::vec4(0.0, -1.0, 0.0, 0.0);
-		light.color = glm::vec4(Lights[i]->Color.X, Lights[i]->Color.Y, Lights[i]->Color.Z, 1.0) * Lights[i]->Intensity;
-		light.type.x = Lights[i]->Type;
+		light.color = glm::vec4(Lights->at(i).Color.X, Lights->at(i).Color.Y, Lights->at(i).Color.Z, 1.0) * Lights->at(i).Intensity;
+		light.type.x = Lights->at(i).LightType;
 		mapped[i] = light;
 	}
 	int result = glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
@@ -704,14 +715,25 @@ Texture* Renderer::LoadTextureByName(String name)
 		return LoadedTextures.find(name)->second;
 	}
 	else {
+		Texture* next = nullptr;
 		int width, height, nrChannels;
-		float* data = stbi_loadf(name.c_str(), &width, &height, &nrChannels, 0);
-		if (data == nullptr) return nullptr;
-		int type = 0;
-		if (name.rbegin()[4] == 'd' || name.rbegin()[5] == 'd') type = 0;
-		else if (name.rbegin()[4] == 'n' || name.rbegin()[5] == 'n') type = 1;
-		Texture* next = new Texture(width, height, nrChannels, data, type);
-		stbi_image_free(data);
+		if (stbi_is_hdr(name.c_str())) {
+			float* data = stbi_loadf(name.c_str(), &width, &height, &nrChannels, 0);
+			if (data == nullptr) return nullptr;
+			next = new Texture(width, height, nrChannels, data);
+			stbi_image_free(data);
+		}
+		else
+		{
+			uint8* data = stbi_load(name.c_str(), &width, &height, &nrChannels, 0);
+			if (data == nullptr) return nullptr;
+			int type = 0;
+			if (name.rbegin()[4] == 'd' || name.rbegin()[5] == 'd') type = 0;
+			else if (name.rbegin()[4] == 'n' || name.rbegin()[5] == 'n') type = 1;
+			next = new Texture(width, height, nrChannels, data, type);
+			stbi_image_free(data);
+		}
+		
 		LoadedTextures.emplace(name, next);
 		Console::Log("Texture loaded: " + name);
 		return next;
@@ -838,11 +860,12 @@ void Renderer::Shadows(int width, int height)
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glDepthFunc(GL_LESS);
 	ShadowColorShader->Bind();
-	for (const LightData* l : Lights) {
-		if (l->Type != 0) continue;
+
+	for (const LightComponent &l : *Lights) {
+		if (l.LightType != 0) continue;
 		glm::vec3 loc = glm::vec3(ActiveCamera->GetLocation().X, ActiveCamera->GetLocation().Z, ActiveCamera->GetLocation().Y);
-		glm::vec3 dir = glm::toMat4(glm::quat(glm::vec3(glm::radians(l->Rotation.X), glm::radians(l->Rotation.Y), glm::radians(l->Rotation.Z)))) * glm::vec4(0.0, -1.0, 0.0, 0.0);
-		glm::vec3 up = glm::toMat4(glm::quat(glm::vec3(glm::radians(l->Rotation.X), glm::radians(l->Rotation.Y), glm::radians(l->Rotation.Z)))) * glm::vec4(1.0, 0.0, 0.0, 0.0);
+		glm::vec3 dir = glm::toMat4(glm::quat(glm::vec3(glm::radians(l.Rotation.X), glm::radians(l.Rotation.Y), glm::radians(l.Rotation.Z)))) * glm::vec4(0.0, -1.0, 0.0, 0.0);
+		glm::vec3 up = glm::toMat4(glm::quat(glm::vec3(glm::radians(l.Rotation.X), glm::radians(l.Rotation.Y), glm::radians(l.Rotation.Z)))) * glm::vec4(1.0, 0.0, 0.0, 0.0);
 		glm::vec3 newLoc = loc + (-dir * 70.f);
 		glm::mat4 view = glm::lookAt(newLoc, newLoc + dir, up);
 
@@ -1098,6 +1121,8 @@ void Renderer::LightCulling(int width, int height)
 	LightCullingShader->Bind();
 
 	LightCullingShader->SetUniform("depthMap", 4);
+	int lightCount = static_cast<IComponentArrayQuerySystem<LightComponent>*>(IECS::GetSystemsManager()->GetSystemByName("LightControllerSystem"))->GetComponentVector("LightComponent")->size();
+	LightCullingShader->SetUniform("lightCount", lightCount);
 
 	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, LightBuffer);
 	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, VisibleLightIndicesBuffer);
@@ -1137,7 +1162,7 @@ void Renderer::Render(float delta)
 	const Vector& loc = ActiveCamera->GetLocation();
 	GlobalVariables.ViewPoint = glm::vec4(loc.X, loc.Z, loc.Y, 1.f);
 	GlobalVariables.ScreenSize = glm::ivec2(width, height);
-	GlobalVariables.SceneLightCount = (int)Lights.size();
+	GlobalVariables.SceneLightCount = (int)Lights->size();
 
 	glBindBuffer(GL_UNIFORM_BUFFER, GlobalUniforms);
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Globals), &GlobalVariables);
@@ -1145,7 +1170,7 @@ void Renderer::Render(float delta)
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, GlobalUniforms);
 
 
-	if (Lights.size() != 0) UpdateLights();
+	if (Lights->size() != 0) UpdateLights();
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, LightBuffer);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, VisibleLightIndicesBuffer);
 
@@ -1284,7 +1309,7 @@ void processMesh(LoadedMesh* meshHolder, aiMesh* mesh)
 	section->vertices = new Vertex[vertices.size() * sizeof(Vertex)];
 	memcpy(section->vertices, vertices.data(), vertices.size() * sizeof(Vertex));*/
 
-	//section->Instance = RI->LoadMaterialByName("Shaders/test");
+	section->Instance = RI->LoadMaterialByName("Assets/Materials/default");
 
 	meshHolder->HolderCount++;
 	meshHolder->Holders.push_back(section);

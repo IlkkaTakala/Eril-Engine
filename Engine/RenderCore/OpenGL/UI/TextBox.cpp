@@ -21,9 +21,16 @@ void TextBox::Render()
 void TextBox::OnFocus()
 {
 	II->SetTextMode(true);
+	Button::OnFocus();
 }
 
 void TextBox::OnLostFocus()
 {
 	II->SetTextMode(false);
+	Button::OnLostFocus();
+}
+
+void TextBox::OnMouseDown()
+{
+	Image::OnMouseDown();
 }

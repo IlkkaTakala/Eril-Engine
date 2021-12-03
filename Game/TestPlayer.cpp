@@ -1,15 +1,20 @@
 #include "Interface/IRender.h"
-#include "LightData.h"
 #include "TestPlayer.h"
 #include "Objects/MovementComponent.h"
 #include "Objects/Terrain.h"
 #include "Timer.h"
 #include "Objects/InstancedObject.h"
 #include "Hunter.h"
-#include "ECSTesting.h"
 #include "TestUI.h"
 #include <Interface/WindowManager.h>
 #include <GamePlay/Scene.h>
+
+//ECS
+#include <Interface/IECS.h>
+#include <ECS_Examples/ECSExample.h>
+#include <ECS/Components/LightComponent.h>
+#include <ECS/Systems/LightControllerSystem.h>
+
 
 void TestPlayer::OpenConsole(bool) {
 	Console::Create();
@@ -25,16 +30,18 @@ void TestPlayer::UseCursor(bool keydown)
 
 TestPlayer::TestPlayer() : Player()
 {
-	//ECS TEST
-	//ecsTest = SpawnObject<ECSTesting>();
+	//ECS Example
+	//ecsExample = SpawnObject<ECSExample>();
 
 	mouseSens = 0.5f;
 	Speed = 5.f;
 	InputMode = true;
 	spawnCounter = 0;
+
 	//GetCamera()->SetLocation(INI->GetValue("Player", "Start"));
 	//GetCamera()->SetRotation(INI->GetValue("Player", "Direction"));
 
+	//Reqister used Inputs
 	II->RegisterKeyContinuousInput(81, &TestPlayer::RunInputQ, this);
 	II->RegisterKeyContinuousInput(90, &TestPlayer::RunInputZ, this);
 	II->RegisterKeyContinuousInput(87, &TestPlayer::RunInputW, this);
@@ -51,114 +58,29 @@ TestPlayer::TestPlayer() : Player()
 	II->RegisterMouseInput(0, &TestPlayer::MouseMoved, this);
 	II->RegisterKeyInput(69, &TestPlayer::UseCursor, this);
 
+	//Player Model
 	Mesh = SpawnObject<VisibleObject>();
 	Mesh->SetModel("Cube");
 	Mesh->GetModel()->SetAABB(AABB(Vector(-0.5f), Vector(0.5f)));
 
-
+	//Player Movement
 	Movement = SpawnObject<MovementComponent>();
 	Movement->SetTarget(dynamic_cast<Actor*>(this));
 	Movement->SetGravity(true);
 
+	//Skybox
 	Sky = SpawnObject<VisibleObject>();
 	Sky->SetModel(MI->LoadData(Sky, "SkySphere"));
 	Sky->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/Sky"));
-	
-	/*
-	{
-		Trees = SpawnObject<InstancedObject>();
-		Trees->SetModel(MI->LoadData(Trees, "tree"));
-		Trees->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/tree"));
-		Trees->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Assets/Materials/leaves"));
-		Trees->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
+	Sky->SetScale(Sky->GetScale() * 2.0f);
 
-		int count = 100;
-		Transformation* arr = new Transformation[count]();
-		for (int i = 0; i < count; i++)
-		{
-			float x = rand() % 100 - 50.f;
-			float y = rand() % 100 - 50.f;
-			float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
-			arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y) - 0.2f);
-			arr[i].Scale = Vector(s);
-		}
-		Trees->AddInstances(count, arr);
-		
-		Trees2 = SpawnObject<InstancedObject>();
-		Trees2->SetModel(MI->LoadData(Trees2, "tree2"));
-		Trees2->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/tree"));
-		Trees2->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Assets/Materials/leaves2"));
-		Trees2->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
-
-		for (int i = 0; i < count; i++)
-		{
-			float x = rand() % 100 - 50.f;
-			float y = rand() % 100 - 50.f;
-			float s = (1.f - rand() / (float)RAND_MAX * 0.7f) * 1.5f;
-			arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y) - 0.2f);
-			arr[i].Scale = Vector(s);
-		}
-		Trees2->AddInstances(count, arr);
-		delete[] arr;
-
-		Grass = SpawnObject<InstancedObject>();
-		Grass->SetModel(MI->LoadData(Grass, "grass"));
-		Grass->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/grass"));
-		Grass->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
-
-		count = 1000;
-		arr = new Transformation[count]();
-
-		for (int i = 0; i < count; i++)
-		{
-			float x = rand() % 100 - 50.f;
-			float y = rand() % 100 - 50.f;
-			float s = (1.f - rand() / (float)RAND_MAX * 0.7f) * 1.5f;
-			Vector normal = terra[0]->GetNormal(x, y);
-			arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y)) - normal * 0.1;
-			arr[i].Scale = Vector(1.f);
-			Vector up(0.f, 0.f, 1.f);
-			Vector axis = Vector::Cross(normal, up).Normalize();
-			float angle = acos(Vector::Dot(up, normal));
-			arr[i].Rotation = Vector::toEuler(axis, angle) * 180.f / PI;
-		}
-		Grass->AddInstances(count, arr);
-		delete[] arr;
-
-		Flowers = SpawnObject<InstancedObject>();
-		Flowers->SetModel(MI->LoadData(Flowers, "flower"));
-		Flowers->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/flower"));
-		Flowers->GetModel()->SetAABB(AABB(Vector(-100.f), Vector(100.f)));
-
-		count = 1000;
-		arr = new Transformation[count]();
-		for (int i = 0; i < count; i++)
-		{
-			float x = rand() % 100 - 50.f;
-			float y = rand() % 100 - 50.f;
-			float s = (1.f - rand() / (float)RAND_MAX * 0.4f);
-			Vector normal = terra[0]->GetNormal(x, y);
-			arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y));
-			arr[i].Scale = Vector(s);
-			Vector up(0.f, 0.f, 1.f);
-			Vector axis = Vector::Cross(normal, up).Normalize();
-			float angle = acos(Vector::Dot(up, normal));
-			arr[i].Rotation = Vector::toEuler(axis, angle) * 180.f / PI;
-		}
-		Flowers->AddInstances(count, arr);
-
-		delete[] arr;
-	}
-	*/
-
-	//hunt = SpawnObject<Hunter>();
-	//hunt->SetLocation(Vector(100.f, 0.f, 0.f));
-	//hunt->move->SetGround(terra[0]);
-
+	//Testing UI
 	auto ui = SpawnObject<TestUI>();
 	UI::AddToScreen(ui, this);
 }
 
+
+//Handle Inputs
 void TestPlayer::RunInputQ(float delta, bool KeyDown)
 {
 	Vector dir(0.0,0.0,1.0);
@@ -245,17 +167,14 @@ void TestPlayer::Tick(float)
 void TimeFunction(float d) {
 }
 
+
+
+
 void TestPlayer::BeginPlay()
 {
-	/*DirLight = SpawnObject<Light>();
-	DirLight->Data.Location = Vector(0.f, 0.f, 1.f);
-	DirLight->Data.Type = LIGHT_POINT;
-	DirLight->Data.Size = 3.f;
-	DirLight->Data.Intensity = 5.f;
-	DirLight->Data.Color = Vector(1.f);
-	DirLight->Data.Rotation = Vector(0.0, 45.0, -45.0);*/
+	
 
-		printf("Spawned object\n");
+	printf("Spawned object\n");
 	Timer::CreateTimer(5.f, TimeFunction, false);
 
 	
@@ -264,56 +183,37 @@ void TestPlayer::BeginPlay()
 	uint32 h = (uint32)l;
 	printf("0x%lx\n", h);
 	
-	/*
-	Lights[0] = SpawnObject<Light>();
-
-	Lights[0]->Data.Location = Vector(70, 70, 1.2f);
-	Lights[0]->Data.Type = LIGHT_POINT;
-	Lights[0]->Data.Size = 80.f;
-	Lights[0]->Data.Intensity = 50.f;
-	Lights[0]->Data.Color = Vector(1.f);
-	*/
 	
 	Terrain* terrain = ObjectManager::GetByRecord<Terrain>(0xA0005554);
 
-	for (int i = 0; i < 1; i++) {
+	//Lights Testing
+	SystemsManager* systemsManager = IECS::GetSystemsManager();
+	IComponentArrayQuerySystem<LightComponent>* lightSystem = static_cast<IComponentArrayQuerySystem<LightComponent>*> (systemsManager->GetSystemByName("LightControllerSystem"));
 
-		float x = rand() % 100;
-		float y = rand() % 100;
-		//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
+	if (lightSystem != nullptr)
+	{
+		LightComponent* DirLight = lightSystem->AddComponentToSystem("LightComponent");
+		DirLight->Location = Vector(0.f, 0.f, 1.f);
+		DirLight->LightType = LIGHT_DIRECTIONAL;
+		DirLight->Size = 3.f;
+		DirLight->Intensity = 1.f;
+		DirLight->Color = Vector(1.f);
+		DirLight->Rotation = Vector(0.5, 0.5, -0.5); 
 
-		Lights[i] = SpawnObject<Light>();
+		for (int i = 0; i < 10; i++)
+		{
+			//Console::Log("Light addded " + std::to_string(i));
+			float x = rand() % 100;
+			float y = rand() % 100;
+			//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
 
-		Lights[i]->Data.Location = Vector(x, y, terrain->GetHeight(x,y) + 0.5f);
-		Lights[i]->Data.Type = LIGHT_POINT;
-		Lights[i]->Data.Size = 5.f;
-		Lights[i]->Data.Intensity = rand() / (float)RAND_MAX * 20.f + 10;
-		Lights[i]->Data.Color = Vector(1.f);
+			LightComponent* light = lightSystem->AddComponentToSystem("LightComponent");
+			light->Location = Vector(x, y, terrain->GetHeight(x, y));
+			light->LightType = LIGHT_POINT;
+			light->Size = 5.f;
+			light->Intensity = rand() / (float)RAND_MAX * 20.f;
+			light->Color = Vector(x, y, 2.5f);
+		}
 	}
-	
-	float x = 9;
-	float y = 5;
-	//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
-
-	Lights[0] = SpawnObject<Light>();
-
-	Lights[0]->Data.Location = Vector(x, y, terrain->GetHeight(x, y) + 0.5f);
-	Lights[0]->Data.Type = LIGHT_POINT;
-	Lights[0]->Data.Size = 15.f;
-	Lights[0]->Data.Intensity = 50.0f;
-	Lights[0]->Data.Color = Vector(1.0, 0.0, 0.0);
-
-	/*
-	Lights[1] = SpawnObject<Light>();
-
-	Lights[1]->Data.Location = Vector(x, y, terrain->GetHeight(x, y) + 0.5f);
-	Lights[1]->Data.Type = LIGHT_DIRECTIONAL;
-	Lights[1]->Data.Size = 15.f;
-	Lights[1]->Data.Intensity = 10.0f;
-	Lights[1]->Data.Color = Vector(1.0, 1.0, 1.0);
-	Lights[1]->Data.Rotation = Vector(0.5, 0.5, 0.5);
-	*/
-	
-
 	Console::Log("Hello beautiful world");
 }

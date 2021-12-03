@@ -337,7 +337,8 @@ void main()
 	float AO = texture(AOt, fs_in.TexCoords).r;
 	float roughness = 1.0 - texture(Roughness, fs_in.TexCoords).r;
 	vec3 normal = texture(Normal, fs_in.TexCoords).rgb;
-	normal.g = 1.0 - normal.g;
+	//normal.r = 1.0 - normal.r;
+	//normal.g = 1.0 - normal.g;
 	normal = normalize(normal * 2.0 - 1.0);
 	
 	float shadow = 0;

@@ -49,9 +49,9 @@ struct RecordInt {
 		record = 0;
 	}
 
-	String ToString() {
+	String ToString() const {
 		char hex_string[24];
-		sprintf_s(hex_string, "0x%llX", record);
+		sprintf_s(hex_string, "0x%015llX", record);
 		return hex_string;
 	}
 
