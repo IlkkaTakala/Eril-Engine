@@ -10,6 +10,7 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 #include "Systems/MovementSystem.h"
 #include <Core/ECS/Components/LightComponent.h>
 #include <Core.h>
+#include <Objects/Terrain.h>
 
 ECSTesting::ECSTesting()
 {
@@ -27,6 +28,7 @@ ECSTesting::ECSTesting()
 
 	if (lightSystem != nullptr)
 	{
+		Terrain* terrain = ObjectManager::GetByRecord<Terrain>(0xA0005554);
 		for (int i = 0; i < 100; i++) 
 		{
 			//Console::Log("Light addded " + std::to_string(i));
@@ -35,7 +37,7 @@ ECSTesting::ECSTesting()
 			//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
 
 			LightComponent* light = lightSystem->AddComponentToSystem("LightComponent");
-			light->Location = Vector(x, y, 2.5f);
+			light->Location = Vector(x, y, terrain->GetHeight(x,y));
 			light->LightType = 1;
 			light->Size = 5.f;
 			light->Intensity = rand() / (float)RAND_MAX * 20.f;
