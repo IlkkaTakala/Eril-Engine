@@ -226,6 +226,7 @@
     <ClCompile Include="Engine\Core\Timer.cpp" />
     <ClCompile Include="Engine\Core\WinConsole.cpp" />
     <ClCompile Include="Engine\external\glfw\deps\glad_gl.c" />
+    <ClCompile Include="Engine\Interface\AudioManager.cpp" />
     <ClCompile Include="Engine\Interface\IECS.cpp" />
     <ClCompile Include="Engine\Interface\FileManager.cpp" />
     <ClCompile Include="Engine\Interface\IRender.cpp" />
@@ -261,6 +262,7 @@
     <ClInclude Include="Engine\Core\ECS\Entity.h" />
     <ClInclude Include="Engine\Core\ECS\EntityManager.h" />
     <ClInclude Include="Engine\Core\ECS\Systems\LightControllerSystem.h" />
+    <ClInclude Include="Engine\Interface\AudioManager.h" />
     <ClInclude Include="Engine\Interface\IECS.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Button.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Image.h" />

@@ -10,6 +10,7 @@
 #include "Timer.h"
 #include <GamePlay/Scene.h>
 #include <Interface/IECS.h>
+#include <Interface/AudioManager.h>
 
 using namespace std;
 
@@ -36,6 +37,7 @@ GameLoop::~GameLoop()
 	delete RI;
 	delete Collector;
 	IECS::Destroy();
+	AudioManager::Destroy();
 }
 
 int GameLoop::Start()
@@ -65,7 +67,7 @@ int GameLoop::Start()
 		return 11;
 	}
 
-	
+	AudioManager::Init();
 	
 	Console::Log("Creating defaults...");
 	State = EngineInterface::CreateDefaults();

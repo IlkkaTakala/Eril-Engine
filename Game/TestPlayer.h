@@ -56,6 +56,7 @@ private:
 	Ref<VisibleObject> Sky;
 	Ref<Terrain> terra[4];
 	Ref<Hunter> hunt;
+	
 
 
 	//ECS TEST

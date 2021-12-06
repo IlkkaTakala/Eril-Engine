@@ -7,6 +7,7 @@
 #include "Hunter.h"
 #include "TestUI.h"
 #include <Interface/WindowManager.h>
+#include <Interface/AudioManager.h>
 
 //ECS
 #include <Interface/IECS.h>
@@ -156,22 +157,71 @@ void TestPlayer::MouseMoved(float X, float Y)
 	if (cursorState) SetRotation(Vector(rot.X + X * mouseSens, rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, rot.Z));
 }
 
-void TestPlayer::Tick(float)
+
+
+void TimeFunction(float d) 
+{
+}
+
+uint audioID = 0;
+bool first = true;
+Vector audioPos(-15.0f, 0.0f, 0.0f);
+
+void AudioTimer(float d)
+{ 
+	if (first)
+	{
+		audioID  = AudioManager::LoadAudio("clicketi.wav");
+		first = false;
+	}
+	
+	
+	AudioManager::SetAudioGain(audioID, 0.5f);
+	audioPos = Vector(-15.0f, 0.0f, 0.0f);
+
+	AudioManager::PlayAudio(audioID, audioPos);
+	Timer::CreateTimer(7.0f, AudioTimer);
+}
+
+uint audioID2 = 0;
+bool first2 = true;
+
+void AudioTimer2(float d)
+{
+
+	if (first2)
+	{
+		audioID2 = AudioManager::LoadAudio("whistle.wav");
+		first2 = false;
+	}
+	AudioManager::PlayAudio(audioID2);
+	AudioManager::SetAudioGain(audioID2, 0.1f);
+
+
+	Timer::CreateTimer(15.0f, AudioTimer2);
+}
+
+
+void TestPlayer::Tick(float deltaTime)
 {
 	GetCamera()->SetLocation(Location + Vector(0.f, 0.f, 1.5f));
 	GetCamera()->SetRotation(Rotation);
 	Sky->SetLocation(Location);
+
+	audioPos.X += 1 * deltaTime;
+	AudioManager::SetAudioPosition(audioID, audioPos);
+	
 }
-
-void TimeFunction(float d) {
-}
-
-
-
 
 void TestPlayer::BeginPlay()
 {
-	
+	AudioTimer(0.0f);
+	Vector listenerPos = Location;
+	Vector listenerOrientation = Rotation;
+	AudioManager::SetListener(listenerPos, listenerOrientation);
+
+
+	//AudioTimer2(0.0f);
 
 	printf("Spawned object\n");
 	Timer::CreateTimer(5.f, TimeFunction, false);
@@ -202,8 +252,9 @@ void TestPlayer::BeginPlay()
 		for (int i = 0; i < 10; i++)
 		{
 			//Console::Log("Light addded " + std::to_string(i));
-			float x = rand() % 100;
-			float y = rand() % 100;
+			float x = (float)(rand() % 100);
+			float y = (float)(rand() % 100);
+			y = 1;
 			//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
 
 			LightComponent* light = lightSystem->AddComponentToSystem("LightComponent");

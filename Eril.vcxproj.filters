@@ -149,6 +149,10 @@
     <ClCompile Include="Game\ECS_Examples\ECSExample.cpp">
       <Filter>Game\ECSExamples</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Core\Audio\Audio.cpp" />
+    <ClCompile Include="Engine\Interface\AudioManager.cpp">
+      <Filter>Engine\Interface</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -186,9 +190,6 @@
     </Filter>
     <Filter Include="Engine\OpenGL\UI">
       <UniqueIdentifier>{3244437c-caa9-4877-ba7a-a047bf86f946}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Audio">
-      <UniqueIdentifier>{299c4543-92c2-43e1-a2be-76aea3550718}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\Deprecated">
       <UniqueIdentifier>{81affc60-0a93-4279-86e2-3f0b96432cee}</UniqueIdentifier>
@@ -336,9 +337,6 @@
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Panel.h">
       <Filter>Engine\OpenGL\UI</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Interface\FileManager.h" />
-    <ClInclude Include="Engine\Core\Audio\Audio.h">
-      <Filter>Engine\Audio</Filter>
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Text.h">
       <Filter>Engine\OpenGL\UI</Filter>
     </ClInclude>
@@ -377,6 +375,10 @@
       <Filter>Game\ECSExamples\Components</Filter>
     </ClInclude>
     <ClInclude Include="Game\EngineInterface.h">
+      <Filter>Engine\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Audio\Audio.h" />
+    <ClInclude Include="Engine\Interface\AudioManager.h">
       <Filter>Engine\Interface</Filter>
     </ClInclude>
   </ItemGroup>
