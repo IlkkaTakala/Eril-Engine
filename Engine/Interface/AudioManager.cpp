@@ -55,6 +55,12 @@ uint AudioManager::LoadAudio(String filename, float minGain, float maxGain)
 	alSourcef(sourceid, AL_MAX_GAIN, maxGain);
 	alSourcei(sourceid, AL_SOURCE_RELATIVE, AL_TRUE);
 	AudioDataStorage.push_back(AudioData(sourceid, bufferid, bufferdata));
+
+	alSourcef(sourceid, AL_PITCH, 1);
+	alSourcef(sourceid, AL_GAIN, 1.0f);
+	alSource3f(sourceid, AL_POSITION, 0, 0, 0);
+	alSource3f(sourceid, AL_VELOCITY, 0, 0, 0);
+	alSourcei(sourceid, AL_LOOPING, AL_FALSE);
 	return sourceid;
 }
 
@@ -113,6 +119,18 @@ void AudioManager::SetAudioGain(uint id, const float gain)
 	alSourcef(id, AL_GAIN, gain);
 }
 
+void AudioManager::SetAudioRelativity(uint id, const bool relative)
+{
+	if (relative)
+	{
+		alSourcei(id, AL_SOURCE_RELATIVE, AL_TRUE);
+	}
+	else
+	{
+		alSourcei(id, AL_SOURCE_RELATIVE, AL_FALSE);
+	}
+}
+
 void AudioManager::StopAudio(uint id)
 {
 	alSourceStop(id); //this stops the audio when it should (i know, dont worry guys i got you)
@@ -120,8 +138,8 @@ void AudioManager::StopAudio(uint id)
 
 void AudioManager::SetListener(const Vector& position, const Vector& orientation)
 {
-	alListener3f(AL_POSITION, position.X, position.Y, position.Z);
-	float f[] = { orientation.X,orientation.Y,orientation.Z,0,1,0 };
+	alListener3f(AL_POSITION, position.X, position.Z, position.Y);
+	float f[] = {-orientation.X, -orientation.Y, -orientation.Z, 0,0,1 };
 	alListenerfv(AL_ORIENTATION, f);
 }
 
@@ -153,7 +171,7 @@ char* AudioManager::LoadWAV(const char* filename, int& ochannels, int& osampleRa
 	in.read(tmpBuffer, 4);
 	if (strncmp(tmpBuffer, "RIFF", 4) != 0)
 	{
-		Console::Warning("AudioManger: This is not a valid WAV file (1) ");
+		Console::Warning("AudioManger: File is not a valid WAVE file (header doesn't begin with RIFF) File:" + String(filename));
 		return 0;
 	}
 	in.read(tmpBuffer, 4);
@@ -161,27 +179,27 @@ char* AudioManager::LoadWAV(const char* filename, int& ochannels, int& osampleRa
 	in.read(tmpBuffer, 4);
 	if (strncmp(tmpBuffer, "WAVE", 4) != 0)
 	{
-		Console::Warning("AudioManger: This is not a valid WAV file (2) ");
+		Console::Warning("File is not a valid WAVE file (header doesn't contain WAVE) FIle:" + String(filename));
 		return 0;
 	}
 	in.read(tmpBuffer, 4);
 	if (strncmp(tmpBuffer, "fmt ", 4) != 0)
 	{
-		Console::Warning("AudioManger: This is not a valid WAV file (3) ");
+		Console::Warning("AudioManger: Could not read fmt! File:" + String(filename));
 		return 0;
 	}
 	in.read(tmpBuffer, 4);
 	int fmtSize = ConvertToInt(tmpBuffer, 4);
 	if (fmtSize != 16)
 	{
-		Console::Warning("AudioManger: Sorry, only PCM (not compressed WAV)");
+		Console::Warning("AudioManger: Sorry, only PCM (not compressed WAV) File:" + String(filename));
 		return 0;
 	}
 	in.read(tmpBuffer, 2);
 	int PCM = ConvertToInt(tmpBuffer, 2);
 	if (PCM != 1)
 	{
-		Console::Warning("AudioManger: Sorry, only PCM (not compressed WAV)");
+		Console::Warning("AudioManger: Sorry, only PCM (not compressed WAV) File:" + String(filename));
 		return 0;
 	}
 	in.read(tmpBuffer, 2);
@@ -197,14 +215,14 @@ char* AudioManager::LoadWAV(const char* filename, int& ochannels, int& osampleRa
 	in.read(tmpBuffer, 4);
 	if (strncmp(tmpBuffer, "data", 4) != 0)
 	{
-		Console::Warning("AudioManger: This is not a valid WAV file (4) ");
+		Console::Warning("AudioManger: This is not a valid WAV file (4) File:" + String(filename));
 		//	return 0;
 	}
 	in.read(tmpBuffer, 4);
 	int dataSize = ConvertToInt(tmpBuffer, 4);
 	if (dataSize <= 0)
 	{
-		Console::Warning("AudioManger: This is not a valid WAV file (4) ");
+		Console::Warning("AudioManger: This is not a valid WAV file (4) File:" + String(filename));
 		return 0;
 	}
 	char* data = new char[dataSize];

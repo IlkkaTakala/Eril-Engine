@@ -62,6 +62,7 @@ TestPlayer::TestPlayer() : Player()
 	Mesh = SpawnObject<VisibleObject>();
 	Mesh->SetModel("Cube");
 	Mesh->GetModel()->SetAABB(AABB(Vector(-0.5f), Vector(0.5f)));
+	
 
 	//Player Movement
 	Movement = SpawnObject<MovementComponent>();
@@ -165,19 +166,19 @@ void TimeFunction(float d)
 
 uint audioID = 0;
 bool first = true;
-Vector audioPos(-15.0f, 0.0f, 0.0f);
+Vector audioPos(10.0f, 10.0f, 1.0f);
 
 void AudioTimer(float d)
 { 
 	if (first)
 	{
 		audioID  = AudioManager::LoadAudio("clicketi.wav");
+		AudioManager::SetAudioRelativity(audioID, false);
 		first = false;
 	}
 	
 	
 	AudioManager::SetAudioGain(audioID, 0.5f);
-	audioPos = Vector(-15.0f, 0.0f, 0.0f);
 
 	AudioManager::PlayAudio(audioID, audioPos);
 	Timer::CreateTimer(7.0f, AudioTimer);
@@ -202,23 +203,37 @@ void AudioTimer2(float d)
 }
 
 
+bool rotSet = false;
 void TestPlayer::Tick(float deltaTime)
 {
+	if (!rotSet)
+	{
+		Rotation.X = -180.0f;
+		Rotation.Y = 0;
+		Rotation.Z = 0;
+		rotSet = true;
+	}
+
 	GetCamera()->SetLocation(Location + Vector(0.f, 0.f, 1.5f));
 	GetCamera()->SetRotation(Rotation);
 	Sky->SetLocation(Location);
 
-	audioPos.X += 1 * deltaTime;
+	//audioPos.X += 4.5f * deltaTime;
+
+	Mesh->SetLocation(audioPos);
+
 	AudioManager::SetAudioPosition(audioID, audioPos);
 	
+	Vector listenerPos = Location;
+	Vector listenerOrientation = GetCamera()->GetForwardVector();
+	Console::Log(std::to_string(listenerPos.X) + "," + std::to_string(listenerPos.Y) + "," + std::to_string(listenerPos.Z) + ", Rot: " + std::to_string(GetCamera()->GetForwardVector().X) + "," + std::to_string(GetCamera()->GetForwardVector().Y) + "," + std::to_string(GetCamera()->GetForwardVector().Z));
+	AudioManager::SetListener(listenerPos, listenerOrientation);
 }
 
 void TestPlayer::BeginPlay()
 {
+	
 	AudioTimer(0.0f);
-	Vector listenerPos = Location;
-	Vector listenerOrientation = Rotation;
-	AudioManager::SetListener(listenerPos, listenerOrientation);
 
 
 	//AudioTimer2(0.0f);
