@@ -14,6 +14,8 @@
 #include <ECS_Examples/ECSExample.h>
 #include <ECS/Components/LightComponent.h>
 #include <ECS/Systems/LightControllerSystem.h>
+#include <ECS/Components/AudioComponent.h>
+#include <ECS/Systems/AudioControllerSystem.h>
 
 
 void TestPlayer::OpenConsole(bool) {
@@ -164,6 +166,7 @@ void TimeFunction(float d)
 {
 }
 
+/*
 uint audioID = 0;
 bool first = true;
 Vector audioPos(10.0f, 10.0f, 1.0f);
@@ -203,16 +206,11 @@ void AudioTimer2(float d)
 }
 
 
-bool rotSet = false;
+*/
+
 void TestPlayer::Tick(float deltaTime)
 {
-	if (!rotSet)
-	{
-		Rotation.X = -180.0f;
-		Rotation.Y = 0;
-		Rotation.Z = 0;
-		rotSet = true;
-	}
+	
 
 	GetCamera()->SetLocation(Location + Vector(0.f, 0.f, 1.5f));
 	GetCamera()->SetRotation(Rotation);
@@ -220,9 +218,9 @@ void TestPlayer::Tick(float deltaTime)
 
 	//audioPos.X += 4.5f * deltaTime;
 
-	Mesh->SetLocation(audioPos);
+	//Mesh->SetLocation(audioPos);
 
-	AudioManager::SetAudioPosition(audioID, audioPos);
+	//AudioManager::SetAudioPosition(audioID, audioPos);
 	
 	Vector listenerPos = Location;
 	Vector listenerOrientation = GetCamera()->GetForwardVector();
@@ -233,7 +231,7 @@ void TestPlayer::Tick(float deltaTime)
 void TestPlayer::BeginPlay()
 {
 	
-	AudioTimer(0.0f);
+	//AudioTimer(0.0f);
 
 
 	//AudioTimer2(0.0f);
@@ -250,13 +248,32 @@ void TestPlayer::BeginPlay()
 	
 	Terrain* terrain = ObjectManager::GetByRecord<Terrain>(0xA0005554);
 
-	//Lights Testing
+	
+	//ECS
 	SystemsManager* systemsManager = IECS::GetSystemsManager();
+	//Audio Testing
+	IComponentArrayQuerySystem<AudioComponent>* audioComponentArraySystem = static_cast<IComponentArrayQuerySystem<AudioComponent>*> (systemsManager->GetSystemByName("AudioControllerSystem"));
+	AudioControllerSystem* audioControllerSystem = static_cast<AudioControllerSystem*>(systemsManager->GetSystemByName("AudioControllerSystem"));
+
+	AudioComponent* audio = audioComponentArraySystem->AddComponentToSystem();
+	audioComponentID = audio->GetID();
+
+	Vector audioPos = Vector(20.0f, 20.0f, terrain->GetHeight(20.0f, 20.0f) + 1.5f);
+	audio->SetSourceID(audioControllerSystem->LoadAudioFile("clicketi.WAV"));
+	audio->SetPosition(audioPos);
+	Mesh->SetLocation(audioPos);
+	audio->SetGain(1.0f);
+	audio->SetPitch(1.0f);
+	audio->SetLooping(true);
+	audio->SetSourceRelative(true);
+
+
+	//Lights Testing
 	IComponentArrayQuerySystem<LightComponent>* lightSystem = static_cast<IComponentArrayQuerySystem<LightComponent>*> (systemsManager->GetSystemByName("LightControllerSystem"));
 
 	if (lightSystem != nullptr)
 	{
-		LightComponent* DirLight = lightSystem->AddComponentToSystem("LightComponent");
+		LightComponent* DirLight = lightSystem->AddComponentToSystem();
 		DirLight->Location = Vector(0.f, 0.f, 1.f);
 		DirLight->LightType = LIGHT_DIRECTIONAL;
 		DirLight->Size = 3.f;
@@ -272,7 +289,7 @@ void TestPlayer::BeginPlay()
 			y = 1;
 			//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
 
-			LightComponent* light = lightSystem->AddComponentToSystem("LightComponent");
+			LightComponent* light = lightSystem->AddComponentToSystem();
 			light->Location = Vector(x, y, terrain->GetHeight(x, y));
 			light->LightType = LIGHT_POINT;
 			light->Size = 5.f;

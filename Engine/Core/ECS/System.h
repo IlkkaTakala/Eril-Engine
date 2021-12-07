@@ -61,11 +61,12 @@ template <class T>
 class IComponentArrayQuerySystem : public System
 {
 public:
-	IComponentArrayQuerySystem(EntityManager* entityManager, ComponentManager* componentManager) : System(entityManager), WorldComponentManager(componentManager)
+	IComponentArrayQuerySystem(EntityManager* entityManager, ComponentManager* componentManager, String typeName) : System(entityManager), WorldComponentManager(componentManager)
 	{
 		SetType(SystemType::IComponentArrayQuerySystem);
 		SystemComponentReferenceEntity = entityManager->AddEntity();
 		SystemComponentReferenceEntity->SetProtected(true);
+		ComponentTypeName = typeName;
 	}
 
 	virtual void Update(float deltaTime) = 0;
@@ -77,22 +78,23 @@ public:
 	/// <param name="entities">Entities to go through</param>
 	virtual void ComponentArrayQueryUpdate(float deltaTime, std::vector<T>* components) = 0;
 
-	T* AddComponentToSystem(String componentType)
+	T* AddComponentToSystem()
 	{
-		return WorldEntityManager->AddComponentToEntity<T>(SystemComponentReferenceEntity->GetID(), componentType);
+		return WorldEntityManager->AddComponentToEntity<T>(SystemComponentReferenceEntity->GetID(), ComponentTypeName);
 	}
 
-	bool RemoveComponentFromSystem(String componentType, int componentID)
+	bool RemoveComponentFromSystem(int componentID)
 	{
-		return WorldEntityManager->RemoveComponentFromEntity<T>(SystemComponentReferenceEntity->GetID(), componentType, componentID);
+		return WorldEntityManager->RemoveComponentFromEntity<T>(SystemComponentReferenceEntity->GetID(), ComponentTypeName, componentID);
 	}
 
-	std::vector<T>* GetComponentVector(String typeName)
+	std::vector<T>* GetComponentVector()
 	{
-		return WorldComponentManager->GetComponentVector<T>(WorldComponentManager->GetTypeIdByName(typeName));
+		return WorldComponentManager->GetComponentVector<T>(WorldComponentManager->GetTypeIdByName(ComponentTypeName));
 	}
 
 private:
 	Entity* SystemComponentReferenceEntity;
 	ComponentManager* WorldComponentManager;
+	String ComponentTypeName;
 };

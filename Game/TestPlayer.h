@@ -62,5 +62,7 @@ private:
 	//ECS TEST
 	Ref<ECSExample> ecsExample;
 
+	int audioComponentID;
+
 	int spawnCounter;
 };

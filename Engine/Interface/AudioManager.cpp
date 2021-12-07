@@ -114,9 +114,19 @@ void AudioManager::SetAudioVelocity(uint id, const Vector& velocity)
 	alSource3f(id, AL_VELOCITY, velocity.X, velocity.Z, velocity.Y);
 }
 
+void AudioManager::SetAudioPitch(uint id, const float pitch)
+{
+	alSourcef(id, AL_PITCH, pitch);
+}
+
 void AudioManager::SetAudioGain(uint id, const float gain)
 {
 	alSourcef(id, AL_GAIN, gain);
+}
+
+void AudioManager::SetAudioLooping(uint id, const bool loop)
+{
+	alSourcef(id, AL_LOOPING, loop);
 }
 
 void AudioManager::SetAudioRelativity(uint id, const bool relative)

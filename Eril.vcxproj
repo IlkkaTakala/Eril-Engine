@@ -257,10 +257,12 @@
     <ClInclude Include="Engine\Core\Core.h" />
     <ClInclude Include="Engine\Core\ECS\Component.h" />
     <ClInclude Include="Engine\Core\ECS\ComponentManager.h" />
+    <ClInclude Include="Engine\Core\ECS\Components\AudioComponent.h" />
     <ClInclude Include="Engine\Core\ECS\Components\LightComponent.h" />
     <ClInclude Include="Engine\Core\ECS\ComponentTypeStorage.h" />
     <ClInclude Include="Engine\Core\ECS\Entity.h" />
     <ClInclude Include="Engine\Core\ECS\EntityManager.h" />
+    <ClInclude Include="Engine\Core\ECS\Systems\AudioControllerSystem.h" />
     <ClInclude Include="Engine\Core\ECS\Systems\LightControllerSystem.h" />
     <ClInclude Include="Engine\Interface\AudioManager.h" />
     <ClInclude Include="Engine\Interface\IECS.h" />

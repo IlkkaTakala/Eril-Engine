@@ -23,7 +23,10 @@ public:
 
 	static void SetAudioPosition(uint id, const Vector& position);
 	static void SetAudioVelocity(uint id, const Vector& velocity);
+
+	static void SetAudioPitch(uint id, const float pitch);
 	static void SetAudioGain(uint id, const float gain);
+	static void SetAudioLooping(uint id, const bool loop);
 	static void SetAudioRelativity(uint id, const bool relative);
 
 	static void StopAudio(uint id);

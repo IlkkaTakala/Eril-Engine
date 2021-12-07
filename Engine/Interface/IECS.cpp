@@ -13,6 +13,8 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 //In-Engine Components and systems
 #include <ECS/Systems/LightControllerSystem.h>
 #include <ECS/Components/LightComponent.h>
+#include <ECS/Systems/AudioControllerSystem.h>
+#include <ECS/Components/AudioComponent.h>
 
 namespace IECS
 {
@@ -30,12 +32,17 @@ namespace IECS
 		WorldSystemsManager = new SystemsManager(WorldEntityManager, WorldComponentManager);
 
 		//In-engine component, entity and system setup
-		//Create Component Storages:
+		//Light System:
 		WorldComponentManager->CreateComponentTypeStorage<LightComponent>("LightComponent");
-
-		LightControllerSystem* lightController = new LightControllerSystem(WorldEntityManager, WorldComponentManager);
+		LightControllerSystem* lightController = new LightControllerSystem(WorldEntityManager, WorldComponentManager, "LightComponent");
 		int systemIndex = WorldSystemsManager->AddSystem(lightController, "LightControllerSystem");
 		WorldSystemsManager->AddWantedComponentType(systemIndex, "LightComponent");
+
+		//Audio System:
+		WorldComponentManager->CreateComponentTypeStorage<AudioComponent>("AudioComponent");
+		AudioControllerSystem* audioController = new AudioControllerSystem(WorldEntityManager, WorldComponentManager, "AudioComponent");
+		systemIndex = WorldSystemsManager->AddSystem(audioController, "AudioControllerSystem");
+		WorldSystemsManager->AddWantedComponentType(systemIndex, "AudioComponent");
 	}
 
 	void Destroy()

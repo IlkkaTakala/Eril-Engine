@@ -127,7 +127,6 @@
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\TextBox.cpp">
       <Filter>Engine\OpenGL\UI</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Interface\FileManager.cpp" />
     <ClCompile Include="Game\FPSCounter.cpp">
       <Filter>Game</Filter>
     </ClCompile>
@@ -151,6 +150,9 @@
     </ClCompile>
     <ClCompile Include="Engine\Core\Audio\Audio.cpp" />
     <ClCompile Include="Engine\Interface\AudioManager.cpp">
+      <Filter>Engine\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Interface\FileManager.cpp">
       <Filter>Engine\Interface</Filter>
     </ClCompile>
   </ItemGroup>
@@ -304,9 +306,6 @@
     <ClInclude Include="Engine\Core\ECS\System.h">
       <Filter>Engine\ECS</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\ECS\Components\LightComponent.h">
-      <Filter>Engine\ECS\Components</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Core\ECS\Systems\LightControllerSystem.h">
       <Filter>Engine\ECS\Systems</Filter>
     </ClInclude>
@@ -349,7 +348,6 @@
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Image.h">
       <Filter>Engine\OpenGL\UI</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Interface\FileManager.h" />
     <ClInclude Include="Game\FPSCounter.h">
       <Filter>Game</Filter>
     </ClInclude>
@@ -379,6 +377,18 @@
     </ClInclude>
     <ClInclude Include="Engine\Core\Audio\Audio.h" />
     <ClInclude Include="Engine\Interface\AudioManager.h">
+      <Filter>Engine\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\ECS\Components\AudioComponent.h">
+      <Filter>Engine\ECS\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\ECS\Components\LightComponent.h">
+      <Filter>Engine\ECS\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\ECS\Systems\AudioControllerSystem.h">
+      <Filter>Engine\ECS\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Interface\FileManager.h">
       <Filter>Engine\Interface</Filter>
     </ClInclude>
   </ItemGroup>
