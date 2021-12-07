@@ -15,11 +15,14 @@ class ECSExample;
 
 class TestPlayer : public Player
 {
+	REGISTER(TestPlayer);
 public:
 	TestPlayer();
 	virtual ~TestPlayer() { /*INI->SetValue("Player", "Start", CameraPoint.ToString()); INI->SetValue("Player", "Direction", CameraDirection.ToString());*/ }
 	virtual void Tick(float Delta) override;
 	virtual void BeginPlay() override;
+	virtual void OnDestroyed() override;
+
 private:
 	float mouseSens;
 	float Speed;

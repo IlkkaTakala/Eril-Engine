@@ -7,6 +7,7 @@
 #include "Hunter.h"
 #include "TestUI.h"
 #include <Interface/WindowManager.h>
+#include <GamePlay/Scene.h>
 
 //ECS
 #include <Interface/IECS.h>
@@ -21,7 +22,7 @@ void TestPlayer::OpenConsole(bool) {
 static bool cursorState = true;
 void TestPlayer::UseCursor(bool keydown)
 {
-	if (!keydown) {
+	if (keydown) {
 		WindowManager::SetShowCursor(0, cursorState);
 		cursorState = !cursorState;
 	}
@@ -131,6 +132,7 @@ void TestPlayer::InputTwo(bool KeyDown)
 {
 	if (KeyDown)
 		InputMode = !InputMode;
+	Scene::OpenLevel("Assets/Maps/test");
 }
 
 void TestPlayer::RunInputShift(bool KeyDown)
@@ -142,7 +144,6 @@ void TestPlayer::RunInputShift(bool KeyDown)
 
 void TestPlayer::LeftMouseDown(bool)
 {
-
 }
 
 void TestPlayer::RightMouseDown(bool KeyDown)
@@ -215,4 +216,8 @@ void TestPlayer::BeginPlay()
 		}
 	}
 	Console::Log("Hello beautiful world");
+}
+
+void TestPlayer::OnDestroyed()
+{
 }

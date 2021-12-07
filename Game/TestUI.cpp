@@ -4,6 +4,7 @@
 #include <UI/Text.h>
 #include <UI/Button.h>
 #include <UI/TextBox.h>
+#include <Gameplay/Scene.h>
 
 void TestUI::Construct()
 {
@@ -19,7 +20,7 @@ void TestUI::Construct()
 				Create<Text>()->SetText("Button", 30)->SetStyle(UIStyle(Vector(0.f, 0.f, 0.f), 1.0f, nullptr))
 			)->SetEventCallback(Constants::UI::UI_ON_MOUSE_DOWN,
 				[]() {
-					Console::Log("Clicked a button!");
+					Scene::OpenLevel("Assets/Maps/test2");
 				})
 			->SetTransform(0, 110, 300, 30)
 		)->AddChild(

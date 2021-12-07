@@ -15,11 +15,14 @@ public:
 	void SetSize(uint width, uint height);
 	void Render(uint Target);
 	void AddComponent(UI* com);
+	void RemoveComponent(UI* com);
 	Vector2D GetSize() const { return ScreenSize; }
 	void SetScreen(uint window) { Screen = window; }
 
 	uint GetColor() const { return Color; }
 	uint GetDepth() const { return Depth; }
+
+	void RegisterInputs();
 
 private:
 	friend UIComponent;

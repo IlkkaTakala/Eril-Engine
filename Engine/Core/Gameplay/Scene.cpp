@@ -3,6 +3,10 @@
 #include "GameLoop.h"
 #include <Interface/FileManager.h>
 #include <RapidXML.hpp>
+#include <Gameplay/GameState.h>
+#include "RenderCore/OpenGL/UI/UISpace.h"
+
+String Scene::newLevel = "";
 
 Scene::Scene() : BaseObject()
 {
@@ -41,9 +45,9 @@ void ParseChildren(rapidxml::xml_node<>* node, SceneComponent* base)
 void LoopSceneChildren(const Ref<SceneComponent>& base) 
 {
 	for (const auto& c : base->GetChildren()) {
-		c->BeginPlay();
 		auto t = dynamic_cast<Tickable*>(base.GetPointer());
 		ObjectManager::AddTick(t);
+		c->BeginPlay();
 
 		LoopSceneChildren(c);
 	}
@@ -51,27 +55,20 @@ void LoopSceneChildren(const Ref<SceneComponent>& base)
 
 void Scene::OpenLevel(String map)
 {
-	using namespace rapidxml;
-	Loop->World = SpawnObject<Scene>();
+	newLevel = map;
+}
 
-	String loaded;
-	FileManager::RequestData(map + ".map", loaded);
+void Scene::CheckShouldLoad()
+{
+	if (newLevel != "") LoadLevel();
+}
 
-	xml_document<>* doc = new xml_document<>();
-	doc->parse<0>(loaded.data());
-
-	ParseChildren(doc, nullptr);
-
-	delete doc;
-
-	for (const auto& base : Loop->World->SceneGraph) {
-		base->BeginPlay();
-		auto t = dynamic_cast<Tickable*>(base.GetPointer());
-		ObjectManager::AddTick(t);
-
-		LoopSceneChildren(base);
+void Scene::OnDestroyed()
+{
+	for (const auto& c : SceneGraph) {
+		c->DestroyObject();
 	}
-	
+	Loop->World = nullptr;
 }
 
 void Scene::AddSceneRoot(SceneComponent* obj)
@@ -82,4 +79,42 @@ void Scene::AddSceneRoot(SceneComponent* obj)
 void Scene::RemoveSceneRoot(SceneComponent* obj)
 {
 	SceneGraph.remove(obj);
+}
+
+void Scene::LoadLevel()
+{
+	if (Loop->World != nullptr) {
+		ObjectManager::CleanObjects();
+		II->ClearInputs();
+	}
+	using namespace rapidxml;
+
+	ObjectManager::PrepareRecord(1, Constants::Record::LOADED);
+	Loop->World = SpawnObject<Scene>();
+
+	ObjectManager::PrepareRecord(2, Constants::Record::LOADED);
+	Ref<GameState> State = SpawnObject<GameState>();
+	Loop->State = State;
+
+	String loaded;
+	FileManager::RequestData(newLevel + ".map", loaded);
+
+	xml_document<>* doc = new xml_document<>();
+	doc->parse<0>(loaded.data());
+
+	ParseChildren(doc, nullptr);
+
+	delete doc;
+
+	for (const auto& base : Loop->World->SceneGraph) {
+		auto t = dynamic_cast<Tickable*>(base.GetPointer());
+		ObjectManager::AddTick(t);
+		base->BeginPlay();
+
+		LoopSceneChildren(base);
+	}
+
+	RI->GetUIManager()->RegisterInputs();
+
+	newLevel = "";
 }

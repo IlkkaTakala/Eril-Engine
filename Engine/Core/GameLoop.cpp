@@ -68,7 +68,7 @@ int GameLoop::Start()
 	
 	
 	Console::Log("Creating defaults...");
-	State = EngineInterface::CreateDefaults();
+	EngineInterface::CreateDefaults();
 	Collector = new GC();
 
 	Console::Log("Loading finished");
@@ -123,7 +123,9 @@ int GameLoop::MainLoop()
 		TickListRemoval.clear();
 		lock.unlock();
 		duration = std::chrono::steady_clock::now() - start;
-		//fps = 1.f / duration.count();
+		fps = 1.f / duration.count();
+
+		Scene::CheckShouldLoad();
 	}
 
 	TickList.clear();

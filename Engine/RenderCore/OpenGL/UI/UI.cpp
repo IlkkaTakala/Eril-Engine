@@ -9,6 +9,8 @@ UI::UI()
 
 void UI::OnDestroyed()
 {
+	RemoveFromScreen();
+	delete TopLevel;
 }
 
 void UI::AddToScreen(UI* component, Player* Owner, int screen)
@@ -29,6 +31,8 @@ void UI::RemoveAllUI()
 
 void UI::RemoveFromScreen(int screen)
 {
+	UISpace* manager = RI->GetUIManager();
+	manager->RemoveComponent(this);
 }
 
 void UI::AddComponent(UIComponent* com)
