@@ -18,7 +18,7 @@ public:
 	virtual void Render() override;
 	Text* SetText(const String& text, int size = 0);
 	String GetText() const { return value; }
-	void SetJustification(Justify j) { just = j; textChanged = true; }
+	Text* SetJustification(Justify j) { just = j; textChanged = true; return this; }
 
 protected:
 	String font;

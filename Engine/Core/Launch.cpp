@@ -26,7 +26,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	default:
 		break;
 	}
-	Console::Log("Game closed, press enter to continue");
+	Console::Log("Game closed, goodbye");
 	Sleep(10000);
 	Console::Close();
 	return retur;

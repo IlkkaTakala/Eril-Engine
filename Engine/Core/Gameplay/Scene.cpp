@@ -5,6 +5,7 @@
 #include <RapidXML.hpp>
 #include <Gameplay/GameState.h>
 #include "RenderCore/OpenGL/UI/UISpace.h"
+#include <Interface/WindowManager.h>
 
 String Scene::newLevel = "";
 
@@ -83,6 +84,7 @@ void Scene::RemoveSceneRoot(SceneComponent* obj)
 
 void Scene::LoadLevel()
 {
+	WindowManager::SetShowCursor(0, false);
 	if (Loop->World != nullptr) {
 		ObjectManager::CleanObjects();
 		II->ClearInputs();

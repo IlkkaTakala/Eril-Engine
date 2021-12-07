@@ -154,6 +154,10 @@
     <ClCompile Include="Game\MainMenu\MenuPlayer.cpp">
       <Filter>Game\MainMenu</Filter>
     </ClCompile>
+    <ClCompile Include="Game\MainMenu\MenuUI.cpp">
+      <Filter>Game\MainMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\PauseUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -389,5 +393,9 @@
     <ClInclude Include="Game\MainMenu\MenuPlayer.h">
       <Filter>Game\MainMenu</Filter>
     </ClInclude>
+    <ClInclude Include="Game\MainMenu\MenuUI.h">
+      <Filter>Game\MainMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\PauseUI.h" />
   </ItemGroup>
 </Project>
