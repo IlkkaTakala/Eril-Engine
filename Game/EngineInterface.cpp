@@ -1,9 +1,9 @@
 #include "Gameplay/GameState.h"
-#include "TestPlayer.h"
+#include "TestArea/TestPlayer.h"
 #include "EngineInterface.h"
 #include "GamePlay/Scene.h"
 
 void EngineInterface::CreateDefaults()
 {
-    Scene::OpenLevel("Assets/Maps/test");
+    Scene::OpenLevel("Game/MainMenu/menu");
 }

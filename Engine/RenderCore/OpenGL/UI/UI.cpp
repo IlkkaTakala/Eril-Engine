@@ -1,5 +1,6 @@
 #include <UI/UI.h>
 #include "UISpace.h"
+#include <RenderCore/OpenGL/UI/UIComponent.h>
 
 UI::UI()
 {

@@ -242,7 +242,7 @@ void main()
 	uint character = 0;
 	
 	if (gl_LocalInvocationIndex == 0) {
-		width = 0.3 - (weight / 100.0 - 1.0) * 0.1;
+		width = 0.5 - (weight / 100.0 - 1.0) * 0.1;
 	}
 
 	uint threadCount = TILE_SIZE;
