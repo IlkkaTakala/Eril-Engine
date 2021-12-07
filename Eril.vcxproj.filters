@@ -157,7 +157,9 @@
     <ClCompile Include="Game\MainMenu\MenuUI.cpp">
       <Filter>Game\MainMenu</Filter>
     </ClCompile>
-    <ClCompile Include="Game\PauseUI.cpp" />
+    <ClCompile Include="Game\PauseUI.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -396,6 +398,8 @@
     <ClInclude Include="Game\MainMenu\MenuUI.h">
       <Filter>Game\MainMenu</Filter>
     </ClInclude>
-    <ClInclude Include="Game\PauseUI.h" />
+    <ClInclude Include="Game\PauseUI.h">
+      <Filter>Game</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
