@@ -11,7 +11,7 @@ public:
 	virtual void Tick(float Delta) override;
 	virtual void BeginPlay() override {};
 	virtual void LoadWithParameters(const String& args) override;
-
+	virtual void OnDestroyed() override;
 	Camera* GetCamera() const { return PlayerCamera; }
 
 protected:

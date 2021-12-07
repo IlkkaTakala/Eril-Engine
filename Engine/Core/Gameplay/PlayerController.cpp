@@ -19,3 +19,8 @@ void Player::LoadWithParameters(const String& args)
 
 	Loop->State->CurrentPlayer = this;
 }
+
+void Player::OnDestroyed()
+{
+	delete PlayerCamera;
+}

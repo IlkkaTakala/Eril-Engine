@@ -22,7 +22,7 @@ void TestPlayer::OpenConsole(bool) {
 static bool cursorState = true;
 void TestPlayer::UseCursor(bool keydown)
 {
-	if (!keydown) {
+	if (keydown) {
 		WindowManager::SetShowCursor(0, cursorState);
 		cursorState = !cursorState;
 	}
@@ -216,4 +216,8 @@ void TestPlayer::BeginPlay()
 		}
 	}
 	Console::Log("Hello beautiful world");
+}
+
+void TestPlayer::OnDestroyed()
+{
 }

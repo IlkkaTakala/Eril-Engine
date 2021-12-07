@@ -22,6 +22,8 @@ public:
 	uint GetColor() const { return Color; }
 	uint GetDepth() const { return Depth; }
 
+	void RegisterInputs();
+
 private:
 	friend UIComponent;
 

@@ -10,6 +10,7 @@ UI::UI()
 void UI::OnDestroyed()
 {
 	RemoveFromScreen();
+	delete TopLevel;
 }
 
 void UI::AddToScreen(UI* component, Player* Owner, int screen)

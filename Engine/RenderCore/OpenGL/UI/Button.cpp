@@ -50,10 +50,6 @@ Button::Button()
 
 Button::~Button()
 {
-	delete normal.texture;
-	delete hovered.texture;
-	delete pressed.texture;
-
 	glDeleteBuffers(1, &normalBuffer);
 	glDeleteBuffers(1, &hoverBuffer);
 	glDeleteBuffers(1, &pressBuffer);

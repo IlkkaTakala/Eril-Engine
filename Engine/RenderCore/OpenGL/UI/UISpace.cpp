@@ -81,9 +81,6 @@ void main()
 
 	glBindVertexArray(0);
 
-	II->RegisterKeyInput(0, &UISpace::LeftClick, this);
-
-	II->RegisterTextInput(&UISpace::GetTextInput, this);
 }
 
 UISpace::~UISpace()
@@ -202,6 +199,14 @@ void UISpace::AddComponent(UI* com)
 void UISpace::RemoveComponent(UI* com)
 {
 	TopLevel.remove(com);
+	Hovered = nullptr;
+	Focused = nullptr;
+}
+
+void UISpace::RegisterInputs()
+{
+	II->RegisterKeyInput(0, &UISpace::LeftClick, this);
+	II->RegisterTextInput(&UISpace::GetTextInput, this);
 }
 
 void UISpace::LeftClick(bool down)

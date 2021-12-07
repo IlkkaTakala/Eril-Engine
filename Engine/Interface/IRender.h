@@ -67,6 +67,13 @@ public:
 	virtual void ProcessInputs(float delta) = 0;
 	void SetTextMode(bool mode) { isText = mode; }
 
+	void ClearInputs() {
+		KeyCallers.clear();
+		KeyCallersHold.clear();
+		MouseCallers.clear();
+		TextCallers.clear();
+	}
+
 	template <class UserClass>
 	void RegisterKeyContinuousInput(int Key, void (UserClass::* Callback)(float, bool), UserClass* Caller)
 	{
