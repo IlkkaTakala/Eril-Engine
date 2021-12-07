@@ -7,7 +7,7 @@ class Player : public Actor
 {
 public:
 	Player();
-	virtual ~Player() { delete PlayerCamera; }
+	virtual ~Player() { }
 	virtual void Tick(float Delta) override;
 	virtual void BeginPlay() override {};
 	virtual void LoadWithParameters(const String& args) override;

@@ -9,6 +9,7 @@ class Light;
 class MovementComponent;
 class Terrain;
 class Hunter;
+class PauseUI;
 
 //ECS TEST
 class ECSExample;
@@ -41,7 +42,7 @@ private:
 	void RightMouseDown(bool KeyDown);
 	void MouseMoved(float X, float Y);
 
-	void InputExit(bool) { Exit(); }
+	void InputExit(bool);
 
 	void OpenConsole(bool);
 	void UseCursor(bool);
@@ -49,6 +50,7 @@ private:
 	Ref<MovementComponent> Movement;
 	Ref<VisibleObject> Mesh;
 
+	bool cursorState;
 	bool InputMode;
 	Ref<Light> DirLight;
 	Ref<Light> Lights[100];
@@ -59,7 +61,7 @@ private:
 	Ref<VisibleObject> Sky;
 	Ref<Terrain> terra[4];
 	Ref<Hunter> hunt;
-
+	PauseUI* pause;
 
 	//ECS TEST
 	Ref<ECSExample> ecsExample;

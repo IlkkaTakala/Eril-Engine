@@ -1225,7 +1225,7 @@ void Renderer::Render(float delta)
 	float fps = 1.f / delta;
 	char sbuffer[32];
 	if (fpsCounter) {
-		sprintf_s(sbuffer, 32, "Eril Engine Demo | FPS: %.1f", fps);
+		sprintf_s(sbuffer, 32, "Project Eril | FPS: %.1f", fps);
 		WindowManager::SetWindowTitle(Window, sbuffer);
 	}
 	WindowManager::UpdateWindow(Window);
@@ -1233,7 +1233,7 @@ void Renderer::Render(float delta)
 
 void Renderer::GameStart()
 {
-	WindowManager::SetWindowTitle(Window, "Eril Engine Demo");
+	WindowManager::SetWindowTitle(Window, "Project Eril");
 }
 
 void Renderer::DestroyWindow()
