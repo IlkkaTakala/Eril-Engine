@@ -85,33 +85,33 @@ void AudioManager::PlayAudio(uint id)
 
 void AudioManager::PlayAudio(uint id, const Vector& position)
 {
-	alSource3f(id, AL_POSITION, position.X, position.Y, position.Z);
+	alSource3f(id, AL_POSITION, position.X, position.Z, position.Y);
 	alSourcePlay(id);
 }
 
 void AudioManager::PlayAudio(uint id, const Vector& position, const Vector& velocity)
 {
-	alSource3f(id, AL_POSITION, position.X, position.Y, position.Z);
-	alSource3f(id, AL_VELOCITY, velocity.X, velocity.Y, velocity.Z);
+	alSource3f(id, AL_POSITION, position.X, position.Z, position.Y);
+	alSource3f(id, AL_VELOCITY, velocity.X, velocity.Z, velocity.Y);
 	alSourcePlay(id);
 }
 
 void AudioManager::PlayAudio(uint id, const Vector& position, const Vector& velocity, float gain)
 {
-	alSource3f(id, AL_POSITION, position.X, position.Y, position.Z);
-	alSource3f(id, AL_VELOCITY, velocity.X, velocity.Y, velocity.Z);
+	alSource3f(id, AL_POSITION, position.X, position.Z, position.Y);
+	alSource3f(id, AL_VELOCITY, velocity.X, velocity.Z, velocity.Y);
 	alSourcef(id, AL_GAIN, gain);
 	alSourcePlay(id);
 }
 
 void AudioManager::SetAudioPosition(uint id, const Vector& position)
 {
-	alSource3f(id, AL_POSITION, position.X, position.Y, position.Z);
+	alSource3f(id, AL_POSITION, position.X, position.Z, position.Y);
 }
 
 void AudioManager::SetAudioVelocity(uint id, const Vector& velocity)
 {
-	alSource3f(id, AL_VELOCITY, velocity.X, velocity.Y, velocity.Z);
+	alSource3f(id, AL_VELOCITY, velocity.X, velocity.Z, velocity.Y);
 }
 
 void AudioManager::SetAudioGain(uint id, const float gain)
@@ -136,10 +136,10 @@ void AudioManager::StopAudio(uint id)
 	alSourceStop(id); //this stops the audio when it should (i know, dont worry guys i got you)
 }
 
-void AudioManager::SetListener(const Vector& position, const Vector& orientation)
+void AudioManager::SetListener(const Vector& position, const Vector& orientation, const Vector& up)
 {
 	alListener3f(AL_POSITION, position.X, position.Z, position.Y);
-	float f[] = {-orientation.X, -orientation.Y, -orientation.Z, 0,0,1 };
+	float f[] = {orientation.X, -orientation.Z, orientation.Y, up.X, -up.Z, up.Y };
 	alListenerfv(AL_ORIENTATION, f);
 }
 

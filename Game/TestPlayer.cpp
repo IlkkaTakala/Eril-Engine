@@ -226,8 +226,8 @@ void TestPlayer::Tick(float deltaTime)
 	
 	Vector listenerPos = Location;
 	Vector listenerOrientation = GetCamera()->GetForwardVector();
-	Console::Log(std::to_string(listenerPos.X) + "," + std::to_string(listenerPos.Y) + "," + std::to_string(listenerPos.Z) + ", Rot: " + std::to_string(GetCamera()->GetForwardVector().X) + "," + std::to_string(GetCamera()->GetForwardVector().Y) + "," + std::to_string(GetCamera()->GetForwardVector().Z));
-	AudioManager::SetListener(listenerPos, listenerOrientation);
+	//Console::Log(std::to_string(listenerPos.X) + "," + std::to_string(listenerPos.Y) + "," + std::to_string(listenerPos.Z) + ", Rot: " + std::to_string(GetCamera()->GetForwardVector().X) + "," + std::to_string(GetCamera()->GetForwardVector().Y) + "," + std::to_string(GetCamera()->GetForwardVector().Z));
+	AudioManager::SetListener(listenerPos, -GetCamera()->GetForwardVector(), -GetCamera()->GetUpVector());
 }
 
 void TestPlayer::BeginPlay()

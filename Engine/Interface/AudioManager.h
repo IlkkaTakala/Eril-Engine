@@ -27,7 +27,7 @@ public:
 	static void SetAudioRelativity(uint id, const bool relative);
 
 	static void StopAudio(uint id);
-	static void SetListener(const Vector &position, const Vector &orientation); //Orientation meaning where are we looking
+	static void SetListener(const Vector &position, const Vector &orientation, const Vector& up); //Orientation meaning where are we looking
 	static void Destroy();
 
 private:
