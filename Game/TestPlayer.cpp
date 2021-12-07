@@ -224,8 +224,8 @@ void TestPlayer::Tick(float deltaTime)
 	
 	Vector listenerPos = Location;
 	Vector listenerOrientation = GetCamera()->GetForwardVector();
-	//Console::Log(std::to_string(listenerPos.X) + "," + std::to_string(listenerPos.Y) + "," + std::to_string(listenerPos.Z) + ", Rot: " + std::to_string(GetCamera()->GetForwardVector().X) + "," + std::to_string(GetCamera()->GetForwardVector().Y) + "," + std::to_string(GetCamera()->GetForwardVector().Z));
 	AudioManager::SetListener(listenerPos, -GetCamera()->GetForwardVector(), -GetCamera()->GetUpVector());
+	//Console::Log(std::to_string(listenerPos.X) + "," + std::to_string(listenerPos.Y) + "," + std::to_string(listenerPos.Z) + ", Rot: " + std::to_string(GetCamera()->GetForwardVector().X) + "," + std::to_string(GetCamera()->GetForwardVector().Y) + "," + std::to_string(GetCamera()->GetForwardVector().Z));
 }
 
 void TestPlayer::BeginPlay()
@@ -265,8 +265,8 @@ void TestPlayer::BeginPlay()
 	audio->SetGain(1.0f);
 	audio->SetPitch(1.0f);
 	audio->SetLooping(true);
-	audio->SetSourceRelative(true);
-
+	audio->SetSourceRelative(false);
+	audio->Play();
 
 	//Lights Testing
 	IComponentArrayQuerySystem<LightComponent>* lightSystem = static_cast<IComponentArrayQuerySystem<LightComponent>*> (systemsManager->GetSystemByName("LightControllerSystem"));

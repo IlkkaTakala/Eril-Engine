@@ -80,7 +80,7 @@ public:
 	void SetLooping(bool loop) { bSettingChanged = true;  bLoop = loop; }
 	void SetSourceRelative(bool relative) { bSettingChanged = true;  bSourceRelative = relative; }
 
-	void Start() { bStartPlaying = true; }
+	void Play() { bStartPlaying = true; }
 	void Stop() { bStopPlaying = true; }
 
 protected:
