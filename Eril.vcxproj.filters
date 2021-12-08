@@ -160,6 +160,12 @@
     <ClCompile Include="Game\PauseUI.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="Game\UIEditor\Editor.cpp">
+      <Filter>Game\UIEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\UIEditor\EditorPlayer.cpp">
+      <Filter>Game\UIEditor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -215,6 +221,9 @@
     </Filter>
     <Filter Include="Game\MainMenu">
       <UniqueIdentifier>{2ab0c0ce-2ceb-4351-ae11-5553dc38f389}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\UIEditor">
+      <UniqueIdentifier>{76c549e1-baf8-4ebb-861f-efc6d3daf410}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -400,6 +409,12 @@
     </ClInclude>
     <ClInclude Include="Game\PauseUI.h">
       <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\UIEditor\Editor.h">
+      <Filter>Game\UIEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\UIEditor\EditorPlayer.h">
+      <Filter>Game\UIEditor</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

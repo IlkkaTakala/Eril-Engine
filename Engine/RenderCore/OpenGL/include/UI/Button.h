@@ -10,6 +10,7 @@ enum class ButtonState
 
 class Button : public Image
 {
+	REGISTER_UI(Button)
 public:
 	Button();
 	virtual ~Button();

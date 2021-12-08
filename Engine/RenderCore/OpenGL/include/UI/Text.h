@@ -11,6 +11,7 @@ enum class Justify
 
 class Text : public Image
 {
+	REGISTER_UI(Text)
 public:
 	Text();
 	virtual ~Text();

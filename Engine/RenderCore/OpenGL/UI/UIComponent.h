@@ -61,7 +61,7 @@ public:
 
 	virtual void HoverCheck(Vector2D& point);
 
-	virtual void LoadWithParameters(const String& args) {}
+	virtual void LoadWithParameters(const std::map<String, String>& args);
 
 protected:
 	friend class UISpace;
@@ -87,10 +87,6 @@ protected:
 	Vector2D realSize;
 	Vector2D topLeft;
 	Vector2D desiredSize;
-
-	Vector basecolor;
-	Vector tint;
-	float opacity;
 
 	bool focusable;
 	bool hasFocus;

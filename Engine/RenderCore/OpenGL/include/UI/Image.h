@@ -28,6 +28,7 @@ public:
 	virtual ~Image();
 
 	virtual void Render() override;
+	virtual void LoadWithParameters(const std::map<String, String>& args) override;
 
 	Image* SetStyle(const UIStyle& s);
 

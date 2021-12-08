@@ -44,8 +44,6 @@ Button::Button()
 	glBindBuffer(GL_UNIFORM_BUFFER, pressBuffer);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(UIStyleGLM), &p, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-	Console::Log("Button here");
 }
 
 Button::~Button()

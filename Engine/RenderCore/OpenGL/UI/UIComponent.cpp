@@ -27,10 +27,6 @@ UIComponent::UIComponent()
 	realDepth = 0.f;
 	desiredSize = Vector2D();
 
-	basecolor = Vector(1.f);
-	tint = Vector(1.f);
-	opacity = 1.f;
-
 	focusable = false;
 	hasFocus = false;
 	hovered = false;
@@ -159,5 +155,29 @@ void UIComponent::HoverCheck(Vector2D& point)
 				OnLeave();
 			}
 		}
+	}
+}
+
+void UIComponent::LoadWithParameters(const std::map<String, String>& args)
+{
+	if (args.find("Transform") != args.end()) {
+		std::vector<String> dats = split(args.at("Transform"), ',');
+
+		switch (dats.size())
+		{
+		default:
+		case 10: origin.Y = atof(dats[9].c_str());
+		case 9: origin.X = atof(dats[8].c_str());
+		case 8: anchor_v.Y = atof(dats[7].c_str());
+		case 7: anchor_v.X = atof(dats[6].c_str());
+		case 6: anchor_h.Y = atof(dats[5].c_str());
+		case 5: anchor_h.X = atof(dats[4].c_str());
+		case 4: bottomOffset = atof(dats[3].c_str());
+		case 3: topOffset = atof(dats[2].c_str());
+		case 2: rightOffset = atof(dats[1].c_str());
+		case 1: leftOffset = atof(dats[0].c_str());
+		case 0: break;
+		}
+
 	}
 }

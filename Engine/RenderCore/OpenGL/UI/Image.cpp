@@ -74,8 +74,6 @@ void main()
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	hits = HitReg::HitTestVisible;
-
-	Console::Log("Texture created");
 }
 
 Image::~Image()
@@ -102,6 +100,33 @@ void Image::Render()
 		glBindTexture(GL_TEXTURE_2D, style.texture->GetTextureID());
 	}
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+void Image::LoadWithParameters(const std::map<String, String>& args)
+{
+	UIComponent::LoadWithParameters(args);
+
+	if (args.find("Style") != args.end()) {
+		std::vector<String> dats = split(args.at("Style"), ',');
+
+		UIStyle s;
+
+		switch (dats.size())
+		{
+		default:
+		case 8: s.Tint.Z = atof(dats[7].c_str());
+		case 7: s.Tint.Y = atof(dats[6].c_str());
+		case 6: s.Tint.X = atof(dats[5].c_str());
+		case 5: s.texture = RI->LoadTextureByName(dats[4]);
+		case 4: s.Opacity = atof(dats[3].c_str());
+		case 3: s.Color.Z = atof(dats[2].c_str());
+		case 2: s.Color.Y = atof(dats[1].c_str());
+		case 1: s.Color.X = atof(dats[0].c_str());
+		case 0: break;
+		}
+
+		SetStyle(s);
+	}
 }
 
 Image* Image::SetStyle(const UIStyle& s)

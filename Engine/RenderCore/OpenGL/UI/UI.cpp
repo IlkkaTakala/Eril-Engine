@@ -52,9 +52,10 @@ void ParseChildren(rapidxml::xml_node<>* node, UIComponent* base)
 		if (UI::UIList().find(type) == UI::UIList().end()) continue;
 
 		uint32 id = 0;
-		String args;
-		auto arg_ptr = n->first_attribute("args");
-		if (arg_ptr != 0) args = arg_ptr->value();
+		std::map<String, String> args;
+		for (auto arg_ptr = n->first_attribute(); arg_ptr; arg_ptr = arg_ptr->next_attribute()) {
+			args.emplace(arg_ptr->name(), arg_ptr->value());
+		}
 
 		UIComponent* par_ui = UI::UIList()[type]();
 		if (par_ui != nullptr && base != nullptr) {
