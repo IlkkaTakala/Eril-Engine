@@ -81,9 +81,6 @@ void main()
 
 	glBindVertexArray(0);
 
-	II->RegisterKeyInput(0, &UISpace::LeftClick, this);
-
-	II->RegisterTextInput(&UISpace::GetTextInput, this);
 }
 
 UISpace::~UISpace()
@@ -99,10 +96,11 @@ UISpace::~UISpace()
 		glDeleteTextures(1, &Color);
 		glDeleteFramebuffers(1, &UIBuffer);
 	}
-
+	
 	for (const auto& t : TopLevel) {
-		delete t;
+		t->DestroyObject();
 	}
+	TopLevel.clear();
 }
 
 void UISpace::SetSize(uint width, uint height)
@@ -167,7 +165,7 @@ void UISpace::Render(uint target)
 	//glDisable(GL_BLEND);
 	glDisable(GL_MULTISAMPLE);
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
+	glDepthFunc(GL_ALWAYS);
 	glDisable(GL_CULL_FACE);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	for (const auto& c : TopLevel) {
@@ -196,6 +194,19 @@ void UISpace::AddComponent(UI* com)
 		com->TopLevel->UpdateMatrices(ScreenSize);
 	com->PostConstruct();
 	TopLevel.push_back(com);
+}
+
+void UISpace::RemoveComponent(UI* com)
+{
+	TopLevel.remove(com);
+	Hovered = nullptr;
+	Focused = nullptr;
+}
+
+void UISpace::RegisterInputs()
+{
+	II->RegisterKeyInput(0, &UISpace::LeftClick, this);
+	II->RegisterTextInput(&UISpace::GetTextInput, this);
 }
 
 void UISpace::LeftClick(bool down)

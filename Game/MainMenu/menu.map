@@ -1,7 +1,7 @@
 <header version='1.0' />
-<TestPlayer id="4" />
+<MenuPlayer id="4"/>
 <Terrain id="A0005554" args="Scale:100,100,1;Resolution:100" />
-<InstancedObject id="A0005556" args=
+<InstancedObject id="B0005556" args=
 "Instances:
 	1,10,0-0,0,0-1,1,1-
 	
@@ -13,5 +13,6 @@
 	
 	18,10,0-0,0,0-1,1,1;
 	
-Mesh:Cube;"
+Mesh:Cube;
+Material:0Assets/Materials/ground;"
 />

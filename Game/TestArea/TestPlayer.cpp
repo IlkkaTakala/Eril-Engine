@@ -6,8 +6,10 @@
 #include "Objects/InstancedObject.h"
 #include "Hunter.h"
 #include "TestUI.h"
+#include "PauseUI.h"
 #include <Interface/WindowManager.h>
 #include <Interface/AudioManager.h>
+#include <GamePlay/Scene.h>
 
 //ECS
 #include <Interface/IECS.h>
@@ -21,10 +23,10 @@
 void TestPlayer::OpenConsole(bool) {
 	Console::Create();
 }
-static bool cursorState = true;
+
 void TestPlayer::UseCursor(bool keydown)
 {
-	if (!keydown) {
+	if (keydown && pause == nullptr) {
 		WindowManager::SetShowCursor(0, cursorState);
 		cursorState = !cursorState;
 	}
@@ -38,6 +40,7 @@ TestPlayer::TestPlayer() : Player()
 	mouseSens = 0.5f;
 	Speed = 5.f;
 	InputMode = true;
+	cursorState = true;
 	spawnCounter = 0;
 
 	//GetCamera()->SetLocation(INI->GetValue("Player", "Start"));
@@ -80,6 +83,8 @@ TestPlayer::TestPlayer() : Player()
 	//Testing UI
 	auto ui = SpawnObject<TestUI>();
 	UI::AddToScreen(ui, this);
+
+	pause = nullptr;
 }
 
 
@@ -135,6 +140,7 @@ void TestPlayer::InputTwo(bool KeyDown)
 {
 	if (KeyDown)
 		InputMode = !InputMode;
+	Scene::OpenLevel("Assets/Maps/test");
 }
 
 void TestPlayer::RunInputShift(bool KeyDown)
@@ -146,7 +152,6 @@ void TestPlayer::RunInputShift(bool KeyDown)
 
 void TestPlayer::LeftMouseDown(bool)
 {
-
 }
 
 void TestPlayer::RightMouseDown(bool KeyDown)
@@ -160,9 +165,24 @@ void TestPlayer::MouseMoved(float X, float Y)
 	if (cursorState) SetRotation(Vector(rot.X + X * mouseSens, rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, rot.Z));
 }
 
+void TestPlayer::InputExit(bool down)
+{
+	if (!down) return;
+	if (pause == nullptr) {
+		pause = SpawnObject<PauseUI>();
+		UI::AddToScreen(pause, this);
+		WindowManager::SetShowCursor(0, true);
+		cursorState = false;
+	}
+	else {
+		pause->DestroyObject();
+		pause = nullptr;
+		WindowManager::SetShowCursor(0, false);
+		cursorState = true;
+	}
+	
+}
 
-
-void TimeFunction(float d) 
 {
 }
 
@@ -298,4 +318,8 @@ void TestPlayer::BeginPlay()
 		}
 	}
 	Console::Log("Hello beautiful world");
+}
+
+void TestPlayer::OnDestroyed()
+{
 }
