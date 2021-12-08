@@ -225,6 +225,9 @@
     <Filter Include="Game\UIEditor">
       <UniqueIdentifier>{76c549e1-baf8-4ebb-861f-efc6d3daf410}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{27cfd01c-53e4-4436-b300-9133214a1517}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Core\Objects\Actor.h">
@@ -416,5 +419,18 @@
     <ClInclude Include="Game\UIEditor\EditorPlayer.h">
       <Filter>Game\UIEditor</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Assets\Resources\resource.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Engine\Assets\Icons\icon.ico">
+      <Filter>Resources</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Engine\Assets\Resources\Eril.rc">
+      <Filter>Resources</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

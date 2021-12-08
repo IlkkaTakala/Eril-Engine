@@ -255,6 +255,7 @@
     <ClCompile Include="Game\TestArea\TestUI.cpp" />
     <ClCompile Include="Game\UIEditor\Editor.cpp" />
     <ClCompile Include="Game\UIEditor\EditorPlayer.cpp" />
+    <ClInclude Include="Engine\Assets\Resources\resource.h" />
     <ClInclude Include="Engine\Core\BasicTypes.h" />
     <ClInclude Include="Engine\Core\Core.h" />
     <ClInclude Include="Engine\Core\ECS\Component.h" />
@@ -317,6 +318,12 @@
     <ClInclude Include="Game\TestArea\TestUI.h" />
     <ClInclude Include="Game\UIEditor\Editor.h" />
     <ClInclude Include="Game\UIEditor\EditorPlayer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Engine\Assets\Icons\icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Engine\Assets\Resources\Eril.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
