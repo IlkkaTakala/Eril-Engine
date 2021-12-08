@@ -4,6 +4,7 @@
 
 class Panel : public UIComponent
 {
+	REGISTER_UI(Panel)
 public:
 	Panel();
 	virtual ~Panel();

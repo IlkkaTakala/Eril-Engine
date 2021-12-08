@@ -22,6 +22,7 @@ struct UIStyle
 
 class Image : public UIComponent
 {
+	REGISTER_UI(Image)
 public:
 	Image();
 	virtual ~Image();

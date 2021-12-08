@@ -1,5 +1,6 @@
 #pragma once
 #include <Core.h>
+#include <UI/UI.h>
 
 struct UIMatrix;
 
@@ -59,6 +60,8 @@ public:
 	UIComponent* SetEventCallback(uint event, Constants::UI::UIEventCallback call);
 
 	virtual void HoverCheck(Vector2D& point);
+
+	virtual void LoadWithParameters(const String& args) {}
 
 protected:
 	friend class UISpace;

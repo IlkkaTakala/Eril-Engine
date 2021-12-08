@@ -77,7 +77,7 @@ TestPlayer::TestPlayer() : Player()
 	Sky->SetScale(Sky->GetScale() * 2.0f);
 
 	//Testing UI
-	auto ui = SpawnObject<TestUI>();
+	auto ui = UI::LoadFromFile("Game/TestArea/testingui.ui");
 	UI::AddToScreen(ui, this);
 
 	pause = nullptr;
