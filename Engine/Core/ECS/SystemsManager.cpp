@@ -54,13 +54,6 @@ void SystemsManager::UpdateSystems(float deltaTime)
 			
 			if (Systems.at(i)->GetType() == System::SystemType::IComponentArrayQuerySystem)
 			{
-				/*
-				IComponentArrayQuerySystem<* caSys = static_cast<IComponentArrayQuerySystem*>(Systems.at(i));
-				if (caSys->TypesWanted.size() > 0)
-				{
-					caSys->ComponentArrayQueryUpdate(deltaTime, WorldComponentManager->GetComponentVector<Component>(caSys->TypesWanted.at(0)));
-				}
-				*/
 				Systems.at(i)->Update(deltaTime);
 
 				continue;
@@ -81,5 +74,19 @@ System* SystemsManager::GetSystemByName(String systemName)
 		}
 	}
 	return nullptr;
+}
+
+void SystemsManager::ClearComponentArraySystems()
+{
+	for (int i = 0; i < static_cast<int>(Systems.size()); i++)
+	{
+		if (Systems.at(i)->GetType() == System::SystemType::IComponentArrayQuerySystem)
+		{
+			
+			IComponentArrayQuerySystem<Component>* caSys = static_cast<IComponentArrayQuerySystem<Component>*>(Systems.at(i));
+			caSys->ResetSystem();
+		}	
+	}
+
 }
 

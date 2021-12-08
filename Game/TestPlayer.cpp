@@ -253,13 +253,13 @@ void TestPlayer::BeginPlay()
 	SystemsManager* systemsManager = IECS::GetSystemsManager();
 	//Audio Testing
 	IComponentArrayQuerySystem<AudioComponent>* audioComponentArraySystem = static_cast<IComponentArrayQuerySystem<AudioComponent>*> (systemsManager->GetSystemByName("AudioControllerSystem"));
-	AudioControllerSystem* audioControllerSystem = static_cast<AudioControllerSystem*>(systemsManager->GetSystemByName("AudioControllerSystem"));
-
 	AudioComponent* audio = audioComponentArraySystem->AddComponentToSystem();
+	
+	AudioControllerSystem* audioControllerSystem = static_cast<AudioControllerSystem*>(systemsManager->GetSystemByName("AudioControllerSystem"));
 	audioComponentID = audio->GetID();
 
 	Vector audioPos = Vector(20.0f, 20.0f, terrain->GetHeight(20.0f, 20.0f) + 1.5f);
-	audio->SetSourceID(audioControllerSystem->LoadAudioFile("clicketi.WAV"));
+	audio->SetSourceID(AudioManager::LoadAudio("clicketi.WAV"));
 	audio->SetPosition(audioPos);
 	Mesh->SetLocation(audioPos);
 	audio->SetGain(1.0f);

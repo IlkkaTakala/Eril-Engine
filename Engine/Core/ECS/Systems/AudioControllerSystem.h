@@ -55,11 +55,5 @@ public:
 		}
 	}
 
-	uint LoadAudioFile(String fileName)
-	{
-		return AudioManager::LoadAudio(fileName);
-	}
-
-
 private:
 };

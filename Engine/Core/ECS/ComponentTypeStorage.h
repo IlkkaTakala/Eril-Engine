@@ -90,7 +90,7 @@ public:
 	/// <returns>Component of given ID, nullptr if the component of that ID was not found or if the component was disabled.</returns>
 	T* GetComponent(int id)
 	{
-		if (id < static_cast<int>(IndexUsage->size()))
+		if (id < static_cast<int>(Components->size()))
 		{
 			if (IndexUsage->at(id))
 			{

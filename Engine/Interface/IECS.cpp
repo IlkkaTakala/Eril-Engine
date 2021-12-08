@@ -1,6 +1,6 @@
 /*
 Author: Albert Uusi-Illikainen [RabbitTortoise]
-12.11.2021
+08.12.2021
 */
 
 #include "IECS.h"
@@ -50,6 +50,12 @@ namespace IECS
 		delete WorldComponentManager;
 		delete WorldEntityManager;
 		delete WorldSystemsManager;
+	}
+
+	void ClearECSWorld()
+	{
+		WorldSystemsManager->ClearComponentArraySystems();
+		WorldEntityManager->ClearEntities();
 	}
 
 	ComponentManager* GetComponentManager()

@@ -69,6 +69,15 @@ public:
 		ComponentTypeName = typeName;
 	}
 
+	virtual void ResetSystem()
+	{
+		SystemComponentReferenceEntity->SetProtected(false);
+		WorldEntityManager->RemoveEntity(SystemComponentReferenceEntity);
+		WorldComponentManager->GetComponentVector<T>(WorldComponentManager->GetTypeIdByName(ComponentTypeName))->clear();
+		SystemComponentReferenceEntity = WorldEntityManager->AddEntity();
+		SystemComponentReferenceEntity->SetProtected(true);
+	}
+
 	virtual void Update(float deltaTime) = 0;
 
 	/// <summary>

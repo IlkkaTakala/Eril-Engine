@@ -201,7 +201,6 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Engine\Core\Audio\Audio.cpp" />
     <ClCompile Include="Engine\Core\BasicTypes.cpp" />
     <ClCompile Include="Engine\Core\Core.cpp" />
     <ClCompile Include="Engine\Core\ECS\EntityManager.cpp" />
@@ -252,7 +251,6 @@
     <ClCompile Include="Game\Hunter.cpp" />
     <ClCompile Include="Game\TestPlayer.cpp" />
     <ClCompile Include="Game\TestUI.cpp" />
-    <ClInclude Include="Engine\Core\Audio\Audio.h" />
     <ClInclude Include="Engine\Core\BasicTypes.h" />
     <ClInclude Include="Engine\Core\Core.h" />
     <ClInclude Include="Engine\Core\ECS\Component.h" />

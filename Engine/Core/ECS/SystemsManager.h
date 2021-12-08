@@ -9,7 +9,6 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 
 class SystemsManager
 {
-	friend class ECSWorldManager;
 public:
 	SystemsManager(EntityManager* entityManager, ComponentManager* componentManager) 
 		: WorldEntityManager(entityManager), WorldComponentManager(componentManager) {}
@@ -45,7 +44,7 @@ public:
 
 	System* GetSystemByName(String systemName);
 	
-
+	void ClearComponentArraySystems();
 
 protected:
 	EntityManager* WorldEntityManager;

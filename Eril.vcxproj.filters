@@ -148,7 +148,6 @@
     <ClCompile Include="Game\ECS_Examples\ECSExample.cpp">
       <Filter>Game\ECSExamples</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\Audio\Audio.cpp" />
     <ClCompile Include="Engine\Interface\AudioManager.cpp">
       <Filter>Engine\Interface</Filter>
     </ClCompile>
@@ -375,7 +374,6 @@
     <ClInclude Include="Game\EngineInterface.h">
       <Filter>Engine\Interface</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\Audio\Audio.h" />
     <ClInclude Include="Engine\Interface\AudioManager.h">
       <Filter>Engine\Interface</Filter>
     </ClInclude>
