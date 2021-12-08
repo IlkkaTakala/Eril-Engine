@@ -14,6 +14,7 @@ namespace IECS
 {
 	void Init();
 	void Destroy();
+	void ClearECSWorld();
 
 	ComponentManager* GetComponentManager();
 	EntityManager* GetEntityManager();

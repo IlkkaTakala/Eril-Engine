@@ -183,50 +183,10 @@ void TestPlayer::InputExit(bool down)
 	
 }
 
+void TimeFunction (float d)
 {
 }
 
-/*
-uint audioID = 0;
-bool first = true;
-Vector audioPos(10.0f, 10.0f, 1.0f);
-
-void AudioTimer(float d)
-{ 
-	if (first)
-	{
-		audioID  = AudioManager::LoadAudio("clicketi.wav");
-		AudioManager::SetAudioRelativity(audioID, false);
-		first = false;
-	}
-	
-	
-	AudioManager::SetAudioGain(audioID, 0.5f);
-
-	AudioManager::PlayAudio(audioID, audioPos);
-	Timer::CreateTimer(7.0f, AudioTimer);
-}
-
-uint audioID2 = 0;
-bool first2 = true;
-
-void AudioTimer2(float d)
-{
-
-	if (first2)
-	{
-		audioID2 = AudioManager::LoadAudio("whistle.wav");
-		first2 = false;
-	}
-	AudioManager::PlayAudio(audioID2);
-	AudioManager::SetAudioGain(audioID2, 0.1f);
-
-
-	Timer::CreateTimer(15.0f, AudioTimer2);
-}
-
-
-*/
 
 void TestPlayer::Tick(float deltaTime)
 {

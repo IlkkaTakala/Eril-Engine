@@ -124,9 +124,6 @@
     <ClCompile Include="Engine\Interface\IRender.cpp">
       <Filter>Engine\Interface</Filter>
     </ClCompile>
-    <ClCompile Include="Game\EngineInterface.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Core\LightData.cpp">
       <Filter>Engine\Deprecated</Filter>
     </ClCompile>
@@ -159,6 +156,12 @@
     </ClCompile>
     <ClCompile Include="Game\PauseUI.cpp">
       <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Interface\AudioManager.cpp">
+      <Filter>Engine\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\EngineInterface.cpp">
+      <Filter>Engine\Interface</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
