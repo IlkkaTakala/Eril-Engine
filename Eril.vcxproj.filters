@@ -160,6 +160,9 @@
     <ClCompile Include="Game\PauseUI.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="Game\Disco\DiscoPlayer.cpp">
+      <Filter>Game\Disco</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -215,6 +218,9 @@
     </Filter>
     <Filter Include="Game\MainMenu">
       <UniqueIdentifier>{2ab0c0ce-2ceb-4351-ae11-5553dc38f389}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Disco">
+      <UniqueIdentifier>{c1638df8-5fae-4cd8-9d38-56e874a765f3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -400,6 +406,9 @@
     </ClInclude>
     <ClInclude Include="Game\PauseUI.h">
       <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Disco\DiscoPlayer.h">
+      <Filter>Game\Disco</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

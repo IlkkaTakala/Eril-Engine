@@ -3,23 +3,19 @@
 #include "Settings.h"
 #include "Gameplay/PlayerController.h"
 
-class Actor;
-class InstancedObject;
 class Light;
 class MovementComponent;
-class Terrain;
-class Hunter;
 class PauseUI;
 
 //ECS TEST
 class ECSExample;
 
-class TestPlayer : public Player
+class DiscoPlayer : public Player
 {
-	REGISTER(TestPlayer);
+	REGISTER(DiscoPlayer);
 public:
-	TestPlayer();
-	virtual ~TestPlayer() { /*INI->SetValue("Player", "Start", CameraPoint.ToString()); INI->SetValue("Player", "Direction", CameraDirection.ToString());*/ }
+	DiscoPlayer();
+	virtual ~DiscoPlayer() { }
 	virtual void Tick(float Delta) override;
 	virtual void BeginPlay() override;
 	virtual void OnDestroyed() override;
@@ -52,8 +48,6 @@ private:
 
 	bool cursorState;
 	bool InputMode;
-	Ref<Light> DirLight;
-	Ref<VisibleObject> Sky;
 	PauseUI* pause;
 
 	//ECS TEST
