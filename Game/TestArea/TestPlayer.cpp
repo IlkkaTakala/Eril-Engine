@@ -34,17 +34,12 @@ void TestPlayer::UseCursor(bool keydown)
 
 TestPlayer::TestPlayer() : Player()
 {
-	//ECS Example
-	//ecsExample = SpawnObject<ECSExample>();
 
 	mouseSens = 0.5f;
 	Speed = 5.f;
 	InputMode = true;
 	cursorState = true;
 	spawnCounter = 0;
-
-	//GetCamera()->SetLocation(INI->GetValue("Player", "Start"));
-	//GetCamera()->SetRotation(INI->GetValue("Player", "Direction"));
 
 	//Reqister used Inputs
 	II->RegisterKeyContinuousInput(81, &TestPlayer::RunInputQ, this);
@@ -91,7 +86,7 @@ TestPlayer::TestPlayer() : Player()
 //Handle Inputs
 void TestPlayer::RunInputQ(float delta, bool KeyDown)
 {
-	Vector dir(0.0,0.0,1.0);
+	Vector dir(0.0, 0.0, 1.0);
 	Movement->AddInput(dir.Normalize());
 }
 void TestPlayer::RunInputZ(float delta, bool KeyDown)
@@ -180,7 +175,7 @@ void TestPlayer::InputExit(bool down)
 		WindowManager::SetShowCursor(0, false);
 		cursorState = true;
 	}
-	
+
 }
 
 void TimeFunction (float d)
@@ -195,37 +190,15 @@ void TestPlayer::Tick(float deltaTime)
 	GetCamera()->SetLocation(Location + Vector(0.f, 0.f, 1.5f));
 	GetCamera()->SetRotation(Rotation);
 	Sky->SetLocation(Location);
-
-	//audioPos.X += 4.5f * deltaTime;
-
-	//Mesh->SetLocation(audioPos);
-
-	//AudioManager::SetAudioPosition(audioID, audioPos);
 	
 	Vector listenerPos = Location;
 	Vector listenerOrientation = GetCamera()->GetForwardVector();
 	AudioManager::SetListener(listenerPos, -GetCamera()->GetForwardVector(), -GetCamera()->GetUpVector());
-	//Console::Log(std::to_string(listenerPos.X) + "," + std::to_string(listenerPos.Y) + "," + std::to_string(listenerPos.Z) + ", Rot: " + std::to_string(GetCamera()->GetForwardVector().X) + "," + std::to_string(GetCamera()->GetForwardVector().Y) + "," + std::to_string(GetCamera()->GetForwardVector().Z));
 }
 
 void TestPlayer::BeginPlay()
 {
-	
-	//AudioTimer(0.0f);
 
-
-	//AudioTimer2(0.0f);
-
-	printf("Spawned object\n");
-	Timer::CreateTimer(5.f, TimeFunction, false);
-
-	
-
-	uint64 l = 0xABCDEF0123456789;
-	uint32 h = (uint32)l;
-	printf("0x%lx\n", h);
-	
-	
 	Terrain* terrain = ObjectManager::GetByRecord<Terrain>(0xA0005554);
 
 	
@@ -259,7 +232,7 @@ void TestPlayer::BeginPlay()
 		DirLight->Size = 3.f;
 		DirLight->Intensity = 1.f;
 		DirLight->Color = Vector(1.f);
-		DirLight->Rotation = Vector(0.5, 0.5, -0.5); 
+		DirLight->Rotation = Vector(0.5, 0.5, -0.5);
 
 		for (int i = 0; i < 10; i++)
 		{

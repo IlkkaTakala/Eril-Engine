@@ -160,6 +160,12 @@
     <ClCompile Include="Game\Disco\DiscoPlayer.cpp">
       <Filter>Game\Disco</Filter>
     </ClCompile>
+    <ClCompile Include="Game\ForestGame\ForestPlayer.cpp">
+      <Filter>Game\ForestGame</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\ForestGame\Ghost.cpp">
+      <Filter>Game\ForestGame</Filter>
+	</ClCompile>
     <ClCompile Include="Engine\Interface\AudioManager.cpp">
       <Filter>Engine\Interface</Filter>
     </ClCompile>
@@ -224,6 +230,9 @@
     </Filter>
     <Filter Include="Game\Disco">
       <UniqueIdentifier>{c1638df8-5fae-4cd8-9d38-56e874a765f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\ForestGame">
+      <UniqueIdentifier>{734f2662-5704-48ce-8f67-7c7c45fe62c9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -427,6 +436,12 @@
     </ClInclude>
     <ClInclude Include="Game\Disco\DiscoLightSystem.h">
       <Filter>Game\Disco</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\ForestGame\ForestPlayer.h">
+      <Filter>Game\ForestGame</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\ForestGame\Ghost.h">
+      <Filter>Game\ForestGame</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

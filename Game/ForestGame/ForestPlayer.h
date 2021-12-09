@@ -11,15 +11,45 @@ class Terrain;
 class Hunter;
 class PauseUI;
 
+class Item : public BaseObject
+{
+	REGISTER(Item)
+public:
+	Item();
+
+	virtual ~Item() { }
+
+	virtual void BeginPlay();
+
+	virtual void DestroyObject();
+};
+
+class PlaceableItem : public Actor
+{
+	REGISTER(PlaceableItem)
+public:
+	PlaceableItem();
+
+	virtual ~PlaceableItem() { }
+
+	virtual void BeginPlay();
+
+	virtual void DestroyObject();
+
+	Ref<MovementComponent> Move;
+	Ref<VisibleObject> Mesh;
+};
+
+
 //ECS TEST
 class ECSExample;
 
-class TestPlayer : public Player
+class ForestPlayer : public Player
 {
-	REGISTER(TestPlayer);
+	REGISTER(ForestPlayer);
 public:
-	TestPlayer();
-	virtual ~TestPlayer() { }
+	ForestPlayer();
+	virtual ~ForestPlayer() { /*INI->SetValue("Player", "Start", CameraPoint.ToString()); INI->SetValue("Player", "Direction", CameraDirection.ToString());*/ }
 	virtual void Tick(float Delta) override;
 	virtual void BeginPlay() override;
 	virtual void OnDestroyed() override;
@@ -28,8 +58,8 @@ private:
 	float mouseSens;
 	float Speed;
 
-	void RunInputQ(float delta, bool KeyDown);
-	void RunInputZ(float delta, bool KeyDown);
+	void ItemThrowQ(bool KeyDown);
+	void ItemPickE(bool KeyDown);
 	void RunInputW(float delta, bool KeyDown);
 	void RunInputA(float delta, bool KeyDown);
 	void RunInputD(float delta, bool KeyDown);
@@ -53,13 +83,23 @@ private:
 	bool cursorState;
 	bool InputMode;
 	Ref<Light> DirLight;
+	Ref<Light> Lights[100];
+	Ref<InstancedObject> Trees;
+	Ref<InstancedObject> Trees2;
+	Ref<InstancedObject> Grass;
+	Ref<InstancedObject> Flowers;
+	Ref<InstancedObject> Rocks;
+	Ref<InstancedObject> Shacks;
+	Ref<InstancedObject> Candy;
+
 	Ref<VisibleObject> Sky;
+	Ref<Terrain> terra[4];
+	Ref<Hunter> hunt;
 	PauseUI* pause;
 
 	//ECS TEST
 	Ref<ECSExample> ecsExample;
 
-	int audioComponentID;
-
 	int spawnCounter;
+	std::vector<Ref<Item>> Items;
 };

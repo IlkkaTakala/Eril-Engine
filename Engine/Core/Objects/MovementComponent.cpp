@@ -47,14 +47,40 @@ void MovementComponent::Tick(float time)
 	{
 		const Vector gravity(0.f, 0.f, -9.8f);
 		Vector delta;
+		Vector delta_a;
+		Vector velocity;
+		Vector brake_a;
 
-		if (isGravity) DesiredState.acceleration += gravity * time;
-		DesiredState.velocity += DesiredState.acceleration * time;
-		delta = DesiredState.velocity * time;
-		Object->AddLocation(delta);
+		if (isGravity) {
+			DesiredState.acceleration += gravity;
+			velocity += DesiredState.acceleration;
+			//velocity += gravity;
+		}
+		
+		for (int i = 0; i < force_count; i++) {
+			delta_a += forces[i].Direction;
+		}
+
+		velocity = OldState.velocity + delta_a * time + brake_a;
+
+		//float drag = velocity.LengthSquared() * (0.5f / max_speed);
+
+		//velocity -= velocity.Normalize() * drag;
+
+		//if (velocity.LengthSquared() > max_speed * max_speed) velocity = velocity.Normalize() * max_speed;
+
+		//if (velocity.LengthSquared() < 0.01f) velocity = 0.f;
+
+		DesiredState.location = Object->GetLocation() + velocity;
+		if (!inAir && Terra != nullptr) {
+			velocity.Z = 0.f;
+			DesiredState.location.Z = Terra->GetHeight(DesiredState.location.X, DesiredState.location.Y);
+		}
+		DesiredState.velocity = velocity;
+
 	}
 	break;
-
+	
 	case false:
 	{
 		Vector delta_a;
@@ -72,7 +98,7 @@ void MovementComponent::Tick(float time)
 			brake_a = brake_a.LengthSquared() > DesiredState.velocity.LengthSquared() ? -DesiredState.velocity : brake_a;
 		}
 		for (int i = 0; i < force_count; i++) {
-			//delta_a += forces[i].Direction;
+			delta_a += forces[i].Direction;
 		}
 
 		velocity = OldState.velocity + delta_a * time + brake_a;

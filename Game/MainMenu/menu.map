@@ -1,18 +1,2 @@
 <header version='1.0' />
 <MenuPlayer id="4"/>
-<Terrain id="A0005554" args="Scale:100,100,1;Resolution:100" />
-<InstancedObject id="B0005556" args=
-"Instances:
-	1,10,0-0,0,0-1,1,1-
-	
-	5,10,0-0,0,0-1,1,1-
-	
-	9,10,0-0,0,0-1,1,1-
-	
-	13,10,0-0,0,0-1,1,1-
-	
-	18,10,0-0,0,0-1,1,1;
-	
-Mesh:Cube;
-Material:0Assets/Materials/ground;"
-/>
