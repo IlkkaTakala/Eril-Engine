@@ -238,7 +238,15 @@ void UISpace::GetTextInput(uint input)
 	auto e = dynamic_cast<TextBox*>(Focused);
 	if (e != nullptr) {
 		String s = e->GetText();
-		s += (char)input;
+		switch (input)
+		{
+		case 259:
+			if (s != "") s.pop_back();
+			break;
+		default:
+			s += (char)input;
+			break;
+		}
 		e->SetText(s);
 	}
 }

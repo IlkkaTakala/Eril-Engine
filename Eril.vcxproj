@@ -244,6 +244,7 @@
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\UI.cpp" />
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\UIComponent.cpp" />
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\UISpace.cpp" />
+    <ClCompile Include="Engine\RenderCore\OpenGL\UI\VerticalPanel.cpp" />
     <ClCompile Include="Game\ECS_Examples\ECSExample.cpp" />
     <ClCompile Include="Game\EngineInterface.cpp" />
     <ClCompile Include="Game\MainMenu\MenuPlayer.cpp" />
@@ -303,6 +304,7 @@
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Text.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\TextBox.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\UI.h" />
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\VerticalPanel.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\UI\UIComponent.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\UI\UISpace.h" />
     <ClInclude Include="Game\ECS_Examples\Components\PositionComponent.h" />

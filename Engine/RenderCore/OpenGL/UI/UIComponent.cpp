@@ -26,6 +26,7 @@ UIComponent::UIComponent()
 	z_index = 0;
 	realDepth = 0.f;
 	desiredSize = Vector2D();
+	bounds = Vector2D();
 
 	focusable = false;
 	hasFocus = false;
@@ -63,23 +64,24 @@ void UIComponent::UpdateMatrices(const Vector2D& size)
 
 	glm::vec3 gloc = parent == nullptr ? glm::vec3(0.f) : glm::vec3(parent->topLeft.X, parent->topLeft.Y, 0.f);
 	glm::vec3 scale(1.f);
-	glm::vec2 bounds = glm::vec2(size.X, size.Y);
+	glm::vec2 bound = size.X == 0 ? glm::vec2(bounds.X, bounds.Y) : glm::vec2(size.X, size.Y);
+	this->bounds = Vector2D(bound.x, bound.y);
 
 	if (anchor_v.Y <= anchor_v.X) {
 		scale.y = bottomOffset;
-		gloc.y += bounds.y * anchor_v.X + topOffset - (bottomOffset * origin.Y);
+		gloc.y += bound.y * anchor_v.X + topOffset - (bottomOffset * origin.Y);
 	}
 	else {
-		gloc.y += anchor_v.X * bounds.y + topOffset;
-		scale.y = (anchor_v.Y * bounds.y - bottomOffset);
+		gloc.y += anchor_v.X * bound.y + topOffset;
+		scale.y = (anchor_v.Y * bound.y - bottomOffset - topOffset);
 	}
 	if (anchor_h.Y <= anchor_h.X) {
 		scale.x = rightOffset;
-		gloc.x += bounds.x * anchor_h.X + leftOffset - (rightOffset * origin.X);
+		gloc.x += bound.x * anchor_h.X + leftOffset - (rightOffset * origin.X);
 	}
 	else {
-		gloc.x += anchor_h.X * bounds.x + leftOffset;
-		scale.x = (anchor_h.Y * bounds.x - rightOffset);
+		gloc.x += anchor_h.X * bound.x + leftOffset;
+		scale.x = (anchor_h.Y * bound.x - rightOffset - leftOffset);
 	}
 
 	glm::mat4 model = glm::translate(glm::mat4(1.f), gloc) * glm::scale(glm::mat4(1.f), scale);
@@ -104,6 +106,13 @@ UIComponent* UIComponent::SetTransform(float left, float right, float top, float
 	anchor_v = anchor_vert;
 	anchor_h = anchor_hor;
 
+	return this;
+}
+
+UIComponent* UIComponent::SetOrigin(float x, float y)
+{
+	origin.X = x;
+	origin.Y = y;
 	return this;
 }
 

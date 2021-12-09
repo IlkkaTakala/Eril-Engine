@@ -11,13 +11,26 @@ void InputCallback(int key, int code, int action, int mods)
 {
 	GLInput* in = dynamic_cast<GLInput*>(II);
 
+	if (in->isText) {
+		switch (key)
+		{
+		case 259:
+		{
+			if (action == GLFW_PRESS) in->Chars.push(key);
+			return;
+		}
+		default:
+			break;
+		}
+	}
+
 	KeyAction next;
 	next.key = key;
 	next.scancode = code;
 	next.action = action;
 	next.mods = mods;
-
 	in->Inputs.push(next);
+
 }
 
 void MouseInputCallback(int button, int action, int mods)

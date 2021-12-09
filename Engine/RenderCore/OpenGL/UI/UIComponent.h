@@ -29,7 +29,8 @@ namespace Constants
 		constexpr uint	UI_ON_FOCUS = 5;
 		constexpr uint	UI_ON_LOST_FOCUS = 6;
 
-		typedef void (*UIEventCallback)(void);
+		typedef std::function<void(void)> UIEventCallback;
+		//typedef void (*UIEventCallback)(void);
 	}
 }
 
@@ -46,7 +47,7 @@ public:
 	virtual void Render() = 0;
 	virtual void UpdateMatrices(const Vector2D& size);
 	UIComponent* SetTransform(float left = 0.f, float right = 0.f, float top = 0.f, float bottom = 0.f, Vector anchor_vert = Vector(), Vector anchor_hor = Vector());
-
+	UIComponent* SetOrigin(float x, float y);
 	bool Trace(const Vector2D& point) const;
 
 	virtual void OnLeave() { if (callbacks[Constants::UI::UI_ON_LEAVE] != nullptr) callbacks[Constants::UI::UI_ON_LEAVE](); }
@@ -87,6 +88,7 @@ protected:
 	Vector2D realSize;
 	Vector2D topLeft;
 	Vector2D desiredSize;
+	Vector2D bounds;
 
 	bool focusable;
 	bool hasFocus;

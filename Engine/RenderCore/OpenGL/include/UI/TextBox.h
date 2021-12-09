@@ -4,6 +4,7 @@
 
 class TextBox : public Button
 {
+	REGISTER_UI(TextBox)
 public:
 	TextBox();
 	virtual ~TextBox();

@@ -166,6 +166,9 @@
     <ClCompile Include="Game\UIEditor\EditorPlayer.cpp">
       <Filter>Game\UIEditor</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\RenderCore\OpenGL\UI\VerticalPanel.cpp">
+      <Filter>Engine\OpenGL\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -421,6 +424,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Assets\Resources\resource.h">
       <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\VerticalPanel.h">
+      <Filter>Engine\OpenGL\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -306,7 +306,7 @@ void Text::Render()
 				storage[i].offset = 0;
 			}
 		}
-		int total_length = storage[value.size() - 1].offset + fonts[font].glyphs[storage[value.size() - 1].letter].advance;
+		int total_length = value == "" ? 0 : storage[value.size() - 1].offset + fonts[font].glyphs[storage[value.size() - 1].letter].advance;
 		int center = (realSize.X - total_length * ratio) / 2;
 
 		switch (just)

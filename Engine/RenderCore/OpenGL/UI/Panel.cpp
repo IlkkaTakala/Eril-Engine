@@ -40,6 +40,20 @@ Panel* Panel::AddChild(UIComponent* child)
 	return this;
 }
 
+int Panel::GetChildIndex(UIComponent* child)
+{
+	auto findResult = std::find_if(std::begin(children), std::end(children), [&](const std::pair<int, UIComponent*>& pair)
+		{
+			return pair.second == child;
+		});
+
+	if (findResult != children.end())
+	{
+		return std::distance(children.begin(), findResult);
+	} else
+		return -1;
+}
+
 void Panel::Render()
 {
 	if (visible != Visibility::Visible) return;
