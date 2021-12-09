@@ -36,7 +36,7 @@ uint WindowManager::CreateMainWindow(int width, int height)
 	glfwWindowHint(GLFW_SAMPLES, 4);
 
 	Console::Log("Creating window...");
-	GLFWwindow* Window = glfwCreateWindow(width, height, "Eril Engine Demo | Loading...", NULL, NULL);
+	GLFWwindow* Window = glfwCreateWindow(width, height, "Eril Engine | Loading...", NULL, NULL);
 	if (!Window) {
 		glfwTerminate();
 		return -1;

@@ -36,8 +36,9 @@ void ObjectManager::CleanObjects()
 {
 	while (ObjectRecords.size() > 0)
 	{
-		DeleteRecord(ObjectRecords.begin()->first);
+		ObjectRecords.begin()->second->object->DestroyObject();
 	}
+	Loop->ClearTick();
 }
 
 void ObjectManager::AddTick(Tickable* t)

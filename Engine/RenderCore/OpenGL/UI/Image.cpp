@@ -83,8 +83,6 @@ Image::~Image()
 	delete solid_shader;
 	delete texture_shader;
 
-	delete style.texture;
-
 	glDeleteBuffers(1, &uniformBuffer);
 }
 

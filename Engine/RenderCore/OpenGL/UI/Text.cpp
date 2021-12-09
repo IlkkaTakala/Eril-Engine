@@ -26,15 +26,14 @@ struct Glyph
 
 struct Letter
 {
-	uint offset;
-	uint8 letter;
+	int offset;
+	uint letter;
 };
 
 struct Font
 {
 	Font() {
 		tex = nullptr;
-		kerningTexture = 0;
 		charBuffer = 0;
 		charCount = 0;
 		kerningCount = 0;
@@ -45,7 +44,6 @@ struct Font
 	void Destroy() {
 		delete tex;
 		glDeleteBuffers(1, &charBuffer);
-		glDeleteTextures(1, &kerningTexture);
 	}
 	Texture* tex;
 	int charCount;
@@ -53,7 +51,6 @@ struct Font
 	Glyph glyphs[256];
 	std::map<char, std::map<char, int>> kernings;
 	uint charBuffer;
-	uint kerningTexture;
 	uint originalSize;
 };
 
@@ -143,8 +140,6 @@ Font loadFont(String name)
 	line = readLine(line, data);
 	f.kerningCount = atoi(readParamOnLine("count", line, data).c_str());
 
-	int* kernData = new int[256 * 256]();
-
 	for (int i = 0; i < f.kerningCount; i++) {
 		line = readLine(line, data);
 		int first = atoi(readParamOnLine("first", line, data).c_str());
@@ -153,25 +148,15 @@ Font loadFont(String name)
 		int idx = first * 256 + second;
 		if (idx < 256 * 256 && idx >= 0)
 		{
-			kernData[idx] = kern;
 			f.kernings[first][second] = kern;
 		}
 		else Console::Error("Invalid kerning");
 	}
 
-	glGenTextures(1, &f.kerningTexture);
-	glBindTexture(GL_TEXTURE_2D, f.kerningTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R8I, 256, 256, 0, GL_RED_INTEGER, GL_INT, kernData);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-
 	glGenBuffers(1, &f.charBuffer);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, f.charBuffer);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(Glyph) * 256, f.glyphs, GL_STATIC_DRAW);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-	delete[] kernData;
 
 	f.tex = RI->LoadTextureByName("Assets/Fonts/" + file);
 
@@ -197,7 +182,7 @@ struct CharData {
 };
 
 struct LetterData {
-	uint offset;
+	int offset;
 	uint letter;
 };
 
@@ -242,7 +227,7 @@ void main()
 	uint character = 0;
 	
 	if (gl_LocalInvocationIndex == 0) {
-		width = 0.3 - (weight / 100.0 - 1.0) * 0.1;
+		width = 0.5 - (weight / 100.0 - 1.0) * 0.13;
 	}
 
 	uint threadCount = TILE_SIZE;
@@ -255,16 +240,18 @@ void main()
 
 		uint letter = stringBuffer[stringIndex].letter;
 		ivec2 size = charBuffer[letter].size;
-		uint xoffset = stringBuffer[stringIndex].offset + charBuffer[letter].offset.x;
-		uint yoffset = charBuffer[letter].offset.y;
+		int xoffset = stringBuffer[stringIndex].offset + charBuffer[letter].offset.x;
+		xoffset = int(xoffset * fontsize);
+		int yoffset = int(charBuffer[letter].offset.y * fontsize);
 		ivec2 dataLoc = charBuffer[letter].topLeft;
-		vec4 result = vec4(1.0);
-		for (int y = 0; y < size.y; y++) {
-			for (int x = 0; x < size.x; x++) {
-				vec2 screenLoc = vec2(xoffset + x, yoffset + y) * fontsize;
+		ivec2 endSize = ivec2(size * fontsize);
+		for (int y = 0; y < endSize.y; y++) {
+			for (int x = 0; x < endSize.x; x++) {
+				vec4 result = vec4(1.0);
+				vec2 screenLoc = vec2(xoffset + x, yoffset + y);
 				ivec2 loc = ivec2(screenLoc.x + topLeft.x, screenSize.y - (topLeft.y + screenLoc.y));
 				//if (texture(depthMap, loc / vec2(screenSize)).r == depthValue) {
-					float fontValue = imageLoad(fontAtlas, dataLoc + ivec2(x, y)).r;
+					float fontValue = imageLoad(fontAtlas, dataLoc + ivec2((ivec2(x, y) / fontsize))).r;
 					result.a = smoothstep(width, width + fade, fontValue);
 					result *= color * tint;
 					vec4 ogColor = imageLoad(colorDest, loc);
@@ -333,7 +320,7 @@ void Text::Render()
 			break;
 		case Justify::Right:
 			for (int i = 0; i < value.size(); i++) {
-				storage[i].offset += center;
+				storage[i].offset -= total_length;
 			}
 			break;
 		default:

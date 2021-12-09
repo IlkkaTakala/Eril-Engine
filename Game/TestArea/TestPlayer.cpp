@@ -7,7 +7,9 @@
 #include "Hunter.h"
 #include "Objects/Actor.h"
 #include "TestUI.h"
+#include "PauseUI.h"
 #include <Interface/WindowManager.h>
+#include <GamePlay/Scene.h>
 
 //ECS
 #include <Interface/IECS.h>
@@ -19,10 +21,10 @@
 void TestPlayer::OpenConsole(bool) {
 	Console::Create();
 }
-static bool cursorState = true;
+
 void TestPlayer::UseCursor(bool keydown)
 {
-	if (!keydown) {
+	if (keydown && pause == nullptr) {
 		WindowManager::SetShowCursor(0, cursorState);
 		cursorState = !cursorState;
 	}
@@ -34,6 +36,7 @@ TestPlayer::TestPlayer() : Player()
 	Speed = 15.f;
 
 	InputMode = true;
+	cursorState = true;
 	spawnCounter = 0;
 
 	//GetCamera()->SetLocation(INI->GetValue("Player", "Start"));
@@ -97,6 +100,8 @@ TestPlayer::TestPlayer() : Player()
 			float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
 			arr[i].Location = Vector(x, y, terra[0]->GetHeight(x, y) - 0.2f);
 			arr[i].Scale = Vector(s);
+
+	pause = nullptr;
 		}
 		Trees->AddInstances(count, arr);
 		delete[] arr;
@@ -245,6 +250,7 @@ void TestPlayer::InputTwo(bool KeyDown)
 {
 	if (KeyDown)
 		InputMode = !InputMode;
+	Scene::OpenLevel("Assets/Maps/test");
 }
 
 void TestPlayer::RunInputShift(bool KeyDown)
@@ -256,7 +262,6 @@ void TestPlayer::RunInputShift(bool KeyDown)
 
 void TestPlayer::LeftMouseDown(bool)
 {
-
 }
 
 void TestPlayer::RightMouseDown(bool KeyDown)
@@ -295,6 +300,24 @@ void TestPlayer::MouseMoved(float X, float Y)
 {
 	const Vector& rot = Rotation;
 	if (cursorState) SetRotation(Vector(rot.X + X * mouseSens, rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, rot.Z));
+}
+
+void TestPlayer::InputExit(bool down)
+{
+	if (!down) return;
+	if (pause == nullptr) {
+		pause = SpawnObject<PauseUI>();
+		UI::AddToScreen(pause, this);
+		WindowManager::SetShowCursor(0, true);
+		cursorState = false;
+	}
+	else {
+		pause->DestroyObject();
+		pause = nullptr;
+		WindowManager::SetShowCursor(0, false);
+		cursorState = true;
+	}
+	
 }
 
 void TestPlayer::Tick(float)
@@ -394,6 +417,10 @@ void PlaceableItem::BeginPlay()
 		}
 	}*/
 	Console::Log("Hello beautiful world");
+}
+
+void TestPlayer::OnDestroyed()
+{
 }
 
 void PlaceableItem::DestroyObject()

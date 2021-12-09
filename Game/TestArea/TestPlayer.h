@@ -9,7 +9,7 @@ class Light;
 class MovementComponent;
 class Terrain;
 class Hunter;
-class VisibleObject;
+class PauseUI;
 
 class Item : public BaseObject
 {
@@ -46,11 +46,13 @@ class ECSExample;
 
 class TestPlayer : public Player
 {
+	REGISTER(TestPlayer);
 public:
 	TestPlayer();
 	virtual ~TestPlayer() { /*INI->SetValue("Player", "Start", CameraPoint.ToString()); INI->SetValue("Player", "Direction", CameraDirection.ToString());*/ }
 	virtual void Tick(float Delta) override;
 	virtual void BeginPlay() override;
+	virtual void OnDestroyed() override;
 
 private:
 	float mouseSens;
@@ -70,7 +72,7 @@ private:
 	void RightMouseDown(bool KeyDown);
 	void MouseMoved(float X, float Y);
 
-	void InputExit(bool) { Exit(); }
+	void InputExit(bool);
 
 	void OpenConsole(bool);
 	void UseCursor(bool);
@@ -78,6 +80,7 @@ private:
 	Ref<MovementComponent> Movement;
 	Ref<VisibleObject> Mesh;
 
+	bool cursorState;
 	bool InputMode;
 	Ref<Light> DirLight;
 	Ref<Light> Lights[100];
@@ -92,7 +95,7 @@ private:
 	Ref<VisibleObject> Sky;
 	Ref<Terrain> terra[4];
 	Ref<Hunter> hunt;
-
+	PauseUI* pause;
 
 	//ECS TEST
 	Ref<ECSExample> ecsExample;
