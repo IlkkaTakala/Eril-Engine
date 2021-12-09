@@ -1,6 +1,9 @@
 <header version='1.0' />
 <ForestPlayer id="4" />
-<Terrain id="A0001111" args="Scale:1000,1000,1; Material:Assets/Materials/ground; Resolution:100;" />
+<Terrain id="A0001111" args="Scale:100,100,1; Material:Assets/Materials/ground; Resolution:100;" />
+<Terrain id="A0001121" args="Scale:100,100,1; Location:-100,-100,0; Material:Assets/Materials/ground; Resolution:100;" />
+<Terrain id="A0001122" args="Scale:100,100,1; Location: 0,-100,0; Material:Assets/Materials/ground; Resolution:100;" />
+<Terrain id="A0001123" args="Scale:100,100,1; Location:-100,0,0; Material:Assets/Materials/ground; Resolution:100;" />
 <InstancedObject id="A0001112" args="Randomize:100; InTerrain:A0001111; Mesh:tree;		Material1:Assets/Materials/tree;  Material2:Assets/Materials/leaves;"  />
 <InstancedObject id="A0001113" args="Randomize:20;  InTerrain:A0001111; Mesh:rock;		Material1:Assets/Materials/rock;" />
 <InstancedObject id="A0001114" args="Randomize:10;  InTerrain:A0001111; Mesh:shack;		Material1:Assets/Materials/shack; Material2:Assets/Materials/shack;" />

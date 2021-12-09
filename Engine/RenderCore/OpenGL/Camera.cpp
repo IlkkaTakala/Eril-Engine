@@ -5,6 +5,7 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include "Settings.h"
+#include "Renderer.h"
 
 GLCamera::GLCamera(RenderObject* parent)
 {
@@ -16,6 +17,8 @@ GLCamera::GLCamera(RenderObject* parent)
 	Orientation = glm::mat4(1.0f);
 
 	ApplyTransformation();
+
+	SetPostProcess("PostProcessMaster");
 
 	int x = std::atoi(INI->GetValue("Render", "ResolutionX").c_str());
 	int y = std::atoi(INI->GetValue("Render", "ResolutionY").c_str());
@@ -89,6 +92,11 @@ const Vector& GLCamera::GetLocation() const
 
 void GLCamera::SetLookAt(const Vector& to, const Vector& up) {
 	Orientation = glm::inverse(glm::lookAtRH(glm::vec3(Location.X, Location.Z, Location.Y), glm::vec3(to.X, to.Z, to.Y), glm::vec3(up.X, up.Z, up.Y)));
+}
+
+void GLCamera::SetPostProcess(const String& name)
+{
+	postProcess = dynamic_cast<Renderer*>(RI)->Shaders.at(name);
 }
 
 void GLCamera::ApplyTransformation()

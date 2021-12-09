@@ -40,9 +40,6 @@ ForestPlayer::ForestPlayer() : Player()
 	pause = nullptr;
 	spawnCounter = 0;
 
-	//GetCamera()->SetLocation(INI->GetValue("Player", "Start"));
-	//GetCamera()->SetRotation(INI->GetValue("Player", "Direction"));
-
 	//Reqister used Inputs
 	II->RegisterKeyContinuousInput(87, &ForestPlayer::RunInputW, this);
 	II->RegisterKeyContinuousInput(65, &ForestPlayer::RunInputA, this);
@@ -68,13 +65,8 @@ ForestPlayer::ForestPlayer() : Player()
 	Movement = SpawnObject<MovementComponent>();
 	Movement->SetTarget(dynamic_cast<Actor*>(this));
 	Movement->SetGravity(true);
-	Movement->SetGround(ObjectManager::GetByRecord<Terrain>(0xA0001111));
 
-	//Skybox
-	Sky = SpawnObject<VisibleObject>();
-	Sky->SetModel(MI->LoadData(Sky, "SkySphere"));
-	Sky->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/Sky"));
-
+	GetCamera()->SetPostProcess("PostProcessForest");
 }
 
 void ForestPlayer::RunInputW(float delta, bool KeyDown)
@@ -191,19 +183,11 @@ void ForestPlayer::Tick(float)
 {
 	GetCamera()->SetLocation(Location + Vector(0.f, 0.f, 1.5f));
 	GetCamera()->SetRotation(Rotation);
-	Sky->SetLocation(Location);
 }
 
 void ForestPlayer::BeginPlay()
 {
-	RecordInt r = GetRecord();//0xABCDEF0123456789;
-
-	if (r.GetSpawnState() == Constants::Record::SPAWNED) {
-		Console::Log("Spawned object");
-	}
-	uint64 l = 0xABCDEF0123456789;
-	uint32 h = (uint32)l;
-	Console::Log("0x%lx " + std::to_string(h));
+	Movement->SetGround(ObjectManager::GetByRecord<Terrain>(0xA0001111));
 
 	Console::Log("Hello beautiful world");
 }

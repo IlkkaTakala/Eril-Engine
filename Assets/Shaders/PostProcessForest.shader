@@ -98,7 +98,7 @@ void main()
 	
 	vec3 pixelPos = WorldPosFromDepth(texture(Depth, TexCoords).r);
 	
-	//result = applyFog(result, length(pixelPos - viewPos.xyz), normalize(pixelPos - viewPos.xyz), normalize(vec3(-1.0, 1.0, -1.0)));
+	result = applyFog(result, length(pixelPos - viewPos.xyz), normalize(pixelPos - viewPos.xyz), normalize(vec3(-1.0, 1.0, -1.0)));
 	
     FragColor = vec4(result, 1.0);
 }

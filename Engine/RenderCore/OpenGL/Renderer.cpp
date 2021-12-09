@@ -604,7 +604,6 @@ void Renderer::LoadShaders()
 					if (!nShader->Success) nShader = nullptr;
 					if (nShader != nullptr) {
 						if (f.path().filename() == "PreDepth.shader") PreDepthShader = nShader;
-						else if (f.path().filename() == "PostProcessMaster.shader") PostProcessMaster = nShader;
 						else if (f.path().filename() == "Composite.shader") CompositeShader = nShader;
 						else if (f.path().filename() == "SSAO.shader") SSAOShader = nShader;
 						else if (f.path().filename() == "SSAOBlur.shader") SSAOBlurShader = nShader;
@@ -1214,7 +1213,7 @@ void Renderer::Render(float delta)
 	BlurRender->Blur(PostProcess->GetBloom(), 4, ScreenVao);
 	PostProcess->BindTextures();
 
-	PostProcessMaster->Bind();
+	ActiveCamera->GetPostProcess()->Bind();
 
 	glDepthFunc(GL_ALWAYS);
 	glBindVertexArray(ScreenVao);
