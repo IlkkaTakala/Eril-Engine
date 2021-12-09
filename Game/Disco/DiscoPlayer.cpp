@@ -170,20 +170,25 @@ void DiscoPlayer::BeginPlay()
 
 	if (lightSystem != nullptr)
 	{
-
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < 20; i++)
 		{
 			//Console::Log("Light addded " + std::to_string(i));
-			float x = rand() % 50;
-			float y = rand() % 50;
+			int x = rand() % 44;
+			int y = rand() % 86;
+			int z = rand() % 30;
+
+			float r = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)); // rand between 0-1
+			float g = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)); // rand between 0-1
+			float b = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)); // rand between 0-1
+
 			//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
 
-			LightComponent* light = lightSystem->AddComponentToSystem("LightComponent");
-			light->Location = Vector(x, y, 1.f);
+			LightComponent* light = lightSystem->AddComponentToSystem();
+			light->Location = Vector(-22 + x, -43 + y, 1 + z);
 			light->LightType = LIGHT_POINT;
-			light->Size = 5.f;
-			light->Intensity = rand() / (float)RAND_MAX * 20.f;
-			light->Color = Vector(x, y, 2.5f);
+			light->Size = 15.f;
+			light->Intensity = rand() / (float)RAND_MAX * 10.f + 10.0f;
+			light->Color = Vector(r, g, b);
 		}
 	}
 
