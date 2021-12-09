@@ -60,6 +60,7 @@
 #include <d2d1helper.h>
 #include <dwrite.h>
 #include <wincodec.h>
+#include <fstream>
 
 #define WM_ADDLOG (WM_USER + 0x0021)
 #define IDC_CMDLINE 2
@@ -74,6 +75,8 @@ static int yPos = 0;
 static int yStep = 14;
 static bool ConsoleOpen = false;
 static WNDPROC oldEditProc;
+
+static std::wofstream outLogs("Log.txt", std::wofstream::out);
 
 void AddLine(const String& pre, const String& line);
 
@@ -505,6 +508,11 @@ private:
 		AddLine("[>>>]", line);
 		SetWindowText(m_input, "");
 		RedrawWindow(m_hwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
+
+		if (line == "flush") {
+			Console::Log("Flushed console, file written");
+			outLogs.flush();
+		}
 	}
 
 	// The windows procedure.
@@ -575,6 +583,7 @@ private:
 						std::unique_lock<std::mutex> logLock(logsMutex);
 						for (int i = logQueue.size(); i > 0; i--) {
 							logs.push_back(logQueue.front());
+							outLogs << logQueue.front() << '\n';
 							logQueue.pop();
 							if (logs.size() > max_line_count) logs.pop_front();
 							count++;
@@ -771,6 +780,7 @@ void Console::Close()
 {
 	SendNotifyMessage(m_hwnd, WM_CLOSE, 0, 0);
 	ConsoleThread.join();
+	outLogs.flush();
 }
 
 void AddLine(const String& pre, const String& line)

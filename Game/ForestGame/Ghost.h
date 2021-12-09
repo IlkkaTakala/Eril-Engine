@@ -17,7 +17,6 @@ private:
 
 	float time;
 	Vector targetLoc;
-	float targetRot;
 	bool caught;
 
 	void SetNewTarget(float);

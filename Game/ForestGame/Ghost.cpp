@@ -7,7 +7,6 @@
 #include <Gameplay/PlayerController.h>
 #include <Objects/VisibleObject.h>
 
-
 Ghost::Ghost() : Actor()
 {
 	Mesh = SpawnObject<VisibleObject>();
@@ -21,7 +20,7 @@ Ghost::Ghost() : Actor()
 	move->SetTarget(this);
 	move->SetGravity(true);
 	move->SetGround(ObjectManager::GetByRecord<Terrain>(0xA0001111));
-	move->SetMaxSpeed(1.f);
+	move->SetMaxSpeed(6.f);
 	caught = false;
 
 	time = 0.f;

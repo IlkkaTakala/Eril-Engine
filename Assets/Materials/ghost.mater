@@ -5,4 +5,4 @@ delta=0.0
 [Vectors]
 velocity=0,0,0
 [Textures]
-Albedo=Assets/Textures/ghost.png
+Albedo=Assets/Textures/forestGame/ghost.png

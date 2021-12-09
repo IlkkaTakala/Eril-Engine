@@ -48,6 +48,7 @@ ForestPlayer::ForestPlayer() : Player()
 	II->RegisterKeyInput(32, &ForestPlayer::RunInputSpace, this);
 	II->RegisterKeyInput(340, &ForestPlayer::RunInputShift, this);
 	II->RegisterKeyInput(0, &ForestPlayer::LeftMouseDown, this);
+	II->RegisterKeyInput(1, &ForestPlayer::RightMouseDown, this);
 	II->RegisterKeyInput(49, &ForestPlayer::InputOne, this);
 	II->RegisterKeyInput(50, &ForestPlayer::InputTwo, this);
 	II->RegisterKeyInput(256, &ForestPlayer::InputExit, this);
@@ -58,9 +59,9 @@ ForestPlayer::ForestPlayer() : Player()
 
 
 	//Player Model
-	Mesh = SpawnObject<VisibleObject>();
+	/*Mesh = SpawnObject<VisibleObject>();
 	Mesh->SetModel("Cube");
-	Mesh->GetModel()->SetAABB(AABB(Vector(-0.5f), Vector(0.5f)));
+	Mesh->GetModel()->SetAABB(AABB(Vector(-0.5f), Vector(0.5f)));*/
 
 	Movement = SpawnObject<MovementComponent>();
 	Movement->SetTarget(dynamic_cast<Actor*>(this));
@@ -126,7 +127,8 @@ void ForestPlayer::LeftMouseDown(bool)
 
 void ForestPlayer::RightMouseDown(bool KeyDown)
 {
-	
+	if (KeyDown == true)
+	Console::Log((GetCamera()->GetLocation() + Vector(0.f, 0.f, -2.2f)).ToString());
 }
 
 void ForestPlayer::ItemThrowQ(bool KeyDown)
@@ -181,8 +183,10 @@ void ForestPlayer::InputExit(bool down)
 
 void ForestPlayer::Tick(float)
 {
-	GetCamera()->SetLocation(Location + Vector(0.f, 0.f, 1.5f));
+	GetCamera()->SetLocation(Location + Vector(0.f, 0.f, 2.2f));
 	GetCamera()->SetRotation(Rotation);
+
+	
 }
 
 void ForestPlayer::BeginPlay()
@@ -222,42 +226,6 @@ void PlaceableItem::BeginPlay()
 	AddComponent(Mesh);
 	Mesh->SetModel("candyCane");
 	Mesh->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/candy"));
-	/*
-	printf("0x%lx\n", h);
-
-
-	Terrain* terrain = ObjectManager::GetByRecord<Terrain>(0xA0005554);
-
-	//Lights Testing
-	SystemsManager* systemsManager = IECS::GetSystemsManager();
-	IComponentArrayQuerySystem<LightComponent>* lightSystem = static_cast<IComponentArrayQuerySystem<LightComponent>*> (systemsManager->GetSystemByName("LightControllerSystem"));
-
-	if (lightSystem != nullptr)
-	{
-		LightComponent* DirLight = lightSystem->AddComponentToSystem("LightComponent");
-		DirLight->Location = Vector(0.f, 0.f, 1.f);
-		DirLight->LightType = LIGHT_DIRECTIONAL;
-		DirLight->Size = 3.f;
-		DirLight->Intensity = 1.f;
-		DirLight->Color = Vector(1.f);
-		DirLight->Rotation = Vector(0.5, 0.5, -0.5);
-
-		for (int i = 0; i < 10; i++)
-		{
-			//Console::Log("Light addded " + std::to_string(i));
-			float x = rand() % 100;
-			float y = rand() % 100;
-			//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
-
-			LightComponent* light = lightSystem->AddComponentToSystem("LightComponent");
-			light->Location = Vector(x, y, terrain->GetHeight(x, y));
-			light->LightType = LIGHT_POINT;
-			light->Size = 5.f;
-			light->Intensity = rand() / (float)RAND_MAX * 20.f;
-			light->Color = Vector(x, y, 2.5f);
-		}
-	}*/
-	Console::Log("Hello beautiful world");
 }
 
 void ForestPlayer::OnDestroyed()
