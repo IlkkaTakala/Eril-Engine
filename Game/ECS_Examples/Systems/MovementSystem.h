@@ -1,7 +1,7 @@
 #pragma once
 /*
 Author: Albert Uusi-Illikainen [RabbitTortoise]
-11.11.2021, Last Edited by RabbitTortoise 24.11.2021
+09.12.2021, Last Edited by RabbitTortoise 24.11.2021
 */
 
 #include "ECS/SystemsManager.h"
@@ -15,6 +15,20 @@ public:
 		Console::Log("MovementSystem Constructor");
 	}
 
+	virtual void Init()
+	{
+		IEntityQuerySystem::Init();
+	}
+
+	virtual void Destroy()
+	{
+		IEntityQuerySystem::Destroy();
+	}
+
+	void Update(float deltaTime)
+	{
+		EntityQueryUpdate(deltaTime, WorldEntityManager->QueryEntitiesByType(TypesWanted));
+	}
 
 	void EntityQueryUpdate(float deltaTime, std::vector<int> entities)
 	{

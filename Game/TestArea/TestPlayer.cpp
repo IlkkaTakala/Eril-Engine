@@ -8,6 +8,7 @@
 #include "TestUI.h"
 #include "PauseUI.h"
 #include <Interface/WindowManager.h>
+#include <Interface/AudioManager.h>
 #include <GamePlay/Scene.h>
 
 //ECS
@@ -15,6 +16,8 @@
 #include <ECS_Examples/ECSExample.h>
 #include <ECS/Components/LightComponent.h>
 #include <ECS/Systems/LightControllerSystem.h>
+#include <ECS/Components/AudioComponent.h>
+#include <ECS/Systems/AudioControllerSystem.h>
 
 
 void TestPlayer::OpenConsole(bool) {
@@ -31,17 +34,12 @@ void TestPlayer::UseCursor(bool keydown)
 
 TestPlayer::TestPlayer() : Player()
 {
-	//ECS Example
-	//ecsExample = SpawnObject<ECSExample>();
 
 	mouseSens = 0.5f;
 	Speed = 5.f;
 	InputMode = true;
 	cursorState = true;
 	spawnCounter = 0;
-
-	//GetCamera()->SetLocation(INI->GetValue("Player", "Start"));
-	//GetCamera()->SetRotation(INI->GetValue("Player", "Direction"));
 
 	//Reqister used Inputs
 	II->RegisterKeyContinuousInput(81, &TestPlayer::RunInputQ, this);
@@ -64,6 +62,7 @@ TestPlayer::TestPlayer() : Player()
 	Mesh = SpawnObject<VisibleObject>();
 	Mesh->SetModel("Cube");
 	Mesh->GetModel()->SetAABB(AABB(Vector(-0.5f), Vector(0.5f)));
+	
 
 	//Player Movement
 	Movement = SpawnObject<MovementComponent>();
@@ -179,42 +178,55 @@ void TestPlayer::InputExit(bool down)
 
 }
 
-void TestPlayer::Tick(float)
+void TimeFunction (float d)
 {
+}
+
+
+void TestPlayer::Tick(float deltaTime)
+{
+	
+
 	GetCamera()->SetLocation(Location + Vector(0.f, 0.f, 1.5f));
 	GetCamera()->SetRotation(Rotation);
 	Sky->SetLocation(Location);
+	
+	Vector listenerPos = Location;
+	Vector listenerOrientation = GetCamera()->GetForwardVector();
+	AudioManager::SetListener(listenerPos, -GetCamera()->GetForwardVector(), -GetCamera()->GetUpVector());
 }
-
-void TimeFunction(float d) {
-}
-
-
-
 
 void TestPlayer::BeginPlay()
 {
 
-
-	printf("Spawned object\n");
-	Timer::CreateTimer(5.f, TimeFunction, false);
-
-
-
-	uint64 l = 0xABCDEF0123456789;
-	uint32 h = (uint32)l;
-	printf("0x%lx\n", h);
-
-
 	Terrain* terrain = ObjectManager::GetByRecord<Terrain>(0xA0005554);
 
-	//Lights Testing
+	
+	//ECS
 	SystemsManager* systemsManager = IECS::GetSystemsManager();
+	//Audio Testing
+	IComponentArrayQuerySystem<AudioComponent>* audioComponentArraySystem = static_cast<IComponentArrayQuerySystem<AudioComponent>*> (systemsManager->GetSystemByName("AudioControllerSystem"));
+	AudioComponent* audio = audioComponentArraySystem->AddComponentToSystem();
+	
+	AudioControllerSystem* audioControllerSystem = static_cast<AudioControllerSystem*>(systemsManager->GetSystemByName("AudioControllerSystem"));
+	audioComponentID = audio->GetID();
+
+	Vector audioPos = Vector(20.0f, 20.0f, terrain->GetHeight(20.0f, 20.0f) + 1.5f);
+	audio->SetSourceID(AudioManager::LoadAudio("clicketi.WAV"));
+	audio->SetPosition(audioPos);
+	Mesh->SetLocation(audioPos);
+	audio->SetGain(1.0f);
+	audio->SetPitch(1.0f);
+	audio->SetLooping(true);
+	audio->SetSourceRelative(false);
+	audio->Play();
+
+	//Lights Testing
 	IComponentArrayQuerySystem<LightComponent>* lightSystem = static_cast<IComponentArrayQuerySystem<LightComponent>*> (systemsManager->GetSystemByName("LightControllerSystem"));
 
 	if (lightSystem != nullptr)
 	{
-		LightComponent* DirLight = lightSystem->AddComponentToSystem("LightComponent");
+		LightComponent* DirLight = lightSystem->AddComponentToSystem();
 		DirLight->Location = Vector(0.f, 0.f, 1.f);
 		DirLight->LightType = LIGHT_DIRECTIONAL;
 		DirLight->Size = 3.f;
@@ -225,11 +237,12 @@ void TestPlayer::BeginPlay()
 		for (int i = 0; i < 10; i++)
 		{
 			//Console::Log("Light addded " + std::to_string(i));
-			float x = rand() % 100;
-			float y = rand() % 100;
+			float x = (float)(rand() % 100);
+			float y = (float)(rand() % 100);
+			y = 1;
 			//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
 
-			LightComponent* light = lightSystem->AddComponentToSystem("LightComponent");
+			LightComponent* light = lightSystem->AddComponentToSystem();
 			light->Location = Vector(x, y, terrain->GetHeight(x, y));
 			light->LightType = LIGHT_POINT;
 			light->Size = 5.f;
