@@ -26,6 +26,7 @@ public:
 	virtual const Vector& GetLocation() const = 0;
 
 	virtual void SetLookAt(const Vector& to, const Vector& up = Vector(0.0f, 1.0f, 0.0f)) = 0;
+	virtual void SetPostProcess(const String& name) = 0;
 
 	virtual void SetFov(float) = 0;
 	virtual void SetPerspective(bool perspective) = 0;

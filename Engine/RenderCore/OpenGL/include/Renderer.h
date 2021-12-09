@@ -49,6 +49,7 @@ public:
 
 private:
 	friend class GLInput;
+	friend class GLCamera;
 
 	void EnvReflection(int width, int height);
 	void EnvCube(int width, int height);
