@@ -42,7 +42,7 @@ Panel* Panel::AddChild(UIComponent* child)
 
 int Panel::GetChildIndex(UIComponent* child)
 {
-	auto findResult = std::find_if(std::begin(children), std::end(children), [&](const std::pair<int, UIComponent*>& pair)
+	auto findResult = std::find_if(std::begin(children), std::end(children), [child](const std::pair<int, UIComponent*>& pair)
 		{
 			return pair.second == child;
 		});

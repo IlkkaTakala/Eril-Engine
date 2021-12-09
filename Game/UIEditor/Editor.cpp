@@ -25,20 +25,19 @@ void Editor::Construct()
 		AddableComps->AddChild(
 			Create<Button>()->AddChild(
 				Create<Text>()->SetText(name)->SetStyle(Vector(0.f))
-			)->SetEventCallback(Constants::UI::UI_ON_MOUSE_UP, [this, spawn]() {
+			)->SetEventCallback(Constants::UI::UI_ON_MOUSE_UP, [this, name, spawn]() {
 				auto button = dynamic_cast<Button*>(this->editing);
 				auto panel = dynamic_cast<Panel*>(this->editing);
-				if (panel) panel->AddChild(spawn());
-				else if (button) button->AddChild(spawn());
+				UIComponent* next = spawn();
+				if (panel) panel->AddChild(next);
+				else if (button) button->AddChild(next);
+				this->Edit(this->editing, next, name);
 				this->EditCanvas->UpdateMatrices(Vector2D());
-				})
+			})
 		);
 	}
 
 	TreeCanvas = Create<VerticalPanel>();
-	TreeCanvas->AddChild(
-		Create<Image>()->SetStyle(Vector(0.6f))->SetTransform(0.f, 0.f, 0.f, 0.f, Vector(0.f, 1.f, 0.f), Vector(0.f, 1.f, 0.f))
-	)->SetOrigin(1.f, 0.f)->SetTransform(0.f, 300.f, 0.f, 0.f, Vector(0.f, 1.f, 0.f), Vector(1.f));
 
 	AddComponent(
 		Create<Panel>()->AddChild(
@@ -58,7 +57,13 @@ void Editor::Construct()
 	);
 }
 
-void Editor::Edit(UIComponent* parent, UIComponent* target)
+void Editor::Edit(UIComponent* parent, UIComponent* target, const String& name)
 {
-	TreeCanvas->AddChild();
+	Button* but = Create<Button>();
+	but->AddChild(Create<Text>()->SetText(name, 16)->SetJustification(Justify::Left)->SetStyle(Vector(0.f)))
+		->SetEventCallback(Constants::UI::UI_ON_MOUSE_DOWN, [this, target]() { 
+			editing = target; 
+			});
+	TreeCanvas->AddChildAt(parent, but);
+	TreeCanvas->UpdateMatrices(Vector2D());
 }

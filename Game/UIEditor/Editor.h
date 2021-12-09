@@ -11,7 +11,7 @@ public:
 
 private:
 
-	void Edit(UIComponent* parent, UIComponent* target);
+	void Edit(UIComponent* parent, UIComponent* target, const String& name);
 
 	Panel* AddableComps;
 	Panel* EditCanvas;

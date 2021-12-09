@@ -7,6 +7,6 @@ class VerticalPanel : public Panel
 public:
 
 	virtual void UpdateMatrices(const Vector2D& size) override;
-	VerticalPanel* AddChildAt(uint index, UIComponent* com);
+	VerticalPanel* AddChildAt(UIComponent* par, UIComponent* com);
 };
 
