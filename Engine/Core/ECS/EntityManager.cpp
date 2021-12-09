@@ -126,3 +126,14 @@ int EntityManager::GetTypeIdByName(String typeName)
 {
 	return WorldComponentManager->GetTypeIdByName(typeName);
 }
+
+void EntityManager::ClearEntities()
+{
+	for (int i = 0; i < Entities.size(); i++)
+	{
+		if (IndexUsage[i])
+		{
+			RemoveEntity(Entities[i]);
+		}
+	}
+}

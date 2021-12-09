@@ -124,9 +124,6 @@
     <ClCompile Include="Engine\Interface\IRender.cpp">
       <Filter>Engine\Interface</Filter>
     </ClCompile>
-    <ClCompile Include="Game\EngineInterface.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Core\LightData.cpp">
       <Filter>Engine\Deprecated</Filter>
     </ClCompile>
@@ -159,6 +156,12 @@
     </ClCompile>
     <ClCompile Include="Game\PauseUI.cpp">
       <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Interface\AudioManager.cpp">
+      <Filter>Engine\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\EngineInterface.cpp">
+      <Filter>Engine\Interface</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -311,9 +314,6 @@
     <ClInclude Include="Engine\Core\ECS\System.h">
       <Filter>Engine\ECS</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\ECS\Components\LightComponent.h">
-      <Filter>Engine\ECS\Components</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Core\ECS\Systems\LightControllerSystem.h">
       <Filter>Engine\ECS\Systems</Filter>
     </ClInclude>
@@ -373,6 +373,18 @@
     </ClInclude>
     <ClInclude Include="Game\EngineInterface.h">
       <Filter>Engine\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Interface\AudioManager.h">
+      <Filter>Engine\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\ECS\Components\AudioComponent.h">
+      <Filter>Engine\ECS\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\ECS\Components\LightComponent.h">
+      <Filter>Engine\ECS\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\ECS\Systems\AudioControllerSystem.h">
+      <Filter>Engine\ECS\Systems</Filter>
     </ClInclude>
     <ClInclude Include="Game\TestArea\FPSCounter.h">
       <Filter>Game\TestArea</Filter>
