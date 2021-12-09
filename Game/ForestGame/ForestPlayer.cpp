@@ -1,11 +1,12 @@
 #include "Interface/IRender.h"
-#include "TestPlayer.h"
+#include "ForestPlayer.h"
 #include "Objects/MovementComponent.h"
 #include "Objects/Terrain.h"
 #include "Timer.h"
 #include "Objects/InstancedObject.h"
-#include "Hunter.h"
-#include "TestUI.h"
+#include "Ghost.h"
+#include "Objects/Actor.h"
+#include "TestArea/TestUI.h"
 #include "PauseUI.h"
 #include <Interface/WindowManager.h>
 #include <GamePlay/Scene.h>
@@ -17,11 +18,11 @@
 #include <ECS/Systems/LightControllerSystem.h>
 
 
-void TestPlayer::OpenConsole(bool) {
+void ForestPlayer::OpenConsole(bool) {
 	Console::Create();
 }
 
-void TestPlayer::UseCursor(bool keydown)
+void ForestPlayer::UseCursor(bool keydown)
 {
 	if (keydown && pause == nullptr) {
 		WindowManager::SetShowCursor(0, cursorState);
@@ -29,139 +30,147 @@ void TestPlayer::UseCursor(bool keydown)
 	}
 }
 
-TestPlayer::TestPlayer() : Player()
+ForestPlayer::ForestPlayer() : Player()
 {
-	//ECS Example
-	//ecsExample = SpawnObject<ECSExample>();
+	mouseSens = 0.2f;
+	Speed = 15.f;
 
-	mouseSens = 0.5f;
-	Speed = 5.f;
 	InputMode = true;
 	cursorState = true;
+	pause = nullptr;
 	spawnCounter = 0;
 
 	//GetCamera()->SetLocation(INI->GetValue("Player", "Start"));
 	//GetCamera()->SetRotation(INI->GetValue("Player", "Direction"));
 
 	//Reqister used Inputs
-	II->RegisterKeyContinuousInput(81, &TestPlayer::RunInputQ, this);
-	II->RegisterKeyContinuousInput(90, &TestPlayer::RunInputZ, this);
-	II->RegisterKeyContinuousInput(87, &TestPlayer::RunInputW, this);
-	II->RegisterKeyContinuousInput(65, &TestPlayer::RunInputA, this);
-	II->RegisterKeyContinuousInput(83, &TestPlayer::RunInputS, this);
-	II->RegisterKeyContinuousInput(68, &TestPlayer::RunInputD, this);
-	II->RegisterKeyInput(32, &TestPlayer::RunInputSpace, this);
-	II->RegisterKeyInput(340, &TestPlayer::RunInputShift, this);
-	II->RegisterKeyInput(0, &TestPlayer::LeftMouseDown, this);
-	II->RegisterKeyInput(49, &TestPlayer::InputOne, this);
-	II->RegisterKeyInput(50, &TestPlayer::InputTwo, this);
-	II->RegisterKeyInput(256, &TestPlayer::InputExit, this);
-	II->RegisterKeyInput(257, &TestPlayer::OpenConsole, this);
-	II->RegisterMouseInput(0, &TestPlayer::MouseMoved, this);
-	II->RegisterKeyInput(69, &TestPlayer::UseCursor, this);
+	II->RegisterKeyContinuousInput(87, &ForestPlayer::RunInputW, this);
+	II->RegisterKeyContinuousInput(65, &ForestPlayer::RunInputA, this);
+	II->RegisterKeyContinuousInput(83, &ForestPlayer::RunInputS, this);
+	II->RegisterKeyContinuousInput(68, &ForestPlayer::RunInputD, this);
+	II->RegisterKeyInput(32, &ForestPlayer::RunInputSpace, this);
+	II->RegisterKeyInput(340, &ForestPlayer::RunInputShift, this);
+	II->RegisterKeyInput(0, &ForestPlayer::LeftMouseDown, this);
+	II->RegisterKeyInput(49, &ForestPlayer::InputOne, this);
+	II->RegisterKeyInput(50, &ForestPlayer::InputTwo, this);
+	II->RegisterKeyInput(256, &ForestPlayer::InputExit, this);
+	II->RegisterKeyInput(257, &ForestPlayer::OpenConsole, this);
+	II->RegisterMouseInput(0, &ForestPlayer::MouseMoved, this);
+	II->RegisterKeyInput(69, &ForestPlayer::ItemPickE, this);
+	II->RegisterKeyInput(81, &ForestPlayer::ItemThrowQ, this);
+
 
 	//Player Model
 	Mesh = SpawnObject<VisibleObject>();
 	Mesh->SetModel("Cube");
 	Mesh->GetModel()->SetAABB(AABB(Vector(-0.5f), Vector(0.5f)));
 
-	//Player Movement
 	Movement = SpawnObject<MovementComponent>();
 	Movement->SetTarget(dynamic_cast<Actor*>(this));
 	Movement->SetGravity(true);
+	Movement->SetGround(ObjectManager::GetByRecord<Terrain>(0xA0001111));
 
 	//Skybox
 	Sky = SpawnObject<VisibleObject>();
 	Sky->SetModel(MI->LoadData(Sky, "SkySphere"));
 	Sky->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/Sky"));
-	Sky->SetScale(Sky->GetScale() * 2.0f);
 
-	//Testing UI
-	auto ui = SpawnObject<TestUI>();
-	UI::AddToScreen(ui, this);
-
-	pause = nullptr;
 }
 
-
-//Handle Inputs
-void TestPlayer::RunInputQ(float delta, bool KeyDown)
-{
-	Vector dir(0.0, 0.0, 1.0);
-	Movement->AddInput(dir.Normalize());
-}
-void TestPlayer::RunInputZ(float delta, bool KeyDown)
-{
-	Vector dir(0.0, 0.0, -1.0);
-	Movement->AddInput(dir.Normalize());
-}
-
-void TestPlayer::RunInputW(float delta, bool KeyDown)
+void ForestPlayer::RunInputW(float delta, bool KeyDown)
 {
 	Vector dir = -GetCamera()->GetForwardVector();
 	dir.Z = 0.f;
 	Movement->AddInput(dir.Normalize());
 }
 
-void TestPlayer::RunInputA(float delta, bool KeyDown)
+void ForestPlayer::RunInputA(float delta, bool KeyDown)
 {
 	Movement->AddInput(-GetCamera()->GetRightVector());
 }
 
-void TestPlayer::RunInputD(float delta, bool KeyDown)
+void ForestPlayer::RunInputD(float delta, bool KeyDown)
 {
 	Movement->AddInput(GetCamera()->GetRightVector());
 }
 
-void TestPlayer::RunInputS(float delta, bool KeyDown)
+void ForestPlayer::RunInputS(float delta, bool KeyDown)
 {
 	Vector dir = GetCamera()->GetForwardVector();
 	dir.Z = 0.f;
 	Movement->AddInput(dir.Normalize());
 }
 
-void TestPlayer::RunInputSpace(bool KeyDown)
+void ForestPlayer::RunInputSpace(bool KeyDown)
 {
-	if (!Movement->IsInAir() && KeyDown)
-		Movement->AddImpulse(Vector(0.f, 0.f, 300.f));
+	if (!Movement->IsInAir() && KeyDown) {
+		Movement->AddImpulse(Vector(0.f, 0.f, 200.f));
+	}
 }
 
-void TestPlayer::InputOne(bool KeyDown)
+void ForestPlayer::InputOne(bool KeyDown)
 {
 	if (KeyDown)
 		InputMode = !InputMode;
 }
 
-void TestPlayer::InputTwo(bool KeyDown)
+void ForestPlayer::InputTwo(bool KeyDown)
 {
 	if (KeyDown)
 		InputMode = !InputMode;
 	Scene::OpenLevel("Assets/Maps/test");
 }
 
-void TestPlayer::RunInputShift(bool KeyDown)
+void ForestPlayer::RunInputShift(bool KeyDown)
 {
 	if (KeyDown) Movement->SetMaxSpeed(10.f);
 	else Movement->SetMaxSpeed(5.f);
 }
 
 
-void TestPlayer::LeftMouseDown(bool)
+void ForestPlayer::LeftMouseDown(bool)
 {
 }
 
-void TestPlayer::RightMouseDown(bool KeyDown)
+void ForestPlayer::RightMouseDown(bool KeyDown)
 {
-
+	
 }
 
-void TestPlayer::MouseMoved(float X, float Y)
+void ForestPlayer::ItemThrowQ(bool KeyDown)
+{
+	if (!KeyDown)
+	{
+		if (Items.size() > 0) {
+			auto it = SpawnObject<PlaceableItem>();
+			it->SetLocation(GetLocation() + Vector(0.f, 0.f, 1.f));
+			it->SetScale(0.2f);
+			it->Move->SetPhysics(true);
+			it->Move->SetMaxSpeed(10.0f);
+			it->Move->AddImpulse(-GetCamera()->GetForwardVector() * 10.f);
+			Items[0]->DestroyObject();
+			Items.erase(Items.begin());
+		}
+		Console::Log("Items: " + std::to_string(Items.size()));
+	}
+}
+
+void ForestPlayer::ItemPickE(bool KeyDown)
+{
+	if (!KeyDown) {
+		Items.push_back(SpawnObject<Item>());
+		Console::Log("Items: " + std::to_string(Items.size()));
+	}
+}
+
+
+void ForestPlayer::MouseMoved(float X, float Y)
 {
 	const Vector& rot = Rotation;
 	if (cursorState) SetRotation(Vector(rot.X + X * mouseSens, rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, rot.Z));
 }
 
-void TestPlayer::InputExit(bool down)
+void ForestPlayer::InputExit(bool down)
 {
 	if (!down) return;
 	if (pause == nullptr) {
@@ -176,33 +185,60 @@ void TestPlayer::InputExit(bool down)
 		WindowManager::SetShowCursor(0, false);
 		cursorState = true;
 	}
-
 }
 
-void TestPlayer::Tick(float)
+void ForestPlayer::Tick(float)
 {
 	GetCamera()->SetLocation(Location + Vector(0.f, 0.f, 1.5f));
 	GetCamera()->SetRotation(Rotation);
 	Sky->SetLocation(Location);
 }
 
-void TimeFunction(float d) {
-}
-
-
-
-
-void TestPlayer::BeginPlay()
+void ForestPlayer::BeginPlay()
 {
+	RecordInt r = GetRecord();//0xABCDEF0123456789;
 
-
-	printf("Spawned object\n");
-	Timer::CreateTimer(5.f, TimeFunction, false);
-
-
-
+	if (r.GetSpawnState() == Constants::Record::SPAWNED) {
+		Console::Log("Spawned object");
+	}
 	uint64 l = 0xABCDEF0123456789;
 	uint32 h = (uint32)l;
+	Console::Log("0x%lx " + std::to_string(h));
+
+	Console::Log("Hello beautiful world");
+}
+
+Item::Item() : BaseObject()
+{
+
+}
+
+void Item::BeginPlay()
+{
+
+}
+
+void Item::DestroyObject()
+{
+	BaseObject::DestroyObject();
+}
+
+PlaceableItem::PlaceableItem() : Actor()
+{
+
+}
+
+void PlaceableItem::BeginPlay()
+{
+	Move = SpawnObject<MovementComponent>();
+	Move->SetTarget(this);
+	Move->SetPhysics(true);
+	Move->SetBrake(1.1f);
+	Mesh = SpawnObject<VisibleObject>();
+	AddComponent(Mesh);
+	Mesh->SetModel("candyCane");
+	Mesh->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/candy"));
+	/*
 	printf("0x%lx\n", h);
 
 
@@ -236,10 +272,15 @@ void TestPlayer::BeginPlay()
 			light->Intensity = rand() / (float)RAND_MAX * 20.f;
 			light->Color = Vector(x, y, 2.5f);
 		}
-	}
+	}*/
 	Console::Log("Hello beautiful world");
 }
 
-void TestPlayer::OnDestroyed()
+void ForestPlayer::OnDestroyed()
 {
+}
+
+void PlaceableItem::DestroyObject()
+{
+	
 }

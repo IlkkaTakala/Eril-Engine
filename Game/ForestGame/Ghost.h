@@ -4,11 +4,11 @@
 
 class MovementComponent;
 
-class Hunter : public Actor
+class Ghost : public Actor
 {
-	REGISTER(Hunter)
+	REGISTER(Ghost)
 public:
-	Hunter();
+	Ghost();
 	Ref<MovementComponent> move;
 
 	virtual void Tick(float) override;
@@ -17,6 +17,7 @@ private:
 
 	float time;
 	Vector targetLoc;
+	float targetRot;
 	bool caught;
 
 	void SetNewTarget(float);

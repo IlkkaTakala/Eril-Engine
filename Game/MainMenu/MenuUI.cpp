@@ -24,6 +24,11 @@ void MenuUI::Construct()
 					Create<Text>()->SetText("Open UI Editor", 25)->SetStyle(Vector(0.f))
 				)->SetTransform(20.f, 40.f, 350.f, 30.f, Vector(0.f, 0.f, 0.f), Vector(0.f, 1.0f, 0.f))
 				->SetEventCallback(Constants::UI::UI_ON_MOUSE_UP, []() { Scene::OpenLevel("Assets/Maps/test"); })
+			)->AddChild(
+				Create<Button>()->AddChild(
+					Create<Text>()->SetText("ForestMap", 25)->SetStyle(Vector(0.f))
+				)->SetTransform(20.f, 40.f, 450.f, 30.f, Vector(0.f, 0.f, 0.f), Vector(0.f, 1.0f, 0.f))
+				->SetEventCallback(Constants::UI::UI_ON_MOUSE_UP, []() { Scene::OpenLevel("Game/ForestGame/forest"); })
 			)
 			->SetTransform(0.f, 0.f, 0.f, 0.f, Vector(0.f, 1.f, 0.f), Vector(0.f, 0.25f, 0.f))
 		)->AddChild(
