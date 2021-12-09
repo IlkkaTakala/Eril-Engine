@@ -127,7 +127,7 @@ void main() {
 	
 		PointLight p = lightBuffer.data[lightIndex];
 		vec4 pos = view * vec4(p.positionAndSize.xyz, 1.0);
-		float rad = p.positionAndSize.w * 2;
+		float rad = p.positionAndSize.w;
 
 		if (visibleLightCount < 1024)
 		{

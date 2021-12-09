@@ -7,12 +7,14 @@
 #include "PauseUI.h"
 #include <Interface/WindowManager.h>
 #include <GamePlay/Scene.h>
+#include <Disco/DiscoLightSystem.h>
 
 //ECS
 #include <Interface/IECS.h>
 #include <ECS_Examples/ECSExample.h>
 #include <ECS/Components/LightComponent.h>
 #include <ECS/Systems/LightControllerSystem.h>
+#include <Disco/DiscoLightComponent.h>
 
 
 void DiscoPlayer::OpenConsole(bool) {
@@ -165,17 +167,49 @@ void DiscoPlayer::Tick(float)
 void DiscoPlayer::BeginPlay()
 {
 	//Lights Testing
-	SystemsManager* systemsManager = IECS::GetSystemsManager();
-	IComponentArrayQuerySystem<LightComponent>* lightSystem = static_cast<IComponentArrayQuerySystem<LightComponent>*> (systemsManager->GetSystemByName("LightControllerSystem"));
+	SystemsManager* WorldSystemsManager = IECS::GetSystemsManager();
+	ComponentManager* WorldComponentManager = IECS::GetComponentManager();
+	EntityManager* WorldEntityManager = IECS::GetEntityManager();
+
+	WorldComponentManager->CreateComponentTypeStorage<DiscoLightComponent>("DiscoLightComponent");
+
+	DiscoLightSystem* DiscoLightControl = new DiscoLightSystem(WorldEntityManager, WorldComponentManager, "DiscoLightComponent");
+	int systemIndex = WorldSystemsManager->AddSystem(DiscoLightControl, "DiscoLightSystem");
+	WorldSystemsManager->AddWantedComponentType(systemIndex, "DiscoLightComponent");
+
+
+
+
+	IComponentArrayQuerySystem<LightComponent>* lightSystem = static_cast<IComponentArrayQuerySystem<LightComponent>*> (WorldSystemsManager->GetSystemByName("LightControllerSystem"));
 
 	if (lightSystem != nullptr)
 	{
-		for (int i = 0; i < 20; i++)
+		for (int i = 0; i < 200; i++)
 		{
+
+			//Circum
+			//2*PI*radius
+
+			float rad = 1.0f;
+			float s = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f * PI;
+			float t = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f * PI;
+
+
+			float x = rad * cos(s) * sin(t);
+			float y = rad * sin(s) * sin(t);
+			float z = rad * cos(t);
+			
+			Vector loc(x, y, z);
+			loc *= Vector(24, 45, 16);
+			loc.Z += 16;
+
+			//X: -24, 24
+			//Y: -45, 45
+			//Z: 0, 32
 			//Console::Log("Light addded " + std::to_string(i));
-			int x = rand() % 44;
-			int y = rand() % 86;
-			int z = rand() % 30;
+			//int x = rand() % 44;
+			//int y = rand() % 86;
+			//int z = rand() % 30;
 
 			float r = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)); // rand between 0-1
 			float g = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)); // rand between 0-1
@@ -184,11 +218,21 @@ void DiscoPlayer::BeginPlay()
 			//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
 
 			LightComponent* light = lightSystem->AddComponentToSystem();
-			light->Location = Vector(-22 + x, -43 + y, 1 + z);
+			light->Location = loc;
 			light->LightType = LIGHT_POINT;
-			light->Size = 15.f;
+			light->Size = 8.f;
 			light->Intensity = rand() / (float)RAND_MAX * 10.f + 10.0f;
 			light->Color = Vector(r, g, b);
+			//lightSystem->GetComponentVector()->at(i).Color = 
+
+			lightposition.emplace(light->GetID(), std::tuple<float, float>(s, t));
+			
+
+			DiscoLightComponent* Discolight = DiscoLightControl->AddComponentToSystem();
+
+			Discolight->LightID = light->GetID();
+			Discolight->s = s;
+			Discolight->t = t;
 		}
 	}
 

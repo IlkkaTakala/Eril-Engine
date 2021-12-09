@@ -422,5 +422,11 @@
     <ClInclude Include="Game\Disco\DiscoPlayer.h">
       <Filter>Game\Disco</Filter>
     </ClInclude>
+    <ClInclude Include="Game\Disco\DiscoLightComponent.h">
+      <Filter>Game\Disco</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Disco\DiscoLightSystem.h">
+      <Filter>Game\Disco</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

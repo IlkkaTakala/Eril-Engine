@@ -307,6 +307,8 @@
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\UI.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\UI\UIComponent.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\UI\UISpace.h" />
+    <ClInclude Include="Game\Disco\DiscoLightComponent.h" />
+    <ClInclude Include="Game\Disco\DiscoLightSystem.h" />
     <ClInclude Include="Game\Disco\DiscoPlayer.h" />
     <ClInclude Include="Game\ECS_Examples\Components\PositionComponent.h" />
     <ClInclude Include="Game\ECS_Examples\ECSExample.h" />

@@ -50,6 +50,8 @@ private:
 	bool InputMode;
 	PauseUI* pause;
 
+	std::map<int, std::tuple<float, float>>lightposition;
+
 	//ECS TEST
 	Ref<ECSExample> ecsExample;
 

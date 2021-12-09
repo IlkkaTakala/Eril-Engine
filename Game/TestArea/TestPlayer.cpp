@@ -235,8 +235,8 @@ void TestPlayer::BeginPlay()
 	IComponentArrayQuerySystem<AudioComponent>* audioComponentArraySystem = static_cast<IComponentArrayQuerySystem<AudioComponent>*> (systemsManager->GetSystemByName("AudioControllerSystem"));
 	AudioComponent* audio = audioComponentArraySystem->AddComponentToSystem();
 	
-	AudioControllerSystem* audioControllerSystem = static_cast<AudioControllerSystem*>(systemsManager->GetSystemByName("AudioControllerSystem"));
-	audioComponentID = audio->GetID();
+	//AudioControllerSystem* audioControllerSystem = static_cast<AudioControllerSystem*>(systemsManager->GetSystemByName("AudioControllerSystem"));
+	//audioComponentID = audio->GetID();
 
 	Vector audioPos = Vector(20.0f, 20.0f, terrain->GetHeight(20.0f, 20.0f) + 1.5f);
 	audio->SetSourceID(AudioManager::LoadAudio("clicketi.WAV"));
