@@ -4,8 +4,8 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 11.11.2021
 */
 
-#include "Core.h"
-#include "ECS/Component.h"
+#include <Core.h>
+#include <ECS/Component.h>
 
 struct LightComponent : public Component
 {

@@ -14,6 +14,7 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 /// </summary>
 class Component
 {
+
 public:
 	Component() {}
 	Component(Component const& c) : ID(c.ID), Type(c.Type), Disabled(c.Disabled) {}

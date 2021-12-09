@@ -367,7 +367,7 @@ int Renderer::SetupWindow(int width, int height)
 	UIHolder->SetScreen(Window);
 
 
-	Lights = static_cast<IComponentArrayQuerySystem<LightComponent>*>(IECS::GetSystemsManager()->GetSystemByName("LightControllerSystem"))->GetComponentVector("LightComponent");
+	Lights = static_cast<IComponentArrayQuerySystem<LightComponent>*>(IECS::GetSystemsManager()->GetSystemByName("LightControllerSystem"))->GetComponentVector();
 
 	return 0;
 }
@@ -428,13 +428,16 @@ void Renderer::UpdateLights()
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, LightBuffer);
 	GLM_Light* mapped = reinterpret_cast<GLM_Light*>(glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, MaxLightCount * sizeof(GLM_Light), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 	for (int i = 0; i < Lights->size(); i++) {
-		GLM_Light light;
-		light.locationAndSize = glm::vec4(Lights->at(i).Location.X, Lights->at(i).Location.Z, Lights->at(i).Location.Y, Lights->at(i).Size);
-		glm::mat4 rot = glm::mat4(1.0) * glm::toMat4(glm::quat(glm::vec3(glm::radians(Lights->at(i).Rotation.X), glm::radians(Lights->at(i).Rotation.Y), glm::radians(Lights->at(i).Rotation.Z))));
-		light.rotation = rot * glm::vec4(0.0, -1.0, 0.0, 0.0);
-		light.color = glm::vec4(Lights->at(i).Color.X, Lights->at(i).Color.Y, Lights->at(i).Color.Z, 1.0) * Lights->at(i).Intensity;
-		light.type.x = Lights->at(i).LightType;
-		mapped[i] = light;
+		if (!Lights->at(i).GetDisabled()) //DONT USE THE LIGHT IF IT'S DISABLED!
+		{
+			GLM_Light light;
+			light.locationAndSize = glm::vec4(Lights->at(i).Location.X, Lights->at(i).Location.Z, Lights->at(i).Location.Y, Lights->at(i).Size);
+			glm::mat4 rot = glm::mat4(1.0) * glm::toMat4(glm::quat(glm::vec3(glm::radians(Lights->at(i).Rotation.X), glm::radians(Lights->at(i).Rotation.Y), glm::radians(Lights->at(i).Rotation.Z))));
+			light.rotation = rot * glm::vec4(0.0, -1.0, 0.0, 0.0);
+			light.color = glm::vec4(Lights->at(i).Color.X, Lights->at(i).Color.Y, Lights->at(i).Color.Z, 1.0) * Lights->at(i).Intensity;
+			light.type.x = Lights->at(i).LightType;
+			mapped[i] = light;
+		}	
 	}
 	int result = glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 	if (result == GL_FALSE) exit(99);
@@ -1121,7 +1124,7 @@ void Renderer::LightCulling(int width, int height)
 	LightCullingShader->Bind();
 
 	LightCullingShader->SetUniform("depthMap", 4);
-	int lightCount = static_cast<IComponentArrayQuerySystem<LightComponent>*>(IECS::GetSystemsManager()->GetSystemByName("LightControllerSystem"))->GetComponentVector("LightComponent")->size();
+	int lightCount = Lights->size();
 	LightCullingShader->SetUniform("lightCount", lightCount);
 
 	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, LightBuffer);
@@ -1162,7 +1165,7 @@ void Renderer::Render(float delta)
 	const Vector& loc = ActiveCamera->GetLocation();
 	GlobalVariables.ViewPoint = glm::vec4(loc.X, loc.Z, loc.Y, 1.f);
 	GlobalVariables.ScreenSize = glm::ivec2(width, height);
-	GlobalVariables.SceneLightCount = (int)Lights->size();
+	GlobalVariables.SceneLightCount = (int)Lights->size();					//DOES NOT TAKE INTO ACCOUNT THAT LIGHTS CAN BE DISABLED/DELETED
 
 	glBindBuffer(GL_UNIFORM_BUFFER, GlobalUniforms);
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Globals), &GlobalVariables);
