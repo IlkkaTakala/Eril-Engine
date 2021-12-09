@@ -19,6 +19,7 @@ public:
 
 	int GetType() { return Type; }
 	int GetComponentCount() { return ComponentCount; }
+	virtual void Reset() = 0;
 
 protected:
 	int Type;
@@ -130,6 +131,13 @@ public:
 	std::vector<T, std::allocator<T>>* GetComponentVector()
 	{
 		return Components;
+	}
+
+	void Reset()
+	{
+		Components->clear();
+		IndexUsage->clear();
+		ComponentCount = 0;
 	}
 	
 private:

@@ -44,7 +44,8 @@ public:
 
 	System* GetSystemByName(String systemName);
 	
-	void ClearComponentArraySystems();
+	void DestroySystems();
+	void InitSystems();
 
 protected:
 	EntityManager* WorldEntityManager;

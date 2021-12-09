@@ -85,7 +85,7 @@ public:
 
 protected:
 
-	int SourceID = -1;
+	uint SourceID = -1;
 
 	bool bPositionChanged = true;
 	Vector Position = Vector(0, 0, 0);

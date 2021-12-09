@@ -12,12 +12,30 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 class AudioControllerSystem : public IComponentArrayQuerySystem<AudioComponent>
 {
 public:
-	AudioControllerSystem(EntityManager* entityManager, ComponentManager* componentManager, String componentTypeName) : IComponentArrayQuerySystem<AudioComponent>(entityManager, componentManager, componentTypeName) {}
+	AudioControllerSystem(EntityManager* entityManager, ComponentManager* componentManager, String componentTypeName) : IComponentArrayQuerySystem<AudioComponent>(entityManager, componentManager, componentTypeName) 
+	{
+	}
+	virtual void Init()
+	{
+		IComponentArrayQuerySystem<AudioComponent>::Init();
+	}
 
+	virtual void Destroy()
+	{
+		std::vector<AudioComponent>* components = GetComponentVector();
+		for (AudioComponent& audio : *components)
+		{
+			if (!audio.GetDisabled())
+			{
+				AudioManager::StopAudio(audio.SourceID);
+				AudioManager::DeleteAudio(audio.SourceID);
+			}
+		}
+		IComponentArrayQuerySystem<AudioComponent>::Destroy();
+	}
 
 	void Update(float deltaTime)
 	{
-
 		ComponentArrayQueryUpdate(deltaTime, GetComponentVector());
 	}
 
@@ -53,6 +71,20 @@ public:
 				}
 			}
 		}
+	}
+
+	virtual bool RemoveComponentFromSystem(int componentID)
+	{
+		IComponentArrayQuerySystem<AudioComponent>::Destroy();
+		std::vector<AudioComponent>* components = GetComponentVector();
+		if (componentID < components->size())
+		{
+			uint sourceID = components->at(componentID).SourceID;
+			AudioManager::StopAudio(sourceID);
+			AudioManager::DeleteAudio(sourceID);
+		}
+
+		return IComponentArrayQuerySystem<AudioComponent>::RemoveComponentFromSystem(componentID);
 	}
 
 private:

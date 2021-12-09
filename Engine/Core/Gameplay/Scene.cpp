@@ -90,7 +90,8 @@ void Scene::LoadLevel()
 		ObjectManager::CleanObjects();
 		II->ClearInputs();
 	}
-	//IECS::ClearECSWorld(); Does not work yet
+
+	IECS::ResetECSWorld();
 
 	using namespace rapidxml;
 

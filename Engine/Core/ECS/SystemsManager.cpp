@@ -45,19 +45,7 @@ void SystemsManager::UpdateSystems(float deltaTime)
 	{
 		if (Systems.at(i)->bEnabled)
 		{
-			if (Systems.at(i)->GetType() == System::SystemType::IEntityQuerySystem)
-			{
-				IEntityQuerySystem* eqSys = static_cast<IEntityQuerySystem*>(Systems.at(i));
-				eqSys->EntityQueryUpdate(deltaTime, WorldEntityManager->QueryEntitiesByType(eqSys->TypesWanted));
-				continue;
-			}
-			
-			if (Systems.at(i)->GetType() == System::SystemType::IComponentArrayQuerySystem)
-			{
-				Systems.at(i)->Update(deltaTime);
-
-				continue;
-			}	
+			Systems.at(i)->Update(deltaTime);
 		}
 	}
 }
@@ -76,17 +64,20 @@ System* SystemsManager::GetSystemByName(String systemName)
 	return nullptr;
 }
 
-void SystemsManager::ClearComponentArraySystems()
+void SystemsManager::DestroySystems()
 {
 	for (int i = 0; i < static_cast<int>(Systems.size()); i++)
 	{
-		if (Systems.at(i)->GetType() == System::SystemType::IComponentArrayQuerySystem)
-		{
-			
-			IComponentArrayQuerySystem<Component>* caSys = static_cast<IComponentArrayQuerySystem<Component>*>(Systems.at(i));
-			caSys->ResetSystem();
-		}	
+		Systems.at(i)->Destroy();
 	}
-
 }
+
+void SystemsManager::InitSystems()
+{
+	for (int i = 0; i < static_cast<int>(Systems.size()); i++)
+	{
+		Systems.at(i)->Init();
+	}
+}
+
 

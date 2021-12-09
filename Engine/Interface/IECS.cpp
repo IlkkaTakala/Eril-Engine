@@ -47,15 +47,20 @@ namespace IECS
 
 	void Destroy()
 	{
+		WorldSystemsManager->DestroySystems();
+		WorldEntityManager->ClearEntities();
+		WorldComponentManager->ResetStorages();
 		delete WorldComponentManager;
 		delete WorldEntityManager;
 		delete WorldSystemsManager;
 	}
 
-	void ClearECSWorld()
+	void ResetECSWorld()
 	{
-		WorldSystemsManager->ClearComponentArraySystems();
+		WorldSystemsManager->DestroySystems();
 		WorldEntityManager->ClearEntities();
+		WorldComponentManager->ResetStorages();
+		WorldSystemsManager->InitSystems();
 	}
 
 	ComponentManager* GetComponentManager()
