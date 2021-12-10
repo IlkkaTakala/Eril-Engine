@@ -99,7 +99,7 @@ int GameLoop::MainLoop()
 		}
 
 		Timer::UpdateTimers(duration.count());
-		Physics::CheckCollisions();
+		Physics::CheckCollisions(duration.count());
 
 		RI->Render(duration.count());
 
