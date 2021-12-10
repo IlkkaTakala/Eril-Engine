@@ -13,6 +13,7 @@ public:
 	virtual void Construct() override;
 	void SetActive(EditorItemWrapper* edit);
 
+	void SaveUI(String path);
 private:
 
 	void RightClick(float, bool);

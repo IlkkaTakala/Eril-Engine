@@ -172,6 +172,9 @@
     <ClCompile Include="Game\UIEditor\EditorItemWrapper.cpp">
       <Filter>Game\UIEditor</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\external\tinyfiledialogs\tinyfiledialogs.c">
+      <Filter>Engine\Interface</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -433,6 +436,9 @@
     </ClInclude>
     <ClInclude Include="Game\UIEditor\EditorItemWrapper.h">
       <Filter>Game\UIEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\external\tinyfiledialogs\tinyfiledialogs.h">
+      <Filter>Engine\Interface</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

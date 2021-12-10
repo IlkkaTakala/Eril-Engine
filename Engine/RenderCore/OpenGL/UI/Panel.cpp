@@ -96,3 +96,12 @@ void Panel::HoverCheck(Vector2D& point)
 	}
 	UIComponent::HoverCheck(point);
 }
+
+std::vector<UIComponent*> Panel::GetChildren()
+{
+	std::vector<UIComponent*> ret;
+	for (auto it = children.begin(); it != children.end(); ++it) {
+		ret.push_back(it->second);
+	}
+	return ret;
+}

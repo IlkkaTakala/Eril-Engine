@@ -6,6 +6,8 @@
 #include <GamePlay/Scene.h>
 #include "EditorItemWrapper.h"
 #include <RenderCore/OpenGL/UI/UISpace.h>
+#include <tinyfiledialogs.h>
+#include <Interface/FileManager.h>
 
 Editor::Editor()
 {
@@ -74,6 +76,15 @@ void Editor::Construct()
 			)->AddChild(
 				TreeCanvas->SetTransform(0.f, 0.f, 0.f, 0.f, Vector(0.5f, 1.f, 0.f), Vector(0.f, 1.f, 0.f))
 			)->SetTransform(0.f, 200.f, 0.f, 0.f, Vector(0.f, 1.f, 0.f), Vector(0.f))
+		)->AddChild(
+			Create<Button>()->AddChild(
+				Create<Text>()->SetText("Save XML", 20)->SetStyle(Vector(0.f))
+			)->SetOrigin(0.5f, 0.f)->SetTransform(-200.f, 100.f, -50.f, 25.f, Vector(1.f), Vector(0.5f))
+			->SetEventCallback(Constants::UI::UI_ON_MOUSE_UP, [this]() {
+				char const* filters[1] = { "*.ui" };
+				String path = tinyfd_saveFileDialog("Save UI file", NULL, 1, filters, "XML UI (.ui)");
+				SaveUI(path);
+			})
 		)
 		->SetTransform(0.f, 0.f, 0.f, 0.f, Vector(0.f, 1.f, 0.f), Vector(0.f, 1.f, 0.f))
 	);
@@ -110,4 +121,14 @@ void Editor::SetActive(EditorItemWrapper* edit)
 
 	editing = edit;
 	editing->active = true;
+}
+
+void Editor::SaveUI(String path)
+{
+	String data;
+	auto objs = EditCanvas->GetChildren();
+	for (const auto& c : objs) {
+		data += c->GetString();
+	}
+	FileManager::SaveData(path, data);
 }

@@ -12,3 +12,8 @@ bool FileManager::RequestData(const String& file, String& data)
 	data = buffer.str();
 	return true;
 }
+
+bool FileManager::SaveData(const String& path, const String& data)
+{
+	return false;
+}
