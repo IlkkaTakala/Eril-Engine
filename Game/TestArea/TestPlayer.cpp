@@ -234,7 +234,7 @@ void TestPlayer::BeginPlay()
 		DirLight->Color = Vector(1.f);
 		DirLight->Rotation = Vector(0.5, 0.5, -0.5);
 
-		for (int i = 0; i < 100; i++)
+		for (int i = 0; i < 50; i++)
 		{
 			//Console::Log("Light addded " + std::to_string(i));
 			float x = (float)(rand() % 100);

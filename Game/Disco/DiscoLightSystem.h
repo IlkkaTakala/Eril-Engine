@@ -28,8 +28,8 @@ public:
 			if (!light.GetDisabled())
 			{
 				float rad = 1.0f;
-				float s = light.s += deltaTime;
-				float t = light.t += deltaTime;
+				float s = light.s += deltaTime / 2.0f;
+				float t = light.t += deltaTime / 2.0f;
 
 
 				float x = rad * cos(s) * sin(t);

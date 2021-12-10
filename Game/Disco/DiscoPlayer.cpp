@@ -65,15 +65,16 @@ DiscoPlayer::DiscoPlayer() : Player()
 
 	//Audio Source Model
 	AudioSourceMesh = SpawnObject<VisibleObject>();
-	AudioSourceMesh->SetModel("Cube");
+	AudioSourceMesh->SetModel("sphere");
 	AudioSourceMesh->GetModel()->SetAABB(AABB(Vector(-0.25f), Vector(0.25f)));
-
+	AudioSourceMesh->SetScale(0.5f);
 
 	//Audio Source Model
 	StaticAudioSource = SpawnObject<VisibleObject>();
 	StaticAudioSource->SetModel("Cube");
-	StaticAudioSource->GetModel()->SetAABB(AABB(Vector(-0.3f), Vector(0.3f)));
-	StaticAudioSource->SetLocation(Vector(0.0f, -35.0f, 4.0f));
+	StaticAudioSource->GetModel()->SetAABB(AABB(Vector(-0.5f), Vector(0.5f)));
+	StaticAudioSource->SetScale(1.0f);
+	StaticAudioSource->SetLocation(Vector(0.0f, -35.0f, 3.6f));
 	pause = nullptr;
 }
 
@@ -295,7 +296,7 @@ void DiscoPlayer::BeginPlay()
 
 	if (lightSystem != nullptr)
 	{
-		for (int i = 0; i < 200; i++)
+		for (int i = 0; i < 100; i++)
 		{
 
 			//Circum
@@ -333,8 +334,8 @@ void DiscoPlayer::BeginPlay()
 			LightComponent* light = lightSystem->AddComponentToSystem();
 			light->Location = loc;
 			light->LightType = LIGHT_POINT;
-			light->Size = 8.f;
-			light->Intensity = rand() / (float)RAND_MAX * 10.f + 10.0f;
+			light->Size = 10.f;
+			light->Intensity = rand() / (float)RAND_MAX * 20.f + 10.0f;
 			light->Color = Vector(r, g, b);
 			//lightSystem->GetComponentVector()->at(i).Color = 
 
@@ -374,7 +375,7 @@ void DiscoPlayer::BeginPlay()
 	AudioDir.Y = 1.0f;
 	AudioDir.Z = 1.0f;
 
-	Timer::CreateTimer<DiscoPlayer>(5.0f, &DiscoPlayer::ChangeAudioSourceAngle, this, true, false);
+	Timer::CreateTimer<DiscoPlayer>(7.5f, &DiscoPlayer::ChangeAudioSourceAngle, this, true, false);
 
 
 	audioComponent = audiosystem->AddComponentToSystem();
