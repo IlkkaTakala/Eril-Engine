@@ -162,12 +162,15 @@
     </ClCompile>
     <ClCompile Include="Game\ForestGame\Ghost.cpp">
       <Filter>Game\ForestGame</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="Engine\Interface\AudioManager.cpp">
       <Filter>Engine\Interface</Filter>
     </ClCompile>
     <ClCompile Include="Game\EngineInterface.cpp">
       <Filter>Engine\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\ForestGame\EndScreen.cpp">
+      <Filter>Game\ForestGame</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -426,6 +429,9 @@
       <Filter>Game\ForestGame</Filter>
     </ClInclude>
     <ClInclude Include="Game\ForestGame\Ghost.h">
+      <Filter>Game\ForestGame</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\ForestGame\EndScreen.h">
       <Filter>Game\ForestGame</Filter>
     </ClInclude>
   </ItemGroup>

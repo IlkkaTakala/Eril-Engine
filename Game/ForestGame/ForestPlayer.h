@@ -10,6 +10,7 @@ class MovementComponent;
 class Terrain;
 class Hunter;
 class PauseUI;
+class EndScreen;
 
 class Item : public BaseObject
 {
@@ -53,6 +54,8 @@ public:
 	virtual void Tick(float Delta) override;
 	virtual void BeginPlay() override;
 	virtual void OnDestroyed() override;
+	void Caught();
+	void Winner();
 
 private:
 	float mouseSens;
@@ -73,9 +76,9 @@ private:
 	void MouseMoved(float X, float Y);
 
 	void InputExit(bool);
-
 	void OpenConsole(bool);
 	void UseCursor(bool);
+
 
 	Ref<MovementComponent> Movement;
 	Ref<VisibleObject> Mesh;
@@ -96,6 +99,8 @@ private:
 	Ref<Terrain> terra[4];
 	Ref<Hunter> hunt;
 	PauseUI* pause;
+	EndScreen* end;
+	std::vector<RefWeak<VisibleObject>> Candys;
 
 	//ECS TEST
 	Ref<ECSExample> ecsExample;

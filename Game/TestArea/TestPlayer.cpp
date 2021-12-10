@@ -175,7 +175,6 @@ void TestPlayer::InputExit(bool down)
 		WindowManager::SetShowCursor(0, false);
 		cursorState = true;
 	}
-
 }
 
 void TimeFunction (float d)

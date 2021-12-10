@@ -15,6 +15,7 @@ SceneComponent::SceneComponent() : BaseObject()
 void SceneComponent::OnDestroyed()
 {
 	if (Parent != nullptr) Parent->RemoveComponent(this);
+	else GetScene()->RemoveSceneRoot(this);
 	for (const auto& c : Children) {
 		c->Parent = nullptr;
 		c->DestroyObject();

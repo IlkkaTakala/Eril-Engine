@@ -6,6 +6,7 @@
 #include <Gameplay/GameState.h>
 #include <Gameplay/PlayerController.h>
 #include <Objects/VisibleObject.h>
+#include "ForestPlayer.h"
 
 Ghost::Ghost() : Actor()
 {
@@ -20,12 +21,12 @@ Ghost::Ghost() : Actor()
 	move->SetTarget(this);
 	move->SetGravity(true);
 	move->SetGround(ObjectManager::GetByRecord<Terrain>(0xA0001111));
-	move->SetMaxSpeed(6.f);
+	move->SetMaxSpeed(5.f);
 	caught = false;
-
+	
 	time = 0.f;
 
-	Timer::CreateTimer(5.f, &Ghost::SetNewTarget, this, true);
+	Timer::CreateTimer(1.f, &Ghost::SetNewTarget, this, true);
 }
 
 void Ghost::Tick(float delta)
@@ -44,12 +45,18 @@ void Ghost::Tick(float delta)
 		if ((playerLoc - Location).Length() < 1.f) {
 			caught = true;
 			Console::Log("Player caught, game over!");
+			dynamic_cast<ForestPlayer*>(GetGameState()->CurrentPlayer.GetPointer())->Caught();
 			move->SetAllowMovement(false);
 		}
 	}
 	else {
 		SetLocation(playerLoc + Vector(0.f, 0.f, 1.f));
 	}
+}
+
+void Ghost::stopMoving()
+{
+	move->SetAllowMovement(false);
 }
 
 void Ghost::SetNewTarget(float delta)

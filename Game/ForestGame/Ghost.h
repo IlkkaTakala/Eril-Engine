@@ -12,6 +12,7 @@ public:
 	Ref<MovementComponent> move;
 
 	virtual void Tick(float) override;
+	void stopMoving();
 private:
 	Ref<VisibleObject> Mesh;
 

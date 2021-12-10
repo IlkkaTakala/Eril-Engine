@@ -201,6 +201,7 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\ForestGame\EndScreen.cpp" />
     <ClCompile Include="Engine\Core\BasicTypes.cpp" />
     <ClCompile Include="Engine\Core\Core.cpp" />
     <ClCompile Include="Engine\Core\ECS\EntityManager.cpp" />
@@ -256,6 +257,7 @@
     <ClCompile Include="Game\TestArea\Hunter.cpp" />
     <ClCompile Include="Game\TestArea\TestPlayer.cpp" />
     <ClCompile Include="Game\TestArea\TestUI.cpp" />
+    <ClInclude Include="Game\ForestGame\EndScreen.h" />
     <ClInclude Include="Engine\Core\BasicTypes.h" />
     <ClInclude Include="Engine\Core\Core.h" />
     <ClInclude Include="Engine\Core\ECS\Component.h" />
