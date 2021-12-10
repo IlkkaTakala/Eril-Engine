@@ -34,7 +34,7 @@ public:
 	virtual void BeginPlay() override {}
 	virtual void Tick(float) override;
 
-	void SetTarget(SceneComponent* t);
+	void SetTarget(SceneComponent* t, const AABB bound = AABB(1.0f, 1.0f));
 	void SetGround(Terrain* t);
 	SceneComponent* GetTarget() const { return Object; }
 	void SetMass(float m) { mass = m; }

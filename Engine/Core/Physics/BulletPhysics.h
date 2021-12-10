@@ -21,7 +21,7 @@ void init();
 
 btDynamicsWorld* GetWorld();
 
-bulletObject* MakeRigidBoby(AABB box);
+bulletObject* MakeRigidBoby(AABB box, Vector pos);
 
 bool callbackFunc(btManifoldPoint& cp, const btCollisionObject* obj1, int id1, int index1, const btCollisionObject* obj2, int id2, int index2)
 {

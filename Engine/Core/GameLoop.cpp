@@ -72,7 +72,7 @@ int GameLoop::Start()
 	
 	printf("Creating defaults...\n");
 	Physics::init();
-	State = EngineInterface::CreateDefaults();
+	EngineInterface::CreateDefaults();
 	Collector = new GC();
 
 	Console::Log("Loading finished");

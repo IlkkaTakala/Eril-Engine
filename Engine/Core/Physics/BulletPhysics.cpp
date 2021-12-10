@@ -123,7 +123,7 @@ btDynamicsWorld* Physics::GetWorld()
     return world;
 }
 
-bulletObject* Physics::MakeRigidBoby(AABB box)
+bulletObject* Physics::MakeRigidBoby(AABB box, Vector pos)
 {
-    return new bulletObject(Physics::addBox(box.maxs.X - box.mins.X, box.maxs.Z - box.mins.Z, box.maxs.Y - box.mins.Y, 0, 0, 0, 10));
+    return new bulletObject(Physics::addBox(box.maxs.X - box.mins.X, box.maxs.Z - box.mins.Z, box.maxs.Y - box.mins.Y, pos.X, pos.Y, pos.Z, 10));
 }

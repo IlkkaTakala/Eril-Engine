@@ -59,7 +59,9 @@ private:
 	Ref<InstancedObject> Grass;
 	Ref<InstancedObject> Flowers;
 	Ref<VisibleObject> Sky;
-	Ref<SceneComponent> box;
+	Ref<Actor> Collider;
+	Ref<MovementComponent> ColliderModelMove;
+	Ref<VisibleObject> ColliderModel;
 
 
 	Ref<Terrain> terra[4];
@@ -72,4 +74,6 @@ private:
 	int audioComponentID;
 
 	int spawnCounter;
+
+	void TestTimer(float d);
 };

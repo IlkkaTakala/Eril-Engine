@@ -41,6 +41,10 @@ void MovementComponent::Tick(float time)
 {
 	if (!allowMovement || Object == nullptr) return;
 	DesiredState.location = Object->GetLocation();
+	btVector3 colliderloc;
+	colliderloc.setValue(DesiredState.location.X, DesiredState.location.Z, DesiredState.location.Y);
+	rigid->body->getWorldTransform().setOrigin(colliderloc);
+
 	OldState = DesiredState;
 	if (Object == nullptr) return;
 	switch (isPhysics)
@@ -129,10 +133,13 @@ void MovementComponent::Tick(float time)
 
 }
 
-void MovementComponent::SetTarget(SceneComponent* t)
+
+void MovementComponent::SetTarget(SceneComponent* t, const AABB bound)
 {
 	Object = t;
-	rigid = Physics::MakeRigidBoby(AABB(Vector(-1.f), Vector(1.f)));
+	rigid = Physics::MakeRigidBoby(bound, t->GetLocation());
+	//OldState.location = t->GetLocation();
+	//DesiredState.location = t->GetLocation();
 	//Physics::RemoveStatic(t);
 }
 
@@ -144,8 +151,15 @@ void MovementComponent::SetGround(Terrain* t)
 void MovementComponent::ApplyMovement()
 {
 	if (!allowMovement || Object == nullptr) return;
-	auto l = rigid->body->getWorldTransform().getOrigin();
-	Object->SetLocation(Vector(l[0], l[2], l[1]));
+
+	if (Object->transformForce) {
+		Object->Location = Object->desired.Location;
+		Object->transformForce = false;
+	}
+	else {
+		auto l = rigid->body->getWorldTransform().getOrigin();
+		Object->Location = Vector(l[0], l[2], l[1]);
+	}
 }
 
 void MovementComponent::AddInput(const Vector& dir)
