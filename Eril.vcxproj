@@ -71,7 +71,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>Engine\external\openal-soft\include;Game;Engine\external\assimp\include;Engine\external\RapidXML;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Game;Engine\external\bullet3\src;Engine\external\openal-soft\include;Game;Engine\external\assimp\include;Engine\external\RapidXML;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -100,7 +100,7 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>OpenAL32.lib;dwrite.lib;d2d1.lib;assimp-vc140-mt.lib;zlibstaticd.lib;IrrXML.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>LinearMath_Debug.lib;Bullet3OpenCL_clew_Debug.lib;Bullet2FileLoader_Debug.lib;BulletSoftBody_Debug.lib;BulletDynamics_Debug.lib;BulletCollision_Debug.lib;BulletInverseDynamics_Debug.lib;Bullet3Common_Debug.lib;Bullet3Geometry_Debug.lib;Bullet3Collision_Debug.lib;Bullet3Dynamics_Debug.lib;OpenAL32.lib;dwrite.lib;d2d1.lib;assimp-vc140-mt.lib;zlibstaticd.lib;IrrXML.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\build\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -108,6 +108,7 @@
       <ImportLibrary>$(SolutionDir)/build/Debug/Eril.lib</ImportLibrary>
       <ProgramDataBaseFile>$(SolutionDir)/build/Debug/Eril.pdb</ProgramDataBaseFile>
       <SubSystem>Windows</SubSystem>
+      <ForceFileOutput>Enabled</ForceFileOutput>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -115,7 +116,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>Engine\external\openal-soft\include;Game;Engine\external\assimp\include;Engine\external\RapidXML;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Game;Engine\external\bullet3\src;Engine\external\openal-soft\include;Game;Engine\external\assimp\include;Engine\external\RapidXML;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ExceptionHandling>Sync</ExceptionHandling>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -159,7 +160,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>Engine\external\openal-soft\include;Game;Engine\external\assimp\include;Engine\external\RapidXML;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Game;Engine\external\bullet3\src;Engine\external\openal-soft\include;Game;Engine\external\assimp\include;Engine\external\RapidXML;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -215,12 +216,14 @@
     <ClCompile Include="Engine\Core\ObjectManager.cpp" />
     <ClCompile Include="Engine\Core\Objects\Actor.cpp" />
     <ClCompile Include="Engine\Core\Objects\BaseObject.cpp" />
+    <ClCompile Include="Engine\Core\Objects\ColliderComponent.cpp" />
     <ClCompile Include="Engine\Core\Objects\InstancedObject.cpp" />
     <ClCompile Include="Engine\Core\Objects\MovementComponent.cpp" />
     <ClCompile Include="Engine\Core\Objects\SceneComponent.cpp" />
     <ClCompile Include="Engine\Core\Objects\Terrain.cpp" />
     <ClCompile Include="Engine\Core\Objects\VisibleObject.cpp" />
     <ClCompile Include="Engine\Core\Physics.cpp" />
+    <ClCompile Include="Engine\Core\Physics\BulletPhysics.cpp" />
     <ClCompile Include="Engine\Core\Settings.cpp" />
     <ClCompile Include="Engine\Core\Timer.cpp" />
     <ClCompile Include="Engine\Core\WinConsole.cpp" />
@@ -282,12 +285,15 @@
     <ClInclude Include="Engine\Core\ObjectManager.h" />
     <ClInclude Include="Engine\Core\Objects\Actor.h" />
     <ClInclude Include="Engine\Core\Objects\BaseObject.h" />
+    <ClInclude Include="Engine\Core\Objects\ColliderComponent.h" />
     <ClInclude Include="Engine\Core\Objects\InstancedObject.h" />
     <ClInclude Include="Engine\Core\Objects\MovementComponent.h" />
     <ClInclude Include="Engine\Core\Objects\SceneComponent.h" />
     <ClInclude Include="Engine\Core\Objects\Terrain.h" />
     <ClInclude Include="Engine\Core\Objects\VisibleObject.h" />
     <ClInclude Include="Engine\Core\Physics.h" />
+    <ClInclude Include="Engine\Core\Physics\BulletObject.h" />
+    <ClInclude Include="Engine\Core\Physics\BulletPhysics.h" />
     <ClInclude Include="Engine\Core\Settings.h" />
     <ClInclude Include="Engine\Core\Timer.h" />
     <ClInclude Include="Engine\Core\WinConsole.h" />
@@ -321,6 +327,9 @@
     <ClInclude Include="Game\TestArea\Hunter.h" />
     <ClInclude Include="Game\TestArea\TestPlayer.h" />
     <ClInclude Include="Game\TestArea\TestUI.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

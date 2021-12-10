@@ -7,6 +7,7 @@
 #include "WinConsole.h"
 #include "GarbageCollector.h"
 #include "Physics.h"
+#include "Physics/BulletPhysics.h"
 #include "Timer.h"
 #include <GamePlay/Scene.h>
 #include <Interface/IECS.h>
@@ -69,7 +70,8 @@ int GameLoop::Start()
 
 	AudioManager::Init();
 	
-	Console::Log("Creating defaults...");
+	Console::Log("Creating defaults...\n");
+	Physics::init();
 	EngineInterface::CreateDefaults();
 	Collector = new GC();
 
@@ -112,7 +114,7 @@ int GameLoop::MainLoop()
 		ECSWorldSystemsManager->UpdateSystems(duration.count());
 
 		Timer::UpdateTimers(duration.count());
-		Physics::CheckCollisions();
+		Physics::CheckCollisions(duration.count());
 
 		RI->Render(duration.count());
 
