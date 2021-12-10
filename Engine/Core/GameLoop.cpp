@@ -70,7 +70,7 @@ int GameLoop::Start()
 
 	AudioManager::Init();
 	
-	printf("Creating defaults...\n");
+	Console::Log("Creating defaults...\n");
 	Physics::init();
 	EngineInterface::CreateDefaults();
 	Collector = new GC();
