@@ -13,6 +13,7 @@ class ECSExample;
 class DiscoPlayer : public Player
 {
 	REGISTER(DiscoPlayer);
+
 public:
 	DiscoPlayer();
 	virtual ~DiscoPlayer() { }
@@ -60,4 +61,9 @@ private:
 	int AudioID;
 	float AudioS;
 	float AudioT;
+	Vector AudioDir;
+	Ref<VisibleObject> AudioSourceMesh;
+	Ref<VisibleObject> StaticAudioSource;
+	void ChangeAudioSourceAngle(float d);
+	void ClampLocation();
 };

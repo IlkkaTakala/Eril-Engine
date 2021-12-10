@@ -62,6 +62,18 @@ DiscoPlayer::DiscoPlayer() : Player()
 	Movement->SetTarget(dynamic_cast<Actor*>(this));
 	Movement->SetGravity(true);
 
+
+	//Audio Source Model
+	AudioSourceMesh = SpawnObject<VisibleObject>();
+	AudioSourceMesh->SetModel("Cube");
+	AudioSourceMesh->GetModel()->SetAABB(AABB(Vector(-0.25f), Vector(0.25f)));
+
+
+	//Audio Source Model
+	StaticAudioSource = SpawnObject<VisibleObject>();
+	StaticAudioSource->SetModel("Cube");
+	StaticAudioSource->GetModel()->SetAABB(AABB(Vector(-0.3f), Vector(0.3f)));
+	StaticAudioSource->SetLocation(Vector(0.0f, -35.0f, 4.0f));
 	pause = nullptr;
 }
 
@@ -161,14 +173,88 @@ void DiscoPlayer::InputExit(bool down)
 	
 }
 
+
+void DiscoPlayer::ChangeAudioSourceAngle(float d)
+{
+	AudioDir.X = 0.0f - (static_cast <float> (rand()) / static_cast <float> (RAND_MAX));
+	AudioDir.Y = 0.0f - (static_cast <float> (rand()) / static_cast <float> (RAND_MAX));
+	if (AudioDir.X < 0.2f && AudioDir.X >= 0.0f)
+	{
+		AudioDir.X = 0.2f;
+	}
+	if (AudioDir.X <= 0.0f && AudioDir.X > -0.2f)
+	{
+		AudioDir.X = -0.2f;
+	}
+	if (AudioDir.Y < 0.2f && AudioDir.Y >= 0.0f)
+	{
+		AudioDir.Y = 0.2f;
+	}
+	if (AudioDir.Y <= 0.0f && AudioDir.Y > -0.2f)
+	{
+		AudioDir.Y = -0.2f;
+	}
+
+}
+
+void DiscoPlayer::ClampLocation()
+{
+	//Room Dimensions
+	//X: -24, 24
+	//Y: -45, 45
+	//Z: 0, 32
+
+	if (Location.X < -23)
+	{
+		Location.X = -23;
+		Vector dir(1.0, 0.0, 0.0);
+		Movement->AddInput(dir.Normalize());
+	}
+	if (Location.X > 23)
+	{
+		Location.X = 23;
+		Vector dir(-1.0, 0.0, 0.0);
+		Movement->AddInput(dir.Normalize());
+	}
+	if (Location.Y < -44)
+	{
+		Location.Y = -44;
+		Vector dir(0.0, 1.0, 0.0);
+		Movement->AddInput(dir.Normalize());
+	}
+	if (Location.Y > 44)
+	{
+		Location.Y = 44;
+		Vector dir(0.0, -1.0, 0.0);
+		Movement->AddInput(dir.Normalize());
+	}
+	if (Location.Z < 1)
+	{
+		Location.Z = 1;
+		Vector dir(0.0, 0.0, 1.0);
+		Movement->AddInput(dir.Normalize());
+	}
+	if (Location.Z > 31)
+	{
+		Location.Z = 31;
+		Vector dir(0.0, 0.0, -1.0);
+		Movement->AddInput(dir.Normalize());
+	}
+}
+
+
 void DiscoPlayer::Tick(float deltaTime)
 {
+	ClampLocation();
+
 	GetCamera()->SetLocation(Location + Vector(0.f, 0.f, 1.5f));
 	GetCamera()->SetRotation(Rotation);
 
+
+
 	AudioComponent &audioComponent = IECS::GetComponentManager()->GetComponentVector<AudioComponent>(IECS::GetComponentManager()->GetTypeIdByName("AudioComponent"))->at(AudioID);
-	AudioS += deltaTime / 2.0f;
-	AudioT += deltaTime / 2.0f;
+	AudioS += deltaTime * AudioDir.X * 0.75f;
+	AudioT += deltaTime * AudioDir.Y * 0.75f;
 	float x = cos(AudioS) * sin(AudioT);
 	float y = sin(AudioS) * sin(AudioT);
 	float z = cos(AudioT);
@@ -179,10 +265,14 @@ void DiscoPlayer::Tick(float deltaTime)
 	Vector velocity = (loc - previousLoc) / deltaTime;
 	audioComponent.SetPosition(loc);
 	audioComponent.SetVelocity(velocity);
+	AudioSourceMesh->SetLocation(loc);
 
 	Vector listenerPos = Location;
 	Vector listenerOrientation = GetCamera()->GetForwardVector();
 	AudioManager::SetListener(listenerPos, -GetCamera()->GetForwardVector(), -GetCamera()->GetUpVector());
+	
+
+	
 }
 
 void DiscoPlayer::BeginPlay()
@@ -224,9 +314,11 @@ void DiscoPlayer::BeginPlay()
 			loc *= Vector(24, 45, 16);
 			loc.Z += 16;
 
+			//Room Dimensions
 			//X: -24, 24
 			//Y: -45, 45
 			//Z: 0, 32
+			
 			//Console::Log("Light addded " + std::to_string(i));
 			//int x = rand() % 44;
 			//int y = rand() % 86;
@@ -278,7 +370,22 @@ void DiscoPlayer::BeginPlay()
 	AudioID = audioComponent->GetID();
 	AudioS = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f * PI;
 	AudioT = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f * PI;
+	AudioDir.X = 1.0f;
+	AudioDir.Y = 1.0f;
+	AudioDir.Z = 1.0f;
 
+	Timer::CreateTimer<DiscoPlayer>(5.0f, &DiscoPlayer::ChangeAudioSourceAngle, this, true, false);
+
+
+	audioComponent = audiosystem->AddComponentToSystem();
+	audioPos = Vector(0.0f, -35.0f, 4.0f);
+	audioComponent->SetSourceID(AudioManager::LoadAudio("clicketi.WAV"));
+	audioComponent->SetPosition(audioPos);
+	audioComponent->SetGain(1.0f);
+	audioComponent->SetPitch(1.5f);
+	audioComponent->SetLooping(true);
+	audioComponent->SetSourceRelative(false);
+	audioComponent->Play();
 
 	Console::Log("Hello colorful world");
 }
