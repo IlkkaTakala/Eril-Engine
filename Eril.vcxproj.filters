@@ -169,6 +169,9 @@
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\VerticalPanel.cpp">
       <Filter>Engine\OpenGL\UI</Filter>
     </ClCompile>
+    <ClCompile Include="Game\UIEditor\EditorItemWrapper.cpp">
+      <Filter>Game\UIEditor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -427,6 +430,9 @@
     </ClInclude>
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\VerticalPanel.h">
       <Filter>Engine\OpenGL\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\UIEditor\EditorItemWrapper.h">
+      <Filter>Game\UIEditor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

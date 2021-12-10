@@ -168,7 +168,7 @@ Button* Button::AddChild(UIComponent* c)
 {
 	child = c;
 	Text* t = dynamic_cast<Text*>(child);
-	if (t != nullptr) t->SetJustification(Justify::Centre);
+	if (t != nullptr && t->GetJustification() == Justify::Unset) t->SetJustification(Justify::Centre);
 	child->SetParent(this);
 	float depth = realDepth + 0.1f;
 	child->UpdateDepth(depth);

@@ -4,6 +4,7 @@
 
 enum class Justify
 {
+	Unset,
 	Left,
 	Centre,
 	Right
@@ -20,6 +21,7 @@ public:
 	Text* SetText(const String& text, int size = 0);
 	String GetText() const { return value; }
 	Text* SetJustification(Justify j) { just = j; textChanged = true; return this; }
+	Justify GetJustification() const { return just; }
 
 protected:
 	String font;

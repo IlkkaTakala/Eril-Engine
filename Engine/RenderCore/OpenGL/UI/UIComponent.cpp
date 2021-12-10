@@ -33,7 +33,7 @@ UIComponent::UIComponent()
 	hovered = false;
 
 	parent = nullptr;
-	space = nullptr;
+	space = RI->GetUIManager();
 
 	redraw = true;
 	recalculate = true;
@@ -189,4 +189,14 @@ void UIComponent::LoadWithParameters(const std::map<String, String>& args)
 		}
 
 	}
+}
+
+String UIComponent::GetString()
+{
+	String data("Transform=\"");
+	data += std::to_string(leftOffset) + ',' + std::to_string(rightOffset) + ',' + std::to_string(topOffset) + ',' + std::to_string(bottomOffset) + ',';
+	data += std::to_string(anchor_h.X) + ',' + std::to_string(anchor_h.Y) + ',' + std::to_string(anchor_v.X) + ',' + std::to_string(anchor_v.Y) + ',';
+	data += std::to_string(origin.X) + ',' + std::to_string(origin.Y);
+	data += "\"";
+	return data;
 }

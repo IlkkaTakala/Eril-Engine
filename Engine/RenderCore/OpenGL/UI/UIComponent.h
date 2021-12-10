@@ -48,6 +48,9 @@ public:
 	virtual void UpdateMatrices(const Vector2D& size);
 	UIComponent* SetTransform(float left = 0.f, float right = 0.f, float top = 0.f, float bottom = 0.f, Vector anchor_vert = Vector(), Vector anchor_hor = Vector());
 	UIComponent* SetOrigin(float x, float y);
+	UIComponent* SetFocusable(bool focus) { focusable = focus; return this; }
+	UIComponent* SetHit(HitReg h) { hits = h; return this; }
+
 	bool Trace(const Vector2D& point) const;
 
 	virtual void OnLeave() { if (callbacks[Constants::UI::UI_ON_LEAVE] != nullptr) callbacks[Constants::UI::UI_ON_LEAVE](); }
@@ -63,8 +66,8 @@ public:
 	virtual void HoverCheck(Vector2D& point);
 
 	virtual void LoadWithParameters(const std::map<String, String>& args);
+	virtual String GetString();
 
-protected:
 	friend class UISpace;
 
 	Vector origin;

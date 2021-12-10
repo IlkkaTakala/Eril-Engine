@@ -275,7 +275,7 @@ void main()
 
 	fontSize = 30;
 	weight = 100;
-	just = Justify::Left;
+	just = Justify::Unset;
 
 	SetText("Hello World");
 }
@@ -311,6 +311,7 @@ void Text::Render()
 
 		switch (just)
 		{
+		case Justify::Unset:
 		case Justify::Left:
 			break;
 		case Justify::Centre:

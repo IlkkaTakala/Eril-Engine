@@ -255,6 +255,7 @@
     <ClCompile Include="Game\TestArea\TestPlayer.cpp" />
     <ClCompile Include="Game\TestArea\TestUI.cpp" />
     <ClCompile Include="Game\UIEditor\Editor.cpp" />
+    <ClCompile Include="Game\UIEditor\EditorItemWrapper.cpp" />
     <ClCompile Include="Game\UIEditor\EditorPlayer.cpp" />
     <ClInclude Include="Engine\Assets\Resources\resource.h" />
     <ClInclude Include="Engine\Core\BasicTypes.h" />
@@ -319,6 +320,7 @@
     <ClInclude Include="Game\TestArea\TestPlayer.h" />
     <ClInclude Include="Game\TestArea\TestUI.h" />
     <ClInclude Include="Game\UIEditor\Editor.h" />
+    <ClInclude Include="Game\UIEditor\EditorItemWrapper.h" />
     <ClInclude Include="Game\UIEditor\EditorPlayer.h" />
   </ItemGroup>
   <ItemGroup>
