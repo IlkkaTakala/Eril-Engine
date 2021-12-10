@@ -116,9 +116,8 @@ namespace Physics
 			auto it2 = Statics.remove_if([](const auto& v) { return v == nullptr; });
 		}
 
-		world->stepSimulation(delta);
+		Physics::GetWorld()->stepSimulation(delta);
 
-		
 
 		for (const auto& m : Movables) {
 			m->ApplyMovement();

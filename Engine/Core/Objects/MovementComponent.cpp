@@ -1,6 +1,7 @@
 #include "Physics.h"
 #include <Objects/Terrain.h>
 #include "Objects/MovementComponent.h"
+#include <Physics/BulletPhysics.h>
 
 MovementComponent::MovementComponent()
 {
@@ -17,6 +18,7 @@ MovementComponent::MovementComponent()
 	brake = 2000.f;
 	air_control = 0.05f;
 	Physics::AddMovable(this);
+	rigid = nullptr;
 }
 
 void MovementComponent::OnDestroyed()
@@ -81,6 +83,7 @@ void MovementComponent::Tick(float time)
 		}
 
 		DesiredState.velocity = velocity;
+		rigid->body->setLinearVelocity(btVector3(velocity.X, velocity.Z, velocity.Y));
 	}
 	break;
 	}
@@ -92,6 +95,7 @@ void MovementComponent::Tick(float time)
 void MovementComponent::SetTarget(Actor* t)
 {
 	Object = t;
+	rigid = Physics::MakeRigidBoby(AABB(Vector(-1.f), Vector(1.f)));
 	//Physics::RemoveStatic(t);
 }
 
@@ -103,5 +107,6 @@ void MovementComponent::SetGround(Terrain* t)
 void MovementComponent::ApplyMovement()
 {
 	if (!allowMovement) return;
-	Object->SetLocation(DesiredState.location);
+	auto l = rigid->body->getWorldTransform().getOrigin();
+	Object->SetLocation(Vector(l[0], l[2], l[1]));
 }

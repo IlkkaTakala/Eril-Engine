@@ -46,6 +46,8 @@ private:
 	Ref<InstancedObject> Grass;
 	Ref<InstancedObject> Flowers;
 	Ref<VisibleObject> Sky;
+	Ref<SceneComponent> box;
+
 
 	Ref<Terrain> terra[4];
 

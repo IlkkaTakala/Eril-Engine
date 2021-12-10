@@ -100,13 +100,12 @@
     <ClCompile Include="Engine\external\glfw\deps\glad_gl.c">
       <Filter>Engine\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="BulletPhysics.cpp">
-      <Filter>Engine\Private</Filter>
+    <ClCompile Include="Engine\Core\Physics\BulletPhysics.cpp">
+      <Filter>Engine\Objects\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="BulletObject.h">
-      <Filter>Engine\Private</Filter>
+    <ClCompile Include="Engine\Core\Objects\ColliderComponent.cpp">
+      <Filter>Engine\Objects\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\Objects\ColliderComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -132,6 +131,9 @@
     </Filter>
     <Filter Include="Engine\OpenGL">
       <UniqueIdentifier>{1a8dd4f1-9c5c-40d8-8a15-89a92e8920dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Objects\Physics">
+      <UniqueIdentifier>{7347c632-ba99-4fda-95d5-697116727367}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -231,10 +233,15 @@
     <ClInclude Include="Engine\external\glfw\deps\glad\gl.h">
       <Filter>Engine\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\Physics\BulletPhysics.h">
-      <Filter>Engine\Public</Filter>
+    <ClInclude Include="Engine\Core\Physics\BulletObject.h">
+      <Filter>Engine\Objects\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\Objects\ColliderComponent.h" />
+    <ClInclude Include="Engine\Core\Physics\BulletPhysics.h">
+      <Filter>Engine\Objects\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Objects\ColliderComponent.h">
+      <Filter>Engine\Objects\Physics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

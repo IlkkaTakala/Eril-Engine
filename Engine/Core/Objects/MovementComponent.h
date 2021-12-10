@@ -1,6 +1,7 @@
 #pragma once
 #include <Core.h>
 #include <Objects/Actor.h>
+#include <Physics/BulletObject.h>
 
 class Terrain;
 
@@ -71,5 +72,7 @@ private:
 	Vector directions[16];
 	int direction_count;
 	int force_count;
+
+	bulletObject* rigid;
 };
 

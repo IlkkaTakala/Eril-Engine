@@ -100,7 +100,7 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>assimp-vc140-mt.lib;zlibstaticd.lib;IrrXML.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc140-mt.lib;LinearMath_Debug.lib;Bullet3OpenCL_clew_Debug.lib;Bullet2FileLoader_Debug.lib;BulletSoftBody_Debug.lib;BulletDynamics_Debug.lib;BulletCollision_Debug.lib;BulletInverseDynamics_Debug.lib;Bullet3Common_Debug.lib;Bullet3Geometry_Debug.lib;Bullet3Collision_Debug.lib;Bullet3Dynamics_Debug.lib;zlibstaticd.lib;IrrXML.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\build\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -108,6 +108,7 @@
       <ImportLibrary>$(SolutionDir)/build/Debug/Eril.lib</ImportLibrary>
       <ProgramDataBaseFile>$(SolutionDir)/build/Debug/Eril.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
+      <ForceFileOutput>Enabled</ForceFileOutput>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -201,8 +202,6 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BulletObject.h" />
-    <ClCompile Include="BulletPhysics.cpp" />
     <ClCompile Include="Engine\Core\BasicTypes.cpp" />
     <ClCompile Include="Engine\Core\Core.cpp" />
     <ClCompile Include="Engine\Core\GameLoop.cpp" />
@@ -221,6 +220,7 @@
     <ClCompile Include="Engine\Core\Objects\Terrain.cpp" />
     <ClCompile Include="Engine\Core\Objects\VisibleObject.cpp" />
     <ClCompile Include="Engine\Core\Physics.cpp" />
+    <ClCompile Include="Engine\Core\Physics\BulletPhysics.cpp" />
     <ClCompile Include="Engine\Core\Settings.cpp" />
     <ClCompile Include="Engine\Core\Timer.cpp" />
     <ClCompile Include="Engine\Core\WinConsole.cpp" />
@@ -254,6 +254,7 @@
     <ClInclude Include="Engine\Core\Objects\Terrain.h" />
     <ClInclude Include="Engine\Core\Objects\VisibleObject.h" />
     <ClInclude Include="Engine\Core\Physics.h" />
+    <ClInclude Include="Engine\Core\Physics\BulletObject.h" />
     <ClInclude Include="Engine\Core\Physics\BulletPhysics.h" />
     <ClInclude Include="Engine\Core\Settings.h" />
     <ClInclude Include="Engine\Core\Timer.h" />

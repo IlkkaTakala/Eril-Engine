@@ -132,6 +132,10 @@ TestPlayer::TestPlayer() : Player()
 		delete[] arr;
 	}
 
+	box = SpawnObject<SceneComponent>();
+	box->
+
+
 	hunt = SpawnObject<Hunter>();
 	hunt->SetLocation(Vector(100.f, 0.f, 0.f));
 	hunt->move->SetGround(terra[0]);

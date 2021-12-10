@@ -7,6 +7,7 @@
 #include "WinConsole.h"
 #include "GarbageCollector.h"
 #include "Physics.h"
+#include "Physics/BulletPhysics.h"
 #include "Timer.h"
 
 using namespace std;
@@ -60,6 +61,7 @@ int GameLoop::Start()
 	}
 	
 	printf("Creating defaults...\n");
+	Physics::init();
 	State = EngineInterface::CreateDefaults();
 	Collector = new GC();
 

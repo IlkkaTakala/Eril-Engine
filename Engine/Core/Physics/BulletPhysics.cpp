@@ -1,5 +1,4 @@
 #include <vector>
-#include <btBulletDynamicsCommon.h>
 #include <glad/gl.h>
 #include <Physics/BulletPhysics.h>
 #include "BulletObject.h"
@@ -11,8 +10,7 @@ btBroadphaseInterface* broadphase;
 btConstraintSolver* solver;
 std::vector<bulletObject*> bodies;
 
-
-btRigidBody* addSphere(float rad, float x, float y, float z, float mass)
+btRigidBody* Physics::addSphere(float rad, float x, float y, float z, float mass)
 {
     btTransform t;
     t.setIdentity();
@@ -24,15 +22,15 @@ btRigidBody* addSphere(float rad, float x, float y, float z, float mass)
 
     btMotionState* motion = new btDefaultMotionState(t);
     btRigidBody::btRigidBodyConstructionInfo info(mass, motion, sphere, inertia);
-    //btRigidBody* body = new btRigidBody(info);
-    //world->addRigidBody(body);
+    btRigidBody* body = new btRigidBody(info);
+    world->addRigidBody(body);
     //bodies.push_back(new bulletObject(body, 0, 1.0, 0.0, 0.0));
     //body->setUserPointer(bodies[bodies.size() - 1]);
-    //return body;
+    return body;
 }
 
 
-btRigidBody* addCylinder(float d, float h, float x, float y, float z, float mass)
+btRigidBody* Physics::addCylinder(float d, float h, float x, float y, float z, float mass)
 {
     btTransform t;
     t.setIdentity();
@@ -45,14 +43,14 @@ btRigidBody* addCylinder(float d, float h, float x, float y, float z, float mass
     btMotionState* motion = new btDefaultMotionState(t);
     btRigidBody::btRigidBodyConstructionInfo info(mass, motion, sphere, inertia);
     btRigidBody* body = new btRigidBody(info);
-    /*world->addRigidBody(body);
-    bodies.push_back(new bulletObject(body, 1, 0.0, 1.0, 0.0));
+    world->addRigidBody(body);
+    /*bodies.push_back(new bulletObject(body, 1, 0.0, 1.0, 0.0));
     body->setUserPointer(bodies[bodies.size() - 1]);*/
     return body;
 }
 
 
-btRigidBody* addCone(float d, float h, float x, float y, float z, float mass)
+btRigidBody* Physics::addCone(float d, float h, float x, float y, float z, float mass)
 {
     btTransform t;
     t.setIdentity();
@@ -66,13 +64,13 @@ btRigidBody* addCone(float d, float h, float x, float y, float z, float mass)
     btRigidBody::btRigidBodyConstructionInfo info(mass, motion, sphere, inertia);
     btRigidBody* body = new btRigidBody(info);
     world->addRigidBody(body);
-    bodies.push_back(new bulletObject(body, 2, 1.0, 0.0, 1.0));
-    body->setUserPointer(bodies[bodies.size() - 1]);
+    /*bodies.push_back(new bulletObject(body));
+    body->setUserPointer(bodies[bodies.size() - 1]);*/
     return body;
 }
 
 
-btRigidBody* addBox(float width, float height, float depth, float x, float y, float z, float mass)
+btRigidBody* Physics::addBox(float width, float height, float depth, float x, float y, float z, float mass)
 {
     btTransform t;
     t.setIdentity();
@@ -86,13 +84,12 @@ btRigidBody* addBox(float width, float height, float depth, float x, float y, fl
     btRigidBody::btRigidBodyConstructionInfo info(mass, motion, sphere, inertia);
     btRigidBody* body = new btRigidBody(info);
     world->addRigidBody(body);
-    bodies.push_back(new bulletObject(body, 3, 1.0, 1.0, 0.0));
-    body->setUserPointer(bodies[bodies.size() - 1]);
+    /*bodies.push_back(new bulletObject(body));
+    body->setUserPointer(bodies[bodies.size() - 1]);*/
     return body;
 }
 
-
-void init(float angle)
+void Physics::init()
 {
     collisionConfig = new btDefaultCollisionConfiguration();
     dispatcher = new btCollisionDispatcher(collisionConfig);
@@ -109,8 +106,8 @@ void init(float angle)
     btRigidBody::btRigidBodyConstructionInfo info(0.0, motion, plane);
     btRigidBody* body = new btRigidBody(info);
     world->addRigidBody(body);
-    bodies.push_back(new bulletObject(body, 4, 0.8, 0.8, 0.8));
-    body->setUserPointer(bodies[bodies.size() - 1]);
+    /*  bodies.push_back(new bulletObject(body, 4, 0.8, 0.8, 0.8));*/
+    /*  body->setUserPointer(bodies[bodies.size() - 1]);*/
 
     addSphere(1.0, 0, 20, 0, 1.0);
 
@@ -119,8 +116,14 @@ void init(float angle)
     glLoadIdentity();
     glMatrixMode(GL_MODELVIEW);
     glEnable(GL_DEPTH_TEST);
-
-
-
 }
 
+btDynamicsWorld* Physics::GetWorld()
+{
+    return world;
+}
+
+bulletObject* Physics::MakeRigidBoby(AABB box)
+{
+    return new bulletObject(Physics::addBox(box.maxs.X - box.mins.X, box.maxs.Z - box.mins.Z, box.maxs.Y - box.mins.Y, 0, 0, 0, 10));
+}
