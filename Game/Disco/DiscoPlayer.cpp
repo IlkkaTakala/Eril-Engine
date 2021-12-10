@@ -7,14 +7,17 @@
 #include "PauseUI.h"
 #include <Interface/WindowManager.h>
 #include <GamePlay/Scene.h>
-#include <Disco/DiscoLightSystem.h>
+
 
 //ECS
 #include <Interface/IECS.h>
 #include <ECS_Examples/ECSExample.h>
 #include <ECS/Components/LightComponent.h>
 #include <ECS/Systems/LightControllerSystem.h>
+#include <ECS/Components/AudioComponent.h>
+#include <ECS/Systems/AudioControllerSystem.h>
 #include <Disco/DiscoLightComponent.h>
+#include <Disco/DiscoLightSystem.h>
 
 
 void DiscoPlayer::OpenConsole(bool) {
@@ -158,10 +161,28 @@ void DiscoPlayer::InputExit(bool down)
 	
 }
 
-void DiscoPlayer::Tick(float)
+void DiscoPlayer::Tick(float deltaTime)
 {
 	GetCamera()->SetLocation(Location + Vector(0.f, 0.f, 1.5f));
 	GetCamera()->SetRotation(Rotation);
+
+	AudioComponent &audioComponent = IECS::GetComponentManager()->GetComponentVector<AudioComponent>(IECS::GetComponentManager()->GetTypeIdByName("AudioComponent"))->at(AudioID);
+	AudioS += deltaTime / 2.0f;
+	AudioT += deltaTime / 2.0f;
+	float x = cos(AudioS) * sin(AudioT);
+	float y = sin(AudioS) * sin(AudioT);
+	float z = cos(AudioT);
+	Vector loc(x, y, z);
+	loc *= Vector(24, 45, 16);
+	loc.Z += 16;
+	Vector previousLoc = audioComponent.GetPosition();
+	Vector velocity = (loc - previousLoc) / deltaTime;
+	audioComponent.SetPosition(loc);
+	audioComponent.SetVelocity(velocity);
+
+	Vector listenerPos = Location;
+	Vector listenerOrientation = GetCamera()->GetForwardVector();
+	AudioManager::SetListener(listenerPos, -GetCamera()->GetForwardVector(), -GetCamera()->GetUpVector());
 }
 
 void DiscoPlayer::BeginPlay()
@@ -236,7 +257,30 @@ void DiscoPlayer::BeginPlay()
 		}
 	}
 
-	Console::Log("Hello beautiful world");
+	//Room Dimensions
+	//X: -24, 24
+	//Y: -45, 45
+	//Z: 0, 32
+
+	IComponentArrayQuerySystem<AudioComponent>* audiosystem = static_cast<IComponentArrayQuerySystem<AudioComponent>*> (WorldSystemsManager->GetSystemByName("AudioControllerSystem"));
+
+
+	AudioComponent* audioComponent = audiosystem->AddComponentToSystem();
+	Vector audioPos = Vector(-20.0f, -41.0f,  15.0f);
+	audioComponent->SetSourceID(AudioManager::LoadAudio("clicketi.WAV"));
+	audioComponent->SetPosition(audioPos);
+	audioComponent->SetGain(1.0f);
+	audioComponent->SetPitch(1.0f);
+	audioComponent->SetLooping(true);
+	audioComponent->SetSourceRelative(false);
+	audioComponent->Play();
+
+	AudioID = audioComponent->GetID();
+	AudioS = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f * PI;
+	AudioT = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f * PI;
+
+
+	Console::Log("Hello colorful world");
 }
 
 void DiscoPlayer::OnDestroyed()

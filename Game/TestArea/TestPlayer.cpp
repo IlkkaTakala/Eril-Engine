@@ -234,12 +234,11 @@ void TestPlayer::BeginPlay()
 		DirLight->Color = Vector(1.f);
 		DirLight->Rotation = Vector(0.5, 0.5, -0.5);
 
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < 100; i++)
 		{
 			//Console::Log("Light addded " + std::to_string(i));
 			float x = (float)(rand() % 100);
 			float y = (float)(rand() % 100);
-			y = 1;
 			//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
 
 			LightComponent* light = lightSystem->AddComponentToSystem();

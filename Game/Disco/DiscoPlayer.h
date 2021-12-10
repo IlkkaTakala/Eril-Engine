@@ -56,4 +56,8 @@ private:
 	Ref<ECSExample> ecsExample;
 
 	int spawnCounter;
+
+	int AudioID;
+	float AudioS;
+	float AudioT;
 };
