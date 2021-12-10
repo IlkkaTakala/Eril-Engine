@@ -2,19 +2,23 @@
 #include "Gameplay/GameState.h"
 #include "EngineInterface.h"
 #include "Settings.h"
-#include "IRender.h"
+#include "Interface/IRender.h"
 #include "GameLoop.h"
 #include "WinConsole.h"
 #include "GarbageCollector.h"
 #include "Physics.h"
 #include "Physics/BulletPhysics.h"
 #include "Timer.h"
+#include <GamePlay/Scene.h>
+#include <Interface/IECS.h>
+#include <Interface/AudioManager.h>
 
 using namespace std;
 
 std::list<Tickable*> GameLoop::TickList;
 std::list<Tickable*> GameLoop::TickListRemoval;
 Ref<GameState> GameLoop::State = nullptr;
+Ref<Scene> GameLoop::World = nullptr;
 
 GameLoop::GameLoop()
 {
@@ -33,19 +37,24 @@ GameLoop::~GameLoop()
 	delete MI;
 	delete RI;
 	delete Collector;
+	IECS::Destroy();
+	AudioManager::Destroy();
 }
 
 int GameLoop::Start()
 {
-	printf("Starting game...\n");
+	Console::Log("Starting game...");
 	Loop = this;
 	INI = new INISettings("Settings.ini");
 	if (!INI->IsValid()) return 10;
 
+	//Initialize ECS World
+	IECS::Init();
+
 	try
 	{
 		if (INI->GetValue("Engine", "Console") == "true") 
-			AddConsole();
+			Console::Create();
 		MI->StartLoading();
 		int x = std::atoi(INI->GetValue("Render", "ResolutionX").c_str());
 		int y = std::atoi(INI->GetValue("Render", "ResolutionY").c_str());
@@ -54,18 +63,19 @@ int GameLoop::Start()
 	}
 	catch (const std::exception& e)
 	{
-		printf(e.what());
-		printf("\n");
+		Console::Log(e.what());
 		RI->DestroyWindow();
 		return 11;
 	}
+
+	AudioManager::Init();
 	
 	printf("Creating defaults...\n");
 	Physics::init();
 	State = EngineInterface::CreateDefaults();
 	Collector = new GC();
 
-	printf("Loading finished\n");
+	Console::Log("Loading finished");
 	return MainLoop();
 }
 
@@ -100,6 +110,9 @@ int GameLoop::MainLoop()
 			t->Tick(duration.count());
 		}
 
+		SystemsManager* ECSWorldSystemsManager = IECS::GetSystemsManager();
+		ECSWorldSystemsManager->UpdateSystems(duration.count());
+
 		Timer::UpdateTimers(duration.count());
 		Physics::CheckCollisions(duration.count());
 
@@ -114,7 +127,9 @@ int GameLoop::MainLoop()
 		TickListRemoval.clear();
 		lock.unlock();
 		duration = std::chrono::steady_clock::now() - start;
-		//fps = 1.f / duration.count();
+		fps = 1.f / duration.count();
+
+		Scene::CheckShouldLoad();
 	}
 
 	TickList.clear();

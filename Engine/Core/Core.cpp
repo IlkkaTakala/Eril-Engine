@@ -11,13 +11,17 @@ void Exit()
 	Loop->Quit();
 }
 
-Data* GetObjectByName(const String& name)
+BaseObject* SpawnObject(String type)
 {
-	//auto result = GC::Pointers.find(name);
-	//return result == GC::Pointers.end() ? nullptr : result->second;
-	return nullptr;
+	if (ObjectManager::TypeList().find(type) == ObjectManager::TypeList().end()) return nullptr;
+	return ObjectManager::TypeList()[type]("", 0, Constants::Record::SPAWNED, false, 0);
 }
 
 GameState* GetGameState() {
 	return GameLoop::State;
+}
+
+BaseObject* FindObjectByRecord(const RecordInt& record)
+{
+	return ObjectManager::GetByRecord<BaseObject>(record);
 }

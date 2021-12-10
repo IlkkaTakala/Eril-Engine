@@ -1,6 +1,9 @@
 #pragma once
+/* Lights have been moved to be handled by the ECS-system. This is kept here if the code is needed later.
+
+
 #include "Core.h"
-#include "IRender.h"
+#include "Interface/IRender.h"
 
 struct LightData 
 {
@@ -20,6 +23,7 @@ struct LightData
 
 constexpr int LIGHT_DIRECTIONAL = 0;
 constexpr int LIGHT_POINT = 1;
+constexpr int LIGHT_SPOT = 2;
 
 class Light : public BaseObject
 {
@@ -40,3 +44,4 @@ private:
 	
 };
 
+*/

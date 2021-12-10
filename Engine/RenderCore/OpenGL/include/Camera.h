@@ -1,8 +1,9 @@
 #pragma once
-#include "IRender.h"
+#include "Interface/IRender.h"
 #include "glm/glm.hpp"
 
 class RenderObject;
+class Shader;
 
 class GLCamera : public Camera
 {
@@ -26,12 +27,16 @@ public:
 	const glm::mat4& GetProjectionMatrix() const { return Projection; }
 	const glm::mat4& GetViewMatrix() const { return View; }
 
+	virtual void SetPostProcess(const String& name) override;
+	Shader* GetPostProcess() const { return postProcess; }
+
 private:
 	glm::mat4 Projection;
 	glm::mat4 View;
 	glm::mat4 Orientation;
 	Vector Location;
 	Vector Rotation;
+	Shader* postProcess;
 
 	inline void ApplyTransformation();
 

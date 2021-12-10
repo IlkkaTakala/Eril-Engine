@@ -19,8 +19,27 @@ typedef __int64		int64;
 typedef std::string	String;
 std::vector<String> split(const String& s, char delim);
 
+namespace Constants {
+	namespace Record
+	{
+		constexpr uint8 LOADED = 0;
+		constexpr uint8 SPAWNED = 1;
+		constexpr uint8 CONSOLE = 2;
+	}
+}
+
 struct RecordInt {
 	uint64 record;
+
+	/*
+		Contains data about the object
+
+		mod id						: 3
+		server state & spawn type	: 1
+		reserved					: 4
+		object id					: 8 
+
+	*/
 
 	RecordInt(uint64 i) {
 		record = i;
@@ -30,8 +49,30 @@ struct RecordInt {
 		record = 0;
 	}
 
-	unsigned int GetModID() const {
-		return record >> 51;
+	String ToString() const {
+		char hex_string[24];
+		sprintf_s(hex_string, "0x%015llX", record);
+		return hex_string;
+	}
+
+	RecordInt(uint32 ID, uint8 SpawnType, bool isServer, uint16 Mod = 0) {
+		uint64 r = 0;
+		if (isServer) r |= 1ULL << 51;
+		r += (uint64)SpawnType << 48;
+		r += ID;
+		record = r;
+	}
+
+	uint GetModID() const {
+		return uint(record >> 52);
+	}
+
+	bool GetIsServer() const {
+		return uint8(record >> 48) & 0x08;
+	}
+
+	uint8 GetSpawnState() const {
+		return uint8(record >> 48) & 0x07;
 	}
 
 	operator uint64() const {
@@ -145,7 +186,7 @@ struct Vector
 			x.X * y.Y - y.X * x.Y);
 	}
 	static float Dot(const Vector& in1, const Vector& in2) { return in1.X* in2.X + in1.Y * in2.Y + in1.Z * in2.Z; }
-	String ToString() { return String(std::to_string(X) + ',' + std::to_string(Y) + ',' + std::to_string(Z)); }
+	String ToString() const { return String(std::to_string(X) + ',' + std::to_string(Y) + ',' + std::to_string(Z)); }
 
 	friend Vector operator+(const Vector& obj, const Vector& obj2) { return Vector(obj2.X + obj.X, obj2.Y + obj.Y, obj2.Z + obj.Z); }
 	friend void operator+=(Vector& obj, const Vector& obj2) { obj.X += obj2.X; obj.Y += obj2.Y; obj.Z += obj2.Z; }
@@ -249,11 +290,16 @@ struct Vector2D
 
 	Vector2D() { X = 0, Y = 0; }
 	Vector2D(long X, long Y) : X(X), Y(Y) {};
+	Vector2D(uint X, uint Y) : X(X), Y(Y) {};
+	Vector2D(int X, int Y) : X(X), Y(Y) {};
+	Vector2D(float X, float Y) : X(long(X)), Y(long(Y)) {};
 
 	Vector2D operator+(const Vector2D& obj) { return Vector2D(X + obj.X, Y + obj.Y); }
 	Vector2D operator-(const Vector2D& obj) { return Vector2D(X - obj.X, Y - obj.Y); }
 	Vector2D operator*(const Vector2D& obj) { return Vector2D(X * obj.X, Y * obj.Y); }
-	Vector2D operator/(const Vector2D& obj) { return Vector2D(X / obj.X, Y / obj.Y); }
+	friend Vector2D operator*(const Vector2D& lhs, float rhs) { return Vector2D(lhs.X * rhs, lhs.Y * rhs); }
+	friend Vector2D operator/(const Vector2D& lhs, const Vector2D& rhs) { return Vector2D(lhs.X / rhs.X, lhs.Y / rhs.Y); }
+	friend Vector2D operator/(const Vector2D& lhs, const float rhs) { return Vector2D(lhs.X / rhs, lhs.Y / rhs); }
 
 	friend bool operator==(const Vector2D& obj, const Vector2D& obj2) { return obj2.X == obj.X && obj2.Y == obj.Y; }
 };

@@ -1,0 +1,370 @@
+#include <UI/Image.h>
+#include <UI/Text.h>
+#include <Interface/FileManager.h>
+
+#include <glm/glm.hpp>
+#include <glad/gl.h>
+#include <GLFW/glfw3.h>
+
+#include <Texture.h>
+#include <Material.h>
+#include "RenderCore/OpenGL/UI/UISpace.h"
+
+struct UIMatrix
+{
+	glm::mat4 model_m;
+};
+
+struct Glyph
+{
+	glm::ivec2 topLeft;
+	glm::ivec2 size;
+	glm::ivec2 offset;
+	uint advance;
+	uint page;
+};
+
+struct Letter
+{
+	int offset;
+	uint letter;
+};
+
+struct Font
+{
+	Font() {
+		tex = nullptr;
+		charBuffer = 0;
+		charCount = 0;
+		kerningCount = 0;
+		originalSize = 0;
+	}
+	~Font() {
+	}
+	void Destroy() {
+		delete tex;
+		glDeleteBuffers(1, &charBuffer);
+	}
+	Texture* tex;
+	int charCount;
+	int kerningCount;
+	Glyph glyphs[256];
+	std::map<char, std::map<char, int>> kernings;
+	uint charBuffer;
+	uint originalSize;
+};
+
+static std::map<String, Font> fonts;
+
+String readParamOnLine(const String& param, int off, String& data)
+{
+	String value;
+	const char* str = data.c_str() + off;
+	int count = 0;
+	while (*str != '\n' && *str != '\0') {
+		if (*str == param[0])
+		{
+			bool match = true;
+			for (int i = 0; i < param.size() && match; i++) {
+				match = *(str + i) == param[i];
+			}
+			if (match) {
+				str += param.size() + 1;
+				while (*str != ' ' && *str != '\n' && *str != '\0') {
+					if (*str != '\"') value += *str;
+					str++;
+				}
+				break;
+			}
+		}
+		count++;
+		str++;
+	}
+	return value;
+}
+
+int readLine(int off, String& data)
+{
+	const char* str = data.c_str() + off;
+	int count = 0;
+	while (true) {
+		if (*str == '\n') {
+			count++;
+			break;
+		}
+		if (*str != '\0') {
+			count++;
+			str++;
+		}
+		else break;
+		
+	}
+	if (count == 0) return 0;
+	return count + off;
+}
+
+Font loadFont(String name)
+{
+	std::chrono::duration<float> duration = std::chrono::milliseconds(0);
+	auto start = std::chrono::steady_clock::now();
+	String data;
+	FileManager::RequestData(name + ".fnt", data);
+	std::stringstream stre(data);
+
+	Font f;
+	int line = 0;
+	f.originalSize = atoi(readParamOnLine("size", line, data).c_str());
+	for (int i = 0; i < 2; i++) {
+		line = readLine(line, data);
+	}
+	String file = readParamOnLine("file", line, data);;
+	line = readLine(line, data);
+	f.charCount = atoi(readParamOnLine("count", line, data).c_str());
+	//Glyph* glyphs = new Glyph[256]();
+	for (int i = 0; i < f.charCount; i++) {
+		line = readLine(line, data);
+		int id = atoi(readParamOnLine("id", line, data).c_str());
+		if (id < 0 || id > 255) {
+			Console::Error("Invalid glyph found");
+			continue;
+		}
+		f.glyphs[id].topLeft.x = atoi(readParamOnLine("x", line, data).c_str());
+		f.glyphs[id].topLeft.y = atoi(readParamOnLine("y", line, data).c_str());
+		f.glyphs[id].size.x = atoi(readParamOnLine("width", line, data).c_str());
+		f.glyphs[id].size.y = atoi(readParamOnLine("height", line, data).c_str());
+		f.glyphs[id].offset.x = atoi(readParamOnLine("xoffset", line, data).c_str());
+		f.glyphs[id].offset.y = atoi(readParamOnLine("yoffset", line, data).c_str());
+		f.glyphs[id].advance = atoi(readParamOnLine("xadvance", line, data).c_str());
+		f.glyphs[id].page = atoi(readParamOnLine("page", line, data).c_str());
+	}
+	line = readLine(line, data);
+	f.kerningCount = atoi(readParamOnLine("count", line, data).c_str());
+
+	for (int i = 0; i < f.kerningCount; i++) {
+		line = readLine(line, data);
+		int first = atoi(readParamOnLine("first", line, data).c_str());
+		int second = atoi(readParamOnLine("second", line, data).c_str());
+		int kern = atoi(readParamOnLine("amount", line, data).c_str());
+		int idx = first * 256 + second;
+		if (idx < 256 * 256 && idx >= 0)
+		{
+			f.kernings[first][second] = kern;
+		}
+		else Console::Error("Invalid kerning");
+	}
+
+	glGenBuffers(1, &f.charBuffer);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, f.charBuffer);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(Glyph) * 256, f.glyphs, GL_STATIC_DRAW);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+	f.tex = RI->LoadTextureByName("Assets/Fonts/" + file);
+
+	auto end = std::chrono::steady_clock::now();
+	duration = end - start;
+
+	Console::Log("Loading font \"" + name + "\" took " + std::to_string(duration.count()));
+
+	return f;
+}
+
+Text::Text()
+{
+	const char* solidShader = R"~~~(
+#version 430 core
+
+struct CharData {
+	ivec2 topLeft;
+	ivec2 size;
+	ivec2 offset;
+	unsigned int advance;
+	unsigned int page;
+};
+
+struct LetterData {
+	int offset;
+	uint letter;
+};
+
+// Shader storage buffer objects
+layout (std140, binding = 0) uniform Globals
+{
+    mat4 projection;
+    mat4 view;
+	vec4 viewPos;
+	ivec2 screenSize;
+	int sceneLightCount;
+};
+
+uniform sampler2D depthMap;
+uniform float depthValue;
+uniform ivec2 topLeft;
+uniform float fontsize;
+uniform int weight;
+layout (binding=0, rgba16f) uniform image2D colorDest;
+layout (binding=4, r8) readonly uniform image2D fontAtlas;
+layout (std140, binding = 1) uniform style
+{
+	vec4 color;
+	vec4 tint;
+};
+
+layout(std430, binding = 2) readonly buffer StringBuffer {
+	LetterData stringBuffer[];
+};
+
+layout(std430, binding = 3) readonly buffer CharBuffer {
+	CharData charBuffer[];
+};
+
+shared float width;
+const float fade = 0.1;
+
+#define TILE_SIZE 64
+layout(local_size_x = TILE_SIZE, local_size_y = 1, local_size_z = 1) in;
+void main() 
+{
+	uint character = 0;
+	
+	if (gl_LocalInvocationIndex == 0) {
+		width = 0.5 - (weight / 100.0 - 1.0) * 0.13;
+	}
+
+	uint threadCount = TILE_SIZE;
+    uint passCount = (stringBuffer.length() + threadCount - 1) / threadCount;
+	for (uint passIt = 0; passIt < passCount; passIt++)
+	{
+		uint stringIndex =  passIt * threadCount + gl_LocalInvocationIndex;
+
+		if (stringIndex >= stringBuffer.length()) break;
+
+		uint letter = stringBuffer[stringIndex].letter;
+		ivec2 size = charBuffer[letter].size;
+		int xoffset = stringBuffer[stringIndex].offset + charBuffer[letter].offset.x;
+		xoffset = int(xoffset * fontsize);
+		int yoffset = int(charBuffer[letter].offset.y * fontsize);
+		ivec2 dataLoc = charBuffer[letter].topLeft;
+		ivec2 endSize = ivec2(size * fontsize);
+		for (int y = 0; y < endSize.y; y++) {
+			for (int x = 0; x < endSize.x; x++) {
+				vec4 result = vec4(1.0);
+				vec2 screenLoc = vec2(xoffset + x, yoffset + y);
+				ivec2 loc = ivec2(screenLoc.x + topLeft.x, screenSize.y - (topLeft.y + screenLoc.y));
+				//if (texture(depthMap, loc / vec2(screenSize)).r == depthValue) {
+					float fontValue = imageLoad(fontAtlas, dataLoc + ivec2((ivec2(x, y) / fontsize))).r;
+					result.a = smoothstep(width, width + fade, fontValue);
+					result *= color * tint;
+					vec4 ogColor = imageLoad(colorDest, loc);
+					imageStore(colorDest, loc, vec4(ogColor.xyz * (1.0 - result.a) + result.xyz * result.a, ogColor.a + result.a));
+				//}
+			}
+		}
+	}
+}
+)~~~";
+
+	if (solid_shader != nullptr) delete solid_shader;
+	solid_shader = new Shader(0, solidShader);
+
+	hits = HitReg::HitTestInvisible;
+
+	font = "Assets/Fonts/arial";
+
+	auto it = fonts.find(font);
+	if (it == fonts.end()) fonts[font] = loadFont(font);
+
+	fontSize = 30;
+	weight = 100;
+	just = Justify::Left;
+
+	SetText("Hello World");
+}
+
+Text::~Text()
+{
+
+}
+
+void Text::Render()
+{
+	if (visible != Visibility::Visible) return;
+
+	if (textChanged) {
+		float ratio = fontSize / (float)fonts[font].originalSize;
+		Letter* storage = new Letter[value.size()]();
+		for (int i = 0; i < value.size(); i++) {
+			char letter = value[i];
+			storage[i].letter = letter;
+			if (i > 0) {
+				storage[i].offset = storage[i - 1].offset + uint(fonts[font].glyphs[storage[i - 1].letter].advance - 20);
+				if (fonts[font].kernings.count(storage[i - 1].letter) > 0) {
+					if (fonts[font].kernings[storage[i - 1].letter].count(letter) > 0)
+						storage[i].offset += (int)(fonts[font].kernings[storage[i - 1].letter][letter]);
+				}
+			}
+			else {
+				storage[i].offset = 0;
+			}
+		}
+		int total_length = storage[value.size() - 1].offset + fonts[font].glyphs[storage[value.size() - 1].letter].advance;
+		int center = (realSize.X - total_length * ratio) / 2;
+
+		switch (just)
+		{
+		case Justify::Left:
+			break;
+		case Justify::Centre:
+			for (int i = 0; i < value.size(); i++) {
+				storage[i].offset += int(center / ratio);
+			}
+			break;
+		case Justify::Right:
+			for (int i = 0; i < value.size(); i++) {
+				storage[i].offset -= total_length;
+			}
+			break;
+		default:
+			break;
+		}
+
+		glGenBuffers(1, &StringBuffer);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, StringBuffer);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(Letter) * value.size(), storage, GL_STATIC_DRAW);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+		delete[] storage;
+
+		textChanged = false;
+	}
+
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, fonts[font].charBuffer);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, StringBuffer);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 1, uniformBuffer);
+
+	solid_shader->Bind();
+
+	solid_shader->SetUniform("topLeft", topLeft.X, topLeft.Y);
+	solid_shader->SetUniform("fontsize", fontSize / (float)fonts[font].originalSize);
+	solid_shader->SetUniform("model", matrix->model_m);
+	solid_shader->SetUniform("depthValue", realDepth);
+	solid_shader->SetUniform("weight", weight);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, RI->GetUIManager()->GetDepth());
+
+	glBindImageTexture(0, RI->GetUIManager()->GetColor(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16F);
+	glBindImageTexture(4, fonts[font].tex->GetTextureID(), 0, GL_FALSE, 0, GL_READ_ONLY, GL_R8);
+
+	glDispatchCompute(1, 1, 1);
+	glMemoryBarrier(GL_FRAMEBUFFER_BARRIER_BIT);
+	//glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+Text* Text::SetText(const String& text, int size)
+{
+	value = text;
+	textChanged = true;
+	if (size != 0) fontSize = size;
+
+	return this;
+}

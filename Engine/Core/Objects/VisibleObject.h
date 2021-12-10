@@ -1,14 +1,16 @@
 #pragma once
 #include <Core.h>
 #include <Objects/SceneComponent.h>
-#include "IRender.h"
+#include "Interface/IRender.h"
 
 class VisibleObject : public SceneComponent
 {
+	REGISTER(VisibleObject);
 public:
 	VisibleObject();
 	virtual ~VisibleObject() { delete RenderData; }
 	virtual void OnDestroyed() override;
+	virtual void LoadWithParameters(const String& args) override;
 
 	void SetModel(std::string Name);
 	void SetModel(RenderMesh* mesh);

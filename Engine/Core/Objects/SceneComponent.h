@@ -6,6 +6,9 @@ class SceneComponent : public BaseObject
 public:
 	SceneComponent();
 	virtual ~SceneComponent() { }
+	virtual void BeginPlay() {}
+	virtual void OnDestroyed() override;
+	virtual void LoadWithParameters(const String& args) override;
 
 	void SetLocation(const Vector& NewLocation);
 	void SetRotation(const Vector& NewRotation);
@@ -18,10 +21,16 @@ public:
 	Transformation GetTransformation() const { return Transformation(Location, Rotation, Scale); }
 
 	SceneComponent* GetParent() const { return Parent; }
-	void SetParent(SceneComponent* obj) { Parent = obj; }
+	const std::list<RefWeak<SceneComponent>> GetChildren() const { return Children; }
+	//void SetParent(SceneComponent* obj) { Parent = obj; }
+
+	void AddComponent(SceneComponent* obj);
+	void RemoveComponent(SceneComponent* obj);
+
 protected:
 
 	SceneComponent* Parent;
+	std::list<RefWeak<SceneComponent>> Children;
 
 	Vector Location;
 	Vector Rotation;

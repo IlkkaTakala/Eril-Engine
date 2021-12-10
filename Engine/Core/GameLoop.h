@@ -7,6 +7,7 @@
 class GameState;
 class GC;
 class Input;
+class ECSWorldManager;
 
 class GameLoop
 {
@@ -18,8 +19,9 @@ public:
 	void Quit();
 	void AddToTick(Tickable* t) { std::unique_lock<std::mutex> lock(TickListMutex); TickList.push_back(t); }
 	void RemoveFromTick(Tickable* t) { std::unique_lock<std::mutex> lock(TickListMutex); TickListRemoval.push_back(t); }
-	
+	void ClearTick() { std::unique_lock<std::mutex> lock(TickListMutex); TickList.clear(); TickListRemoval.clear(); }
 	static Ref<GameState> State;
+	static Ref<Scene> World;
 
 private:
 	int MainLoop();

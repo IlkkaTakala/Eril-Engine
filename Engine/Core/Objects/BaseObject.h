@@ -1,7 +1,9 @@
 #pragma once
 #include <BasicTypes.h>
+#include <map>
 
 class ObjectManager;
+class Scene;
 struct Record;
 
 class RefHold
@@ -46,12 +48,17 @@ class BaseObject : public Data
 {
 public:
 	//void operator delete(void* ptr);
+	BaseObject();
 
 	virtual void BeginPlay() = 0;
 	virtual void OnDestroyed() {};
+	Scene* GetScene() const { return World; }
+	virtual void LoadWithParameters(const String& args) {}
 
 protected:
-
 	virtual ~BaseObject() {};
 
+	static const std::map<String, String> ParseOptions(const String& args);
+private:
+	Scene* World;
 };

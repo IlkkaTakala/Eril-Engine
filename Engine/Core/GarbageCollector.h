@@ -2,7 +2,7 @@
 #include "BasicTypes.h"
 #include <map>
 #include <thread>
-#include "IRender.h"
+#include "Interface/IRender.h"
 
 class BaseObject;
 class Mesh;

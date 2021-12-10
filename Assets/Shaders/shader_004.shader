@@ -137,12 +137,12 @@ void main()
 {
 	//in_position * clamp(dot(normalize(in_position), velocity.xzy), 0.0, 10.0) * 10.0
 	vec3 vel_add = velocity.xzy * 0.2 * clamp(dot(normalize(in_position), velocity.xzy), 0.0, 3.0) * 0.5;
-	vec4 o_pos = vec4(NOISE(in_position + vec3(delta)) * 5.0 * in_position + vel_add, 1.0);
+	vec4 o_pos = vec4(NOISE(in_position + vec3(delta)) * 5.0 * 0.1 * in_position + vel_add, 1.0);
 	//vec4 o_pos = vec4(in_position * dot(normalize(in_position), normalize(velocity.xzy)) * 1.0, 1.0);
 	
 	vs_out.color = vec4(1.0);
 	
-	vec4 pos = Model * in_disp * o_pos;
+	vec4 pos = Model * in_disp * vec4(in_position, 1.0);
 	vec4 out_pos = projection * view * pos;
 	out_pos.z = 0.0;
 	gl_Position = out_pos;

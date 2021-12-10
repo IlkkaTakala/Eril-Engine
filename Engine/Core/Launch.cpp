@@ -2,12 +2,15 @@
 #define NOMINMAX
 #define NOCOMM
 #include <Windows.h>
-#include <iostream>
 #include "GameLoop.h"
-#include "IRender.h"
+#include "Interface/IRender.h"
+#include <Interface/WindowManager.h>
 
-int main()
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
+	WindowManager::SetInstance(hInstance);
+	Console::Log("Hello, Eril is starting");
+	Console::Error("This world is an error");
 	GameLoop* Game = new GameLoop();
 	if (InterfaceInit()) return 11;
 	int retur = Game->Start();
@@ -15,15 +18,16 @@ int main()
 	switch (retur)
 	{
 	case 10:
-		printf("Failed to load INI file\n");
+		Console::Error("Failed to load INI file");
 		break;
 	case 11:
-		printf("Render error\n");
+		Console::Error("Render error");
 		break;
 	default:
 		break;
 	}
-	printf("\nGame closed, press enter to continue\n");
-	std::cin.get();
+	Console::Log("Game closed, goodbye");
+	Sleep(10000);
+	Console::Close();
 	return retur;
 }

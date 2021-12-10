@@ -6,5 +6,5 @@ class GameState;
 class EngineInterface
 {
 public:
-	static GameState* CreateDefaults();
+	static void CreateDefaults();
 };

@@ -19,7 +19,9 @@ layout (std140, binding = 0) uniform Globals
 out VS_OUT {
 	vec2 TexCoords;
 	vec4 FragPos;
-	mat3 TBN;
+	vec3 Normals;
+	vec3 BiTangents;
+	vec3 Tangents;
 } vs_out;
 
 uniform mat4 Model;
@@ -36,11 +38,159 @@ void main()
 	T = normalize(T - dot(T, N) * N);
 	vec3 B = cross(N, T);
 
-	mat3 TBN = mat3(T, B, N);
-	vs_out.TBN = TBN;
+	vs_out.Normals = N;
+	vs_out.BiTangents = B;
+	vs_out.Tangents = T;
 	//vs_out.normal = normalize(mat3(Model * in_disp) * in_normal).xyz;
+
+	/*
+	//vec3 T = (Model * in_disp * vec4(in_tangent, 1.0f)).xyz;
+	//vec3 N = (Model * in_disp * vec4(in_normal, 1.0f)).xyz;
+	vec3 T = (Model * in_disp * vec4(in_tangent, 0.0f)).xyz;
+	vec3 N = (Model * in_disp * vec4(in_normal, 0.0f)).xyz;
+	T = normalize(T);
+	N = normalize(N);
+	
+	*/
 }
 ###END_VERTEX###
+
+###GEOMETRY###
+#version 430 core
+
+layout(triangles) in;
+
+// Three lines will be generated: 6 vertices
+layout(line_strip, max_vertices = 12) out;
+
+// Shader storage buffer objects
+layout(std140, binding = 0) uniform Globals
+{
+	mat4 projection;
+	mat4 view;
+	vec4 viewPos;
+	ivec2 screenSize;
+	int sceneLightCount;
+};
+
+//uniform float normal_length;
+//uniform mat4 gxl3d_ModelViewProjectionMatrix;
+
+
+in VS_OUT{
+	vec2 TexCoords;
+	vec4 FragPos;
+	vec3 Normals;
+	vec3 BiTangents;
+	vec3 Tangents;
+} gs_in[];
+
+out GS_OUT
+{
+	vec2 TexCoords;
+	vec4 FragPos;
+	vec3 Normals;
+	vec3 BiTangents;
+	vec3 Tangents;
+} gs_out;
+
+
+void main()							 
+{			
+	
+
+	//Make Normal Triangle
+	float normal_length = 0.5;
+	int i;
+	for (i = 0; i < gs_in.length(); i++)
+	{
+		gs_out.TexCoords = gs_in[i].TexCoords;
+		gs_out.FragPos = gs_in[i].FragPos;
+		gs_out.Normals = gs_in[i].Normals;
+		gs_out.BiTangents = gs_in[i].BiTangents;
+		gs_out.Tangents = gs_in[i].Tangents;
+
+		
+	}	 
+
+	vec4 P = gl_in[0].gl_Position;
+	vec4 N = vec4(gs_in[0].Normals, 1.0);
+
+	//WireFrame
+	/*
+	P = gl_in[0].gl_Position;
+	gl_Position = P;
+	EmitVertex();
+
+	P = gl_in[1].gl_Position;
+	gl_Position = P;
+	EmitVertex();
+	EndPrimitive();
+
+	P = gl_in[1].gl_Position;
+	gl_Position = P;
+	EmitVertex();
+
+	P = gl_in[2].gl_Position;
+	gl_Position = P;
+	EmitVertex();
+	EndPrimitive();
+
+	P = gl_in[2].gl_Position;
+	gl_Position = P;
+	EmitVertex();
+
+	P = gl_in[0].gl_Position;
+	gl_Position = P;
+	EmitVertex();
+	EndPrimitive();
+	*/
+
+	//Normals
+	P = gl_in[0].gl_Position;
+	N = projection * view * vec4(gs_in[0].Normals, 0.0) * normal_length;
+	gl_Position = P;
+	EmitVertex();
+
+	gl_Position = P + N;
+	EmitVertex();
+	EndPrimitive();
+
+	//Tangents
+	P = gl_in[0].gl_Position;
+	vec4 T = projection * view * vec4(gs_in[0].Tangents, 0.0) * normal_length;
+	gl_Position = P;
+	EmitVertex();
+
+	gl_Position = P + T;
+	EmitVertex();
+	EndPrimitive();
+
+	//BiTangents
+	
+	P = gl_in[0].gl_Position;
+	vec4 B = projection * view * vec4(gs_in[0].BiTangents, 0.0) * normal_length;
+	gl_Position = P;
+	EmitVertex();
+
+	gl_Position = P + B;
+	EmitVertex();
+	EndPrimitive();
+	
+	
+
+
+	
+
+
+
+
+}
+
+
+
+###END_GEOMETRY###
+
 ###FRAGMENT###
 #version 430 core
 
@@ -78,11 +228,13 @@ layout (location = 1) out vec4 BloomBuffer;
 layout (location = 2) out vec4 accum;
 layout (location = 3) out float reveal;
 
-in VS_OUT {
+in VS_OUT{
 	vec2 TexCoords;
 	vec4 FragPos;
 	//vec3 normal;
-	mat3 TBN;
+	vec3 Normals;
+	vec3 BiTangents;
+	vec3 Tangents;
 } fs_in;
 
 uniform sampler2D Albedo;
@@ -185,7 +337,8 @@ void main()
 	float AO = texture(AOt, fs_in.TexCoords).r;
 	float roughness = 1.0 - texture(Roughness, fs_in.TexCoords).r;
 	vec3 normal = texture(Normal, fs_in.TexCoords).rgb;
-	normal.g = 1.0 - normal.g;
+	//normal.r = 1.0 - normal.r;
+	//normal.g = 1.0 - normal.g;
 	normal = normalize(normal * 2.0 - 1.0);
 	
 	float shadow = 0;
@@ -194,8 +347,11 @@ void main()
 	vec3 ambient = vec3(0.01, 0.02, 0.06) * albedo * AO;// * SSAO;
 	
 	vec3 Lo = vec3(0.0);
+	
+	mat3 TBN = mat3(fs_in.Tangents, fs_in.BiTangents, fs_in.Normals);
 
-	vec3 N = normalize(fs_in.TBN * normal); 
+
+	vec3 N = normalize(TBN * normal);
     vec3 V = normalize(viewPos - fs_in.FragPos).xyz;
 
 	uint offset = index * 1024;
@@ -231,6 +387,22 @@ void main()
 				float attenuation = 1.0 / (1.0 + 0.1 * distance + b * distance * distance);//1.0 / (distance * distance);
 				radiance = light.color.rgb * attenuation;
 				
+			} break;
+			
+			case 2:
+			{
+				L = normalize(light.positionAndSize.xyz - fs_in.FragPos.xyz);
+				H = normalize(V + L);
+				
+				float theta = dot(L , normalize(-light.rotation.xyz));
+				
+				if(theta > light.positionAndSize.w){
+					float epsilon = light.positionAndSize.w - (10.0 - light.positionAndSize.w);
+					float intensity = clamp((theta - (10.0 - light.positionAndSize.w)) / epsilon, 0.0, 1.0);
+					radiance = light.color.rgb * intensity;
+				}
+				else radiance = vec3 (0.0);
+			
 			} break;
 		}
 		

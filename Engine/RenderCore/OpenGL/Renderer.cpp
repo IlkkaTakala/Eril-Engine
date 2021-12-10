@@ -1,19 +1,21 @@
 #include "Material.h"
 #include <glad/gl.h>
-#include <GLFW/glfw3.h>
 #include "Core.h"
+#include <Interface/WindowManager.h>
 #include "Renderer.h"
 #include "Camera.h"
 #include "Mesh.h"
 #include "Texture.h"
 #include "RenderBuffer.h"
 #include <Objects/VisibleObject.h>
-#include "LightData.h"
+//#include "LightData.h" //Lights have been moved to be handled by the ECS-system.
 #include "Settings.h"
 #include <filesystem>
 #include <stdexcept>
 #include <iostream>
 #include <random>
+#include "UI/UISpace.h"
+#include "UI/Panel.h"
 
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/quaternion.hpp>
@@ -23,6 +25,10 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+
+#include <Interface/IECS.h>
+#include <Core/ECS/System.h>
+#include <Core/ECS/Components/LightComponent.h>
 
 struct Globals
 {
@@ -56,7 +62,7 @@ Renderer::Renderer()
 {
 	DepthBuffer = nullptr;
 	BlurRender = nullptr;
-	Window = nullptr;
+	Window = 0;
 	ActiveCamera = nullptr;
 	PreDepthShader = nullptr;
 	LightCullingShader = nullptr;
@@ -72,6 +78,8 @@ Renderer::Renderer()
 	EnvironmentRender = nullptr;
 	SkyDomeShader = nullptr;
 	SkyBoxShader = nullptr;
+	UIHolder = nullptr;
+	SkyFilterShader = nullptr;
 
 	MaxLightCount = 1024;
 
@@ -84,6 +92,16 @@ Renderer::Renderer()
 
 	EnvSizeX = 1024;
 	EnvSizeY = 1024;
+
+	GlobalUniforms = 0;
+	LightBuffer = 0;
+	SSAOKernelBuffer = 0;
+	SSAONoise = 0;
+	VisibleLightIndicesBuffer = 0;
+	WorkGroupsX = 0;
+	WorkGroupsY = 0;
+	fpsCounter = 0;
+
 }
 
 Renderer::~Renderer()
@@ -114,6 +132,7 @@ Renderer::~Renderer()
 	delete ShadowMapping;
 	delete SkyDomeShader;
 	delete SkyBoxShader;
+	delete UIHolder;
 }
 
 inline float lerp(float a, float b, float f)
@@ -121,43 +140,35 @@ inline float lerp(float a, float b, float f)
 	return a + f * (b - a);
 }
 
+void GLAPIENTRY
+MessageCallback(GLenum source,
+	GLenum type,
+	GLuint id,
+	GLenum severity,
+	GLsizei length,
+	const GLchar* message,
+	const void* userParam)
+{
+	if (severity == GL_DEBUG_SEVERITY_NOTIFICATION) return;
+	char hex_string1[20];
+	char hex_string2[20];
+	sprintf(hex_string1, "%X", type);
+	sprintf(hex_string2, "%X", severity);
+	if (severity == GL_DEBUG_SEVERITY_LOW) Console::Warning(String("OpenGL Error: type = ") + hex_string1 + ", severity = " + hex_string2 + ", message = " + message);
+	else Console::Error(String("OpenGL Error: type = ") + hex_string1 + ", severity = " + hex_string2 + ", message = " + message);
+}
+
 int Renderer::SetupWindow(int width, int height)
 {
 	if (width < 640 || width > 2048 || height < 480 || height > 2048) throw std::exception("Unsupported resolution!\n");
 
-	if (!glfwInit()) {
-		return -1;
-	}
-	fpsCounter = INI->GetValue("Engine", "ShowFps") == "true";
+	Window = WindowManager::CreateMainWindow(width, height);
 
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
-	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-	glfwWindowHint(GLFW_SAMPLES, 4);
+	// During init, enable debug output
+	glEnable(GL_DEBUG_OUTPUT);
+	glDebugMessageCallback(MessageCallback, 0);
 
-	printf("Creating window...\n");
-	Window = glfwCreateWindow(width, height, "Eril Engine Demo | Loading...", NULL, NULL);
-	if (!Window) {
-		glfwTerminate();
-		return -1;
-	}
-	if (INI->GetValue("Render", "ResolutionY").c_str() == "false")
-		glfwSetWindowAttrib(Window, GLFW_DECORATED, GLFW_FALSE);
-	glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	glfwSetInputMode(Window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
-	if (glfwRawMouseMotionSupported())
-		glfwSetInputMode(Window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
-
-	glfwMakeContextCurrent(Window);
-	if (INI->GetValue("Render", "VSync") == "false") glfwSwapInterval(0);
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		std::cout << "Failed to initialize OpenGL context" << std::endl;
-		return -1;
-	}
-
-	printf("Allocating buffers...\n");
+	Console::Log("Allocating buffers...");
 	DepthBuffer = new PreDepthBuffer(width, height);
 	PostProcess = new PostBuffer(width, height);
 	SSAORender = new SSAOBuffer(width, height);
@@ -231,7 +242,7 @@ int Renderer::SetupWindow(int width, int height)
 	glViewport(0, 0, width, height);
 	glClearColor(0.f, 0.f, 0.f, 0.f);
 
-	printf("Loading shaders...\n");
+	Console::Log("Loading shaders...");
 	LoadShaders();
 
 	if (LightCullingShader == nullptr || PreDepthShader == nullptr) throw std::exception("Important shaders not found!\n");
@@ -351,12 +362,19 @@ int Renderer::SetupWindow(int width, int height)
 
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
+	UIHolder = new UISpace();
+	UIHolder->SetSize(width, height);
+	UIHolder->SetScreen(Window);
+
+
+	Lights = static_cast<IComponentArrayQuerySystem<LightComponent>*>(IECS::GetSystemsManager()->GetSystemByName("LightControllerSystem"))->GetComponentVector();
+
 	return 0;
 }
 
 void Renderer::CleanRenderer()
 {
-	glfwDestroyWindow(Window);
+	WindowManager::CloseWindow(Window);
 
 	glDeleteBuffers(1, &LightBuffer);
 	glDeleteBuffers(1, &VisibleLightIndicesBuffer);
@@ -370,7 +388,7 @@ void Renderer::CleanRenderer()
 	glDeleteVertexArrays(1, &ScreenVao);
 	glDeleteVertexArrays(1, &EnvironmentVAO);
 
-	glfwTerminate();
+	WindowManager::Terminate();
 }
 
 Camera* Renderer::CreateCamera(VisibleObject* parent)
@@ -384,6 +402,7 @@ void Renderer::SetActiveCamera(Camera* cam)
 	ActiveCamera = dynamic_cast<GLCamera*>(cam);
 }
 
+/* //Lights have been moved to be handled by the ECS-system.
 void Renderer::CreateLight(const LightData* light)
 {
 	Lights.push_back(light);
@@ -401,19 +420,24 @@ void Renderer::RemoveLight(const LightData* light)
 	}
 	LightCullingShader->SetUniform("lightCount", (int)Lights.size());
 }
+*/
+
 
 void Renderer::UpdateLights()
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, LightBuffer);
 	GLM_Light* mapped = reinterpret_cast<GLM_Light*>(glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, MaxLightCount * sizeof(GLM_Light), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
-	for (int i = 0; i < Lights.size(); i++) {
-		GLM_Light light;
-		light.locationAndSize = glm::vec4(Lights[i]->Location.X, Lights[i]->Location.Z, Lights[i]->Location.Y, Lights[i]->Size);
-		glm::mat4 rot = glm::mat4(1.0) * glm::toMat4(glm::quat(glm::vec3(glm::radians(Lights[i]->Rotation.X), glm::radians(Lights[i]->Rotation.Y), glm::radians(Lights[i]->Rotation.Z))));
-		light.rotation = rot * glm::vec4(0.0, -1.0, 0.0, 0.0);
-		light.color = glm::vec4(Lights[i]->Color.X, Lights[i]->Color.Y, Lights[i]->Color.Z, 1.0) * Lights[i]->Intensity;
-		light.type.x = Lights[i]->Type;
-		mapped[i] = light;
+	for (int i = 0; i < Lights->size(); i++) {
+		if (!Lights->at(i).GetDisabled()) //DONT USE THE LIGHT IF IT'S DISABLED!
+		{
+			GLM_Light light;
+			light.locationAndSize = glm::vec4(Lights->at(i).Location.X, Lights->at(i).Location.Z, Lights->at(i).Location.Y, Lights->at(i).Size);
+			glm::mat4 rot = glm::mat4(1.0) * glm::toMat4(glm::quat(glm::vec3(glm::radians(Lights->at(i).Rotation.X), glm::radians(Lights->at(i).Rotation.Y), glm::radians(Lights->at(i).Rotation.Z))));
+			light.rotation = rot * glm::vec4(0.0, -1.0, 0.0, 0.0);
+			light.color = glm::vec4(Lights->at(i).Color.X, Lights->at(i).Color.Y, Lights->at(i).Color.Z, 1.0) * Lights->at(i).Intensity;
+			light.type.x = Lights->at(i).LightType;
+			mapped[i] = light;
+		}	
 	}
 	int result = glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 	if (result == GL_FALSE) exit(99);
@@ -580,7 +604,6 @@ void Renderer::LoadShaders()
 					if (!nShader->Success) nShader = nullptr;
 					if (nShader != nullptr) {
 						if (f.path().filename() == "PreDepth.shader") PreDepthShader = nShader;
-						else if (f.path().filename() == "PostProcessMaster.shader") PostProcessMaster = nShader;
 						else if (f.path().filename() == "Composite.shader") CompositeShader = nShader;
 						else if (f.path().filename() == "SSAO.shader") SSAOShader = nShader;
 						else if (f.path().filename() == "SSAOBlur.shader") SSAOBlurShader = nShader;
@@ -638,7 +661,7 @@ void Renderer::LoadShaders()
 				break;
 			}
 
-			printf("Shader loaded: %s\n", f.path().string().c_str());
+			Console::Log("Shader loaded: " + f.path().string());
 			stre.close();
 		}
 	}
@@ -680,7 +703,7 @@ Material* Renderer::LoadMaterialByName(String name)
 					nMat->VectorParameters.emplace(name, Vector(vec));
 				}
 				BaseMaterials.emplace(name, nMat);
-				printf("Material loaded: %s\n", name.c_str());
+				Console::Log("Material loaded: " + name);
 				return BaseMaterials.find(name)->second;
 			}
 		}
@@ -694,24 +717,34 @@ Texture* Renderer::LoadTextureByName(String name)
 		return LoadedTextures.find(name)->second;
 	}
 	else {
+		Texture* next = nullptr;
 		int width, height, nrChannels;
-		float* data = stbi_loadf(name.c_str(), &width, &height, &nrChannels, 0);
-		if (data == nullptr) return nullptr;
-		int type = 0;
-		if (name.rbegin()[4] == 'd' || name.rbegin()[5] == 'd') type = 0;
-		else if (name.rbegin()[4] == 'n' || name.rbegin()[5] == 'n') type = 1;
-		Texture* next = new Texture(width, height, nrChannels, data, type);
-		stbi_image_free(data);
+		if (stbi_is_hdr(name.c_str())) {
+			float* data = stbi_loadf(name.c_str(), &width, &height, &nrChannels, 0);
+			if (data == nullptr) return nullptr;
+			next = new Texture(width, height, nrChannels, data);
+			stbi_image_free(data);
+		}
+		else
+		{
+			uint8* data = stbi_load(name.c_str(), &width, &height, &nrChannels, 0);
+			if (data == nullptr) return nullptr;
+			int type = 0;
+			if (name.rbegin()[4] == 'd' || name.rbegin()[5] == 'd') type = 0;
+			else if (name.rbegin()[4] == 'n' || name.rbegin()[5] == 'n') type = 1;
+			next = new Texture(width, height, nrChannels, data, type);
+			stbi_image_free(data);
+		}
+		
 		LoadedTextures.emplace(name, next);
-		printf("Texture loaded: %s\n", name.c_str());
+		Console::Log("Texture loaded: " + name);
 		return next;
 	}
 }
 
 void Renderer::Update()
 {
-	glfwPollEvents();
-	if (glfwWindowShouldClose(Window)) Exit();
+	if (WindowManager::GetShouldWindowClose(Window)) Exit();
 }
 
 void Renderer::EnvReflection(int width, int height)
@@ -722,7 +755,7 @@ void Renderer::EnvReflection(int width, int height)
 	glm::mat3(glm::vec3(1.0), glm::vec3(1.0), glm::vec3(1.0));
 	SkyDomeShader->Bind();
 	SkyDomeShader->SetUniform("P", ShadowProj);
-	SkyDomeShader->SetUniform("time", (float)glfwGetTime() * 1.f);
+	SkyDomeShader->SetUniform("time", WindowManager::GetWindowTime() * 1.f);
 	glBindVertexArray(ScreenVao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
@@ -829,11 +862,12 @@ void Renderer::Shadows(int width, int height)
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glDepthFunc(GL_LESS);
 	ShadowColorShader->Bind();
-	for (const LightData* l : Lights) {
-		if (l->Type != 0) continue;
+
+	for (const LightComponent &l : *Lights) {
+		if (l.LightType != 0) continue;
 		glm::vec3 loc = glm::vec3(ActiveCamera->GetLocation().X, ActiveCamera->GetLocation().Z, ActiveCamera->GetLocation().Y);
-		glm::vec3 dir = glm::toMat4(glm::quat(glm::vec3(glm::radians(l->Rotation.X), glm::radians(l->Rotation.Y), glm::radians(l->Rotation.Z)))) * glm::vec4(0.0, -1.0, 0.0, 0.0);
-		glm::vec3 up = glm::toMat4(glm::quat(glm::vec3(glm::radians(l->Rotation.X), glm::radians(l->Rotation.Y), glm::radians(l->Rotation.Z)))) * glm::vec4(1.0, 0.0, 0.0, 0.0);
+		glm::vec3 dir = glm::toMat4(glm::quat(glm::vec3(glm::radians(l.Rotation.X), glm::radians(l.Rotation.Y), glm::radians(l.Rotation.Z)))) * glm::vec4(0.0, -1.0, 0.0, 0.0);
+		glm::vec3 up = glm::toMat4(glm::quat(glm::vec3(glm::radians(l.Rotation.X), glm::radians(l.Rotation.Y), glm::radians(l.Rotation.Z)))) * glm::vec4(1.0, 0.0, 0.0, 0.0);
 		glm::vec3 newLoc = loc + (-dir * 70.f);
 		glm::mat4 view = glm::lookAt(newLoc, newLoc + dir, up);
 
@@ -1043,7 +1077,7 @@ void Renderer::Forward(int width, int height)
 
 void Renderer::PreDepth(int width, int height)
 {
-	//glEnable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
 	glDepthFunc(GL_LESS);
 	// Clear the screen
 	glClearColor(0.f, 0.f, 0.f, 0.f);
@@ -1089,6 +1123,8 @@ void Renderer::LightCulling(int width, int height)
 	LightCullingShader->Bind();
 
 	LightCullingShader->SetUniform("depthMap", 4);
+	int lightCount = Lights->size();
+	LightCullingShader->SetUniform("lightCount", lightCount);
 
 	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, LightBuffer);
 	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, VisibleLightIndicesBuffer);
@@ -1115,20 +1151,20 @@ void Renderer::UpdateTransforms() {
 
 void Renderer::Render(float delta)
 {
-	int width, height;
-
 	if (ActiveCamera == nullptr) return;
 
-	UpdateTransforms();
+	Vector2D size = WindowManager::GetWindowSize(Window);
+	int width = size.X;
+	int height = size.Y;
 
-	glfwGetFramebufferSize(Window, &width, &height);
+	UpdateTransforms();
 
 	GlobalVariables.Projection = ActiveCamera->GetProjectionMatrix();
 	GlobalVariables.View = glm::inverse(ActiveCamera->GetViewMatrix());
 	const Vector& loc = ActiveCamera->GetLocation();
 	GlobalVariables.ViewPoint = glm::vec4(loc.X, loc.Z, loc.Y, 1.f);
 	GlobalVariables.ScreenSize = glm::ivec2(width, height);
-	GlobalVariables.SceneLightCount = (int)Lights.size();
+	GlobalVariables.SceneLightCount = (int)Lights->size();					//DOES NOT TAKE INTO ACCOUNT THAT LIGHTS CAN BE DISABLED/DELETED
 
 	glBindBuffer(GL_UNIFORM_BUFFER, GlobalUniforms);
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Globals), &GlobalVariables);
@@ -1136,13 +1172,14 @@ void Renderer::Render(float delta)
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, GlobalUniforms);
 
 
-	if (Lights.size() != 0) UpdateLights();
+	if (Lights->size() != 0) UpdateLights();
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, LightBuffer);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, VisibleLightIndicesBuffer);
 
 	//EnvReflection(width, height);
 
 	glViewport(0, 0, width, height);
+	glEnable(GL_DEPTH_TEST);
 	DepthBuffer->Bind();
 
 	PreDepth(width, height);
@@ -1176,32 +1213,34 @@ void Renderer::Render(float delta)
 	BlurRender->Blur(PostProcess->GetBloom(), 4, ScreenVao);
 	PostProcess->BindTextures();
 
-	PostProcessMaster->Bind();
+	ActiveCamera->GetPostProcess()->Bind();
 
 	glDepthFunc(GL_ALWAYS);
 	glBindVertexArray(ScreenVao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
 
+	UIHolder->Render(0);
+
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, 0);
 
 	float fps = 1.f / delta;
 	char sbuffer[32];
 	if (fpsCounter) {
-		sprintf_s(sbuffer, 32, "Eril Engine Demo | FPS: %.1f", fps);
-		glfwSetWindowTitle(Window, sbuffer);
+		sprintf_s(sbuffer, 32, "Project Eril | FPS: %.1f", fps);
+		WindowManager::SetWindowTitle(Window, sbuffer);
 	}
-	glfwSwapBuffers(Window);
+	WindowManager::UpdateWindow(Window);
 }
 
 void Renderer::GameStart()
 {
-	glfwSetWindowTitle(Window, "Eril Engine Demo");
+	WindowManager::SetWindowTitle(Window, "Project Eril");
 }
 
 void Renderer::DestroyWindow()
 {
-	glfwDestroyWindow(Window);
+	WindowManager::CloseWindow(Window);
 }
 
 GLMesh::GLMesh()
@@ -1272,7 +1311,7 @@ void processMesh(LoadedMesh* meshHolder, aiMesh* mesh)
 	section->vertices = new Vertex[vertices.size() * sizeof(Vertex)];
 	memcpy(section->vertices, vertices.data(), vertices.size() * sizeof(Vertex));*/
 
-	//section->Instance = RI->LoadMaterialByName("Shaders/test");
+	section->Instance = RI->LoadMaterialByName("Assets/Materials/default");
 
 	meshHolder->HolderCount++;
 	meshHolder->Holders.push_back(section);
@@ -1304,7 +1343,7 @@ LoadedMesh* loadMeshes(const std::string& path)
 	//Check for errors
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
-		printf("Error loading model file \"%s\": \"%s\" ", path.c_str(), importer.GetErrorString());
+		Console::Log("Error loading model file " + path + " : " + importer.GetErrorString());
 		delete mesh;
 		return nullptr;
 	}

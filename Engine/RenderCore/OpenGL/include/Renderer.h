@@ -10,7 +10,9 @@ class BlurBuffer;
 class SSAOBuffer;
 class ShadowMapBuffer;
 class ReflectionBuffer;
-struct LightData;
+//struct LightData; //Lights have been moved to be handled by the ECS-system.
+class LightComponent;
+class UISpace;
 
 struct GLFWwindow;
 
@@ -27,8 +29,10 @@ public:
 
 	virtual Camera* CreateCamera(VisibleObject* parent = nullptr) override;
 	virtual void SetActiveCamera(Camera*) override;
-	virtual void CreateLight(const LightData*) override;
-	virtual void RemoveLight(const LightData*) override;
+	
+	//virtual void CreateLight(const LightData*) override; //Lights have been moved to be handled by the ECS-system.
+	//virtual void RemoveLight(const LightData*) override; //Lights have been moved to be handled by the ECS-system.
+	
 	void UpdateLights();
 
 	virtual void LoadShaders() override;
@@ -41,8 +45,11 @@ public:
 	virtual void GameStart() override;
 	virtual void DestroyWindow() override;
 
+	virtual UISpace* GetUIManager(int screen = 0) const override { return UIHolder; }
+
 private:
 	friend class GLInput;
+	friend class GLCamera;
 
 	void EnvReflection(int width, int height);
 	void EnvCube(int width, int height);
@@ -56,7 +63,7 @@ private:
 	std::map<String, Shader*> Shaders;
 	std::map<String, Material*> BaseMaterials;
 	std::map<String, Texture*> LoadedTextures;
-	std::vector<const LightData*> Lights;
+	//std::vector<const LightData*> Lights;
 
 	Shader* LightCullingShader;
 	Shader* PreDepthShader;
@@ -69,7 +76,7 @@ private:
 	Shader* SkyDomeShader;
 	Shader* SkyFilterShader;
 	Shader* SkyBoxShader;
-	GLFWwindow* Window;
+	uint Window;
 	PreDepthBuffer* DepthBuffer;
 	PostBuffer* PostProcess;
 	BlurBuffer* BlurRender;
@@ -77,6 +84,7 @@ private:
 	ShadowMapBuffer* ShadowMapping;
 	ReflectionBuffer* EnvironmentRender;
 	GLCamera* ActiveCamera;
+	UISpace* UIHolder;
 
 	uint ScreenVao;
 	uint ScreenVbo;
@@ -99,6 +107,8 @@ private:
 	uint WorkGroupsY;
 
 	bool fpsCounter;
+
+	std::vector<LightComponent>* Lights;
 };
 
 class GLMesh : public IMesh

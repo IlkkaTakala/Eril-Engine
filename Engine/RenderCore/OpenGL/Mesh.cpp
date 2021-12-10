@@ -20,14 +20,18 @@ Section::~Section()
 	glDeleteBuffers(1, &InstanceDisp);
 }
 
-//#pragma optimize("", off)
 void Section::Render()
 {
 	glBindVertexArray(Holder->VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, InstanceDisp);
+	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(0));
+	glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 4));
+	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 8));
+	glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 12));
+
 	if (Instanced) glDrawElementsInstanced(GL_TRIANGLES, Holder->IndexCount, GL_UNSIGNED_INT, 0, InstanceCount);
 	else glDrawElements(GL_TRIANGLES, Holder->IndexCount, GL_UNSIGNED_INT, 0);
 }
-//#pragma optimize("", on)
 
 void Section::MakeInstanced(int count, const glm::mat4* modelM)
 {

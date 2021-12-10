@@ -144,9 +144,10 @@ namespace Physics
 
 	void RemoveMovable(MovementComponent* obj)
 	{
-		for (auto i = Movables.begin(); i != Movables.end(); i++)
-		{
+		//if (Movables.size() < 1) return;
+		Movables.remove(obj);
+		/*for (auto i = Movables.begin(); i != Movables.end(); i++) {
 			if (i->GetPointer() == obj) Movables.erase(i);
-		}
+		}*/
 	}
 }
