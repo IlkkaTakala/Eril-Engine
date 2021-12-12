@@ -61,12 +61,13 @@ TestPlayer::TestPlayer() : Player()
 	//Player Model
 	Mesh = SpawnObject<VisibleObject>();
 	Mesh->SetModel("Cube");
-	Mesh->GetModel()->SetAABB(AABB(Vector(-0.5f), Vector(0.5f)));
+	Mesh->GetModel()->SetAABB(AABB(Vector(-1.f), Vector(1.f)));
 	
+	SetLocation(Vector(0, 0, 2));
 
 	//Player Movement
 	Movement = SpawnObject<MovementComponent>();
-	Movement->SetTarget(dynamic_cast<Actor*>(this));
+	Movement->SetTarget(dynamic_cast<Actor*>(this), Mesh->GetModel()->GetAABB());
 	Movement->SetGravity(true);
 
 	//Skybox
@@ -80,6 +81,31 @@ TestPlayer::TestPlayer() : Player()
 	UI::AddToScreen(ui, this);
 
 	pause = nullptr;
+
+
+		
+	Collider = SpawnObject<Actor>();
+
+	//Moment Model -> ColliderModel
+	ColliderModel = SpawnObject<VisibleObject>();
+	ColliderModel->SetModel("Cube");
+	ColliderModel->GetModel()->SetAABB(AABB(Vector(-0.5f), Vector(0.5f)));
+
+	Collider->AddComponent(ColliderModel);
+	Collider->SetLocation(Vector(20, 2, 1));
+	
+
+	ColliderModelMove = SpawnObject<MovementComponent>();
+	ColliderModelMove->SetTarget(Collider, ColliderModel->GetModel()->GetAABB());
+
+	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
+
+}
+
+void TestPlayer::TestTimer(float d)
+{
+	Console::Log("Location changed");
+	Collider->SetLocation(Vector(30, 0, 1), true);
 }
 
 
@@ -186,7 +212,7 @@ void TimeFunction (float d)
 void TestPlayer::Tick(float deltaTime)
 {
 	
-
+	Vector loc = Collider->GetLocation();
 	GetCamera()->SetLocation(Location + Vector(0.f, 0.f, 1.5f));
 	GetCamera()->SetRotation(Rotation);
 	Sky->SetLocation(Location);

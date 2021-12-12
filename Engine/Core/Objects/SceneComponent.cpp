@@ -8,6 +8,8 @@ SceneComponent::SceneComponent() : BaseObject()
 	Rotation = Vector(0, 0, 0);
 	Scale = Vector(1, 1, 1);
 
+	transformForce = false;
+
 	Parent = nullptr;
 	GetScene()->AddSceneRoot(this);
 }
@@ -35,19 +37,25 @@ void SceneComponent::LoadWithParameters(const String& args)
 	if (scale != data.end()) SetScale(Vector(scale->second));
 }
 
-void SceneComponent::SetLocation(const Vector& NewLocation)
+void SceneComponent::SetLocation(const Vector& NewLocation, bool force)
 {
 	Location = NewLocation;
+	desired.Location = NewLocation;
+	transformForce = force;
 }
 
-void SceneComponent::SetRotation(const Vector& NewRotation)
+void SceneComponent::SetRotation(const Vector& NewRotation, bool force)
 {
 	Rotation = NewRotation;
+	desired.Rotation = NewRotation;
+	transformForce = force;
 }
 
-void SceneComponent::SetScale(const Vector& NewScale)
+void SceneComponent::SetScale(const Vector& NewScale, bool force)
 {
 	Scale = NewScale;
+	desired.Scale = NewScale;
+	transformForce = force;
 }
 
 void SceneComponent::AddComponent(SceneComponent* obj)

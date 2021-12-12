@@ -54,6 +54,11 @@ private:
 	bool InputMode;
 	Ref<Light> DirLight;
 	Ref<VisibleObject> Sky;
+	Ref<Actor> Collider;
+	Ref<MovementComponent> ColliderModelMove;
+	Ref<VisibleObject> ColliderModel;
+
+
 	PauseUI* pause;
 
 	//ECS TEST
@@ -62,4 +67,6 @@ private:
 	int audioComponentID;
 
 	int spawnCounter;
+
+	void TestTimer(float d);
 };
