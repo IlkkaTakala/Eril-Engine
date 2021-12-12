@@ -11,6 +11,7 @@ class Terrain;
 class Hunter;
 class PauseUI;
 class EndScreen;
+class StartScreen;
 
 class Item : public BaseObject
 {
@@ -61,7 +62,7 @@ private:
 	float mouseSens;
 	float Speed;
 
-	void ItemThrowQ(bool KeyDown);
+	void InputQ(bool KeyDown);
 	void ItemPickE(bool KeyDown);
 	void RunInputW(float delta, bool KeyDown);
 	void RunInputA(float delta, bool KeyDown);
@@ -100,6 +101,7 @@ private:
 	Ref<Hunter> hunt;
 	PauseUI* pause;
 	EndScreen* end;
+	StartScreen* start;
 	std::vector<RefWeak<VisibleObject>> Candys;
 
 	//ECS TEST

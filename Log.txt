@@ -1,72 +1,217 @@
-[LOG] 16.12.14 | Hello, Eril is starting
-[ERROR] 16.12.14 | This world is an error
-[LOG] 16.12.14 | Starting game...
-[LOG] 16.12.14 | Creating window...
-[LOG] 16.12.14 | Allocating buffers...
-[LOG] 16.12.14 | Loading shaders...
-[LOG] 16.12.14 | Shader loaded: Assets/Shaders\BlurCompute.shader
-[LOG] 16.12.14 | Shader loaded: Assets/Shaders\Composite.shader
-[LOG] 16.12.14 | Shader loaded: Assets/Shaders\LightCullingShader.shader
-[LOG] 16.12.14 | Shader loaded: Assets/Shaders\PostProcessForest.shader
-[LOG] 16.12.14 | Shader loaded: Assets/Shaders\PostProcessMaster.shader
-[LOG] 16.12.14 | Shader loaded: Assets/Shaders\PreDepth.shader
-[LOG] 16.12.14 | Shader loaded: Assets/Shaders\shader_001.shader
-[LOG] 16.12.14 | Shader loaded: Assets/Shaders\shader_002.shader
-[LOG] 16.12.14 | Shader loaded: Assets/Shaders\shader_003.shader
-[LOG] 16.12.14 | Shader loaded: Assets/Shaders\shader_004.shader
-[LOG] 16.12.14 | Shader loaded: Assets/Shaders\ShadowColor.shader
-[LOG] 16.12.14 | Shader loaded: Assets/Shaders\SkyBox.shader
-[LOG] 16.12.15 | Shader loaded: Assets/Shaders\SkyDome.shader
-[LOG] 16.12.15 | Shader loaded: Assets/Shaders\SkyFilter.shader
-[LOG] 16.12.15 | Shader loaded: Assets/Shaders\skyshader.shader
-[LOG] 16.12.15 | Shader loaded: Assets/Shaders\SSAO.shader
-[LOG] 16.12.15 | Shader loaded: Assets/Shaders\SSAOBlur.shader
-[LOG] 16.12.15 | Creating defaults...
-[LOG] 16.12.15 | Loading finished
-[LOG] 16.12.15 | Spawned object with record: 0x000000000000004
-[LOG] 16.12.15 | Texture created
-[LOG] 16.12.15 | Texture created
-[LOG] 16.12.15 | Texture created
-[LOG] 16.12.15 | Button here
-[LOG] 16.12.15 | Texture created
-[LOG] 16.12.15 | Texture loaded: Assets/Fonts/arial.png
-[LOG] 16.12.15 | Loading font "Assets/Fonts/arial" took 0.031756
-[LOG] 16.12.15 | Texture created
-[LOG] 16.12.15 | Button here
-[LOG] 16.12.15 | Texture created
-[LOG] 16.12.15 | Texture created
-[LOG] 16.12.15 | Button here
-[LOG] 16.12.15 | Texture created
-[LOG] 16.12.15 | Texture created
-[LOG] 16.12.15 | Texture created
-[LOG] 16.12.15 | Texture created
-[ERROR] 16.12.15 | OpenGL Error: type = 8250, severity = 9147, message = Program/shader state performance warning: Vertex shader in program 46 is being recompiled based on GL state.
-[LOG] 16.12.16 | Spawned object with record: 0x000000000000004
-[LOG] 16.12.16 | Spawned object with record: 0x0000000A0001111
-[LOG] 16.12.16 | Texture loaded: Assets/Textures/forestGround/diffuse_d.jpg
-[LOG] 16.12.17 | Texture loaded: Assets/Textures/forestGround/normal_n.jpg
-[LOG] 16.12.17 | Texture loaded: Assets/Textures/forestGround/gloss.jpg
-[LOG] 16.12.17 | Texture loaded: Assets/Textures/forestGround/ao.jpg
-[LOG] 16.12.17 | Material loaded: Assets/Materials/ground
-[LOG] 16.12.17 | Spawned object with record: 0x0000000A0001121
-[LOG] 16.12.17 | Spawned object with record: 0x0000000A0001122
-[LOG] 16.12.18 | Spawned object with record: 0x0000000A0001123
-[LOG] 16.12.18 | Spawned object with record: 0x0000000A0001112
-[LOG] 16.12.18 | Texture loaded: Assets/Textures/default/default_d.png
-[LOG] 16.12.18 | Texture loaded: Assets/Textures/default/map_n.png
-[LOG] 16.12.18 | Material loaded: Assets/Materials/default
-[LOG] 16.12.18 | Texture loaded: Assets/Textures/trees/diffuse_d.jpg
-[LOG] 16.12.18 | Texture loaded: Assets/Textures/trees/normal_n.jpg
-[LOG] 16.12.18 | Texture loaded: Assets/Textures/trees/gloss.jpg
-[LOG] 16.12.18 | Texture loaded: Assets/Textures/trees/ao.jpg
-[LOG] 16.12.18 | Material loaded: Assets/Materials/tree
-[LOG] 16.12.18 | Texture loaded: Assets/Textures/trees/SpruceBranch_d.png
-[LOG] 16.12.18 | Material loaded: Assets/Materials/leaves
-[LOG] 16.12.18 | Spawned object with record: 0x0000000A0001113
-[LOG] 16.12.18 | Texture loaded: Assets/Textures/rocks/diffuse_d.jpg
-[LOG] 16.12.19 | Texture loaded: Assets/Textures/rocks/normal_n.jpg
-[LOG] 16.12.19 | Texture loaded: Assets/Textures/rocks/gloss.jpg
-[LOG] 16.12.19 | Texture loaded: Assets/Textures/rocks/ao.jpg
-[LOG] 16.12.19 | Material loaded: Assets/Materials/rock
-[LOG] 16.12.19 | Spawned object with record: 0x0000000A0001114
-[LOG] 16.12.19 | Texture loaded: Assets/Textures
+[LOG] 22.08.47 | Hello, Eril is starting
+[ERROR] 22.08.47 | This world is an error
+[LOG] 22.08.47 | Starting game...
+[LOG] 22.08.47 | Creating window...
+[LOG] 22.08.47 | Allocating buffers...
+[LOG] 22.08.47 | Loading shaders...
+[LOG] 22.08.47 | Shader loaded: Assets/Shaders\BlurCompute.shader
+[LOG] 22.08.47 | Shader loaded: Assets/Shaders\Composite.shader
+[LOG] 22.08.47 | Shader loaded: Assets/Shaders\LightCullingShader.shader
+[LOG] 22.08.47 | Shader loaded: Assets/Shaders\PostProcessForest.shader
+[LOG] 22.08.47 | Shader loaded: Assets/Shaders\PostProcessMaster.shader
+[LOG] 22.08.47 | Shader loaded: Assets/Shaders\PreDepth.shader
+[LOG] 22.08.47 | Shader loaded: Assets/Shaders\shader_001.shader
+[LOG] 22.08.47 | Shader loaded: Assets/Shaders\shader_002.shader
+[LOG] 22.08.47 | Shader loaded: Assets/Shaders\shader_003.shader
+[LOG] 22.08.47 | Shader loaded: Assets/Shaders\shader_004.shader
+[LOG] 22.08.47 | Shader loaded: Assets/Shaders\ShadowColor.shader
+[LOG] 22.08.47 | Shader loaded: Assets/Shaders\SkyBox.shader
+[LOG] 22.08.47 | Shader loaded: Assets/Shaders\SkyDome.shader
+[LOG] 22.08.47 | Shader loaded: Assets/Shaders\SkyFilter.shader
+[LOG] 22.08.47 | Shader loaded: Assets/Shaders\skyshader.shader
+[LOG] 22.08.47 | Shader loaded: Assets/Shaders\SSAO.shader
+[LOG] 22.08.47 | Shader loaded: Assets/Shaders\SSAOBlur.shader
+[LOG] 22.08.47 | Creating defaults...
+[LOG] 22.08.47 | Loading finished
+[LOG] 22.08.47 | Spawned object with record: 0x000000000000004
+[LOG] 22.08.47 | Texture created
+[LOG] 22.08.47 | Texture created
+[LOG] 22.08.47 | Texture created
+[LOG] 22.08.47 | Button here
+[LOG] 22.08.47 | Texture created
+[LOG] 22.08.47 | Texture loaded: Assets/Fonts/arial.png
+[LOG] 22.08.47 | Loading font "Assets/Fonts/arial" took 0.037532
+[LOG] 22.08.47 | Texture created
+[LOG] 22.08.47 | Button here
+[LOG] 22.08.47 | Texture created
+[LOG] 22.08.47 | Texture created
+[LOG] 22.08.47 | Button here
+[LOG] 22.08.47 | Texture created
+[LOG] 22.08.47 | Texture created
+[LOG] 22.08.47 | Texture created
+[LOG] 22.08.47 | Texture created
+[ERROR] 22.08.47 | OpenGL Error: type = 8250, severity = 9147, message = Program/shader state performance warning: Vertex shader in program 46 is being recompiled based on GL state.
+[LOG] 22.08.48 | Spawned object with record: 0x000000000000004
+[LOG] 22.08.48 | Spawned object with record: 0x0000000A0001111
+[LOG] 22.08.49 | Texture loaded: Assets/Textures/forestGround/diffuse_d.jpg
+[LOG] 22.08.49 | Texture loaded: Assets/Textures/forestGround/normal_n.jpg
+[LOG] 22.08.50 | Texture loaded: Assets/Textures/forestGround/gloss.jpg
+[LOG] 22.08.50 | Texture loaded: Assets/Textures/forestGround/ao.jpg
+[LOG] 22.08.50 | Material loaded: Assets/Materials/ground
+[LOG] 22.08.50 | Spawned object with record: 0x0000000A0001121
+[LOG] 22.08.50 | Spawned object with record: 0x0000000A0001122
+[LOG] 22.08.50 | Spawned object with record: 0x0000000A0001123
+[LOG] 22.08.50 | Spawned object with record: 0x0000000A0001112
+[LOG] 22.08.50 | Texture loaded: Assets/Textures/default/default_d.png
+[LOG] 22.08.50 | Texture loaded: Assets/Textures/default/map_n.png
+[LOG] 22.08.50 | Material loaded: Assets/Materials/default
+[LOG] 22.08.50 | Texture loaded: Assets/Textures/trees/diffuse_d.jpg
+[LOG] 22.08.51 | Texture loaded: Assets/Textures/trees/normal_n.jpg
+[LOG] 22.08.51 | Texture loaded: Assets/Textures/trees/gloss.jpg
+[LOG] 22.08.51 | Texture loaded: Assets/Textures/trees/ao.jpg
+[LOG] 22.08.51 | Material loaded: Assets/Materials/tree
+[LOG] 22.08.51 | Texture loaded: Assets/Textures/trees/SpruceBranch_d.png
+[LOG] 22.08.51 | Material loaded: Assets/Materials/leaves
+[LOG] 22.08.51 | Spawned object with record: 0x0000000A0001113
+[LOG] 22.08.51 | Texture loaded: Assets/Textures/rocks/diffuse_d.jpg
+[LOG] 22.08.51 | Texture loaded: Assets/Textures/rocks/normal_n.jpg
+[LOG] 22.08.51 | Texture loaded: Assets/Textures/rocks/gloss.jpg
+[LOG] 22.08.51 | Texture loaded: Assets/Textures/rocks/ao.jpg
+[LOG] 22.08.51 | Material loaded: Assets/Materials/rock
+[LOG] 22.08.51 | Spawned object with record: 0x0000000A0001114
+[LOG] 22.08.51 | Texture loaded: Assets/Textures/forestGame/shack.png
+[LOG] 22.08.51 | Material loaded: Assets/Materials/roof
+[LOG] 22.08.51 | Material loaded: Assets/Materials/wall
+[LOG] 22.08.51 | Spawned object with record: 0x0000000000000C1
+[LOG] 22.08.51 | Texture loaded: Assets/Textures/forestGame/candy_cane.png
+[LOG] 22.08.51 | Material loaded: Assets/Materials/candy
+[LOG] 22.08.51 | Spawned object with record: 0x0000000000000C2
+[LOG] 22.08.51 | Spawned object with record: 0x0000000000000C3
+[LOG] 22.08.51 | Spawned object with record: 0x0000000000000C4
+[LOG] 22.08.51 | Spawned object with record: 0x0000000000000C5
+[LOG] 22.08.52 | Texture loaded: Assets/Textures/forestGame/ghost.png
+[LOG] 22.08.52 | Material loaded: Assets/Materials/ghost
+[LOG] 22.08.52 | Spawned object with record: 0x000000000000010
+[LOG] 22.08.52 | Hello beautiful world
+[LOG] 22.08.52 | Texture created
+[LOG] 22.08.52 | Texture created
+[LOG] 22.08.52 | Texture created
+[LOG] 22.08.52 | Texture created
+[LOG] 22.08.52 | Texture created
+[LOG] 22.08.52 | Texture created
+[LOG] 22.08.52 | Button here
+[LOG] 22.08.52 | Texture created
+[LOG] 22.08.52 | Texture created
+[LOG] 22.08.52 | Button here
+[LOG] 22.08.52 | Texture created
+[ERROR] 22.08.52 | OpenGL Error: type = 8250, severity = 9147, message = Program/shader state performance warning: Vertex shader in program 55 is being recompiled based on GL state.
+[ERROR] 22.08.52 | OpenGL Error: type = 8250, severity = 9147, message = Program/shader state performance warning: Vertex shader in program 46 is being recompiled based on GL state.
+[LOG] 22.08.53 | New target set
+[LOG] 22.08.54 | New target set
+[LOG] 22.08.55 | New target set
+[LOG] 22.08.56 | New target set
+[LOG] 22.08.57 | New target set
+[LOG] 22.08.58 | New target set
+[LOG] 22.08.59 | New target set
+[LOG] 22.09.00 | New target set
+[LOG] 22.09.01 | Items: 1
+[LOG] 22.09.01 | New target set
+[LOG] 22.09.02 | New target set
+[LOG] 22.09.03 | New target set
+[LOG] 22.09.04 | New target set
+[LOG] 22.09.05 | New target set
+[LOG] 22.09.06 | New target set
+[LOG] 22.09.07 | New target set
+[LOG] 22.09.07 | Record 0x001000000000008 is pending destroy
+[LOG] 22.09.07 | Record 0x001000000000008 is pending destroy
+[LOG] 22.09.07 | Removed record: 0x001000000000008. No active references
+[LOG] 22.09.08 | New target set
+[LOG] 22.09.09 | New target set
+[LOG] 22.09.10 | New target set
+[LOG] 22.09.11 | New target set
+[LOG] 22.09.11 | Items: 2
+[LOG] 22.09.12 | New target set
+[LOG] 22.09.13 | New target set
+[LOG] 22.09.14 | New target set
+[LOG] 22.09.15 | New target set
+[LOG] 22.09.16 | New target set
+[LOG] 22.09.17 | New target set
+[LOG] 22.09.17 | Items: 3
+[LOG] 22.09.18 | New target set
+[LOG] 22.09.19 | New target set
+[LOG] 22.09.20 | New target set
+[LOG] 22.09.21 | New target set
+[LOG] 22.09.22 | New target set
+[LOG] 22.09.23 | New target set
+[LOG] 22.09.24 | New target set
+[LOG] 22.09.25 | New target set
+[LOG] 22.09.26 | New target set
+[LOG] 22.09.27 | New target set
+[LOG] 22.09.28 | New target set
+[LOG] 22.09.29 | New target set
+[LOG] 22.09.30 | New target set
+[LOG] 22.09.31 | New target set
+[LOG] 22.09.32 | New target set
+[LOG] 22.09.32 | Items: 4
+[LOG] 22.09.33 | New target set
+[LOG] 22.09.34 | New target set
+[LOG] 22.09.35 | New target set
+[LOG] 22.09.36 | New target set
+[LOG] 22.09.37 | New target set
+[LOG] 22.09.38 | Items: 5
+[LOG] 22.09.38 | Texture created
+[LOG] 22.09.38 | Texture created
+[LOG] 22.09.38 | Texture created
+[LOG] 22.09.38 | Button here
+[LOG] 22.09.38 | Texture created
+[LOG] 22.09.38 | Texture created
+[LOG] 22.09.38 | Button here
+[LOG] 22.09.38 | Texture created
+[LOG] 22.09.38 | Texture created
+[LOG] 22.09.38 | Button here
+[LOG] 22.09.38 | Texture created
+[LOG] 22.09.38 | New target set
+[LOG] 22.09.39 | New target set
+[LOG] 22.09.40 | New target set
+[LOG] 22.09.40 | Spawned object with record: 0x000000000000004
+[LOG] 22.09.40 | Spawned object with record: 0x0000000A0001111
+[LOG] 22.09.40 | Spawned object with record: 0x0000000A0001121
+[LOG] 22.09.40 | Spawned object with record: 0x0000000A0001122
+[LOG] 22.09.40 | Spawned object with record: 0x0000000A0001123
+[LOG] 22.09.40 | Spawned object with record: 0x0000000A0001112
+[LOG] 22.09.40 | Spawned object with record: 0x0000000A0001113
+[LOG] 22.09.40 | Spawned object with record: 0x0000000A0001114
+[LOG] 22.09.40 | Spawned object with record: 0x0000000000000C1
+[LOG] 22.09.40 | Spawned object with record: 0x0000000000000C2
+[LOG] 22.09.40 | Spawned object with record: 0x0000000000000C3
+[LOG] 22.09.40 | Spawned object with record: 0x0000000000000C4
+[LOG] 22.09.40 | Spawned object with record: 0x0000000000000C5
+[LOG] 22.09.40 | Spawned object with record: 0x000000000000010
+[LOG] 22.09.40 | Hello beautiful world
+[LOG] 22.09.40 | Texture created
+[LOG] 22.09.40 | Texture created
+[LOG] 22.09.40 | Texture created
+[LOG] 22.09.40 | Texture created
+[LOG] 22.09.40 | Texture created
+[LOG] 22.09.40 | Texture created
+[LOG] 22.09.40 | Button here
+[LOG] 22.09.40 | Texture created
+[LOG] 22.09.40 | Texture created
+[LOG] 22.09.40 | Button here
+[LOG] 22.09.40 | Texture created
+[LOG] 22.09.41 | New target set
+[LOG] 22.09.41 | New target set
+[LOG] 22.09.42 | New target set
+[LOG] 22.09.42 | New target set
+[LOG] 22.09.43 | New target set
+[LOG] 22.09.43 | New target set
+[LOG] 22.09.44 | New target set
+[LOG] 22.09.44 | New target set
+[LOG] 22.09.45 | New target set
+[LOG] 22.09.45 | New target set
+[LOG] 22.09.46 | New target set
+[LOG] 22.09.46 | New target set
+[LOG] 22.09.47 | New target set
+[LOG] 22.09.47 | New target set
+[LOG] 22.09.48 | New target set
+[LOG] 22.09.48 | New target set
+[LOG] 22.09.49 | New target set
+[LOG] 22.09.49 | Texture created
+[LOG] 22.09.49 | Texture created
+[LOG] 22.09.49 | Button here
+[LOG] 22.09.49 | Texture created
+[LOG] 22.09.49 | Texture created
+[LOG] 22.09.49 | Button here
+[LOG] 22.09.49 | Texture created
+[LOG] 22.09.49 | New target set
+[LOG] 22.09.53 | Game closed, goodbye

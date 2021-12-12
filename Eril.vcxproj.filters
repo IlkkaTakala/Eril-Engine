@@ -172,6 +172,9 @@
     <ClCompile Include="Game\ForestGame\EndScreen.cpp">
       <Filter>Game\ForestGame</Filter>
     </ClCompile>
+    <ClCompile Include="Game\ForestGame\StartScreen.cpp">
+      <Filter>Game\ForestGame</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -230,6 +233,9 @@
     </Filter>
     <Filter Include="Game\ForestGame">
       <UniqueIdentifier>{734f2662-5704-48ce-8f67-7c7c45fe62c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\ForestGame\Controls">
+      <UniqueIdentifier>{34564567-3c84-44b1-92d1-8196774e156b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -432,6 +438,9 @@
       <Filter>Game\ForestGame</Filter>
     </ClInclude>
     <ClInclude Include="Game\ForestGame\EndScreen.h">
+      <Filter>Game\ForestGame</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\ForestGame\StartScreen.h">
       <Filter>Game\ForestGame</Filter>
     </ClInclude>
   </ItemGroup>

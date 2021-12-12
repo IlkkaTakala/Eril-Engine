@@ -13,6 +13,8 @@ public:
 
 	virtual void Tick(float) override;
 	void stopMoving();
+	void startMoving();
+
 private:
 	Ref<VisibleObject> Mesh;
 

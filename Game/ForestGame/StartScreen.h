@@ -2,11 +2,9 @@
 #include <UI/UI.h>
 #include <UI/Text.h>
 
-class EndScreen : public UI
+class StartScreen : public UI
 {
-	REGISTER(EndScreen)
+	REGISTER(StartScreen)
 public:
 	virtual void Construct() override;
-	Text* endText;
-	void SetText(const String& s);
 };

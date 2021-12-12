@@ -11,12 +11,16 @@
 #include <Interface/WindowManager.h>
 #include <GamePlay/Scene.h>
 #include "EndScreen.h"
+#include "StartScreen.h"
 
 //ECS
 #include <Interface/IECS.h>
 #include <ECS_Examples/ECSExample.h>
 #include <ECS/Components/LightComponent.h>
 #include <ECS/Systems/LightControllerSystem.h>
+#include <ECS/Components/AudioComponent.h>
+#include <ECS/Systems/AudioControllerSystem.h>
+
 class Ghost;
 
 void ForestPlayer::OpenConsole(bool) {
@@ -54,13 +58,14 @@ void ForestPlayer::Winner()
 
 ForestPlayer::ForestPlayer() : Player()
 {
-	mouseSens = 0.2f;
-	Speed = 15.f;
+	mouseSens = 0.1f;
+	Speed = 5.f;
 
 	InputMode = true;
 	cursorState = true;
 	pause = nullptr;
 	end = nullptr;
+	start = nullptr;
 	spawnCounter = 0;
 
 	//Reqister used Inputs
@@ -78,7 +83,7 @@ ForestPlayer::ForestPlayer() : Player()
 	II->RegisterKeyInput(257, &ForestPlayer::OpenConsole, this);
 	II->RegisterMouseInput(0, &ForestPlayer::MouseMoved, this);
 	II->RegisterKeyInput(69, &ForestPlayer::ItemPickE, this);
-	II->RegisterKeyInput(81, &ForestPlayer::ItemThrowQ, this);
+	II->RegisterKeyInput(81, &ForestPlayer::InputQ, this);
 
 	Movement = SpawnObject<MovementComponent>();
 	Movement->SetTarget(dynamic_cast<Actor*>(this));
@@ -120,21 +125,22 @@ void ForestPlayer::RunInputSpace(bool KeyDown)
 
 void ForestPlayer::InputOne(bool KeyDown)
 {
-	if (KeyDown)
-		InputMode = !InputMode;
+	
 }
 
 void ForestPlayer::InputTwo(bool KeyDown)
 {
-	if (KeyDown)
-		InputMode = !InputMode;
-	Scene::OpenLevel("Assets/Maps/test");
+	
 }
 
 void ForestPlayer::RunInputShift(bool KeyDown)
 {
-	if (KeyDown) Movement->SetMaxSpeed(10.f);
-	else Movement->SetMaxSpeed(5.f);
+	if (KeyDown) {
+		Movement->SetMaxSpeed(10.f);
+	}
+	else {
+		Movement->SetMaxSpeed(5.f);
+	}
 }
 
 
@@ -145,13 +151,19 @@ void ForestPlayer::LeftMouseDown(bool KeyDown)
 
 void ForestPlayer::RightMouseDown(bool KeyDown)
 {
-	if (KeyDown == true)
-	Console::Log((GetCamera()->GetLocation() + Vector(0.f, 0.f, -2.2f)).ToString());
+	//if (KeyDown == true)
+	//Console::Log((GetCamera()->GetLocation() + Vector(0.f, 0.f, -2.2f)).ToString());
 }
 
-void ForestPlayer::ItemThrowQ(bool KeyDown)
+void ForestPlayer::InputQ(bool KeyDown)
 {
-	if (!KeyDown)
+	start->UI::RemoveFromScreen();
+	WindowManager::SetShowCursor(0, false);
+	cursorState = true;
+	Movement->SetAllowMovement(true);
+	ObjectManager::GetByRecord<Ghost>(0x10)->startMoving();
+
+	/*if (!KeyDown)
 	{
 		if (Items.size() > 0) {
 			auto it = SpawnObject<PlaceableItem>();
@@ -164,7 +176,7 @@ void ForestPlayer::ItemThrowQ(bool KeyDown)
 			Items.erase(Items.begin());
 		}
 		Console::Log("Items: " + std::to_string(Items.size()));
-	}
+	}*/
 }
 
 void ForestPlayer::ItemPickE(bool KeyDown)
@@ -182,7 +194,7 @@ void ForestPlayer::ItemPickE(bool KeyDown)
 				Candys.erase(index);
 				Items.push_back(SpawnObject<Item>());
 				Console::Log("Items: " + std::to_string(Items.size()));
-				if (Items.size() == 1) {
+				if (Items.size() == 5) {
 					Winner();
 				}
 				break;
@@ -218,13 +230,12 @@ void ForestPlayer::Tick(float)
 {
 	GetCamera()->SetLocation(Location + Vector(0.f, 0.f, 2.2f));
 	GetCamera()->SetRotation(Rotation);
-
-	
 }
 
 void ForestPlayer::BeginPlay()
 {
 	Movement->SetGround(ObjectManager::GetByRecord<Terrain>(0xA0001111));
+	ObjectManager::GetByRecord<Ghost>(0x10)->stopMoving();
 
 	Console::Log("Hello beautiful world");
 
@@ -233,6 +244,12 @@ void ForestPlayer::BeginPlay()
 	Candys.push_back(ObjectManager::GetByRecord<VisibleObject>(0xC3));
 	Candys.push_back(ObjectManager::GetByRecord<VisibleObject>(0xC4));
 	Candys.push_back(ObjectManager::GetByRecord<VisibleObject>(0xC5));
+
+	start = SpawnObject<StartScreen>();
+	UI::AddToScreen(start, this);
+	WindowManager::SetShowCursor(0, true);
+	cursorState = false;
+	Movement->SetAllowMovement(false);
 }
 
 Item::Item() : BaseObject()
@@ -276,3 +293,4 @@ void PlaceableItem::DestroyObject()
 {
 	
 }
+

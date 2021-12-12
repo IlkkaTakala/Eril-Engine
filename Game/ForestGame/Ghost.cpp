@@ -36,7 +36,8 @@ void Ghost::Tick(float delta)
 	Mesh->GetModel()->GetMaterial(0)->SetParameter("velocity", move->DesiredState.velocity);
 
 	Vector playerLoc = GetGameState()->CurrentPlayer->GetLocation();
-	
+
+
 	if (!caught) {
 
 		if ((targetLoc - Location).Length() < 1.f) SetNewTarget(0.f);
@@ -57,6 +58,11 @@ void Ghost::Tick(float delta)
 void Ghost::stopMoving()
 {
 	move->SetAllowMovement(false);
+}
+
+void Ghost::startMoving()
+{
+	move->SetAllowMovement(true);
 }
 
 void Ghost::SetNewTarget(float delta)
