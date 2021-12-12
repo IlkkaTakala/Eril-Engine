@@ -248,6 +248,7 @@
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\UI.cpp" />
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\UIComponent.cpp" />
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\UISpace.cpp" />
+    <ClCompile Include="Game\Disco\DiscoPlayer.cpp" />
     <ClCompile Include="Game\ECS_Examples\ECSExample.cpp" />
     <ClCompile Include="Game\EngineInterface.cpp" />
     <ClCompile Include="Game\ForestGame\ForestPlayer.cpp" />
@@ -314,6 +315,9 @@
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\UI.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\UI\UIComponent.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\UI\UISpace.h" />
+    <ClInclude Include="Game\Disco\DiscoLightComponent.h" />
+    <ClInclude Include="Game\Disco\DiscoLightSystem.h" />
+    <ClInclude Include="Game\Disco\DiscoPlayer.h" />
     <ClInclude Include="Game\ECS_Examples\Components\PositionComponent.h" />
     <ClInclude Include="Game\ECS_Examples\ECSExample.h" />
     <ClInclude Include="Game\ECS_Examples\Systems\MovementSystem.h" />

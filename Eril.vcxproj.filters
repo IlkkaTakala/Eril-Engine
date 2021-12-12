@@ -157,6 +157,9 @@
     <ClCompile Include="Game\PauseUI.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="Game\Disco\DiscoPlayer.cpp">
+      <Filter>Game\Disco</Filter>
+    </ClCompile>
     <ClCompile Include="Game\ForestGame\ForestPlayer.cpp">
       <Filter>Game\ForestGame</Filter>
     </ClCompile>
@@ -233,6 +236,9 @@
     </Filter>
     <Filter Include="Game\MainMenu">
       <UniqueIdentifier>{2ab0c0ce-2ceb-4351-ae11-5553dc38f389}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Disco">
+      <UniqueIdentifier>{c1638df8-5fae-4cd8-9d38-56e874a765f3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game\ForestGame">
       <UniqueIdentifier>{734f2662-5704-48ce-8f67-7c7c45fe62c9}</UniqueIdentifier>
@@ -439,6 +445,15 @@
     </ClInclude>
     <ClInclude Include="Game\PauseUI.h">
       <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Disco\DiscoPlayer.h">
+      <Filter>Game\Disco</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Disco\DiscoLightComponent.h">
+      <Filter>Game\Disco</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Disco\DiscoLightSystem.h">
+      <Filter>Game\Disco</Filter>
     </ClInclude>
     <ClInclude Include="Game\ForestGame\ForestPlayer.h">
       <Filter>Game\ForestGame</Filter>

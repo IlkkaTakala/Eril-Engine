@@ -234,8 +234,8 @@ void TestPlayer::BeginPlay()
 	IComponentArrayQuerySystem<AudioComponent>* audioComponentArraySystem = static_cast<IComponentArrayQuerySystem<AudioComponent>*> (systemsManager->GetSystemByName("AudioControllerSystem"));
 	AudioComponent* audio = audioComponentArraySystem->AddComponentToSystem();
 	
-	AudioControllerSystem* audioControllerSystem = static_cast<AudioControllerSystem*>(systemsManager->GetSystemByName("AudioControllerSystem"));
-	audioComponentID = audio->GetID();
+	//AudioControllerSystem* audioControllerSystem = static_cast<AudioControllerSystem*>(systemsManager->GetSystemByName("AudioControllerSystem"));
+	//audioComponentID = audio->GetID();
 
 	Vector audioPos = Vector(20.0f, 20.0f, terrain->GetHeight(20.0f, 20.0f) + 1.5f);
 	audio->SetSourceID(AudioManager::LoadAudio("clicketi.WAV"));
@@ -260,12 +260,11 @@ void TestPlayer::BeginPlay()
 		DirLight->Color = Vector(1.f);
 		DirLight->Rotation = Vector(0.5, 0.5, -0.5);
 
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < 50; i++)
 		{
 			//Console::Log("Light addded " + std::to_string(i));
 			float x = (float)(rand() % 100);
 			float y = (float)(rand() % 100);
-			y = 1;
 			//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
 
 			LightComponent* light = lightSystem->AddComponentToSystem();

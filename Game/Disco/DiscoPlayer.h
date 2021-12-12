@@ -3,23 +3,20 @@
 #include "Settings.h"
 #include "Gameplay/PlayerController.h"
 
-class Actor;
-class InstancedObject;
 class Light;
 class MovementComponent;
-class Terrain;
-class Hunter;
 class PauseUI;
 
 //ECS TEST
 class ECSExample;
 
-class TestPlayer : public Player
+class DiscoPlayer : public Player
 {
-	REGISTER(TestPlayer);
+	REGISTER(DiscoPlayer);
+
 public:
-	TestPlayer();
-	virtual ~TestPlayer() { }
+	DiscoPlayer();
+	virtual ~DiscoPlayer() { }
 	virtual void Tick(float Delta) override;
 	virtual void BeginPlay() override;
 	virtual void OnDestroyed() override;
@@ -52,21 +49,21 @@ private:
 
 	bool cursorState;
 	bool InputMode;
-	Ref<Light> DirLight;
-	Ref<VisibleObject> Sky;
-	Ref<Actor> Collider;
-	Ref<MovementComponent> ColliderModelMove;
-	Ref<VisibleObject> ColliderModel;
-
-
 	PauseUI* pause;
+
+	std::map<int, std::tuple<float, float>>lightposition;
 
 	//ECS TEST
 	Ref<ECSExample> ecsExample;
 
-	int audioComponentID;
-
 	int spawnCounter;
 
-	void TestTimer(float d);
+	int AudioID;
+	float AudioS;
+	float AudioT;
+	Vector AudioDir;
+	Ref<VisibleObject> AudioSourceMesh;
+	Ref<VisibleObject> StaticAudioSource;
+	void ChangeAudioSourceAngle(float d);
+	void ClampLocation();
 };
