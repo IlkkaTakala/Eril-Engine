@@ -91,6 +91,22 @@ UI* UI::LoadFromFile(const String& file)
 	return temp;
 }
 
+void UI::AddFromFile(Panel* parent, const String& file)
+{
+	String data;
+	FileManager::RequestData(file, data);
+	if (data == "") return;
+
+	using namespace rapidxml;
+
+	xml_document<>* doc = new xml_document<>();
+	doc->parse<0>(data.data());
+
+	ParseChildren(doc, parent);
+
+	delete doc;
+}
+
 void UI::AddComponent(UIComponent* com)
 {
 	TopLevel = com;

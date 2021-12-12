@@ -15,5 +15,9 @@ bool FileManager::RequestData(const String& file, String& data)
 
 bool FileManager::SaveData(const String& path, const String& data)
 {
-	return false;
+	std::ofstream out(path, std::fstream::out);
+	out << data;
+	out.close();
+
+	return true;
 }

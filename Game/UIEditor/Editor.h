@@ -14,6 +14,7 @@ public:
 	void SetActive(EditorItemWrapper* edit);
 
 	void SaveUI(String path);
+	void LoadUI(String path);
 private:
 
 	void RightClick(float, bool);

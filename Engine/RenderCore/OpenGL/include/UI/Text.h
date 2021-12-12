@@ -2,6 +2,8 @@
 #include <Core.h>
 #include <UI/Image.h>
 
+class TextBox;
+
 enum class Justify
 {
 	Unset,
@@ -22,8 +24,15 @@ public:
 	String GetText() const { return value; }
 	Text* SetJustification(Justify j) { just = j; textChanged = true; return this; }
 	Justify GetJustification() const { return just; }
+	Text* SetFont(const String& name);
+	virtual void LoadWithParameters(const std::map<String, String>& args) override;
+	virtual String GetString() const override;
+	virtual void MakeEditMenu(std::vector<UIComponent*>& comps) override;
+
+	virtual void UpdateMatrices(const Vector2D& size) override;
 
 protected:
+	friend class TextBox;
 	String font;
 	uint StringBuffer;
 	String value;

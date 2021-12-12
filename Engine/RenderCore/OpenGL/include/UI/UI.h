@@ -3,6 +3,7 @@
 
 class UIComponent;
 class Player;
+class Panel;
 
 template <class T>
 UIComponent* CreateUI()
@@ -26,6 +27,7 @@ public:
 	void RemoveFromScreen(int screen = 0);
 
 	static UI* LoadFromFile(const String& file);
+	void AddFromFile(Panel* parent, const String& file);
 
 	template <typename T>
 	static bool do_ui_register(String name) {

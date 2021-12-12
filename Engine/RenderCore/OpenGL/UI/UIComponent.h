@@ -50,6 +50,7 @@ public:
 	UIComponent* SetOrigin(float x, float y);
 	UIComponent* SetFocusable(bool focus) { focusable = focus; return this; }
 	UIComponent* SetHit(HitReg h) { hits = h; return this; }
+	UIComponent* SetVisibility(Visibility v) { visible = v; return this; }
 
 	bool Trace(const Vector2D& point) const;
 
@@ -66,7 +67,9 @@ public:
 	virtual void HoverCheck(Vector2D& point);
 
 	virtual void LoadWithParameters(const std::map<String, String>& args);
-	virtual String GetString();
+	virtual String GetString() const;
+
+	virtual void MakeEditMenu(std::vector<UIComponent*>& comps);
 
 	friend class UISpace;
 

@@ -9,6 +9,7 @@ public:
 	Panel();
 	virtual ~Panel();
 	Panel* AddChild(UIComponent* child);
+	void RemoveChildren();
 	int GetChildIndex(UIComponent* child);
 
 	virtual void Render() override;
@@ -18,6 +19,7 @@ public:
 	virtual void HoverCheck(Vector2D& point) override;
 
 	std::vector<UIComponent*> GetChildren();
+	virtual String GetString() const override;
 
 protected:
 	std::multimap<int, UIComponent*> children;

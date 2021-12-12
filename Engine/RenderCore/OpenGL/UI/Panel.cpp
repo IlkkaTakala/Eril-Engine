@@ -40,6 +40,14 @@ Panel* Panel::AddChild(UIComponent* child)
 	return this;
 }
 
+void Panel::RemoveChildren()
+{
+	for (const auto& c : children) {
+		delete c.second;
+	}
+	children.clear();
+}
+
 int Panel::GetChildIndex(UIComponent* child)
 {
 	auto findResult = std::find_if(std::begin(children), std::end(children), [child](const std::pair<int, UIComponent*>& pair)
@@ -49,7 +57,7 @@ int Panel::GetChildIndex(UIComponent* child)
 
 	if (findResult != children.end())
 	{
-		return std::distance(children.begin(), findResult);
+		return (int)std::distance(children.begin(), findResult);
 	} else
 		return -1;
 }
@@ -104,4 +112,21 @@ std::vector<UIComponent*> Panel::GetChildren()
 		ret.push_back(it->second);
 	}
 	return ret;
+}
+
+String Panel::GetString() const
+{
+	String data("<Panel ");
+	data += UIComponent::GetString();
+	if (children.size() > 0) {
+		data += ">\n";
+		for (const auto& c : children) {
+			data += '\t' + c.second->GetString();
+		}
+		data += "</Panel>\n";
+	}
+	else {
+		data += " />\n";
+	}
+	return data;
 }

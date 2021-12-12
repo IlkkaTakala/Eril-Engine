@@ -4,6 +4,12 @@
 #include <glm/gtx/quaternion.hpp>
 #include "UISpace.h"
 
+#include <UI/Panel.h>
+#include <UI/Text.h>
+#include <UI/TextBox.h>
+#include <UI/Button.h>
+#include <UI/VerticalPanel.h>
+
 struct UIMatrix
 {
 	glm::mat4 model_m;
@@ -175,23 +181,23 @@ void UIComponent::LoadWithParameters(const std::map<String, String>& args)
 		switch (dats.size())
 		{
 		default:
-		case 10: origin.Y = atof(dats[9].c_str());
-		case 9: origin.X = atof(dats[8].c_str());
-		case 8: anchor_v.Y = atof(dats[7].c_str());
-		case 7: anchor_v.X = atof(dats[6].c_str());
-		case 6: anchor_h.Y = atof(dats[5].c_str());
-		case 5: anchor_h.X = atof(dats[4].c_str());
-		case 4: bottomOffset = atof(dats[3].c_str());
-		case 3: topOffset = atof(dats[2].c_str());
-		case 2: rightOffset = atof(dats[1].c_str());
-		case 1: leftOffset = atof(dats[0].c_str());
+		case 10: origin.Y = (float)atof(dats[9].c_str());
+		case 9: origin.X = (float)atof(dats[8].c_str());
+		case 8: anchor_v.Y = (float)atof(dats[7].c_str());
+		case 7: anchor_v.X = (float)atof(dats[6].c_str());
+		case 6: anchor_h.Y = (float)atof(dats[5].c_str());
+		case 5: anchor_h.X = (float)atof(dats[4].c_str());
+		case 4: bottomOffset = (float)atof(dats[3].c_str());
+		case 3: topOffset = (float)atof(dats[2].c_str());
+		case 2: rightOffset = (float)atof(dats[1].c_str());
+		case 1: leftOffset = (float)atof(dats[0].c_str());
 		case 0: break;
 		}
 
 	}
 }
 
-String UIComponent::GetString()
+String UIComponent::GetString() const
 {
 	String data("Transform=\"");
 	data += std::to_string(leftOffset) + ',' + std::to_string(rightOffset) + ',' + std::to_string(topOffset) + ',' + std::to_string(bottomOffset) + ',';
@@ -199,4 +205,49 @@ String UIComponent::GetString()
 	data += std::to_string(origin.X) + ',' + std::to_string(origin.Y);
 	data += "\"";
 	return data;
+}
+
+void UIComponent::MakeEditMenu(std::vector<UIComponent*>& comps)
+{
+	VerticalPanel* topLevel = new VerticalPanel();
+	topLevel->SetTransform(0.f, 0.f, 0.f, 150.f, Vector(0.f), Vector(0.f, 1.f, 0.f));
+	TextBox* offset_box = new TextBox();
+	TextBox* origin_box = new TextBox();
+	TextBox* anchor_box = new TextBox();
+	String offs = std::to_string(leftOffset) + ',' + std::to_string(rightOffset) + ',' + std::to_string(topOffset) + ',' + std::to_string(bottomOffset);
+	String ancs = std::to_string(anchor_h.X) + ',' + std::to_string(anchor_h.Y) + ',' + std::to_string(anchor_v.X) + ',' + std::to_string(anchor_v.Y);
+	String ori = std::to_string(origin.X) + ',' + std::to_string(origin.Y);
+
+
+	topLevel->AddChild(
+		(new Panel())->AddChild(
+			(new Text())->SetText("Offsets: ", 20)->SetTransform()
+		)->AddChild(
+			offset_box->SetText(offs)->SetFontSize(20)->SetTransform(0.f, 300.f, 0.f, 30.f, Vector(0.f), Vector(0.25f))
+		)->SetTransform(0.f, 0.f, 0.f, 30.f)
+	)->AddChild(
+		(new Panel())->AddChild(
+			(new Text())->SetText("Anchors: ", 20)->SetTransform()
+		)->AddChild(
+			anchor_box->SetText(ancs)->SetFontSize(20)->SetTransform(0.f, 300.f, 0.f, 30.f, Vector(0.f), Vector(0.25f))
+		)->SetTransform(0.f, 0.f, 0.f, 30.f)
+	)->AddChild(
+		(new Panel())->AddChild(
+			(new Text())->SetText("Origin: ", 20)->SetTransform()
+		)->AddChild(
+			origin_box->SetText(ori)->SetFontSize(20)->SetTransform(0.f, 300.f, 0.f, 30.f, Vector(0.f), Vector(0.25f))
+		)->SetTransform(0.f, 0.f, 0.f, 30.f)
+	)->AddChild(
+		(new Panel())->SetTransform(0.f, 0.f, 0.f, 10.f)
+	)->AddChild(
+		(new Button())->AddChild((new Text())->SetText("Apply", 20))->SetTransform(0.f, 0.f, 0.f, 30.f)
+		->SetEventCallback(Constants::UI::UI_ON_MOUSE_DOWN, [this, offset_box, anchor_box, origin_box]() {
+			std::map<String, String> data;
+			String trans = offset_box->GetText() + ',' + anchor_box->GetText() + ',' + origin_box->GetText();
+			data.emplace("Transform", trans);
+			LoadWithParameters(data);
+		})
+	);
+	
+	comps.push_back(topLevel);
 }

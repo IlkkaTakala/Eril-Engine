@@ -258,6 +258,8 @@
     <ClCompile Include="Game\UIEditor\Editor.cpp" />
     <ClCompile Include="Game\UIEditor\EditorItemWrapper.cpp" />
     <ClCompile Include="Game\UIEditor\EditorPlayer.cpp" />
+    <ClCompile Include="Game\UITest\TestPlayerLoad.cpp" />
+    <ClCompile Include="Game\UITest\TestUILoad.cpp" />
     <ClInclude Include="Engine\Assets\Resources\resource.h" />
     <ClInclude Include="Engine\Core\BasicTypes.h" />
     <ClInclude Include="Engine\Core\Core.h" />
@@ -324,6 +326,8 @@
     <ClInclude Include="Game\UIEditor\Editor.h" />
     <ClInclude Include="Game\UIEditor\EditorItemWrapper.h" />
     <ClInclude Include="Game\UIEditor\EditorPlayer.h" />
+    <ClInclude Include="Game\UITest\TestPlayerLoad.h" />
+    <ClInclude Include="Game\UITest\TestUILoad.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Engine\Assets\Icons\icon.ico" />

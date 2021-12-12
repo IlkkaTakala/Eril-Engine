@@ -8,5 +8,7 @@ public:
 
 	virtual void UpdateMatrices(const Vector2D& size) override;
 	VerticalPanel* AddChildAt(int idx, UIComponent* com);
+
+	virtual String GetString() const override;
 };
 

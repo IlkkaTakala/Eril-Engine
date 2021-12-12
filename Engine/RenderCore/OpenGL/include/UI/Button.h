@@ -19,7 +19,7 @@ public:
 	Button* SetPressStyle(const UIStyle& s);
 	Button* SetStyle(const UIStyle& s);
 	void OnEnter() override;
-	void OnLeave() override;
+	virtual void OnLeave() override;
 	void OnMouseDown() override;
 	void OnMouseUp() override;
 
@@ -31,6 +31,9 @@ public:
 	virtual void HoverCheck(Vector2D& point) override;
 
 	Button* AddChild(UIComponent* child);
+
+	virtual void LoadWithParameters(const std::map<String, String>& args) override;
+	virtual String GetString() const override;
 
 protected:
 	UIStyle hovered;

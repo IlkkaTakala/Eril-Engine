@@ -25,3 +25,20 @@ VerticalPanel* VerticalPanel::AddChildAt(int idx, UIComponent* com)
 
 	return this;
 }
+
+String VerticalPanel::GetString() const
+{
+	String data("<VerticalPanel ");
+	data += UIComponent::GetString();
+	if (children.size() > 0) {
+		data += ">\n";
+		for (const auto& c : children) {
+			data += '\t' + c.second->GetString();
+		}
+		data += "</VerticalPanel>\n";
+	}
+	else {
+		data += " />\n";
+	}
+	return data;
+}

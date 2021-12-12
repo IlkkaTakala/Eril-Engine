@@ -175,6 +175,8 @@
     <ClCompile Include="Engine\external\tinyfiledialogs\tinyfiledialogs.c">
       <Filter>Engine\Interface</Filter>
     </ClCompile>
+    <ClCompile Include="Game\UITest\TestPlayerLoad.cpp" />
+    <ClCompile Include="Game\UITest\TestUILoad.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -440,6 +442,8 @@
     <ClInclude Include="Engine\external\tinyfiledialogs\tinyfiledialogs.h">
       <Filter>Engine\Interface</Filter>
     </ClInclude>
+    <ClInclude Include="Game\UITest\TestPlayerLoad.h" />
+    <ClInclude Include="Game\UITest\TestUILoad.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Engine\Assets\Icons\icon.ico">
