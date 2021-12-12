@@ -360,7 +360,7 @@ void DiscoPlayer::BeginPlay()
 
 	AudioComponent* audioComponent = audiosystem->AddComponentToSystem();
 	Vector audioPos = Vector(-20.0f, -41.0f,  15.0f);
-	audioComponent->SetSourceID(AudioManager::LoadAudio("clicketi.WAV"));
+	audioComponent->SetSourceID(AudioManager::LoadAudio("siren.WAV"));
 	audioComponent->SetPosition(audioPos);
 	audioComponent->SetGain(1.0f);
 	audioComponent->SetPitch(1.0f);
