@@ -2,4 +2,6 @@
 build/
 *.zip
 *.mtl
+__pycache__
+*.aps
 build

@@ -10,6 +10,12 @@
 #include <Material.h>
 #include "RenderCore/OpenGL/UI/UISpace.h"
 
+#include <UI/Panel.h>
+#include <UI/Text.h>
+#include <UI/TextBox.h>
+#include <UI/Button.h>
+#include <UI/VerticalPanel.h>
+
 struct UIMatrix
 {
 	glm::mat4 model_m;
@@ -268,14 +274,13 @@ void main()
 
 	hits = HitReg::HitTestInvisible;
 
-	font = "Assets/Fonts/arial";
+	SetFont("Assets/Fonts/arial");
 
-	auto it = fonts.find(font);
-	if (it == fonts.end()) fonts[font] = loadFont(font);
+	SetStyle(Vector(0.f));
 
 	fontSize = 30;
 	weight = 100;
-	just = Justify::Left;
+	just = Justify::Unset;
 
 	SetText("Hello World");
 }
@@ -306,11 +311,12 @@ void Text::Render()
 				storage[i].offset = 0;
 			}
 		}
-		int total_length = storage[value.size() - 1].offset + fonts[font].glyphs[storage[value.size() - 1].letter].advance;
-		int center = (realSize.X - total_length * ratio) / 2;
+		int total_length = value == "" ? 0 : storage[value.size() - 1].offset + fonts[font].glyphs[storage[value.size() - 1].letter].advance;
+		int center = (int)(realSize.X - total_length * ratio) / 2;
 
 		switch (just)
 		{
+		case Justify::Unset:
 		case Justify::Left:
 			break;
 		case Justify::Centre:
@@ -367,4 +373,109 @@ Text* Text::SetText(const String& text, int size)
 	if (size != 0) fontSize = size;
 
 	return this;
+}
+
+Text* Text::SetFont(const String& name)
+{
+	if (name == "") return this;
+	font = name;
+	auto it = fonts.find(font);
+	if (it == fonts.end()) fonts[font] = loadFont(font);
+
+	return this;
+}
+
+void Text::LoadWithParameters(const std::map<String, String>& args)
+{
+	Image::LoadWithParameters(args);
+
+	if (args.find("Text") != args.end()) {
+		String dats = args.at("Text");
+		SetText(dats);
+	}
+	if (args.find("TextStyle") != args.end()) {
+		std::vector<String> dats = split(args.at("TextStyle"), ',');
+
+		UIStyle s;
+
+		switch (dats.size())
+		{
+		default:
+		case 3: SetJustification((Justify)atoi(dats[2].c_str()));
+		case 2: SetFont(dats[1]);
+		case 1: fontSize = (int)atof(dats[0].c_str());
+		case 0: break;
+		}
+
+		textChanged = true;
+	}
+}
+
+String Text::GetString() const
+{
+	String data("<Text ");
+	data += UIComponent::GetString();
+	data += " Style=\"" + style.Color.ToString() + ',' + std::to_string(style.Opacity) + ',' + (style.texture ? style.texture->GetName() : " ") + ',' + style.Tint.ToString() + '"';
+	data += " Text=\"" + value + "\"";
+	data += " TextStyle=\"" + fontSize + ',' + font + ',' + std::to_string((uint8)just) + "\"";
+	data += " />\n";
+	return data;
+}
+
+void Text::MakeEditMenu(std::vector<UIComponent*>& comps)
+{
+	Image::MakeEditMenu(comps);
+	VerticalPanel* topLevel = new VerticalPanel();
+	topLevel->SetTransform(0.f, 0.f, 0.f, 200.f, Vector(0.f), Vector(0.f, 1.f, 0.f));
+	TextBox* value_box = new TextBox();
+	TextBox* font_box = new TextBox();
+	TextBox* size_box = new TextBox();
+	TextBox* just_box = new TextBox();
+
+	topLevel->AddChild(
+		(new Panel())->AddChild(
+			(new Text())->SetText("Text: ", 20)->SetTransform()
+		)->AddChild(
+			value_box->SetText(value)->SetFontSize(20)->SetTransform(0.f, 300.f, 0.f, 30.f, Vector(0.f), Vector(0.25f))
+		)->SetTransform(0.f, 0.f, 0.f, 30.f)
+	)->AddChild(
+		(new Panel())->AddChild(
+			(new Text())->SetText("Fontsize: ", 20)->SetTransform()
+		)->AddChild(
+			size_box->SetText(std::to_string(fontSize))->SetFontSize(20)->SetTransform(0.f, 300.f, 0.f, 30.f, Vector(0.f), Vector(0.25f))
+		)->SetTransform(0.f, 0.f, 0.f, 30.f)
+	)->AddChild(
+		(new Panel())->AddChild(
+			(new Text())->SetText("Font: ", 20)->SetTransform()
+		)->AddChild(
+			font_box->SetText(font)->SetFontSize(20)->SetTransform(0.f, 300.f, 0.f, 30.f, Vector(0.f), Vector(0.25f))
+		)->SetTransform(0.f, 0.f, 0.f, 30.f)
+	)->AddChild(
+		(new Panel())->AddChild(
+			(new Text())->SetText("Justify: ", 20)->SetTransform()
+		)->AddChild(
+			just_box->SetText(std::to_string((uint8)just))->SetFontSize(20)->SetTransform(0.f, 300.f, 0.f, 30.f, Vector(0.f), Vector(0.25f))
+		)->SetTransform(0.f, 0.f, 0.f, 30.f)
+	)->AddChild(
+		(new Panel())->SetTransform(0.f, 0.f, 0.f, 10.f)
+	)->AddChild(
+		(new Button())->AddChild((new Text())->SetText("Apply", 20))->SetTransform(0.f, 0.f, 0.f, 30.f)
+		->SetEventCallback(Constants::UI::UI_ON_MOUSE_DOWN, [this, value_box, size_box, font_box, just_box]() {
+		std::map<String, String> data;
+		String trans = size_box->GetText() + ',' + font_box->GetText() + ',' + just_box->GetText();
+		data.emplace("Text", value_box->GetText());
+		data.emplace("TextStyle", trans);
+		LoadWithParameters(data);
+	})
+	);
+
+	comps.push_back(topLevel);
+}
+
+
+void Text::UpdateMatrices(const Vector2D& size)
+{
+	Image::UpdateMatrices(size);
+
+	textChanged = true;
 }
