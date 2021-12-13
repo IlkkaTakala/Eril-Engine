@@ -22,13 +22,17 @@ struct UIStyle
 
 class Image : public UIComponent
 {
+	REGISTER_UI(Image)
 public:
 	Image();
 	virtual ~Image();
 
 	virtual void Render() override;
+	virtual void LoadWithParameters(const std::map<String, String>& args) override;
 
 	Image* SetStyle(const UIStyle& s);
+	virtual String GetString() const override;
+	virtual void MakeEditMenu(std::vector<UIComponent*>& comps);
 
 protected:
 	Shader* solid_shader;

@@ -2,6 +2,8 @@
 #include <Objects/MovementComponent.h>
 #include <limits>
 #include "Physics.h"
+#include <cassert>
+#include "Physics/BulletPhysics.h"
 
 namespace Physics
 {
@@ -9,12 +11,12 @@ namespace Physics
 	{
 		std::list<RefWeak<VisibleObject>> Statics;
 		std::list<RefWeak<MovementComponent>> Movables;
-
-		bool intersect(AABB a, AABB b) {
+		// -------------------------------------------------------------------> alla oleva koodi on alkuperäistä
+		/*bool intersect(AABB a, AABB b) {
 			return (a.mins.X <= b.maxs.X && a.maxs.X >= b.mins.X) &&
 				(a.mins.Y <= b.maxs.Y && a.maxs.Y >= b.mins.Y) &&
 				(a.mins.Z <= b.maxs.Z && a.maxs.Z >= b.mins.Z);
-		}
+		}*/
 
 		float sign(float v) {
 			return v < 0.f ? -1.0f : 1.0f;
@@ -105,29 +107,17 @@ namespace Physics
 		}*/
 	}
 
+
 #pragma optimize("", off)
-	void CheckCollisions()
+	void CheckCollisions(float delta)
 	{
 		{
 			auto it = Movables.remove_if([](const auto& v) { return v == nullptr; });
 			auto it2 = Statics.remove_if([](const auto& v) { return v == nullptr; });
 		}
 
-		/*for (const auto& o : Movables) {
-			if (o->GetTarget() == nullptr || o->GetTarget()->GetModel() == nullptr) continue;
-			Vector& d_loc = o->DesiredState.location;
-			const Vector& o_loc = o->OldState.location;
-			const AABB& d_AABB = o->GetTarget()->GetModel()->GetAABB();
+		Physics::GetWorld()->stepSimulation(delta);
 
-
-
-			std::vector<VisibleObject*> Collisions;
-			for (const auto& s : Statics) {
-				const AABB& bounds = s->GetModel()->GetAABB();
-				const Vector& loc = s->GetLocation();
-				
-			}
-		}*/
 
 		for (const auto& m : Movables) {
 			m->ApplyMovement();

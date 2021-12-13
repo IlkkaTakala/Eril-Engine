@@ -71,7 +71,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>Engine\external\openal-soft\include;Game;Engine\external\assimp\include;Engine\external\RapidXML;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Game;Engine\external\bullet3\src;Engine\external\assimp\include;Engine\external\tinyfiledialogs;Engine\external\openal-soft\include;Game;Engine\external\assimp\include;Engine\external\RapidXML;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -100,7 +100,7 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>OpenAL32.lib;dwrite.lib;d2d1.lib;assimp-vc140-mt.lib;zlibstaticd.lib;IrrXML.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>LinearMath_Debug.lib;Bullet3OpenCL_clew_Debug.lib;Bullet2FileLoader_Debug.lib;BulletSoftBody_Debug.lib;BulletDynamics_Debug.lib;BulletCollision_Debug.lib;BulletInverseDynamics_Debug.lib;Bullet3Common_Debug.lib;Bullet3Geometry_Debug.lib;Bullet3Collision_Debug.lib;Bullet3Dynamics_Debug.lib;OpenAL32.lib;dwrite.lib;d2d1.lib;assimp-vc140-mt.lib;zlibstaticd.lib;IrrXML.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\build\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -108,6 +108,7 @@
       <ImportLibrary>$(SolutionDir)/build/Debug/Eril.lib</ImportLibrary>
       <ProgramDataBaseFile>$(SolutionDir)/build/Debug/Eril.pdb</ProgramDataBaseFile>
       <SubSystem>Windows</SubSystem>
+      <ForceFileOutput>Enabled</ForceFileOutput>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -115,7 +116,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>Engine\external\openal-soft\include;Game;Engine\external\assimp\include;Engine\external\RapidXML;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Game;Engine\external\bullet3\src;Engine\external\assimp\include;Engine\external\tinyfiledialogs;Engine\external\openal-soft\include;Game;Engine\external\assimp\include;Engine\external\RapidXML;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ExceptionHandling>Sync</ExceptionHandling>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -159,7 +160,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>Engine\external\openal-soft\include;Game;Engine\external\assimp\include;Engine\external\RapidXML;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Game;Engine\external\bullet3\src;Engine\external\assimp\include;Engine\external\tinyfiledialogs;Engine\external\openal-soft\include;Game;Engine\external\assimp\include;Engine\external\RapidXML;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -215,16 +216,19 @@
     <ClCompile Include="Engine\Core\ObjectManager.cpp" />
     <ClCompile Include="Engine\Core\Objects\Actor.cpp" />
     <ClCompile Include="Engine\Core\Objects\BaseObject.cpp" />
+    <ClCompile Include="Engine\Core\Objects\ColliderComponent.cpp" />
     <ClCompile Include="Engine\Core\Objects\InstancedObject.cpp" />
     <ClCompile Include="Engine\Core\Objects\MovementComponent.cpp" />
     <ClCompile Include="Engine\Core\Objects\SceneComponent.cpp" />
     <ClCompile Include="Engine\Core\Objects\Terrain.cpp" />
     <ClCompile Include="Engine\Core\Objects\VisibleObject.cpp" />
     <ClCompile Include="Engine\Core\Physics.cpp" />
+    <ClCompile Include="Engine\Core\Physics\BulletPhysics.cpp" />
     <ClCompile Include="Engine\Core\Settings.cpp" />
     <ClCompile Include="Engine\Core\Timer.cpp" />
     <ClCompile Include="Engine\Core\WinConsole.cpp" />
     <ClCompile Include="Engine\external\glfw\deps\glad_gl.c" />
+    <ClCompile Include="Engine\external\tinyfiledialogs\tinyfiledialogs.c" />
     <ClCompile Include="Engine\Interface\AudioManager.cpp" />
     <ClCompile Include="Engine\Interface\IECS.cpp" />
     <ClCompile Include="Engine\Interface\FileManager.cpp" />
@@ -245,6 +249,8 @@
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\UI.cpp" />
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\UIComponent.cpp" />
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\UISpace.cpp" />
+    <ClCompile Include="Engine\RenderCore\OpenGL\UI\VerticalPanel.cpp" />
+    <ClCompile Include="Game\Disco\DiscoPlayer.cpp" />
     <ClCompile Include="Game\ECS_Examples\ECSExample.cpp" />
     <ClCompile Include="Game\EngineInterface.cpp" />
     <ClCompile Include="Game\ForestGame\ForestPlayer.cpp" />
@@ -256,6 +262,12 @@
     <ClCompile Include="Game\TestArea\Hunter.cpp" />
     <ClCompile Include="Game\TestArea\TestPlayer.cpp" />
     <ClCompile Include="Game\TestArea\TestUI.cpp" />
+    <ClCompile Include="Game\UIEditor\Editor.cpp" />
+    <ClCompile Include="Game\UIEditor\EditorItemWrapper.cpp" />
+    <ClCompile Include="Game\UIEditor\EditorPlayer.cpp" />
+    <ClCompile Include="Game\UITest\TestPlayerLoad.cpp" />
+    <ClCompile Include="Game\UITest\TestUILoad.cpp" />
+    <ClInclude Include="Engine\Assets\Resources\resource.h" />
     <ClInclude Include="Engine\Core\BasicTypes.h" />
     <ClInclude Include="Engine\Core\Core.h" />
     <ClInclude Include="Engine\Core\ECS\Component.h" />
@@ -267,6 +279,7 @@
     <ClInclude Include="Engine\Core\ECS\EntityManager.h" />
     <ClInclude Include="Engine\Core\ECS\Systems\AudioControllerSystem.h" />
     <ClInclude Include="Engine\Core\ECS\Systems\LightControllerSystem.h" />
+    <ClInclude Include="Engine\external\tinyfiledialogs\tinyfiledialogs.h" />
     <ClInclude Include="Engine\Interface\AudioManager.h" />
     <ClInclude Include="Engine\Interface\IECS.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Button.h" />
@@ -282,12 +295,15 @@
     <ClInclude Include="Engine\Core\ObjectManager.h" />
     <ClInclude Include="Engine\Core\Objects\Actor.h" />
     <ClInclude Include="Engine\Core\Objects\BaseObject.h" />
+    <ClInclude Include="Engine\Core\Objects\ColliderComponent.h" />
     <ClInclude Include="Engine\Core\Objects\InstancedObject.h" />
     <ClInclude Include="Engine\Core\Objects\MovementComponent.h" />
     <ClInclude Include="Engine\Core\Objects\SceneComponent.h" />
     <ClInclude Include="Engine\Core\Objects\Terrain.h" />
     <ClInclude Include="Engine\Core\Objects\VisibleObject.h" />
     <ClInclude Include="Engine\Core\Physics.h" />
+    <ClInclude Include="Engine\Core\Physics\BulletObject.h" />
+    <ClInclude Include="Engine\Core\Physics\BulletPhysics.h" />
     <ClInclude Include="Engine\Core\Settings.h" />
     <ClInclude Include="Engine\Core\Timer.h" />
     <ClInclude Include="Engine\Core\WinConsole.h" />
@@ -306,8 +322,12 @@
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\Text.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\TextBox.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\UI.h" />
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\VerticalPanel.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\UI\UIComponent.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\UI\UISpace.h" />
+    <ClInclude Include="Game\Disco\DiscoLightComponent.h" />
+    <ClInclude Include="Game\Disco\DiscoLightSystem.h" />
+    <ClInclude Include="Game\Disco\DiscoPlayer.h" />
     <ClInclude Include="Game\ECS_Examples\Components\PositionComponent.h" />
     <ClInclude Include="Game\ECS_Examples\ECSExample.h" />
     <ClInclude Include="Game\ECS_Examples\Systems\MovementSystem.h" />
@@ -321,6 +341,17 @@
     <ClInclude Include="Game\TestArea\Hunter.h" />
     <ClInclude Include="Game\TestArea\TestPlayer.h" />
     <ClInclude Include="Game\TestArea\TestUI.h" />
+    <ClInclude Include="Game\UIEditor\Editor.h" />
+    <ClInclude Include="Game\UIEditor\EditorItemWrapper.h" />
+    <ClInclude Include="Game\UIEditor\EditorPlayer.h" />
+    <ClInclude Include="Game\UITest\TestPlayerLoad.h" />
+    <ClInclude Include="Game\UITest\TestUILoad.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Engine\Assets\Icons\icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Engine\Assets\Resources\Eril.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

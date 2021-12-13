@@ -6,7 +6,7 @@ class MovementComponent;
 
 namespace Physics
 {
-	void CheckCollisions();
+	void CheckCollisions(float delta);
 	void AddStatic(VisibleObject* obj);
 	void RemoveStatic(VisibleObject* obj);
 	void AddMovable(MovementComponent* obj);

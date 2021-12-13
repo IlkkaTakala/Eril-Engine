@@ -157,17 +157,47 @@
     <ClCompile Include="Game\PauseUI.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="Game\UIEditor\Editor.cpp">
+      <Filter>Game\UIEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\UIEditor\EditorPlayer.cpp">
+      <Filter>Game\UIEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\RenderCore\OpenGL\UI\VerticalPanel.cpp">
+      <Filter>Engine\OpenGL\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\UIEditor\EditorItemWrapper.cpp">
+      <Filter>Game\UIEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\external\tinyfiledialogs\tinyfiledialogs.c">
+      <Filter>Engine\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Disco\DiscoPlayer.cpp">
+      <Filter>Game\Disco</Filter>
+    </ClCompile>
     <ClCompile Include="Game\ForestGame\ForestPlayer.cpp">
       <Filter>Game\ForestGame</Filter>
     </ClCompile>
     <ClCompile Include="Game\ForestGame\Ghost.cpp">
       <Filter>Game\ForestGame</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="Engine\Interface\AudioManager.cpp">
       <Filter>Engine\Interface</Filter>
     </ClCompile>
     <ClCompile Include="Game\EngineInterface.cpp">
       <Filter>Engine\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Physics\BulletPhysics.cpp">
+      <Filter>Engine\Objects\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Objects\ColliderComponent.cpp">
+      <Filter>Engine\Objects\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\UITest\TestPlayerLoad.cpp">
+      <Filter>Game\UITesting</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\UITest\TestUILoad.cpp">
+      <Filter>Game\UITesting</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -191,6 +221,9 @@
     </Filter>
     <Filter Include="Engine\OpenGL">
       <UniqueIdentifier>{1a8dd4f1-9c5c-40d8-8a15-89a92e8920dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Objects\Physics">
+      <UniqueIdentifier>{7347c632-ba99-4fda-95d5-697116727367}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\ECS">
       <UniqueIdentifier>{ee669dbc-1437-4613-b8e8-9420e11f382e}</UniqueIdentifier>
@@ -225,8 +258,20 @@
     <Filter Include="Game\MainMenu">
       <UniqueIdentifier>{2ab0c0ce-2ceb-4351-ae11-5553dc38f389}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\UIEditor">
+      <UniqueIdentifier>{76c549e1-baf8-4ebb-861f-efc6d3daf410}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{27cfd01c-53e4-4436-b300-9133214a1517}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Disco">
+      <UniqueIdentifier>{c1638df8-5fae-4cd8-9d38-56e874a765f3}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Game\ForestGame">
       <UniqueIdentifier>{734f2662-5704-48ce-8f67-7c7c45fe62c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\UITesting">
+      <UniqueIdentifier>{7ceb856b-ccf9-40a6-98dc-2a4226f8f168}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -304,6 +349,15 @@
     </ClInclude>
     <ClInclude Include="Engine\external\glfw\deps\glad\gl.h">
       <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Physics\BulletObject.h">
+      <Filter>Engine\Objects\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Physics\BulletPhysics.h">
+      <Filter>Engine\Objects\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Objects\ColliderComponent.h">
+      <Filter>Engine\Objects\Physics</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\ECS\ComponentManager.h">
       <Filter>Engine\ECS</Filter>
@@ -422,11 +476,57 @@
     <ClInclude Include="Game\PauseUI.h">
       <Filter>Game</Filter>
     </ClInclude>
+    <ClInclude Include="Game\UIEditor\Editor.h">
+      <Filter>Game\UIEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\UIEditor\EditorPlayer.h">
+      <Filter>Game\UIEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Assets\Resources\resource.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\VerticalPanel.h">
+      <Filter>Engine\OpenGL\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\UIEditor\EditorItemWrapper.h">
+      <Filter>Game\UIEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\external\tinyfiledialogs\tinyfiledialogs.h">
+      <Filter>Engine\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\UITest\TestPlayerLoad.h">
+      <Filter>Game\UITesting</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\UITest\TestUILoad.h">
+      <Filter>Game\UITesting</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Engine\Assets\Icons\icon.ico">
+      <Filter>Resources</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Engine\Assets\Resources\Eril.rc">
+      <Filter>Resources</Filter>
+    </ResourceCompile>
+    <ClInclude Include="Game\Disco\DiscoPlayer.h">
+      <Filter>Game\Disco</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Disco\DiscoLightComponent.h">
+      <Filter>Game\Disco</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Disco\DiscoLightSystem.h">
+      <Filter>Game\Disco</Filter>
+    </ClInclude>
     <ClInclude Include="Game\ForestGame\ForestPlayer.h">
       <Filter>Game\ForestGame</Filter>
     </ClInclude>
     <ClInclude Include="Game\ForestGame\Ghost.h">
       <Filter>Game\ForestGame</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>

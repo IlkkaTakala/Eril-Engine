@@ -24,6 +24,8 @@ public:
 
 	void RegisterInputs();
 
+	Vector2D GetCursorDelta() { return cursorDelta; }
+
 private:
 	friend UIComponent;
 
@@ -39,6 +41,9 @@ private:
 	uint VBO;
 	uint TBO;
 	uint Screen;
+
+	Vector2D oldCursor;
+	Vector2D cursorDelta;
 
 	Shader* UIShader;
 	Shader* Combiner;

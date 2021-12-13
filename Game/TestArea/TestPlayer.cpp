@@ -61,12 +61,13 @@ TestPlayer::TestPlayer() : Player()
 	//Player Model
 	Mesh = SpawnObject<VisibleObject>();
 	Mesh->SetModel("Cube");
-	Mesh->GetModel()->SetAABB(AABB(Vector(-0.5f), Vector(0.5f)));
+	Mesh->GetModel()->SetAABB(AABB(Vector(-1.f), Vector(1.f)));
 	
+	SetLocation(Vector(0, 0, 2));
 
 	//Player Movement
 	Movement = SpawnObject<MovementComponent>();
-	Movement->SetTarget(dynamic_cast<Actor*>(this));
+	Movement->SetTarget(dynamic_cast<Actor*>(this), Mesh->GetModel()->GetAABB());
 	Movement->SetGravity(true);
 
 	//Skybox
@@ -76,10 +77,35 @@ TestPlayer::TestPlayer() : Player()
 	Sky->SetScale(Sky->GetScale() * 2.0f);
 
 	//Testing UI
-	auto ui = SpawnObject<TestUI>();
+	auto ui = UI::LoadFromFile("Game/TestArea/testingui2.ui");
 	UI::AddToScreen(ui, this);
 
 	pause = nullptr;
+
+
+		
+	Collider = SpawnObject<Actor>();
+
+	//Moment Model -> ColliderModel
+	ColliderModel = SpawnObject<VisibleObject>();
+	ColliderModel->SetModel("Cube");
+	ColliderModel->GetModel()->SetAABB(AABB(Vector(-0.5f), Vector(0.5f)));
+
+	Collider->AddComponent(ColliderModel);
+	Collider->SetLocation(Vector(20, 2, 1));
+	
+
+	ColliderModelMove = SpawnObject<MovementComponent>();
+	ColliderModelMove->SetTarget(Collider, ColliderModel->GetModel()->GetAABB());
+
+	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
+
+}
+
+void TestPlayer::TestTimer(float d)
+{
+	Console::Log("Location changed");
+	Collider->SetLocation(Vector(30, 0, 1), true);
 }
 
 
@@ -186,7 +212,7 @@ void TimeFunction (float d)
 void TestPlayer::Tick(float deltaTime)
 {
 	
-
+	Vector loc = Collider->GetLocation();
 	GetCamera()->SetLocation(Location + Vector(0.f, 0.f, 1.5f));
 	GetCamera()->SetRotation(Rotation);
 	Sky->SetLocation(Location);
@@ -208,8 +234,8 @@ void TestPlayer::BeginPlay()
 	IComponentArrayQuerySystem<AudioComponent>* audioComponentArraySystem = static_cast<IComponentArrayQuerySystem<AudioComponent>*> (systemsManager->GetSystemByName("AudioControllerSystem"));
 	AudioComponent* audio = audioComponentArraySystem->AddComponentToSystem();
 	
-	AudioControllerSystem* audioControllerSystem = static_cast<AudioControllerSystem*>(systemsManager->GetSystemByName("AudioControllerSystem"));
-	audioComponentID = audio->GetID();
+	//AudioControllerSystem* audioControllerSystem = static_cast<AudioControllerSystem*>(systemsManager->GetSystemByName("AudioControllerSystem"));
+	//audioComponentID = audio->GetID();
 
 	Vector audioPos = Vector(20.0f, 20.0f, terrain->GetHeight(20.0f, 20.0f) + 1.5f);
 	audio->SetSourceID(AudioManager::LoadAudio("clicketi.WAV"));
@@ -234,12 +260,11 @@ void TestPlayer::BeginPlay()
 		DirLight->Color = Vector(1.f);
 		DirLight->Rotation = Vector(0.5, 0.5, -0.5);
 
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < 50; i++)
 		{
 			//Console::Log("Light addded " + std::to_string(i));
 			float x = (float)(rand() % 100);
 			float y = (float)(rand() % 100);
-			y = 1;
 			//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
 
 			LightComponent* light = lightSystem->AddComponentToSystem();

@@ -1,6 +1,8 @@
 #pragma once
 #include <Core.h>
 
+class MovementComponent;
+
 class SceneComponent : public BaseObject
 {
 public:
@@ -10,9 +12,9 @@ public:
 	virtual void OnDestroyed() override;
 	virtual void LoadWithParameters(const String& args) override;
 
-	void SetLocation(const Vector& NewLocation);
-	void SetRotation(const Vector& NewRotation);
-	void SetScale(const Vector& NewScale);
+	void SetLocation(const Vector& NewLocation, bool force = false);
+	void SetRotation(const Vector& NewRotation, bool force = false);
+	void SetScale(const Vector& NewScale, bool force = false);
 	void AddLocation(const Vector& NewLocation) { SetLocation(NewLocation + Location); };
 	void AddRotation(const Vector& NewRotation) { SetRotation(NewRotation + Rotation); };
 	const Vector GetLocation() const { return Location; }
@@ -28,6 +30,7 @@ public:
 	void RemoveComponent(SceneComponent* obj);
 
 protected:
+	friend class MovementComponent;
 
 	SceneComponent* Parent;
 	std::list<RefWeak<SceneComponent>> Children;
@@ -35,5 +38,8 @@ protected:
 	Vector Location;
 	Vector Rotation;
 	Vector Scale;
+
+	bool transformForce;
+	Transformation desired;
 };
 

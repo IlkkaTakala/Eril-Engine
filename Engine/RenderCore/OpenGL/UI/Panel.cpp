@@ -40,6 +40,28 @@ Panel* Panel::AddChild(UIComponent* child)
 	return this;
 }
 
+void Panel::RemoveChildren()
+{
+	for (const auto& c : children) {
+		delete c.second;
+	}
+	children.clear();
+}
+
+int Panel::GetChildIndex(UIComponent* child)
+{
+	auto findResult = std::find_if(std::begin(children), std::end(children), [child](const std::pair<int, UIComponent*>& pair)
+		{
+			return pair.second == child;
+		});
+
+	if (findResult != children.end())
+	{
+		return (int)std::distance(children.begin(), findResult);
+	} else
+		return -1;
+}
+
 void Panel::Render()
 {
 	if (visible != Visibility::Visible) return;
@@ -81,4 +103,30 @@ void Panel::HoverCheck(Vector2D& point)
 		it->second->HoverCheck(point);
 	}
 	UIComponent::HoverCheck(point);
+}
+
+std::vector<UIComponent*> Panel::GetChildren()
+{
+	std::vector<UIComponent*> ret;
+	for (auto it = children.begin(); it != children.end(); ++it) {
+		ret.push_back(it->second);
+	}
+	return ret;
+}
+
+String Panel::GetString() const
+{
+	String data("<Panel ");
+	data += UIComponent::GetString();
+	if (children.size() > 0) {
+		data += ">\n";
+		for (const auto& c : children) {
+			data += '\t' + c.second->GetString();
+		}
+		data += "</Panel>\n";
+	}
+	else {
+		data += " />\n";
+	}
+	return data;
 }

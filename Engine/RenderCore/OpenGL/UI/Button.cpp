@@ -44,8 +44,6 @@ Button::Button()
 	glBindBuffer(GL_UNIFORM_BUFFER, pressBuffer);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(UIStyleGLM), &p, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-	Console::Log("Button here");
 }
 
 Button::~Button()
@@ -170,9 +168,97 @@ Button* Button::AddChild(UIComponent* c)
 {
 	child = c;
 	Text* t = dynamic_cast<Text*>(child);
-	if (t != nullptr) t->SetJustification(Justify::Centre);
+	if (t != nullptr && t->GetJustification() == Justify::Unset) t->SetJustification(Justify::Centre);
 	child->SetParent(this);
 	float depth = realDepth + 0.1f;
 	child->UpdateDepth(depth);
 	return this;
+}
+
+void Button::LoadWithParameters(const std::map<String, String>& args)
+{
+	UIComponent::LoadWithParameters(args);
+
+	if (args.find("NormalStyle") != args.end()) {
+		std::vector<String> dats = split(args.at("NormalStyle"), ',');
+
+		UIStyle s;
+
+		switch (dats.size())
+		{
+		default:
+		case 8: s.Tint.Z = (float)atof(dats[7].c_str());
+		case 7: s.Tint.Y = (float)atof(dats[6].c_str());
+		case 6: s.Tint.X = (float)atof(dats[5].c_str());
+		case 5: s.texture = RI->LoadTextureByName(dats[4]);
+		case 4: s.Opacity = (float)atof(dats[3].c_str());
+		case 3: s.Color.Z = (float)atof(dats[2].c_str());
+		case 2: s.Color.Y = (float)atof(dats[1].c_str());
+		case 1: s.Color.X = (float)atof(dats[0].c_str());
+		case 0: break;
+		}
+
+		SetStyle(s);
+	}
+	if (args.find("HoverStyle") != args.end()) {
+		std::vector<String> dats = split(args.at("HoverStyle"), ',');
+
+		UIStyle s;
+
+		switch (dats.size())
+		{
+		default:
+		case 8: s.Tint.Z = (float)atof(dats[7].c_str());
+		case 7: s.Tint.Y = (float)atof(dats[6].c_str());
+		case 6: s.Tint.X = (float)atof(dats[5].c_str());
+		case 5: s.texture = RI->LoadTextureByName(dats[4]);
+		case 4: s.Opacity = (float)atof(dats[3].c_str());
+		case 3: s.Color.Z = (float)atof(dats[2].c_str());
+		case 2: s.Color.Y = (float)atof(dats[1].c_str());
+		case 1: s.Color.X = (float)atof(dats[0].c_str());
+		case 0: break;
+		}
+
+		SetHoverStyle(s);
+	}
+	if (args.find("PressStyle") != args.end()) {
+		std::vector<String> dats = split(args.at("PressStyle"), ',');
+
+		UIStyle s;
+
+		switch (dats.size())
+		{
+		default:
+		case 8: s.Tint.Z = (float)atof(dats[7].c_str());
+		case 7: s.Tint.Y = (float)atof(dats[6].c_str());
+		case 6: s.Tint.X = (float)atof(dats[5].c_str());
+		case 5: s.texture = RI->LoadTextureByName(dats[4]);
+		case 4: s.Opacity = (float)atof(dats[3].c_str());
+		case 3: s.Color.Z = (float)atof(dats[2].c_str());
+		case 2: s.Color.Y = (float)atof(dats[1].c_str());
+		case 1: s.Color.X = (float)atof(dats[0].c_str());
+		case 0: break;
+		}
+
+		SetPressStyle(s);
+	}
+}
+
+String Button::GetString() const
+{
+	String data("<Button ");
+	data += UIComponent::GetString();
+	data += " NormalStyle=\"" + style.Color.ToString() + ',' + std::to_string(style.Opacity) + ',' + (style.texture ? style.texture->GetName() : " ") + ',' + style.Tint.ToString() + '"';
+	data += " HoverStyle=\"" + hovered.Color.ToString() + ',' + std::to_string(hovered.Opacity) + ',' + (hovered.texture ? hovered.texture->GetName() : " ") + ',' + hovered.Tint.ToString() + '"';
+	data += " PressStyle=\"" + pressed.Color.ToString() + ',' + std::to_string(pressed.Opacity) + ',' + (pressed.texture ? pressed.texture->GetName() : " ") + ',' + pressed.Tint.ToString() + '"';
+	if (child) {
+		data += " >\n";
+		data += '\t' + child->GetString();
+		data += "</Button>\n";
+	}
+	else {
+		data += " />\n";
+	}
+
+	return data;
 }

@@ -1,0 +1,8 @@
+[Shader]
+name=shader_001
+[Textures]
+Albedo=Assets/Textures/ornaMetal/floor_albedo.png
+Normal=Assets/Textures/ornaMetal/floor_normal.png
+Roughness=Assets/Textures/ornaMetal/floor_roughness.png
+AO=Assets/Textures/ornaMetal/floor_ao.png
+Metallic=Assets/Textures/ornaMetal/floor_metallic.png
