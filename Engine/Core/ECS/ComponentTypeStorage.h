@@ -19,6 +19,7 @@ public:
 
 	int GetType() { return Type; }
 	int GetComponentCount() { return ComponentCount; }
+	virtual void Reset() = 0;
 
 protected:
 	int Type;
@@ -90,7 +91,7 @@ public:
 	/// <returns>Component of given ID, nullptr if the component of that ID was not found or if the component was disabled.</returns>
 	T* GetComponent(int id)
 	{
-		if (id < static_cast<int>(IndexUsage->size()))
+		if (id < static_cast<int>(Components->size()))
 		{
 			if (IndexUsage->at(id))
 			{
@@ -130,6 +131,13 @@ public:
 	std::vector<T, std::allocator<T>>* GetComponentVector()
 	{
 		return Components;
+	}
+
+	void Reset()
+	{
+		Components->clear();
+		IndexUsage->clear();
+		ComponentCount = 0;
 	}
 	
 private:

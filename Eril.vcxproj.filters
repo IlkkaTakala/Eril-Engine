@@ -124,9 +124,6 @@
     <ClCompile Include="Engine\Interface\IRender.cpp">
       <Filter>Engine\Interface</Filter>
     </ClCompile>
-    <ClCompile Include="Game\EngineInterface.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Core\LightData.cpp">
       <Filter>Engine\Deprecated</Filter>
     </ClCompile>
@@ -177,6 +174,27 @@
     </ClCompile>
     <ClCompile Include="Game\UITest\TestPlayerLoad.cpp" />
     <ClCompile Include="Game\UITest\TestUILoad.cpp" />
+    <ClCompile Include="Game\Disco\DiscoPlayer.cpp">
+      <Filter>Game\Disco</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\ForestGame\ForestPlayer.cpp">
+      <Filter>Game\ForestGame</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\ForestGame\Ghost.cpp">
+      <Filter>Game\ForestGame</Filter>
+	</ClCompile>
+    <ClCompile Include="Engine\Interface\AudioManager.cpp">
+      <Filter>Engine\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\EngineInterface.cpp">
+      <Filter>Engine\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Physics\BulletPhysics.cpp">
+      <Filter>Engine\Objects\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Objects\ColliderComponent.cpp">
+      <Filter>Engine\Objects\Physics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -199,6 +217,9 @@
     </Filter>
     <Filter Include="Engine\OpenGL">
       <UniqueIdentifier>{1a8dd4f1-9c5c-40d8-8a15-89a92e8920dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Objects\Physics">
+      <UniqueIdentifier>{7347c632-ba99-4fda-95d5-697116727367}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\ECS">
       <UniqueIdentifier>{ee669dbc-1437-4613-b8e8-9420e11f382e}</UniqueIdentifier>
@@ -238,6 +259,12 @@
     </Filter>
     <Filter Include="Resources">
       <UniqueIdentifier>{27cfd01c-53e4-4436-b300-9133214a1517}</UniqueIdentifier>
+	</Filter>
+    <Filter Include="Game\Disco">
+      <UniqueIdentifier>{c1638df8-5fae-4cd8-9d38-56e874a765f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\ForestGame">
+      <UniqueIdentifier>{734f2662-5704-48ce-8f67-7c7c45fe62c9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -316,6 +343,15 @@
     <ClInclude Include="Engine\external\glfw\deps\glad\gl.h">
       <Filter>Engine\OpenGL</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Core\Physics\BulletObject.h">
+      <Filter>Engine\Objects\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Physics\BulletPhysics.h">
+      <Filter>Engine\Objects\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Objects\ColliderComponent.h">
+      <Filter>Engine\Objects\Physics</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\Core\ECS\ComponentManager.h">
       <Filter>Engine\ECS</Filter>
     </ClInclude>
@@ -333,9 +369,6 @@
     </ClInclude>
     <ClInclude Include="Engine\Core\ECS\System.h">
       <Filter>Engine\ECS</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Core\ECS\Components\LightComponent.h">
-      <Filter>Engine\ECS\Components</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\ECS\Systems\LightControllerSystem.h">
       <Filter>Engine\ECS\Systems</Filter>
@@ -397,6 +430,18 @@
     <ClInclude Include="Game\EngineInterface.h">
       <Filter>Engine\Interface</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Interface\AudioManager.h">
+      <Filter>Engine\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\ECS\Components\AudioComponent.h">
+      <Filter>Engine\ECS\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\ECS\Components\LightComponent.h">
+      <Filter>Engine\ECS\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\ECS\Systems\AudioControllerSystem.h">
+      <Filter>Engine\ECS\Systems</Filter>
+    </ClInclude>
     <ClInclude Include="Game\TestArea\FPSCounter.h">
       <Filter>Game\TestArea</Filter>
     </ClInclude>
@@ -454,5 +499,26 @@
     <ResourceCompile Include="Engine\Assets\Resources\Eril.rc">
       <Filter>Resources</Filter>
     </ResourceCompile>
+    <ClInclude Include="Game\Disco\DiscoPlayer.h">
+      <Filter>Game\Disco</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Disco\DiscoLightComponent.h">
+      <Filter>Game\Disco</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Disco\DiscoLightSystem.h">
+      <Filter>Game\Disco</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\ForestGame\ForestPlayer.h">
+      <Filter>Game\ForestGame</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\ForestGame\Ghost.h">
+      <Filter>Game\ForestGame</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>

@@ -171,6 +171,8 @@ public:
 		}
 		return false;
 	}
+
+	void ClearEntities();
 	
 private:
 

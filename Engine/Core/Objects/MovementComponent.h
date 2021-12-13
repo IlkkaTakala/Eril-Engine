@@ -1,6 +1,7 @@
 #pragma once
 #include <Core.h>
 #include <Objects/Actor.h>
+#include <Physics/BulletObject.h>
 
 class Terrain;
 
@@ -33,10 +34,11 @@ public:
 	virtual void BeginPlay() override {}
 	virtual void Tick(float) override;
 
-	void SetTarget(SceneComponent* t);
+	void SetTarget(SceneComponent* t, const AABB bound = AABB(1.0f, 1.0f));
 	void SetGround(Terrain* t);
 	SceneComponent* GetTarget() const { return Object; }
 	void SetMass(float m) { mass = m; }
+	void SetBrake(float b) { brake = b; }
 	void SetMaxSpeed(float speed) { max_speed = speed; }
 	void SetPhysics(bool p) { isPhysics = p; }
 	void SetGravity(bool g) { isGravity = g; }
@@ -53,7 +55,6 @@ public:
 	State OldState;
 
 private:
-
 	Ref<SceneComponent> Object;
 	RefWeak<Terrain> Terra;
 
@@ -73,5 +74,7 @@ private:
 	Vector directions[16];
 	int direction_count;
 	int force_count;
+
+	bulletObject* rigid;
 };
 

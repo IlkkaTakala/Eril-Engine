@@ -32,7 +32,7 @@ void Hunter::Tick(float delta)
 
 
 	Vector player = GetGameState()->CurrentPlayer->GetLocation();
-	
+
 	if (!caught) {
 		if ((targetLoc - Location).Length() < 1.f) SetNewTarget(0.f);
 		move->AddInput(targetLoc - Location);

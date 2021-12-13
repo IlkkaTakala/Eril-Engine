@@ -19,7 +19,7 @@ class TestPlayer : public Player
 	REGISTER(TestPlayer);
 public:
 	TestPlayer();
-	virtual ~TestPlayer() { /*INI->SetValue("Player", "Start", CameraPoint.ToString()); INI->SetValue("Player", "Direction", CameraDirection.ToString());*/ }
+	virtual ~TestPlayer() { }
 	virtual void Tick(float Delta) override;
 	virtual void BeginPlay() override;
 	virtual void OnDestroyed() override;
@@ -53,18 +53,20 @@ private:
 	bool cursorState;
 	bool InputMode;
 	Ref<Light> DirLight;
-	Ref<Light> Lights[100];
-	Ref<InstancedObject> Trees;
-	Ref<InstancedObject> Trees2;
-	Ref<InstancedObject> Grass;
-	Ref<InstancedObject> Flowers;
 	Ref<VisibleObject> Sky;
-	Ref<Terrain> terra[4];
-	Ref<Hunter> hunt;
+	Ref<Actor> Collider;
+	Ref<MovementComponent> ColliderModelMove;
+	Ref<VisibleObject> ColliderModel;
+
+
 	PauseUI* pause;
 
 	//ECS TEST
 	Ref<ECSExample> ecsExample;
 
+	int audioComponentID;
+
 	int spawnCounter;
+
+	void TestTimer(float d);
 };

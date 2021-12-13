@@ -65,6 +65,14 @@ public:
 		return nullptr;
 	}
 
+	void ResetStorages()
+	{
+		for (auto s : componentStorages)
+		{
+			s->Reset();
+		}
+	}
+
 protected:
 
 	/// <summary>
@@ -134,6 +142,7 @@ protected:
 		return false;
 	}
 
+	
 	
 
 private:

@@ -1,6 +1,7 @@
 #include "Physics.h"
 #include <Objects/Terrain.h>
 #include "Objects/MovementComponent.h"
+#include <Physics/BulletPhysics.h>
 
 MovementComponent::MovementComponent()
 {
@@ -17,6 +18,7 @@ MovementComponent::MovementComponent()
 	brake = 2000.f;
 	air_control = 0.05f;
 	Physics::AddMovable(this);
+	rigid = nullptr;
 }
 
 void MovementComponent::LoadWithParameters(const String& args)
@@ -39,6 +41,10 @@ void MovementComponent::Tick(float time)
 {
 	if (!allowMovement || Object == nullptr) return;
 	DesiredState.location = Object->GetLocation();
+	btVector3 colliderloc;
+	colliderloc.setValue(DesiredState.location.X, DesiredState.location.Z, DesiredState.location.Y);
+	rigid->body->getWorldTransform().setOrigin(colliderloc);
+
 	OldState = DesiredState;
 	if (Object == nullptr) return;
 	switch (isPhysics)
@@ -47,14 +53,40 @@ void MovementComponent::Tick(float time)
 	{
 		const Vector gravity(0.f, 0.f, -9.8f);
 		Vector delta;
+		Vector delta_a;
+		Vector velocity;
+		Vector brake_a;
 
-		if (isGravity) DesiredState.acceleration += gravity * time;
-		DesiredState.velocity += DesiredState.acceleration * time;
-		delta = DesiredState.velocity * time;
-		Object->AddLocation(delta);
+		if (isGravity) {
+			DesiredState.acceleration += gravity;
+			velocity += DesiredState.acceleration;
+			//velocity += gravity;
+		}
+		
+		for (int i = 0; i < force_count; i++) {
+			delta_a += forces[i].Direction;
+		}
+
+		velocity = OldState.velocity + delta_a * time + brake_a;
+
+		//float drag = velocity.LengthSquared() * (0.5f / max_speed);
+
+		//velocity -= velocity.Normalize() * drag;
+
+		//if (velocity.LengthSquared() > max_speed * max_speed) velocity = velocity.Normalize() * max_speed;
+
+		//if (velocity.LengthSquared() < 0.01f) velocity = 0.f;
+
+		DesiredState.location = Object->GetLocation() + velocity;
+		if (!inAir && Terra != nullptr) {
+			velocity.Z = 0.f;
+			DesiredState.location.Z = Terra->GetHeight(DesiredState.location.X, DesiredState.location.Y);
+		}
+		DesiredState.velocity = velocity;
+
 	}
 	break;
-
+	
 	case false:
 	{
 		Vector delta_a;
@@ -72,7 +104,7 @@ void MovementComponent::Tick(float time)
 			brake_a = brake_a.LengthSquared() > DesiredState.velocity.LengthSquared() ? -DesiredState.velocity : brake_a;
 		}
 		for (int i = 0; i < force_count; i++) {
-			//delta_a += forces[i].Direction;
+			delta_a += forces[i].Direction;
 		}
 
 		velocity = OldState.velocity + delta_a * time + brake_a;
@@ -92,6 +124,7 @@ void MovementComponent::Tick(float time)
 		}
 
 		DesiredState.velocity = velocity;
+		rigid->body->setLinearVelocity(btVector3(velocity.X, velocity.Z, velocity.Y));
 	}
 	break;
 	}
@@ -100,9 +133,13 @@ void MovementComponent::Tick(float time)
 
 }
 
-void MovementComponent::SetTarget(SceneComponent* t)
+
+void MovementComponent::SetTarget(SceneComponent* t, const AABB bound)
 {
 	Object = t;
+	rigid = Physics::MakeRigidBoby(bound, t->GetLocation());
+	//OldState.location = t->GetLocation();
+	//DesiredState.location = t->GetLocation();
 	//Physics::RemoveStatic(t);
 }
 
@@ -114,7 +151,15 @@ void MovementComponent::SetGround(Terrain* t)
 void MovementComponent::ApplyMovement()
 {
 	if (!allowMovement || Object == nullptr) return;
-	Object->SetLocation(DesiredState.location);
+
+	if (Object->transformForce) {
+		Object->Location = Object->desired.Location;
+		Object->transformForce = false;
+	}
+	else {
+		auto l = rigid->body->getWorldTransform().getOrigin();
+		Object->Location = Vector(l[0], l[2], l[1]);
+	}
 }
 
 void MovementComponent::AddInput(const Vector& dir)

@@ -4,3 +4,4 @@ build/
 *.mtl
 __pycache__
 *.aps
+build

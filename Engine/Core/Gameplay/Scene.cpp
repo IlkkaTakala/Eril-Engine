@@ -6,6 +6,7 @@
 #include <Gameplay/GameState.h>
 #include "RenderCore/OpenGL/UI/UISpace.h"
 #include <Interface/WindowManager.h>
+#include <Interface/IECS.h>
 
 String Scene::newLevel = "";
 
@@ -89,6 +90,9 @@ void Scene::LoadLevel()
 		ObjectManager::CleanObjects();
 		II->ClearInputs();
 	}
+
+	IECS::ResetECSWorld();
+
 	using namespace rapidxml;
 
 	ObjectManager::PrepareRecord(1, Constants::Record::LOADED);
