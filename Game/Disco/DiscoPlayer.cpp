@@ -205,37 +205,37 @@ void DiscoPlayer::ClampLocation()
 	//Y: -45, 45
 	//Z: 0, 32
 
-	if (Location.X < -23)
+	if (Location.X < -23.f)
 	{
 		Location.X = -23;
 		Vector dir(1.0, 0.0, 0.0);
 		Movement->AddInput(dir.Normalize());
 	}
-	if (Location.X > 23)
+	if (Location.X > 23.f)
 	{
 		Location.X = 23;
 		Vector dir(-1.0, 0.0, 0.0);
 		Movement->AddInput(dir.Normalize());
 	}
-	if (Location.Y < -44)
+	if (Location.Y < -44.f)
 	{
 		Location.Y = -44;
 		Vector dir(0.0, 1.0, 0.0);
 		Movement->AddInput(dir.Normalize());
 	}
-	if (Location.Y > 44)
+	if (Location.Y > 44.f)
 	{
 		Location.Y = 44;
 		Vector dir(0.0, -1.0, 0.0);
 		Movement->AddInput(dir.Normalize());
 	}
-	if (Location.Z < 1)
+	if (Location.Z <= 0.f)
 	{
-		Location.Z = 1;
+		Location.Z = 0.f;
 		Vector dir(0.0, 0.0, 1.0);
-		Movement->AddInput(dir.Normalize());
+		//Movement->AddInput(dir.Normalize());
 	}
-	if (Location.Z > 31)
+	if (Location.Z > 31.f)
 	{
 		Location.Z = 31;
 		Vector dir(0.0, 0.0, -1.0);
@@ -334,8 +334,8 @@ void DiscoPlayer::BeginPlay()
 			LightComponent* light = lightSystem->AddComponentToSystem();
 			light->Location = loc;
 			light->LightType = LIGHT_POINT;
-			light->Size = 10.f;
-			light->Intensity = rand() / (float)RAND_MAX * 20.f + 10.0f;
+			light->Size = 5.f;
+			light->Intensity = rand() / (float)RAND_MAX * 10.f + 10.0f;
 			light->Color = Vector(r, g, b);
 			//lightSystem->GetComponentVector()->at(i).Color = 
 
@@ -380,10 +380,10 @@ void DiscoPlayer::BeginPlay()
 
 	audioComponent = audiosystem->AddComponentToSystem();
 	audioPos = Vector(0.0f, -35.0f, 4.0f);
-	audioComponent->SetSourceID(AudioManager::LoadAudio("clicketi.WAV"));
+	audioComponent->SetSourceID(AudioManager::LoadAudio("MonkeyWarhol.wav"));
 	audioComponent->SetPosition(audioPos);
-	audioComponent->SetGain(1.0f);
-	audioComponent->SetPitch(1.5f);
+	audioComponent->SetGain(2.f);
+	audioComponent->SetPitch(1.0f);
 	audioComponent->SetLooping(true);
 	audioComponent->SetSourceRelative(false);
 	audioComponent->Play();

@@ -59,7 +59,7 @@ vec3 WorldPosFromDepth(float depth) {
 }
 
 const float gamma = 2.2;
-const float exposure = 1.0;
+const float exposure = 0.6;
 const float b = 0.1; // Density
 const float a = 1.1; //Scatter
 

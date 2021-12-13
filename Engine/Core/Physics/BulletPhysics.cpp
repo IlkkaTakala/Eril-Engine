@@ -96,7 +96,7 @@ void Physics::init()
     broadphase = new btDbvtBroadphase();
     solver = new btSequentialImpulseConstraintSolver();
     world = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfig);
-    world->setGravity(btVector3(0, -10, 0));
+    world->setGravity(btVector3(0, 0, 0));
 
     btTransform t;
     t.setIdentity();
@@ -126,4 +126,12 @@ btDynamicsWorld* Physics::GetWorld()
 bulletObject* Physics::MakeRigidBoby(AABB box, Vector pos)
 {
     return new bulletObject(Physics::addBox(box.maxs.X - box.mins.X, box.maxs.Z - box.mins.Z, box.maxs.Y - box.mins.Y, pos.X, pos.Y, pos.Z, 10));
+}
+
+bool Physics::callbackFunc(btManifoldPoint& cp, const btCollisionObject* obj1, int id1, int index1, const btCollisionObject* obj2, int id2, int index2)
+{
+    ((bulletObject*)obj1->getUserPointer())->hit = true;
+
+    ((bulletObject*)obj2->getUserPointer())->hit = true;
+    return false;
 }

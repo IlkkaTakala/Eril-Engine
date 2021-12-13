@@ -1210,7 +1210,7 @@ void Renderer::Render(float delta)
 
 	//EnvCube(width, height);
 
-	BlurRender->Blur(PostProcess->GetBloom(), 4, ScreenVao);
+	BlurRender->Blur(PostProcess->GetBloom(), 10, ScreenVao);
 	PostProcess->BindTextures();
 
 	ActiveCamera->GetPostProcess()->Bind();
