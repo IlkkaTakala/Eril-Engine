@@ -21,7 +21,7 @@ Ghost::Ghost() : Actor()
 	move->SetTarget(this);
 	move->SetGravity(true);
 	move->SetGround(ObjectManager::GetByRecord<Terrain>(0xA0001111));
-	move->SetMaxSpeed(5.f);
+	move->SetMaxSpeed(6.f);
 	caught = false;
 	
 	time = 0.f;
@@ -36,7 +36,6 @@ void Ghost::Tick(float delta)
 	Mesh->GetModel()->GetMaterial(0)->SetParameter("velocity", move->DesiredState.velocity);
 
 	Vector playerLoc = GetGameState()->CurrentPlayer->GetLocation();
-
 
 	if (!caught) {
 
@@ -67,7 +66,6 @@ void Ghost::startMoving()
 
 void Ghost::SetNewTarget(float delta)
 {
-	Console::Log("New target set");
 	if (GetGameState()->CurrentPlayer != nullptr)
 		targetLoc = GetGameState()->CurrentPlayer->GetLocation();
 }

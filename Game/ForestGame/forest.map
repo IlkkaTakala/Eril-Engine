@@ -1,5 +1,5 @@
 <header version='1.0' />
-<ForestPlayer id="4" />
+<ForestPlayer id="4" args= "Location:0,0,0; Rotation:45,0,0;"/>
 <Terrain id="A0001111" args="Scale:100,100,1; Material:Assets/Materials/ground; Resolution:100;" />
 <Terrain id="A0001121" args="Scale:100,100,1; Location:-100,-100,0; Material:Assets/Materials/ground; Resolution:100;" />
 <Terrain id="A0001122" args="Scale:100,100,1; Location: 0,-100,0; Material:Assets/Materials/ground; Resolution:100;" />
@@ -281,4 +281,4 @@ Mesh:shack; Material1:Assets/Materials/roof; Material2:Assets/Materials/wall;" /
 <VisibleObject id="C4" args="Location:-6.736106,23.464224,0.543961;   Rotation:0,0,0; Scale:0.3,0.3,0.3; Mesh:candyCane; Material1:Assets/Materials/candy;" />
 <VisibleObject id="C5" args="Location:-57.845665,26.067411,2.084421;  Rotation:0,0,0; Scale:0.3,0.3,0.3; Mesh:candyCane; Material1:Assets/Materials/candy;" />
 
-<Ghost id="10" args= "Location:20,0,1;" />
+<Ghost id="10" args= "Location:-30,-30,1; Rotation: 180,180,30;" />

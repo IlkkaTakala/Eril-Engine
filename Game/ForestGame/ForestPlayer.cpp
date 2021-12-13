@@ -151,32 +151,19 @@ void ForestPlayer::LeftMouseDown(bool KeyDown)
 
 void ForestPlayer::RightMouseDown(bool KeyDown)
 {
-	//if (KeyDown == true)
-	//Console::Log((GetCamera()->GetLocation() + Vector(0.f, 0.f, -2.2f)).ToString());
+	if (KeyDown == true)
+	Console::Log((GetCamera()->GetLocation() + Vector(0.f, 0.f, -2.2f)).ToString());
 }
 
 void ForestPlayer::InputQ(bool KeyDown)
 {
-	start->UI::RemoveFromScreen();
-	WindowManager::SetShowCursor(0, false);
-	cursorState = true;
-	Movement->SetAllowMovement(true);
-	ObjectManager::GetByRecord<Ghost>(0x10)->startMoving();
-
-	/*if (!KeyDown)
-	{
-		if (Items.size() > 0) {
-			auto it = SpawnObject<PlaceableItem>();
-			it->SetLocation(GetLocation() + Vector(0.f, 0.f, 1.5f));
-			it->SetScale(0.2f);
-			it->Move->SetPhysics(true);
-			it->Move->SetMaxSpeed(10.0f);
-			it->Move->AddImpulse(-GetCamera()->GetForwardVector() * 10.f);
-			Items[0]->DestroyObject();
-			Items.erase(Items.begin());
-		}
-		Console::Log("Items: " + std::to_string(Items.size()));
-	}*/
+	if (start != nullptr && end == nullptr) {
+		start->UI::RemoveFromScreen();
+		WindowManager::SetShowCursor(0, false);
+		cursorState = true;
+		Movement->SetAllowMovement(true);
+		ObjectManager::GetByRecord<Ghost>(0x10)->startMoving();
+	}
 }
 
 void ForestPlayer::ItemPickE(bool KeyDown)
