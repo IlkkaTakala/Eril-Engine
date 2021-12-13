@@ -3,6 +3,11 @@
 #include "Texture.h"
 #include <UI/Text.h>
 
+struct UIMatrix
+{
+	glm::mat4 model_m;
+};
+
 struct UIStyleGLM
 {
 	glm::vec4 color;
@@ -26,19 +31,19 @@ Button::Button()
 
 	glDeleteBuffers(1, &uniformBuffer);
 
-	normal = UIStyle(Vector(1.f));
+	normal = UIStyle(Vector(1.f), 1.f, RI->LoadTextureByName("Assets/Textures/button.png"));
 	UIStyleGLM n(style);
 	glGenBuffers(1, &normalBuffer);
 	glBindBuffer(GL_UNIFORM_BUFFER, normalBuffer);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(UIStyleGLM), &n, GL_DYNAMIC_DRAW);
 
-	hovered = UIStyle(Vector(0.8f));
+	hovered = UIStyle(Vector(0.8f), 1.f, RI->LoadTextureByName("Assets/Textures/button.png"));
 	UIStyleGLM h(hovered);
 	glGenBuffers(1, &hoverBuffer);
 	glBindBuffer(GL_UNIFORM_BUFFER, hoverBuffer);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(UIStyleGLM), &h, GL_DYNAMIC_DRAW);
 
-	pressed = UIStyle(Vector(0.5f));
+	pressed = UIStyle(Vector(0.8f), 1.f, RI->LoadTextureByName("Assets/Textures/buttonPressed.png"));
 	UIStyleGLM p(pressed);
 	glGenBuffers(1, &pressBuffer);
 	glBindBuffer(GL_UNIFORM_BUFFER, pressBuffer);
@@ -117,19 +122,33 @@ void Button::OnMouseUp()
 
 void Button::Render()
 {
+	UIStyle* current = nullptr;
 	switch (state)
 	{
-	case ButtonState::Neutral: uniformBuffer = normalBuffer;
+	case ButtonState::Neutral: uniformBuffer = normalBuffer; current = &normal;
 		break;
-	case ButtonState::Hovered: uniformBuffer = hoverBuffer;
+	case ButtonState::Hovered: uniformBuffer = hoverBuffer; current = &hovered;
 		break;
-	case ButtonState::Pressed: uniformBuffer = pressBuffer;
+	case ButtonState::Pressed: uniformBuffer = pressBuffer; current = &pressed;
 		break;
 	default:
 		break;
 	}
 
-	Image::Render();
+	if (visible != Visibility::Visible) return;
+	glBindBufferBase(GL_UNIFORM_BUFFER, 1, uniformBuffer);
+	if (current->texture == nullptr) {
+		solid_shader->Bind();
+		solid_shader->SetUniform("model", matrix->model_m);
+	}
+	else {
+		texture_shader->Bind();
+		texture_shader->SetUniform("model", matrix->model_m);
+		texture_shader->SetUniform("tex", 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, current->texture->GetTextureID());
+	}
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 	if (child != nullptr) child->Render();
 }
