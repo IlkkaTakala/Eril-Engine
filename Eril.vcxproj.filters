@@ -243,9 +243,6 @@
     <Filter Include="Game\ForestGame">
       <UniqueIdentifier>{734f2662-5704-48ce-8f67-7c7c45fe62c9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\ForestGame\Controls">
-      <UniqueIdentifier>{34564567-3c84-44b1-92d1-8196774e156b}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Core\Objects\Actor.h">
