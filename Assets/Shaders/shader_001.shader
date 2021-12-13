@@ -422,6 +422,6 @@ void main()
 	const float exposure = 1.0;
 	
 	ColorBuffer = color;
-	BloomBuffer = clamp(color - exposure, 0.0, 100.0);
+	BloomBuffer = clamp(color - exposure, 0.0, 2.0);
 }
 ###END_FRAGMENT###
