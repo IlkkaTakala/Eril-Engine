@@ -36,9 +36,8 @@ void MenuUI::Construct()
 				)
 			->SetTransform(0.f, 0.f, 0.f, 0.f, Vector(0.f, 1.f, 0.f), Vector(0.f, 0.25f, 0.f))
 		)->AddChild(
-			Create<Text>()->SetText("Eril", 150)->SetTransform(0.f, 0.f, 0.f, -300.f, Vector(0.5f, 0.4f, 0.f), Vector(0.4f, 1.f, 0.f))
-		)->AddChild(
-			Create<Text>()->SetText("Project", 170)->SetTransform(0.f, 0.f, 0.f, -300.f, Vector(0.25f, 0.0f, 0.f), Vector(0.4f, 1.f, 0.f))
+			Create<Image>()->SetStyle(UIStyle(Vector(1.f), 1.f, RI->LoadTextureByName("Assets/Textures/TextLogo.png")))
+			->SetTransform(0.f, 750.f, 0.f, 512.f, Vector(0.f), Vector(0.3f))
 		)->AddChild(
 			Create<Text>()->SetText("v0.2.1 demo", 16)->SetJustification(Justify::Right)->SetStyle(Vector(0.5f))->SetTransform(0.f, 0.f, 5.f, 100.f, Vector(0.f, 0.f, 0.f), Vector(1.f, 1.f, 0.f))
 		)
