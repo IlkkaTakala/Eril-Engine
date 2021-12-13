@@ -4,6 +4,12 @@
 #include <glm/gtx/quaternion.hpp>
 #include "UISpace.h"
 
+#include <UI/Panel.h>
+#include <UI/Text.h>
+#include <UI/TextBox.h>
+#include <UI/Button.h>
+#include <UI/VerticalPanel.h>
+
 struct UIMatrix
 {
 	glm::mat4 model_m;
@@ -26,17 +32,14 @@ UIComponent::UIComponent()
 	z_index = 0;
 	realDepth = 0.f;
 	desiredSize = Vector2D();
-
-	basecolor = Vector(1.f);
-	tint = Vector(1.f);
-	opacity = 1.f;
+	bounds = Vector2D();
 
 	focusable = false;
 	hasFocus = false;
 	hovered = false;
 
 	parent = nullptr;
-	space = nullptr;
+	space = RI->GetUIManager();
 
 	redraw = true;
 	recalculate = true;
@@ -67,23 +70,24 @@ void UIComponent::UpdateMatrices(const Vector2D& size)
 
 	glm::vec3 gloc = parent == nullptr ? glm::vec3(0.f) : glm::vec3(parent->topLeft.X, parent->topLeft.Y, 0.f);
 	glm::vec3 scale(1.f);
-	glm::vec2 bounds = glm::vec2(size.X, size.Y);
+	glm::vec2 bound = size.X == 0 ? glm::vec2(bounds.X, bounds.Y) : glm::vec2(size.X, size.Y);
+	this->bounds = Vector2D(bound.x, bound.y);
 
 	if (anchor_v.Y <= anchor_v.X) {
 		scale.y = bottomOffset;
-		gloc.y += bounds.y * anchor_v.X + topOffset - (bottomOffset * origin.Y);
+		gloc.y += bound.y * anchor_v.X + topOffset - (bottomOffset * origin.Y);
 	}
 	else {
-		gloc.y += anchor_v.X * bounds.y + topOffset;
-		scale.y = (anchor_v.Y * bounds.y - bottomOffset);
+		gloc.y += anchor_v.X * bound.y + topOffset;
+		scale.y = (anchor_v.Y * bound.y - bottomOffset - topOffset);
 	}
 	if (anchor_h.Y <= anchor_h.X) {
 		scale.x = rightOffset;
-		gloc.x += bounds.x * anchor_h.X + leftOffset - (rightOffset * origin.X);
+		gloc.x += bound.x * anchor_h.X + leftOffset - (rightOffset * origin.X);
 	}
 	else {
-		gloc.x += anchor_h.X * bounds.x + leftOffset;
-		scale.x = (anchor_h.Y * bounds.x - rightOffset);
+		gloc.x += anchor_h.X * bound.x + leftOffset;
+		scale.x = (anchor_h.Y * bound.x - rightOffset - leftOffset);
 	}
 
 	glm::mat4 model = glm::translate(glm::mat4(1.f), gloc) * glm::scale(glm::mat4(1.f), scale);
@@ -108,6 +112,13 @@ UIComponent* UIComponent::SetTransform(float left, float right, float top, float
 	anchor_v = anchor_vert;
 	anchor_h = anchor_hor;
 
+	return this;
+}
+
+UIComponent* UIComponent::SetOrigin(float x, float y)
+{
+	origin.X = x;
+	origin.Y = y;
 	return this;
 }
 
@@ -160,4 +171,83 @@ void UIComponent::HoverCheck(Vector2D& point)
 			}
 		}
 	}
+}
+
+void UIComponent::LoadWithParameters(const std::map<String, String>& args)
+{
+	if (args.find("Transform") != args.end()) {
+		std::vector<String> dats = split(args.at("Transform"), ',');
+
+		switch (dats.size())
+		{
+		default:
+		case 10: origin.Y = (float)atof(dats[9].c_str());
+		case 9: origin.X = (float)atof(dats[8].c_str());
+		case 8: anchor_v.Y = (float)atof(dats[7].c_str());
+		case 7: anchor_v.X = (float)atof(dats[6].c_str());
+		case 6: anchor_h.Y = (float)atof(dats[5].c_str());
+		case 5: anchor_h.X = (float)atof(dats[4].c_str());
+		case 4: bottomOffset = (float)atof(dats[3].c_str());
+		case 3: topOffset = (float)atof(dats[2].c_str());
+		case 2: rightOffset = (float)atof(dats[1].c_str());
+		case 1: leftOffset = (float)atof(dats[0].c_str());
+		case 0: break;
+		}
+
+	}
+}
+
+String UIComponent::GetString() const
+{
+	String data("Transform=\"");
+	data += std::to_string(leftOffset) + ',' + std::to_string(rightOffset) + ',' + std::to_string(topOffset) + ',' + std::to_string(bottomOffset) + ',';
+	data += std::to_string(anchor_h.X) + ',' + std::to_string(anchor_h.Y) + ',' + std::to_string(anchor_v.X) + ',' + std::to_string(anchor_v.Y) + ',';
+	data += std::to_string(origin.X) + ',' + std::to_string(origin.Y);
+	data += "\"";
+	return data;
+}
+
+void UIComponent::MakeEditMenu(std::vector<UIComponent*>& comps)
+{
+	VerticalPanel* topLevel = new VerticalPanel();
+	topLevel->SetTransform(0.f, 0.f, 0.f, 150.f, Vector(0.f), Vector(0.f, 1.f, 0.f));
+	TextBox* offset_box = new TextBox();
+	TextBox* origin_box = new TextBox();
+	TextBox* anchor_box = new TextBox();
+	String offs = std::to_string(leftOffset) + ',' + std::to_string(rightOffset) + ',' + std::to_string(topOffset) + ',' + std::to_string(bottomOffset);
+	String ancs = std::to_string(anchor_h.X) + ',' + std::to_string(anchor_h.Y) + ',' + std::to_string(anchor_v.X) + ',' + std::to_string(anchor_v.Y);
+	String ori = std::to_string(origin.X) + ',' + std::to_string(origin.Y);
+
+
+	topLevel->AddChild(
+		(new Panel())->AddChild(
+			(new Text())->SetText("Offsets: ", 20)->SetTransform()
+		)->AddChild(
+			offset_box->SetText(offs)->SetFontSize(20)->SetTransform(0.f, 300.f, 0.f, 30.f, Vector(0.f), Vector(0.25f))
+		)->SetTransform(0.f, 0.f, 0.f, 30.f)
+	)->AddChild(
+		(new Panel())->AddChild(
+			(new Text())->SetText("Anchors: ", 20)->SetTransform()
+		)->AddChild(
+			anchor_box->SetText(ancs)->SetFontSize(20)->SetTransform(0.f, 300.f, 0.f, 30.f, Vector(0.f), Vector(0.25f))
+		)->SetTransform(0.f, 0.f, 0.f, 30.f)
+	)->AddChild(
+		(new Panel())->AddChild(
+			(new Text())->SetText("Origin: ", 20)->SetTransform()
+		)->AddChild(
+			origin_box->SetText(ori)->SetFontSize(20)->SetTransform(0.f, 300.f, 0.f, 30.f, Vector(0.f), Vector(0.25f))
+		)->SetTransform(0.f, 0.f, 0.f, 30.f)
+	)->AddChild(
+		(new Panel())->SetTransform(0.f, 0.f, 0.f, 10.f)
+	)->AddChild(
+		(new Button())->AddChild((new Text())->SetText("Apply", 20))->SetTransform(0.f, 0.f, 0.f, 30.f)
+		->SetEventCallback(Constants::UI::UI_ON_MOUSE_DOWN, [this, offset_box, anchor_box, origin_box]() {
+			std::map<String, String> data;
+			String trans = offset_box->GetText() + ',' + anchor_box->GetText() + ',' + origin_box->GetText();
+			data.emplace("Transform", trans);
+			LoadWithParameters(data);
+		})
+	);
+	
+	comps.push_back(topLevel);
 }

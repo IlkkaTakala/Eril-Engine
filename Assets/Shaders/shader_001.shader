@@ -1,4 +1,4 @@
-2;1;
+2;0;0;
 ###VERTEX###
 #version 430 core
 layout (location = 0) in vec3 in_position;
@@ -19,7 +19,9 @@ layout (std140, binding = 0) uniform Globals
 out VS_OUT {
 	vec2 TexCoords;
 	vec4 FragPos;
-	mat3 TBN;
+	vec3 Normals;
+	vec3 BiTangents;
+	vec3 Tangents;
 } vs_out;
 
 uniform mat4 Model;
@@ -36,11 +38,159 @@ void main()
 	T = normalize(T - dot(T, N) * N);
 	vec3 B = cross(N, T);
 
-	mat3 TBN = mat3(T, B, N);
-	vs_out.TBN = TBN;
+	vs_out.Normals = N;
+	vs_out.BiTangents = B;
+	vs_out.Tangents = T;
 	//vs_out.normal = normalize(mat3(Model * in_disp) * in_normal).xyz;
+
+	/*
+	//vec3 T = (Model * in_disp * vec4(in_tangent, 1.0f)).xyz;
+	//vec3 N = (Model * in_disp * vec4(in_normal, 1.0f)).xyz;
+	vec3 T = (Model * in_disp * vec4(in_tangent, 0.0f)).xyz;
+	vec3 N = (Model * in_disp * vec4(in_normal, 0.0f)).xyz;
+	T = normalize(T);
+	N = normalize(N);
+	
+	*/
 }
 ###END_VERTEX###
+
+###GEOMETRY###
+#version 430 core
+
+layout(triangles) in;
+
+// Three lines will be generated: 6 vertices
+layout(line_strip, max_vertices = 12) out;
+
+// Shader storage buffer objects
+layout(std140, binding = 0) uniform Globals
+{
+	mat4 projection;
+	mat4 view;
+	vec4 viewPos;
+	ivec2 screenSize;
+	int sceneLightCount;
+};
+
+//uniform float normal_length;
+//uniform mat4 gxl3d_ModelViewProjectionMatrix;
+
+
+in VS_OUT{
+	vec2 TexCoords;
+	vec4 FragPos;
+	vec3 Normals;
+	vec3 BiTangents;
+	vec3 Tangents;
+} gs_in[];
+
+out GS_OUT
+{
+	vec2 TexCoords;
+	vec4 FragPos;
+	vec3 Normals;
+	vec3 BiTangents;
+	vec3 Tangents;
+} gs_out;
+
+
+void main()							 
+{			
+	
+
+	//Make Normal Triangle
+	float normal_length = 0.5;
+	int i;
+	for (i = 0; i < gs_in.length(); i++)
+	{
+		gs_out.TexCoords = gs_in[i].TexCoords;
+		gs_out.FragPos = gs_in[i].FragPos;
+		gs_out.Normals = gs_in[i].Normals;
+		gs_out.BiTangents = gs_in[i].BiTangents;
+		gs_out.Tangents = gs_in[i].Tangents;
+
+		
+	}	 
+
+	vec4 P = gl_in[0].gl_Position;
+	vec4 N = vec4(gs_in[0].Normals, 1.0);
+
+	//WireFrame
+	/*
+	P = gl_in[0].gl_Position;
+	gl_Position = P;
+	EmitVertex();
+
+	P = gl_in[1].gl_Position;
+	gl_Position = P;
+	EmitVertex();
+	EndPrimitive();
+
+	P = gl_in[1].gl_Position;
+	gl_Position = P;
+	EmitVertex();
+
+	P = gl_in[2].gl_Position;
+	gl_Position = P;
+	EmitVertex();
+	EndPrimitive();
+
+	P = gl_in[2].gl_Position;
+	gl_Position = P;
+	EmitVertex();
+
+	P = gl_in[0].gl_Position;
+	gl_Position = P;
+	EmitVertex();
+	EndPrimitive();
+	*/
+
+	//Normals
+	P = gl_in[0].gl_Position;
+	N = projection * view * vec4(gs_in[0].Normals, 0.0) * normal_length;
+	gl_Position = P;
+	EmitVertex();
+
+	gl_Position = P + N;
+	EmitVertex();
+	EndPrimitive();
+
+	//Tangents
+	P = gl_in[0].gl_Position;
+	vec4 T = projection * view * vec4(gs_in[0].Tangents, 0.0) * normal_length;
+	gl_Position = P;
+	EmitVertex();
+
+	gl_Position = P + T;
+	EmitVertex();
+	EndPrimitive();
+
+	//BiTangents
+	
+	P = gl_in[0].gl_Position;
+	vec4 B = projection * view * vec4(gs_in[0].BiTangents, 0.0) * normal_length;
+	gl_Position = P;
+	EmitVertex();
+
+	gl_Position = P + B;
+	EmitVertex();
+	EndPrimitive();
+	
+	
+
+
+	
+
+
+
+
+}
+
+
+
+###END_GEOMETRY###
+
 ###FRAGMENT###
 #version 430 core
 
@@ -49,7 +199,6 @@ struct LightData {
 	vec4 positionAndSize;
 	vec4 rotation;
 	ivec4 type;
-	mat4 transform;
 };
 
 struct VisibleIndex {
@@ -74,19 +223,24 @@ layout(std430, binding = 2) readonly buffer VisibleLightIndicesBuffer {
 	VisibleIndex data[];
 } visibleLightIndicesBuffer;
 
-layout (location = 0) out vec4 accum;
-layout (location = 1) out float reveal;
+layout (location = 0) out vec4 ColorBuffer;
+layout (location = 1) out vec4 BloomBuffer;
+layout (location = 2) out vec4 accum;
+layout (location = 3) out float reveal;
 
-in VS_OUT {
+in VS_OUT{
 	vec2 TexCoords;
 	vec4 FragPos;
 	//vec3 normal;
-	mat3 TBN;
+	vec3 Normals;
+	vec3 BiTangents;
+	vec3 Tangents;
 } fs_in;
 
 uniform sampler2D Albedo;
 uniform sampler2D Normal;
 uniform sampler2D Roughness;
+uniform sampler2D AO;
 uniform sampler2D Metallic;
 
 uniform int numberOfTilesX;
@@ -178,21 +332,27 @@ void main()
 	// Get color and normal components from texture maps
 	//vec3 FragPos = texture(gPosition, TexCoords).xyz;
 	//vec4 data = texture(gData, TexCoords);
-	
-	vec3 albedo = texture(Albedo, fs_in.TexCoords).rgb;
-	float metallic = 0.0;//texture(Metallic, fs_in.TexCoords).r;
-	float AO = 1.0;
-	float roughness = texture(Roughness, fs_in.TexCoords).r;
+	float gamma = 2.2;	
+	vec3 albedo = pow(texture(Albedo, fs_in.TexCoords).rgb, vec3(gamma));
+	float metallic = texture(Metallic, fs_in.TexCoords).r;
+	float AOt = texture(AO, fs_in.TexCoords).r;
+	float roughness = 1.0 - texture(Roughness, fs_in.TexCoords).r;
 	vec3 normal = texture(Normal, fs_in.TexCoords).rgb;
+	//normal.r = 1.0 - normal.r;
+	//normal.g = 1.0 - normal.g;
+	normal = normalize(normal * 2.0 - 1.0);
 	
 	float shadow = 0;
 	//float SSAO = texture(gSSAO, TexCoords).r;
 	
-	vec3 ambient = vec3(0.01, 0.02, 0.06) * albedo * AO;// * SSAO;
+	vec3 ambient = vec3(0.01, 0.02, 0.06) * albedo * AOt;// * SSAO;
 	
 	vec3 Lo = vec3(0.0);
+	
+	mat3 TBN = mat3(fs_in.Tangents, fs_in.BiTangents, fs_in.Normals);
 
-	vec3 N = normalize(fs_in.TBN * normal); 
+
+	vec3 N = normalize(TBN * normal);
     vec3 V = normalize(viewPos - fs_in.FragPos).xyz;
 
 	uint offset = index * 1024;
@@ -213,11 +373,7 @@ void main()
 				L = normalize(-light.rotation.xyz);
 				H = normalize(V + L);
 
-				float distance 	= 1.0;
-				float radius 	= 10000000.0;
-				float b 		= 1.0 / (radius * radius * 0.01);
-				float attenuation = 1.0 / (1.0 + 0.1 * distance + b * distance * distance);//1.0 / (distance * distance);
-				radiance = light.color.rgb * attenuation;
+				radiance = light.color.rgb;
 				//shadow = ShadowCalculation(light.transform * vec4(fs_in.FragPos, 1.0), L, N);
 			} break;
 			
@@ -225,7 +381,7 @@ void main()
 			{
 				L = normalize(light.positionAndSize.xyz - fs_in.FragPos.xyz);
 				H = normalize(V + L);
-			  
+				
 				float distance 	= length(light.positionAndSize.xyz - fs_in.FragPos.xyz);
 				float radius 	= light.positionAndSize.w;
 				float b 		= 1.0 / (radius * radius * 0.01);
@@ -243,8 +399,8 @@ void main()
 		float G   = GeometrySmith(N, V, L, roughness);
 		
 		vec3 numerator    = NDF * G * F;
-		float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0);
-		vec3 specular     = numerator / max(denominator, 0.001);
+		float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0)  + 0.0001;
+		vec3 specular     = numerator / denominator; 
 		
 		vec3 kS = F;
 		vec3 kD = vec3(1.0) - kS;
@@ -252,11 +408,11 @@ void main()
 		kD *= 1.0 - metallic;
 
 		float NdotL = max(dot(N, L), 0.0);
-		Lo += (kD * albedo / PI + specular) * radiance * NdotL * (1.0 - shadow);
+		Lo += (kD * albedo / PI + specular) * radiance * NdotL;
 		
 	}
 	
-	vec4 color = vec4(ambient + Lo, 0.3);
+	vec4 color = vec4(ambient + Lo, 1.0);
 	
 	// Height fog
 	//float depth = LinearizeDepth(fs_in.FragPos.z) / 100.0;
@@ -265,16 +421,7 @@ void main()
 	//const float gamma = 2.2;
 	const float exposure = 1.0;
 	
-	float weight = clamp(pow(min(1.0, color.a * 10.0) + 0.01, 3.0) * 1e8 * 
-                         pow(1.0 - gl_FragCoord.z * 0.9, 3.0), 1e-2, 3e3);
-
-    // store pixel color accumulation
-    accum = vec4(color.rgb * color.a, color.a) * weight;
-
-    // store pixel revealage threshold
-    reveal = 0.3;
-	
-	//ColorBuffer = vec4(0.0);
-	//BloomBuffer = clamp(color - exposure, 0.0, 100.0);
+	ColorBuffer = color;
+	BloomBuffer = clamp(color - exposure, 0.0, 2.0);
 }
 ###END_FRAGMENT###

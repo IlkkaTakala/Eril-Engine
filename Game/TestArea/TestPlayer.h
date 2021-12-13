@@ -53,19 +53,12 @@ private:
 	bool cursorState;
 	bool InputMode;
 	Ref<Light> DirLight;
-	Ref<Light> Lights[100];
-	Ref<InstancedObject> Trees;
-	Ref<InstancedObject> Trees2;
-	Ref<InstancedObject> Grass;
-	Ref<InstancedObject> Flowers;
 	Ref<VisibleObject> Sky;
 	Ref<Actor> Collider;
 	Ref<MovementComponent> ColliderModelMove;
 	Ref<VisibleObject> ColliderModel;
 
 
-	Ref<Terrain> terra[4];
-	Ref<Hunter> hunt;
 	PauseUI* pause;
 
 	//ECS TEST

@@ -12,3 +12,12 @@ bool FileManager::RequestData(const String& file, String& data)
 	data = buffer.str();
 	return true;
 }
+
+bool FileManager::SaveData(const String& path, const String& data)
+{
+	std::ofstream out(path, std::fstream::out);
+	out << data;
+	out.close();
+
+	return true;
+}

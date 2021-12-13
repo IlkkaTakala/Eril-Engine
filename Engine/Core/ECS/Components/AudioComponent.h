@@ -83,6 +83,8 @@ public:
 	void Play() { bStartPlaying = true; }
 	void Stop() { bStopPlaying = true; }
 
+	Vector GetPosition() { return Position; }
+
 protected:
 
 	uint SourceID = -1;
