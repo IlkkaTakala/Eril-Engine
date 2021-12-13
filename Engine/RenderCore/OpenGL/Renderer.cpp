@@ -152,8 +152,8 @@ MessageCallback(GLenum source,
 	if (severity == GL_DEBUG_SEVERITY_NOTIFICATION) return;
 	char hex_string1[20];
 	char hex_string2[20];
-	sprintf(hex_string1, "%X", type);
-	sprintf(hex_string2, "%X", severity);
+	sprintf_s(hex_string1, "%X", type);
+	sprintf_s(hex_string2, "%X", severity);
 	if (severity == GL_DEBUG_SEVERITY_LOW) Console::Warning(String("OpenGL Error: type = ") + hex_string1 + ", severity = " + hex_string2 + ", message = " + message);
 	else Console::Error(String("OpenGL Error: type = ") + hex_string1 + ", severity = " + hex_string2 + ", message = " + message);
 }
@@ -713,6 +713,7 @@ Material* Renderer::LoadMaterialByName(String name)
 
 Texture* Renderer::LoadTextureByName(String name)
 {
+	if (name == "") return nullptr;
 	if (LoadedTextures.find(name) != LoadedTextures.end()) {
 		return LoadedTextures.find(name)->second;
 	}
@@ -735,7 +736,7 @@ Texture* Renderer::LoadTextureByName(String name)
 			next = new Texture(width, height, nrChannels, data, type);
 			stbi_image_free(data);
 		}
-		
+		next->SetName(name);
 		LoadedTextures.emplace(name, next);
 		Console::Log("Texture loaded: " + name);
 		return next;
@@ -1299,7 +1300,7 @@ void processMesh(LoadedMesh* meshHolder, aiMesh* mesh)
 		}
 	}
 	std::vector<uint> adjacent;
-	MeshDataHolder* section = new MeshDataHolder(vertices.data(), vertices.size(), indices.data(), indices.size());
+	MeshDataHolder* section = new MeshDataHolder(vertices.data(), (uint32)vertices.size(), indices.data(), (uint32)indices.size());
 	section->Radius = radius;
 	/*section->FaceCount = indices.size() / 3;
 	section->VertexCount = vertices.size();

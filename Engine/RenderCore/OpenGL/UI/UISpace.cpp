@@ -151,10 +151,13 @@ void UISpace::Render(uint target)
 	glBindFramebuffer(GL_FRAMEBUFFER, UIBuffer);
 
 	if (WindowManager::GetShowCursor(Screen)) {
+		
 		float x;
 		float y;
 		WindowManager::GetCursorPosition(Screen, x, y);
 		Vector2D point(x, y);
+		cursorDelta = point - oldCursor;
+		oldCursor = point;
 
 		for (auto it = TopLevel.rbegin(); it != TopLevel.rend(); it++) {
 			(*it)->TopLevel->HoverCheck(point);
@@ -238,7 +241,15 @@ void UISpace::GetTextInput(uint input)
 	auto e = dynamic_cast<TextBox*>(Focused);
 	if (e != nullptr) {
 		String s = e->GetText();
-		s += (char)input;
+		switch (input)
+		{
+		case 259:
+			if (s != "") s.pop_back();
+			break;
+		default:
+			s += (char)input;
+			break;
+		}
 		e->SetText(s);
 	}
 }

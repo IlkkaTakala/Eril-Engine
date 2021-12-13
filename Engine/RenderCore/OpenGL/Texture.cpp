@@ -5,6 +5,7 @@ Texture::Texture(int width, int height, int nrChannels, const uint8* data, int t
 {
 	ID = 0;
 	Type = type;
+	Name = "";
 	glGenTextures(1, &ID);
 	glBindTexture(GL_TEXTURE_2D, ID);
 	switch (nrChannels)
@@ -64,6 +65,7 @@ Texture::Texture(int width, int height, int nrChannels, const float* data)
 {
 	ID = 0;
 	Type = 0;
+	Name = "";
 	glGenTextures(1, &ID);
 	glBindTexture(GL_TEXTURE_2D, ID);
 	switch (nrChannels)
@@ -94,6 +96,7 @@ Texture::Texture(int width, int height, int nrChannels, const float* data)
 Texture::Texture(int width, int height, bool isDepthTexture)
 {
 	Type = 4;
+	Name = "";
 	glGenTextures(1, &ID);
 	glBindTexture(GL_TEXTURE_2D, ID);
 

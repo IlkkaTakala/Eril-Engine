@@ -10,8 +10,10 @@ public:
 	~Texture();
 
 	uint GetTextureID() const { return ID; }
-
+	String GetName() const { return Name; }
+	void SetName(const String& name) { if (Name == "") Name = name; }
 private:
 	uint ID;
 	int Type;
+	String Name;
 };

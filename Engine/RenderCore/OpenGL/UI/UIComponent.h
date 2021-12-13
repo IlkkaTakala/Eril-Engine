@@ -1,5 +1,6 @@
 #pragma once
 #include <Core.h>
+#include <UI/UI.h>
 
 struct UIMatrix;
 
@@ -28,7 +29,8 @@ namespace Constants
 		constexpr uint	UI_ON_FOCUS = 5;
 		constexpr uint	UI_ON_LOST_FOCUS = 6;
 
-		typedef void (*UIEventCallback)(void);
+		typedef std::function<void(void)> UIEventCallback;
+		//typedef void (*UIEventCallback)(void);
 	}
 }
 
@@ -45,6 +47,10 @@ public:
 	virtual void Render() = 0;
 	virtual void UpdateMatrices(const Vector2D& size);
 	UIComponent* SetTransform(float left = 0.f, float right = 0.f, float top = 0.f, float bottom = 0.f, Vector anchor_vert = Vector(), Vector anchor_hor = Vector());
+	UIComponent* SetOrigin(float x, float y);
+	UIComponent* SetFocusable(bool focus) { focusable = focus; return this; }
+	UIComponent* SetHit(HitReg h) { hits = h; return this; }
+	UIComponent* SetVisibility(Visibility v) { visible = v; return this; }
 
 	bool Trace(const Vector2D& point) const;
 
@@ -60,7 +66,11 @@ public:
 
 	virtual void HoverCheck(Vector2D& point);
 
-protected:
+	virtual void LoadWithParameters(const std::map<String, String>& args);
+	virtual String GetString() const;
+
+	virtual void MakeEditMenu(std::vector<UIComponent*>& comps);
+
 	friend class UISpace;
 
 	Vector origin;
@@ -84,10 +94,7 @@ protected:
 	Vector2D realSize;
 	Vector2D topLeft;
 	Vector2D desiredSize;
-
-	Vector basecolor;
-	Vector tint;
-	float opacity;
+	Vector2D bounds;
 
 	bool focusable;
 	bool hasFocus;
