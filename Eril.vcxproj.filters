@@ -172,8 +172,6 @@
     <ClCompile Include="Engine\external\tinyfiledialogs\tinyfiledialogs.c">
       <Filter>Engine\Interface</Filter>
     </ClCompile>
-    <ClCompile Include="Game\UITest\TestPlayerLoad.cpp" />
-    <ClCompile Include="Game\UITest\TestUILoad.cpp" />
     <ClCompile Include="Game\Disco\DiscoPlayer.cpp">
       <Filter>Game\Disco</Filter>
     </ClCompile>
@@ -182,7 +180,7 @@
     </ClCompile>
     <ClCompile Include="Game\ForestGame\Ghost.cpp">
       <Filter>Game\ForestGame</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="Engine\Interface\AudioManager.cpp">
       <Filter>Engine\Interface</Filter>
     </ClCompile>
@@ -194,6 +192,12 @@
     </ClCompile>
     <ClCompile Include="Engine\Core\Objects\ColliderComponent.cpp">
       <Filter>Engine\Objects\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\UITest\TestPlayerLoad.cpp">
+      <Filter>Game\UITesting</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\UITest\TestUILoad.cpp">
+      <Filter>Game\UITesting</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -259,12 +263,15 @@
     </Filter>
     <Filter Include="Resources">
       <UniqueIdentifier>{27cfd01c-53e4-4436-b300-9133214a1517}</UniqueIdentifier>
-	</Filter>
+    </Filter>
     <Filter Include="Game\Disco">
       <UniqueIdentifier>{c1638df8-5fae-4cd8-9d38-56e874a765f3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game\ForestGame">
       <UniqueIdentifier>{734f2662-5704-48ce-8f67-7c7c45fe62c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\UITesting">
+      <UniqueIdentifier>{7ceb856b-ccf9-40a6-98dc-2a4226f8f168}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -487,8 +494,12 @@
     <ClInclude Include="Engine\external\tinyfiledialogs\tinyfiledialogs.h">
       <Filter>Engine\Interface</Filter>
     </ClInclude>
-    <ClInclude Include="Game\UITest\TestPlayerLoad.h" />
-    <ClInclude Include="Game\UITest\TestUILoad.h" />
+    <ClInclude Include="Game\UITest\TestPlayerLoad.h">
+      <Filter>Game\UITesting</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\UITest\TestUILoad.h">
+      <Filter>Game\UITesting</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Engine\Assets\Icons\icon.ico">
@@ -514,9 +525,6 @@
     <ClInclude Include="Game\ForestGame\Ghost.h">
       <Filter>Game\ForestGame</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

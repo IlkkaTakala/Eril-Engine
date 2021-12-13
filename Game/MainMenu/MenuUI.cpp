@@ -43,6 +43,11 @@ void MenuUI::Construct()
 						Create<Text>()->SetText("Open UI Test", 25)->SetStyle(Vector(0.f))
 					)->SetTransform(20.f, 40.f, 500.f, 30.f, Vector(0.f, 0.f, 0.f), Vector(0.f, 1.0f, 0.f))
 					->SetEventCallback(Constants::UI::UI_ON_MOUSE_UP, []() { Scene::OpenLevel("Game/UITest/loaduitest"); })
+				)->AddChild(
+					Create<Button>()->AddChild(
+						Create<Text>()->SetText("Exit", 25)->SetStyle(Vector(0.f))
+					)->SetTransform(20.f, 40.f, 550.f, 30.f, Vector(0.f, 0.f, 0.f), Vector(0.f, 1.0f, 0.f))
+					->SetEventCallback(Constants::UI::UI_ON_MOUSE_UP, []() { Exit(); })
 				)
 			->SetTransform(0.f, 0.f, 0.f, 0.f, Vector(0.f, 1.f, 0.f), Vector(0.f, 0.25f, 0.f))
 		)->AddChild(
