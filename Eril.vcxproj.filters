@@ -169,6 +169,12 @@
     <ClCompile Include="Game\EngineInterface.cpp">
       <Filter>Engine\Interface</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Core\Physics\BulletPhysics.cpp">
+      <Filter>Engine\Objects\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Objects\ColliderComponent.cpp">
+      <Filter>Engine\Objects\Physics</Filter>
+    </ClCompile>
     <ClCompile Include="Game\ForestGame\EndScreen.cpp">
       <Filter>Game\ForestGame</Filter>
     </ClCompile>
@@ -197,6 +203,9 @@
     </Filter>
     <Filter Include="Engine\OpenGL">
       <UniqueIdentifier>{1a8dd4f1-9c5c-40d8-8a15-89a92e8920dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Objects\Physics">
+      <UniqueIdentifier>{7347c632-ba99-4fda-95d5-697116727367}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\ECS">
       <UniqueIdentifier>{ee669dbc-1437-4613-b8e8-9420e11f382e}</UniqueIdentifier>
@@ -313,6 +322,15 @@
     </ClInclude>
     <ClInclude Include="Engine\external\glfw\deps\glad\gl.h">
       <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Physics\BulletObject.h">
+      <Filter>Engine\Objects\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Physics\BulletPhysics.h">
+      <Filter>Engine\Objects\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Objects\ColliderComponent.h">
+      <Filter>Engine\Objects\Physics</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\ECS\ComponentManager.h">
       <Filter>Engine\ECS</Filter>
@@ -443,5 +461,11 @@
     <ClInclude Include="Game\ForestGame\StartScreen.h">
       <Filter>Game\ForestGame</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>

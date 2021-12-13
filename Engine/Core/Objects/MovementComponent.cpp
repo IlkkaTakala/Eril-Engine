@@ -1,6 +1,7 @@
 #include "Physics.h"
 #include <Objects/Terrain.h>
 #include "Objects/MovementComponent.h"
+#include <Physics/BulletPhysics.h>
 
 MovementComponent::MovementComponent()
 {
@@ -17,6 +18,7 @@ MovementComponent::MovementComponent()
 	brake = 2000.f;
 	air_control = 0.05f;
 	Physics::AddMovable(this);
+	rigid = nullptr;
 }
 
 void MovementComponent::LoadWithParameters(const String& args)
@@ -39,6 +41,10 @@ void MovementComponent::Tick(float time)
 {
 	if (!allowMovement || Object == nullptr) return;
 	DesiredState.location = Object->GetLocation();
+	btVector3 colliderloc;
+	colliderloc.setValue(DesiredState.location.X, DesiredState.location.Z, DesiredState.location.Y);
+	rigid->body->getWorldTransform().setOrigin(colliderloc);
+
 	OldState = DesiredState;
 	if (Object == nullptr) return;
 	switch (isPhysics)
@@ -118,6 +124,7 @@ void MovementComponent::Tick(float time)
 		}
 
 		DesiredState.velocity = velocity;
+		rigid->body->setLinearVelocity(btVector3(velocity.X, velocity.Z, velocity.Y));
 	}
 	break;
 	}
@@ -126,9 +133,13 @@ void MovementComponent::Tick(float time)
 
 }
 
-void MovementComponent::SetTarget(SceneComponent* t)
+
+void MovementComponent::SetTarget(SceneComponent* t, const AABB bound)
 {
 	Object = t;
+	rigid = Physics::MakeRigidBoby(bound, t->GetLocation());
+	//OldState.location = t->GetLocation();
+	//DesiredState.location = t->GetLocation();
 	//Physics::RemoveStatic(t);
 }
 
@@ -140,7 +151,15 @@ void MovementComponent::SetGround(Terrain* t)
 void MovementComponent::ApplyMovement()
 {
 	if (!allowMovement || Object == nullptr) return;
-	Object->SetLocation(DesiredState.location);
+
+	if (Object->transformForce) {
+		Object->Location = Object->desired.Location;
+		Object->transformForce = false;
+	}
+	else {
+		auto l = rigid->body->getWorldTransform().getOrigin();
+		Object->Location = Vector(l[0], l[2], l[1]);
+	}
 }
 
 void MovementComponent::AddInput(const Vector& dir)
