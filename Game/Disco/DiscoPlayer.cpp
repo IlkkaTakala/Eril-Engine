@@ -382,7 +382,7 @@ void DiscoPlayer::BeginPlay()
 	audioPos = Vector(0.0f, -35.0f, 4.0f);
 	audioComponent->SetSourceID(AudioManager::LoadAudio("MonkeyWarhol.wav"));
 	audioComponent->SetPosition(audioPos);
-	audioComponent->SetGain(2.f);
+	audioComponent->SetGain(3.f);
 	audioComponent->SetPitch(1.0f);
 	audioComponent->SetLooping(true);
 	audioComponent->SetSourceRelative(false);
