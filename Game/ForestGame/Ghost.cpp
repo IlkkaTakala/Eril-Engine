@@ -6,7 +6,7 @@
 #include <Gameplay/GameState.h>
 #include <Gameplay/PlayerController.h>
 #include <Objects/VisibleObject.h>
-
+#include "ForestPlayer.h"
 
 Ghost::Ghost() : Actor()
 {
@@ -21,12 +21,12 @@ Ghost::Ghost() : Actor()
 	move->SetTarget(this);
 	move->SetGravity(true);
 	move->SetGround(ObjectManager::GetByRecord<Terrain>(0xA0001111));
-	move->SetMaxSpeed(1.f);
+	move->SetMaxSpeed(3.0f);
 	caught = false;
-
+	
 	time = 0.f;
 
-	Timer::CreateTimer(5.f, &Ghost::SetNewTarget, this, true);
+	Timer::CreateTimer(1.f, &Ghost::SetNewTarget, this, true);
 }
 
 void Ghost::Tick(float delta)
@@ -36,15 +36,16 @@ void Ghost::Tick(float delta)
 	Mesh->GetModel()->GetMaterial(0)->SetParameter("velocity", move->DesiredState.velocity);
 
 	Vector playerLoc = GetGameState()->CurrentPlayer->GetLocation();
-	
+
 	if (!caught) {
 
 		if ((targetLoc - Location).Length() < 1.f) SetNewTarget(0.f);
 		move->AddInput(targetLoc - Location);
 
-		if ((playerLoc - Location).Length() < 1.f) {
+		if ((playerLoc - Location).Length() < 2.f) {
 			caught = true;
 			Console::Log("Player caught, game over!");
+			dynamic_cast<ForestPlayer*>(GetGameState()->CurrentPlayer.GetPointer())->Caught();
 			move->SetAllowMovement(false);
 		}
 	}
@@ -53,9 +54,18 @@ void Ghost::Tick(float delta)
 	}
 }
 
+void Ghost::stopMoving()
+{
+	move->SetAllowMovement(false);
+}
+
+void Ghost::startMoving()
+{
+	move->SetAllowMovement(true);
+}
+
 void Ghost::SetNewTarget(float delta)
 {
-	Console::Log("New target set");
 	if (GetGameState()->CurrentPlayer != nullptr)
 		targetLoc = GetGameState()->CurrentPlayer->GetLocation();
 }

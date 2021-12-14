@@ -10,6 +10,8 @@ class MovementComponent;
 class Terrain;
 class Hunter;
 class PauseUI;
+class EndScreen;
+class StartScreen;
 
 class Item : public BaseObject
 {
@@ -22,22 +24,6 @@ public:
 	virtual void BeginPlay();
 
 	virtual void DestroyObject();
-};
-
-class PlaceableItem : public Actor
-{
-	REGISTER(PlaceableItem)
-public:
-	PlaceableItem();
-
-	virtual ~PlaceableItem() { }
-
-	virtual void BeginPlay();
-
-	virtual void DestroyObject();
-
-	Ref<MovementComponent> Move;
-	Ref<VisibleObject> Mesh;
 };
 
 
@@ -53,12 +39,14 @@ public:
 	virtual void Tick(float Delta) override;
 	virtual void BeginPlay() override;
 	virtual void OnDestroyed() override;
+	void Caught();
+	void Winner();
 
 private:
 	float mouseSens;
 	float Speed;
 
-	void ItemThrowQ(bool KeyDown);
+	void InputQ(bool KeyDown);
 	void ItemPickE(bool KeyDown);
 	void RunInputW(float delta, bool KeyDown);
 	void RunInputA(float delta, bool KeyDown);
@@ -73,7 +61,6 @@ private:
 	void MouseMoved(float X, float Y);
 
 	void InputExit(bool);
-
 	void OpenConsole(bool);
 	void UseCursor(bool);
 
@@ -96,10 +83,12 @@ private:
 	Ref<Terrain> terra[4];
 	Ref<Hunter> hunt;
 	PauseUI* pause;
+	EndScreen* end;
+	StartScreen* start;
+	std::vector<RefWeak<VisibleObject>> Candys;
+	std::vector<Ref<Item>> Items;
 
 	//ECS TEST
 	Ref<ECSExample> ecsExample;
-
 	int spawnCounter;
-	std::vector<Ref<Item>> Items;
 };

@@ -30,7 +30,7 @@ void InstancedObject::LoadWithParameters(const String& args)
 	if (rot != data.end()) Rotation = Vector(rot->second);
 	if (ter != data.end()) Terra = ObjectManager::GetByRecord<Terrain>(std::stoul(ter->second, nullptr, 16));
 	if (ins != data.end()) {
-		it = split(ins->second, '-');
+		it = split(ins->second, '/');
 		instanceCount = it.size() / 3;
 	}
 		Transformation* arr = new Transformation[randCount + instanceCount]();

@@ -12,12 +12,14 @@ public:
 	Ref<MovementComponent> move;
 
 	virtual void Tick(float) override;
+	void stopMoving();
+	void startMoving();
+
 private:
 	Ref<VisibleObject> Mesh;
 
 	float time;
 	Vector targetLoc;
-	float targetRot;
 	bool caught;
 
 	void SetNewTarget(float);

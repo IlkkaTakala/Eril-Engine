@@ -23,6 +23,13 @@ namespace Noise {
 	static int start = 1;
 
 	static void init(void);
+	static bool doInit() {
+		start = 0;
+		srand(1);
+		init();
+		return true;
+	}
+	static bool inited = doInit();
 
 	#define s_curve(t) ( t * t * (3. - 2. * t) )
 

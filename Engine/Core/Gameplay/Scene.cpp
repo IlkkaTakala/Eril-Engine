@@ -67,8 +67,9 @@ void Scene::CheckShouldLoad()
 
 void Scene::OnDestroyed()
 {
-	for (const auto& c : SceneGraph) {
-		c->DestroyObject();
+	while (SceneGraph.size() > 0) {
+		if (*SceneGraph.begin() != nullptr) (*SceneGraph.begin())->DestroyObject();
+		else SceneGraph.pop_front();
 	}
 	Loop->World = nullptr;
 }

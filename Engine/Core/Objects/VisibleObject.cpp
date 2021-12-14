@@ -10,6 +10,7 @@ VisibleObject::VisibleObject() : SceneComponent()
 
 void VisibleObject::OnDestroyed()
 {
+	SceneComponent::OnDestroyed();
 	Physics::RemoveStatic(this);
 }
 
