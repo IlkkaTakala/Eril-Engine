@@ -26,22 +26,6 @@ public:
 	virtual void DestroyObject();
 };
 
-class PlaceableItem : public Actor
-{
-	REGISTER(PlaceableItem)
-public:
-	PlaceableItem();
-
-	virtual ~PlaceableItem() { }
-
-	virtual void BeginPlay();
-
-	virtual void DestroyObject();
-
-	Ref<MovementComponent> Move;
-	Ref<VisibleObject> Mesh;
-};
-
 
 //ECS TEST
 class ECSExample;
@@ -80,7 +64,6 @@ private:
 	void OpenConsole(bool);
 	void UseCursor(bool);
 
-
 	Ref<MovementComponent> Movement;
 	Ref<VisibleObject> Mesh;
 
@@ -103,10 +86,9 @@ private:
 	EndScreen* end;
 	StartScreen* start;
 	std::vector<RefWeak<VisibleObject>> Candys;
+	std::vector<Ref<Item>> Items;
 
 	//ECS TEST
 	Ref<ECSExample> ecsExample;
-
 	int spawnCounter;
-	std::vector<Ref<Item>> Items;
 };

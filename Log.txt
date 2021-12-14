@@ -1,123 +1,80 @@
-[LOG] 15.31.20 | Hello, Eril is starting
-[ERROR] 15.31.20 | This world is an error
-[LOG] 15.31.20 | Starting game...
-[LOG] 15.31.21 | Creating window...
-[LOG] 15.31.21 | Allocating buffers...
-[LOG] 15.31.21 | Loading shaders...
-[LOG] 15.31.21 | Shader loaded: Assets/Shaders\BlurCompute.shader
-[LOG] 15.31.21 | Shader loaded: Assets/Shaders\Composite.shader
-[LOG] 15.31.21 | Shader loaded: Assets/Shaders\LightCullingShader.shader
-[LOG] 15.31.21 | Shader loaded: Assets/Shaders\PostProcessForest.shader
-[LOG] 15.31.21 | Shader loaded: Assets/Shaders\PostProcessMaster.shader
-[LOG] 15.31.21 | Shader loaded: Assets/Shaders\PreDepth.shader
-[LOG] 15.31.21 | Shader loaded: Assets/Shaders\shader_001.shader
-[LOG] 15.31.21 | Shader loaded: Assets/Shaders\shader_002.shader
-[LOG] 15.31.21 | Shader loaded: Assets/Shaders\shader_003.shader
-[LOG] 15.31.21 | Shader loaded: Assets/Shaders\shader_004.shader
-[LOG] 15.31.21 | Shader loaded: Assets/Shaders\ShadowColor.shader
-[LOG] 15.31.21 | Shader loaded: Assets/Shaders\SkyBox.shader
-[LOG] 15.31.21 | Shader loaded: Assets/Shaders\SkyDome.shader
-[LOG] 15.31.21 | Shader loaded: Assets/Shaders\SkyFilter.shader
-[LOG] 15.31.21 | Shader loaded: Assets/Shaders\skyshader.shader
-[LOG] 15.31.21 | Shader loaded: Assets/Shaders\SSAO.shader
-[LOG] 15.31.21 | Shader loaded: Assets/Shaders\SSAOBlur.shader
-[LOG] 15.31.21 | Creating defaults...
-[LOG] 15.31.21 | Loading finished
-[LOG] 15.31.21 | Spawned object with record: 0x000000000000004
-[ERROR] 15.31.21 | OpenGL Error: type = 824C, severity = 9146, message = GL_INVALID_OPERATION error generated. Function glMatrixMode is deprecated and not available in preview contexts.
-[ERROR] 15.31.21 | OpenGL Error: type = 824C, severity = 9146, message = GL_INVALID_OPERATION error generated. Function glLoadIdentity is deprecated and not available in preview contexts.
-[ERROR] 15.31.21 | OpenGL Error: type = 824C, severity = 9146, message = GL_INVALID_OPERATION error generated. Function glMatrixMode is deprecated and not available in preview contexts.
-[LOG] 15.31.21 | Texture loaded: Assets/Textures/LetterLogo.png
-[LOG] 15.31.21 | Texture loaded: Assets/Fonts/arial.png
-[LOG] 15.31.21 | Loading font "Assets/Fonts/arial" took 0.034148
-[LOG] 15.31.21 | Texture loaded: Assets/Textures/TextLogo.png
-[ERROR] 15.31.21 | OpenGL Error: type = 8250, severity = 9147, message = Program/shader state performance warning: Vertex shader in program 46 is being recompiled based on GL state.
-[LOG] 15.31.22 | Spawned object with record: 0x000000000000004
-[LOG] 15.31.22 | Spawned object with record: 0x0000000A0001111
-[LOG] 15.31.23 | Texture loaded: Assets/Textures/forestGround/diffuse_d.jpg
-[LOG] 15.31.24 | Texture loaded: Assets/Textures/forestGround/normal_n.jpg
-[LOG] 15.31.24 | Texture loaded: Assets/Textures/forestGround/gloss.jpg
-[LOG] 15.31.24 | Texture loaded: Assets/Textures/forestGround/ao.jpg
-[LOG] 15.31.24 | Material loaded: Assets/Materials/ground
-[LOG] 15.31.24 | Spawned object with record: 0x0000000A0001121
-[LOG] 15.31.24 | Spawned object with record: 0x0000000A0001122
-[LOG] 15.31.24 | Spawned object with record: 0x0000000A0001123
-[LOG] 15.31.24 | Spawned object with record: 0x0000000A0001112
-[LOG] 15.31.25 | Texture loaded: Assets/Textures/default/default_d.png
-[LOG] 15.31.25 | Texture loaded: Assets/Textures/default/map_n.png
-[LOG] 15.31.25 | Material loaded: Assets/Materials/default
-[LOG] 15.31.25 | Texture loaded: Assets/Textures/trees/diffuse_d.jpg
-[LOG] 15.31.25 | Texture loaded: Assets/Textures/trees/normal_n.jpg
-[LOG] 15.31.25 | Texture loaded: Assets/Textures/trees/gloss.jpg
-[LOG] 15.31.25 | Texture loaded: Assets/Textures/trees/ao.jpg
-[LOG] 15.31.25 | Material loaded: Assets/Materials/tree
-[LOG] 15.31.25 | Texture loaded: Assets/Textures/trees/SpruceBranch_d.png
-[LOG] 15.31.25 | Material loaded: Assets/Materials/leaves
-[LOG] 15.31.25 | Spawned object with record: 0x0000000A0001113
-[LOG] 15.31.25 | Texture loaded: Assets/Textures/rocks/diffuse_d.jpg
-[LOG] 15.31.26 | Texture loaded: Assets/Textures/rocks/normal_n.jpg
-[LOG] 15.31.26 | Texture loaded: Assets/Textures/rocks/gloss.jpg
-[LOG] 15.31.26 | Texture loaded: Assets/Textures/rocks/ao.jpg
-[LOG] 15.31.26 | Material loaded: Assets/Materials/rock
-[LOG] 15.31.26 | Spawned object with record: 0x0000000A0001114
-[LOG] 15.31.26 | Texture loaded: Assets/Textures/forestGame/shack.png
-[LOG] 15.31.26 | Material loaded: Assets/Materials/roof
-[LOG] 15.31.26 | Material loaded: Assets/Materials/wall
-[LOG] 15.31.26 | Spawned object with record: 0x0000000000000C1
-[LOG] 15.31.26 | Texture loaded: Assets/Textures/forestGame/candy_cane.png
-[LOG] 15.31.26 | Material loaded: Assets/Materials/candy
-[LOG] 15.31.26 | Spawned object with record: 0x0000000000000C2
-[LOG] 15.31.26 | Spawned object with record: 0x0000000000000C3
-[LOG] 15.31.26 | Spawned object with record: 0x0000000000000C4
-[LOG] 15.31.26 | Spawned object with record: 0x0000000000000C5
-[LOG] 15.31.26 | Texture loaded: Assets/Textures/forestGame/ghost.png
-[LOG] 15.31.26 | Material loaded: Assets/Materials/ghost
-[LOG] 15.31.26 | Spawned object with record: 0x000000000000010
-[LOG] 15.31.26 | Hello beautiful world
-[ERROR] 15.31.34 | OpenGL Error: type = 8250, severity = 9147, message = Program/shader state performance warning: Vertex shader in program 55 is being recompiled based on GL state.
-[ERROR] 15.31.34 | OpenGL Error: type = 8250, severity = 9147, message = Program/shader state performance warning: Vertex shader in program 46 is being recompiled based on GL state.
-[LOG] 15.31.48 | Player caught, game over!
-[LOG] 15.31.51 | Spawned object with record: 0x000000000000004
-[LOG] 15.31.51 | Spawned object with record: 0x0000000A0001111
-[LOG] 15.31.51 | Spawned object with record: 0x0000000A0001121
-[LOG] 15.31.51 | Spawned object with record: 0x0000000A0001122
-[LOG] 15.31.51 | Spawned object with record: 0x0000000A0001123
-[LOG] 15.31.51 | Spawned object with record: 0x0000000A0001112
-[LOG] 15.31.51 | Spawned object with record: 0x0000000A0001113
-[LOG] 15.31.51 | Spawned object with record: 0x0000000A0001114
-[LOG] 15.31.51 | Spawned object with record: 0x0000000000000C1
-[LOG] 15.31.51 | Spawned object with record: 0x0000000000000C2
-[LOG] 15.31.51 | Spawned object with record: 0x0000000000000C3
-[LOG] 15.31.51 | Spawned object with record: 0x0000000000000C4
-[LOG] 15.31.51 | Spawned object with record: 0x0000000000000C5
-[LOG] 15.31.51 | Spawned object with record: 0x000000000000010
-[LOG] 15.31.51 | Hello beautiful world
-[LOG] 15.31.56 | Player caught, game over!
-[LOG] 15.32.01 | Spawned object with record: 0x000000000000004
-[LOG] 15.32.01 | Spawned object with record: 0x0000000A0001111
-[LOG] 15.32.01 | Spawned object with record: 0x0000000A0001121
-[LOG] 15.32.01 | Spawned object with record: 0x0000000A0001122
-[LOG] 15.32.01 | Spawned object with record: 0x0000000A0001123
-[LOG] 15.32.01 | Spawned object with record: 0x0000000A0001112
-[LOG] 15.32.01 | Spawned object with record: 0x0000000A0001113
-[LOG] 15.32.01 | Spawned object with record: 0x0000000A0001114
-[LOG] 15.32.01 | Spawned object with record: 0x0000000000000C1
-[LOG] 15.32.01 | Spawned object with record: 0x0000000000000C2
-[LOG] 15.32.01 | Spawned object with record: 0x0000000000000C3
-[LOG] 15.32.01 | Spawned object with record: 0x0000000000000C4
-[LOG] 15.32.01 | Spawned object with record: 0x0000000000000C5
-[LOG] 15.32.01 | Spawned object with record: 0x000000000000010
-[LOG] 15.32.01 | Hello beautiful world
-[LOG] 15.32.09 | Player caught, game over!
-[LOG] 15.32.10 | Spawned object with record: 0x000000000000004
-[LOG] 15.32.10 | Spawned object with record: 0x0000000A0001111
-[LOG] 15.32.10 | Spawned object with record: 0x0000000A0001121
-[LOG] 15.32.10 | Spawned object with record: 0x0000000A0001122
-[LOG] 15.32.10 | Spawned object with record: 0x0000000A0001123
-[LOG] 15.32.10 | Spawned object with record: 0x0000000A0001112
-[LOG] 15.32.10 | Spawned object with record: 0x0000000A0001113
-[LOG] 15.32.10 | Spawned object with record: 0x0000000A0001114
-[LOG] 15.32.10 | Spawned object with record: 0x0000000000000C1
-[LOG] 15.32.10 | Spawned object with record: 0x0000000000000C2
-[LOG] 15.32.10 | Spawned object with record: 0x0000000000000C3
-[LOG] 15.32.10 | Spawn
+[LOG] 21.05.31 | Hello, Eril is starting
+[ERROR] 21.05.31 | This world is an error
+[LOG] 21.05.31 | Starting game...
+[LOG] 21.05.31 | Creating window...
+[LOG] 21.05.32 | Allocating buffers...
+[LOG] 21.05.32 | Loading shaders...
+[LOG] 21.05.32 | Shader loaded: Assets/Shaders\BlurCompute.shader
+[LOG] 21.05.32 | Shader loaded: Assets/Shaders\Composite.shader
+[LOG] 21.05.32 | Shader loaded: Assets/Shaders\LightCullingShader.shader
+[LOG] 21.05.32 | Shader loaded: Assets/Shaders\PostProcessForest.shader
+[LOG] 21.05.32 | Shader loaded: Assets/Shaders\PostProcessMaster.shader
+[LOG] 21.05.32 | Shader loaded: Assets/Shaders\PreDepth.shader
+[LOG] 21.05.32 | Shader loaded: Assets/Shaders\shader_001.shader
+[LOG] 21.05.32 | Shader loaded: Assets/Shaders\shader_002.shader
+[LOG] 21.05.32 | Shader loaded: Assets/Shaders\shader_003.shader
+[LOG] 21.05.32 | Shader loaded: Assets/Shaders\shader_004.shader
+[LOG] 21.05.32 | Shader loaded: Assets/Shaders\ShadowColor.shader
+[LOG] 21.05.32 | Shader loaded: Assets/Shaders\SkyBox.shader
+[LOG] 21.05.32 | Shader loaded: Assets/Shaders\SkyDome.shader
+[LOG] 21.05.32 | Shader loaded: Assets/Shaders\SkyFilter.shader
+[LOG] 21.05.32 | Shader loaded: Assets/Shaders\skyshader.shader
+[LOG] 21.05.32 | Shader loaded: Assets/Shaders\SSAO.shader
+[LOG] 21.05.32 | Shader loaded: Assets/Shaders\SSAOBlur.shader
+[LOG] 21.05.32 | Creating defaults...
+[LOG] 21.05.32 | Loading finished
+[LOG] 21.05.32 | Spawned object with record: 0x000000000000004
+[LOG] 21.05.32 | Texture loaded: Assets/Textures/LetterLogo.png
+[LOG] 21.05.32 | Texture loaded: Assets/Textures/button.png
+[LOG] 21.05.32 | Texture loaded: Assets/Textures/buttonPressed.png
+[LOG] 21.05.32 | Texture loaded: Assets/Fonts/arial.png
+[LOG] 21.05.32 | Loading font "Assets/Fonts/arial" took 0.029845
+[LOG] 21.05.32 | Texture loaded: Assets/Textures/TextLogo.png
+[ERROR] 21.05.32 | OpenGL Error: type = 8250, severity = 9147, message = Program/shader state performance warning: Vertex shader in program 46 is being recompiled based on GL state.
+[LOG] 21.05.35 | Spawned object with record: 0x000000000000004
+[LOG] 21.05.35 | Spawned object with record: 0x0000000A0001111
+[LOG] 21.05.36 | Texture loaded: Assets/Textures/forestGround/diffuse_d.jpg
+[LOG] 21.05.37 | Texture loaded: Assets/Textures/forestGround/normal_n.jpg
+[LOG] 21.05.37 | Texture loaded: Assets/Textures/forestGround/gloss.jpg
+[LOG] 21.05.37 | Texture loaded: Assets/Textures/forestGround/ao.jpg
+[LOG] 21.05.37 | Material loaded: Assets/Materials/ground
+[LOG] 21.05.37 | Spawned object with record: 0x0000000A0001121
+[LOG] 21.05.37 | Spawned object with record: 0x0000000A0001122
+[LOG] 21.05.37 | Spawned object with record: 0x0000000A0001123
+[LOG] 21.05.37 | Spawned object with record: 0x0000000A0001112
+[LOG] 21.05.38 | Texture loaded: Assets/Textures/default/default_d.png
+[LOG] 21.05.38 | Texture loaded: Assets/Textures/default/map_n.png
+[LOG] 21.05.38 | Material loaded: Assets/Materials/default
+[LOG] 21.05.38 | Texture loaded: Assets/Textures/trees/diffuse_d.jpg
+[LOG] 21.05.38 | Texture loaded: Assets/Textures/trees/normal_n.jpg
+[LOG] 21.05.38 | Texture loaded: Assets/Textures/trees/gloss.jpg
+[LOG] 21.05.38 | Texture loaded: Assets/Textures/trees/ao.jpg
+[LOG] 21.05.38 | Material loaded: Assets/Materials/tree
+[LOG] 21.05.38 | Texture loaded: Assets/Textures/trees/SpruceBranch_d.png
+[LOG] 21.05.38 | Material loaded: Assets/Materials/leaves
+[LOG] 21.05.38 | Spawned object with record: 0x0000000A0001113
+[LOG] 21.05.38 | Texture loaded: Assets/Textures/rocks/diffuse_d.jpg
+[LOG] 21.05.39 | Texture loaded: Assets/Textures/rocks/normal_n.jpg
+[LOG] 21.05.39 | Texture loaded: Assets/Textures/rocks/gloss.jpg
+[LOG] 21.05.39 | Texture loaded: Assets/Textures/rocks/ao.jpg
+[LOG] 21.05.39 | Material loaded: Assets/Materials/rock
+[LOG] 21.05.39 | Spawned object with record: 0x0000000A0001114
+[LOG] 21.05.39 | Texture loaded: Assets/Textures/forestGame/shack.png
+[LOG] 21.05.39 | Material loaded: Assets/Materials/roof
+[LOG] 21.05.39 | Material loaded: Assets/Materials/wall
+[LOG] 21.05.39 | Spawned object with record: 0x0000000000000C1
+[LOG] 21.05.39 | Texture loaded: Assets/Textures/forestGame/candy_cane.png
+[LOG] 21.05.39 | Material loaded: Assets/Materials/candy
+[LOG] 21.05.39 | Spawned object with record: 0x0000000000000C2
+[LOG] 21.05.39 | Spawned object with record: 0x0000000000000C3
+[LOG] 21.05.39 | Spawned object with record: 0x0000000000000C4
+[LOG] 21.05.39 | Spawned object with record: 0x0000000000000C5
+[LOG] 21.05.39 | Texture loaded: Assets/Textures/forestGame/ghost.png
+[LOG] 21.05.39 | Material loaded: Assets/Materials/ghost
+[LOG] 21.05.39 | Spawned object with record: 0x000000000000010
+[LOG] 21.05.39 | Hello beautiful world
+[ERROR] 21.05.39 | OpenGL Error: type = 8250, severity = 9147, message = Program/shader state performance warning: Vertex shader in program 55 is being recompiled based on GL state.
+[ERROR] 21.05.39 | OpenGL Error: type = 8250, severity = 9147, message = Program/shader state performance warning: Vertex shader in program 46 is being recompiled based on GL state.
+[LOG] 21.05.52 | Record 0x001000000000008 is pending destroy
+[LOG] 21.05.52 | Removed record: 0x001000000000008. No active references
+[LOG] 21.05.52 | Game closed, goodbye

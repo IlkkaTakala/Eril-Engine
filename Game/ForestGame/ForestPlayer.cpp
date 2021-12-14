@@ -59,7 +59,7 @@ void ForestPlayer::Winner()
 ForestPlayer::ForestPlayer() : Player()
 {
 	mouseSens = 0.1f;
-	Speed = 5.f;
+	Speed = 2.5f;
 
 	InputMode = true;
 	cursorState = true;
@@ -88,6 +88,8 @@ ForestPlayer::ForestPlayer() : Player()
 	Movement = SpawnObject<MovementComponent>();
 	Movement->SetTarget(dynamic_cast<Actor*>(this));
 	Movement->SetGravity(true);
+	Movement->SetPhysics(false);
+	Movement->SetMaxSpeed(Speed);
 
 	GetCamera()->SetPostProcess("PostProcessForest");
 }
@@ -136,13 +138,12 @@ void ForestPlayer::InputTwo(bool KeyDown)
 void ForestPlayer::RunInputShift(bool KeyDown)
 {
 	if (KeyDown) {
-		Movement->SetMaxSpeed(10.f);
+		Movement->SetMaxSpeed(4.f);
 	}
 	else {
-		Movement->SetMaxSpeed(5.f);
+		Movement->SetMaxSpeed(Speed);
 	}
 }
-
 
 void ForestPlayer::LeftMouseDown(bool KeyDown)
 {
@@ -151,14 +152,15 @@ void ForestPlayer::LeftMouseDown(bool KeyDown)
 
 void ForestPlayer::RightMouseDown(bool KeyDown)
 {
-	if (KeyDown == true)
-	Console::Log((GetCamera()->GetLocation() + Vector(0.f, 0.f, -2.2f)).ToString());
+	/*if (KeyDown == true)
+	Console::Log((GetCamera()->GetLocation() + Vector(0.f, 0.f, -2.2f)).ToString());*/
 }
 
 void ForestPlayer::InputQ(bool KeyDown)
 {
 	if (start != nullptr && end == nullptr) {
 		start->UI::RemoveFromScreen();
+		start = nullptr;
 		WindowManager::SetShowCursor(0, false);
 		cursorState = true;
 		Movement->SetAllowMovement(true);
@@ -239,6 +241,11 @@ void ForestPlayer::BeginPlay()
 	Movement->SetAllowMovement(false);
 }
 
+void ForestPlayer::OnDestroyed()
+{
+
+}
+
 Item::Item() : BaseObject()
 {
 
@@ -254,30 +261,8 @@ void Item::DestroyObject()
 	BaseObject::DestroyObject();
 }
 
-PlaceableItem::PlaceableItem() : Actor()
-{
 
-}
 
-void PlaceableItem::BeginPlay()
-{
-	Move = SpawnObject<MovementComponent>();
-	Move->SetTarget(this);
-	Move->SetPhysics(true);
-	Move->SetBrake(1.1f);
-	Mesh = SpawnObject<VisibleObject>();
-	AddComponent(Mesh);
-	Mesh->SetModel("candyCane");
-	Mesh->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/candy"));
-}
 
-void ForestPlayer::OnDestroyed()
-{
 
-}
-
-void PlaceableItem::DestroyObject()
-{
-	
-}
 

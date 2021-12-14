@@ -21,7 +21,7 @@ Ghost::Ghost() : Actor()
 	move->SetTarget(this);
 	move->SetGravity(true);
 	move->SetGround(ObjectManager::GetByRecord<Terrain>(0xA0001111));
-	move->SetMaxSpeed(6.f);
+	move->SetMaxSpeed(3.0f);
 	caught = false;
 	
 	time = 0.f;
