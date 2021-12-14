@@ -8,6 +8,9 @@ TextBox::TextBox()
 	AddChild(value);
 	value->SetJustification(Justify::Left);
 	value->SetStyle(Vector(0.f));
+	SetStyle(Vector(1.f));
+	SetHoverStyle(Vector(0.8f));
+	SetPressStyle(Vector(0.5f));
 }
 
 TextBox::~TextBox()

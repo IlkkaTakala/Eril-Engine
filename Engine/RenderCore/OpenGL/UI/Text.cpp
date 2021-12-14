@@ -32,8 +32,8 @@ struct Glyph
 
 struct Letter
 {
-	int offset;
-	uint letter;
+	glm::ivec2 offset;
+	glm::ivec2 letter;
 };
 
 struct Font
@@ -188,8 +188,8 @@ struct CharData {
 };
 
 struct LetterData {
-	int offset;
-	uint letter;
+	ivec2 offset;
+	ivec2 letter;
 };
 
 // Shader storage buffer objects
@@ -233,7 +233,7 @@ void main()
 	uint character = 0;
 	
 	if (gl_LocalInvocationIndex == 0) {
-		width = 0.5 - (weight / 100.0 - 1.0) * 0.13;
+		width = 0.47 - (weight / 100.0 - 1.0) * 0.13;
 	}
 
 	uint threadCount = TILE_SIZE;
@@ -244,11 +244,11 @@ void main()
 
 		if (stringIndex >= stringBuffer.length()) break;
 
-		uint letter = stringBuffer[stringIndex].letter;
+		uint letter = stringBuffer[stringIndex].letter.x;
 		ivec2 size = charBuffer[letter].size;
-		int xoffset = stringBuffer[stringIndex].offset + charBuffer[letter].offset.x;
+		int xoffset = stringBuffer[stringIndex].offset.x + charBuffer[letter].offset.x;
 		xoffset = int(xoffset * fontsize);
-		int yoffset = int(charBuffer[letter].offset.y * fontsize);
+		int yoffset = stringBuffer[stringIndex].offset.y + int(charBuffer[letter].offset.y * fontsize);
 		ivec2 dataLoc = charBuffer[letter].topLeft;
 		ivec2 endSize = ivec2(size * fontsize);
 		for (int y = 0; y < endSize.y; y++) {
@@ -256,13 +256,11 @@ void main()
 				vec4 result = vec4(1.0);
 				vec2 screenLoc = vec2(xoffset + x, yoffset + y);
 				ivec2 loc = ivec2(screenLoc.x + topLeft.x, screenSize.y - (topLeft.y + screenLoc.y));
-				//if (texture(depthMap, loc / vec2(screenSize)).r == depthValue) {
-					float fontValue = imageLoad(fontAtlas, dataLoc + ivec2((ivec2(x, y) / fontsize))).r;
-					result.a = smoothstep(width, width + fade, fontValue);
-					result *= color * tint;
-					vec4 ogColor = imageLoad(colorDest, loc);
-					imageStore(colorDest, loc, vec4(ogColor.xyz * (1.0 - result.a) + result.xyz * result.a, ogColor.a + result.a));
-				//}
+				float fontValue = imageLoad(fontAtlas, dataLoc + ivec2((ivec2(x, y) / fontsize))).r;
+				result.a = smoothstep(width, width + fade, fontValue);
+				result *= color * tint;
+				vec4 ogColor = imageLoad(colorDest, loc);
+				imageStore(colorDest, loc, vec4(ogColor.xyz * (1.0 - result.a) + result.xyz * result.a, ogColor.a + result.a));
 			}
 		}
 	}
@@ -299,20 +297,23 @@ void Text::Render()
 		Letter* storage = new Letter[value.size()]();
 		for (int i = 0; i < value.size(); i++) {
 			char letter = value[i];
-			storage[i].letter = letter;
+			storage[i].letter.x = letter;
 			if (i > 0) {
-				storage[i].offset = storage[i - 1].offset + uint(fonts[font].glyphs[storage[i - 1].letter].advance - 20);
-				if (fonts[font].kernings.count(storage[i - 1].letter) > 0) {
-					if (fonts[font].kernings[storage[i - 1].letter].count(letter) > 0)
-						storage[i].offset += (int)(fonts[font].kernings[storage[i - 1].letter][letter]);
+				storage[i].offset.x = storage[i - 1].offset.x + uint(fonts[font].glyphs[storage[i - 1].letter.x].advance - 20);
+				if (fonts[font].kernings.count(storage[i - 1].letter.x) > 0) {
+					if (fonts[font].kernings[storage[i - 1].letter.x].count(letter) > 0)
+						storage[i].offset += (int)(fonts[font].kernings[storage[i - 1].letter.x][letter]);
 				}
+				storage[i].offset.y = 0;
 			}
 			else {
-				storage[i].offset = 0;
+				storage[i].offset.x = 0;
+				storage[i].offset.y = 0;
 			}
 		}
-		int total_length = value == "" ? 0 : storage[value.size() - 1].offset + fonts[font].glyphs[storage[value.size() - 1].letter].advance;
+		int total_length = value == "" ? 0 : storage[value.size() - 1].offset.x + fonts[font].glyphs[storage[value.size() - 1].letter.x].advance;
 		int center = (int)(realSize.X - total_length * ratio) / 2;
+		int total_height = realSize.Y - fontSize;
 
 		switch (just)
 		{
@@ -321,12 +322,13 @@ void Text::Render()
 			break;
 		case Justify::Centre:
 			for (int i = 0; i < value.size(); i++) {
-				storage[i].offset += int(center / ratio);
+				storage[i].offset.x += int(center / ratio);
+				storage[i].offset.y += total_height / 2;
 			}
 			break;
 		case Justify::Right:
 			for (int i = 0; i < value.size(); i++) {
-				storage[i].offset -= total_length;
+				storage[i].offset.x -= total_length;
 			}
 			break;
 		default:
