@@ -43,8 +43,8 @@ shared vec4 frustumPlanes[6];
 // Shared local storage for visible indices, will be written out to the global buffer at the end
 shared int visibleLightIndices[1024];
 
-// Took some light culling guidance from Dice's deferred renderer
-// http://www.dice.se/news/directx-11-rendering-battlefield-3/
+// Shader code is reimplemented version of this:
+// https://github.com/bcrusco/Forward-Plus-Renderer
 
 #define TILE_SIZE 16
 layout(local_size_x = TILE_SIZE, local_size_y = TILE_SIZE, local_size_z = 1) in;

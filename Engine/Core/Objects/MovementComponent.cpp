@@ -41,10 +41,7 @@ void MovementComponent::Tick(float time)
 {
 	if (!allowMovement || Object == nullptr) return;
 	DesiredState.location = Object->GetLocation();
-	btVector3 colliderloc;
-	colliderloc.setValue(DesiredState.location.X, DesiredState.location.Z, DesiredState.location.Y);
-	rigid->body->getWorldTransform().setOrigin(colliderloc);
-
+	
 	OldState = DesiredState;
 	if (Object == nullptr) return;
 	switch (isPhysics)
@@ -122,6 +119,9 @@ void MovementComponent::Tick(float time)
 			velocity.Z = 0.f;
 			DesiredState.location.Z = Terra->GetHeight(DesiredState.location.X, DesiredState.location.Y);
 		}
+		btVector3 colliderloc;
+		colliderloc.setValue(DesiredState.location.X, DesiredState.location.Z, DesiredState.location.Y);
+		rigid->body->getWorldTransform().setOrigin(colliderloc);
 
 		DesiredState.velocity = velocity;
 		rigid->body->setLinearVelocity(btVector3(velocity.X, velocity.Z, velocity.Y));

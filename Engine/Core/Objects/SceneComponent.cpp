@@ -32,9 +32,9 @@ void SceneComponent::LoadWithParameters(const String& args)
 	auto rot = data.find("Rotation");
 	auto scale = data.find("Scale");
 
-	if (loc != data.end()) SetLocation(Vector(loc->second));
-	if (rot != data.end()) SetRotation(Vector(rot->second));
-	if (scale != data.end()) SetScale(Vector(scale->second));
+	if (loc != data.end()) SetLocation(Vector(loc->second), true);
+	if (rot != data.end()) SetRotation(Vector(rot->second), true);
+	if (scale != data.end()) SetScale(Vector(scale->second), true);
 }
 
 void SceneComponent::SetLocation(const Vector& NewLocation, bool force)
