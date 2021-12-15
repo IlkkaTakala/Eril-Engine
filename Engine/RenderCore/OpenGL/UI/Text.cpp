@@ -419,7 +419,7 @@ String Text::GetString() const
 	data += UIComponent::GetString();
 	data += " Style=\"" + style.Color.ToString() + ',' + std::to_string(style.Opacity) + ',' + (style.texture ? style.texture->GetName() : " ") + ',' + style.Tint.ToString() + '"';
 	data += " Text=\"" + value + "\"";
-	data += " TextStyle=\"" + fontSize + ',' + font + ',' + std::to_string((uint8)just) + "\"";
+	data += " TextStyle=\"" + std::to_string(fontSize) + ',' + font + ',' + std::to_string((uint8)just) + "\"";
 	data += " />\n";
 	return data;
 }

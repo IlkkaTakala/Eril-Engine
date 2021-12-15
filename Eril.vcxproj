@@ -145,7 +145,7 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>OpenAL32.lib;dwrite.lib;d2d1.lib;assimp-vc140-mt.lib;zlibstatic.lib;IrrXML.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>LinearMath.lib;BulletDynamics.lib;BulletCollision.lib;BulletInverseDynamics.lib;Bullet3Common.lib;Bullet3Geometry.lib;Bullet3Collision.lib;Bullet3Dynamics.lib;OpenAL32.lib;dwrite.lib;d2d1.lib;assimp-vc140-mt.lib;zlibstatic.lib;IrrXML.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\Engine\external\openal-soft\build\Debug;$(SolutionDir)\build\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -352,10 +352,10 @@
     <ClInclude Include="Game\UITest\TestUILoad.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Engine\Assets\Icons\icon.ico" />
+    <ResourceCompile Include="Engine\Assets\Resources\Eril.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Engine\Assets\Resources\Eril.rc" />
+    <Image Include="Engine\Assets\Icons\icon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
