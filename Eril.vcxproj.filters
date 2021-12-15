@@ -488,9 +488,6 @@
     <ClInclude Include="Game\UIEditor\EditorPlayer.h">
       <Filter>Game\UIEditor</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Assets\Resources\resource.h">
-      <Filter>Resources</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\VerticalPanel.h">
       <Filter>Engine\OpenGL\UI</Filter>
     </ClInclude>
@@ -506,16 +503,11 @@
     <ClInclude Include="Game\UITest\TestUILoad.h">
       <Filter>Game\UITesting</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Assets\Resources\resource.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Engine\Assets\Icons\icon.ico">
-      <Filter>Resources</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="Engine\Assets\Resources\Eril.rc">
-      <Filter>Resources</Filter>
-    </ResourceCompile>
     <ClInclude Include="Game\Disco\DiscoPlayer.h">
       <Filter>Game\Disco</Filter>
     </ClInclude>
@@ -539,6 +531,11 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="cpp.hint" />
+    <ResourceCompile Include="Engine\Assets\Resources\Eril.rc">
+      <Filter>Resources</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Engine\Assets\Icons\icon.ico" />
   </ItemGroup>
 </Project>

@@ -38,33 +38,12 @@ END
 
 3 TEXTINCLUDE 
 BEGIN
-    "MAINICON ICON ""Engine/Assets/Icons/icon.ico""\r\n"
-    "\0"
+    "MAINICON ICON ""../Icons/icon.ico""\0"
 END
 
 #endif    // APSTUDIO_INVOKED
 
 #endif    // Finnish (Finland) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// English (United Kingdom) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
-#pragma code_page(1252)
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDI_ICON1               ICON                    "..\\Icons\\icon.ico"
-
-#endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -74,7 +53,7 @@ IDI_ICON1               ICON                    "..\\Icons\\icon.ico"
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-
+MAINICON ICON "../Icons/icon.ico"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
 
