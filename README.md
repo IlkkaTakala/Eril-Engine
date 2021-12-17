@@ -1,3 +1,6 @@
+# [Release build here (under binaries)](https://repo.kamit.fi/ilkkatak/erilengine/-/releases)
+https://repo.kamit.fi/ilkkatak/erilengine/-/releases
+
 # Project Eril
 
 For information about the project, see the links below
