@@ -12,6 +12,7 @@ public:
 
 private:
 	void InputExit(bool);
+	void RegisterInputs(InputComponent* com);
 
 	UI* paused;
 };

@@ -10,6 +10,7 @@
 #include <Interface/WindowManager.h>
 #include <Interface/AudioManager.h>
 #include <GamePlay/Scene.h>
+#include "Objects/InputComponent.h"
 
 //ECS
 #include <Interface/IECS.h>
@@ -32,6 +33,25 @@ void TestPlayer::UseCursor(bool keydown)
 	}
 }
 
+void TestPlayer::RegisterInputs(InputComponent* com)
+{
+	com->RegisterKeyContinuousInput(81, &TestPlayer::RunInputQ, this);
+	com->RegisterKeyContinuousInput(90, &TestPlayer::RunInputZ, this);
+	com->RegisterKeyContinuousInput(87, &TestPlayer::RunInputW, this);
+	com->RegisterKeyContinuousInput(65, &TestPlayer::RunInputA, this);
+	com->RegisterKeyContinuousInput(83, &TestPlayer::RunInputS, this);
+	com->RegisterKeyContinuousInput(68, &TestPlayer::RunInputD, this);
+	com->RegisterKeyInput(32, &TestPlayer::RunInputSpace, this);
+	com->RegisterKeyInput(340, &TestPlayer::RunInputShift, this);
+	com->RegisterKeyInput(0, &TestPlayer::LeftMouseDown, this);
+	com->RegisterKeyInput(49, &TestPlayer::InputOne, this);
+	com->RegisterKeyInput(50, &TestPlayer::InputTwo, this);
+	com->RegisterKeyInput(256, &TestPlayer::InputExit, this);
+	com->RegisterKeyInput(257, &TestPlayer::OpenConsole, this);
+	com->RegisterMouseInput(0, &TestPlayer::MouseMoved, this);
+	com->RegisterKeyInput(69, &TestPlayer::UseCursor, this);
+}
+
 TestPlayer::TestPlayer() : Player()
 {
 
@@ -42,21 +62,7 @@ TestPlayer::TestPlayer() : Player()
 	spawnCounter = 0;
 
 	//Reqister used Inputs
-	II->RegisterKeyContinuousInput(81, &TestPlayer::RunInputQ, this);
-	II->RegisterKeyContinuousInput(90, &TestPlayer::RunInputZ, this);
-	II->RegisterKeyContinuousInput(87, &TestPlayer::RunInputW, this);
-	II->RegisterKeyContinuousInput(65, &TestPlayer::RunInputA, this);
-	II->RegisterKeyContinuousInput(83, &TestPlayer::RunInputS, this);
-	II->RegisterKeyContinuousInput(68, &TestPlayer::RunInputD, this);
-	II->RegisterKeyInput(32, &TestPlayer::RunInputSpace, this);
-	II->RegisterKeyInput(340, &TestPlayer::RunInputShift, this);
-	II->RegisterKeyInput(0, &TestPlayer::LeftMouseDown, this);
-	II->RegisterKeyInput(49, &TestPlayer::InputOne, this);
-	II->RegisterKeyInput(50, &TestPlayer::InputTwo, this);
-	II->RegisterKeyInput(256, &TestPlayer::InputExit, this);
-	II->RegisterKeyInput(257, &TestPlayer::OpenConsole, this);
-	II->RegisterMouseInput(0, &TestPlayer::MouseMoved, this);
-	II->RegisterKeyInput(69, &TestPlayer::UseCursor, this);
+	
 
 	//Player Model
 	Mesh = SpawnObject<VisibleObject>();

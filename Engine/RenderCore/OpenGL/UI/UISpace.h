@@ -22,7 +22,7 @@ public:
 	uint GetColor() const { return Color; }
 	uint GetDepth() const { return Depth; }
 
-	void RegisterInputs();
+	void RegisterInput();
 
 	Vector2D GetCursorDelta() { return cursorDelta; }
 
@@ -53,5 +53,7 @@ private:
 	std::list<Ref<UI>> TopLevel;
 	UIComponent* Focused;
 	UIComponent* Hovered;
+	Ref<InputComponent> UInputComp;
+
 };
 

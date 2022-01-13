@@ -43,6 +43,11 @@ BaseObject::BaseObject()
 	World = Loop->World;
 }
 
+void BaseObject::RegisterInputs(InputComponent* IC)
+{
+
+}
+
 const std::map<String, String> BaseObject::ParseOptions(const String& args)
 {
 	std::map<String, String> options;

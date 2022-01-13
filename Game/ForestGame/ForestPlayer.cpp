@@ -12,6 +12,7 @@
 #include <GamePlay/Scene.h>
 #include "EndScreen.h"
 #include "StartScreen.h"
+#include "Objects/InputComponent.h"
 
 //ECS
 #include <Interface/IECS.h>
@@ -69,21 +70,7 @@ ForestPlayer::ForestPlayer() : Player()
 	spawnCounter = 0;
 
 	//Reqister used Inputs
-	II->RegisterKeyContinuousInput(87, &ForestPlayer::RunInputW, this);
-	II->RegisterKeyContinuousInput(65, &ForestPlayer::RunInputA, this);
-	II->RegisterKeyContinuousInput(83, &ForestPlayer::RunInputS, this);
-	II->RegisterKeyContinuousInput(68, &ForestPlayer::RunInputD, this);
-	II->RegisterKeyInput(32, &ForestPlayer::RunInputSpace, this);
-	II->RegisterKeyInput(340, &ForestPlayer::RunInputShift, this);
-	II->RegisterKeyInput(0, &ForestPlayer::LeftMouseDown, this);
-	II->RegisterKeyInput(1, &ForestPlayer::RightMouseDown, this);
-	II->RegisterKeyInput(49, &ForestPlayer::InputOne, this);
-	II->RegisterKeyInput(50, &ForestPlayer::InputTwo, this);
-	II->RegisterKeyInput(256, &ForestPlayer::InputExit, this);
-	II->RegisterKeyInput(257, &ForestPlayer::OpenConsole, this);
-	II->RegisterMouseInput(0, &ForestPlayer::MouseMoved, this);
-	II->RegisterKeyInput(69, &ForestPlayer::ItemPickE, this);
-	II->RegisterKeyInput(81, &ForestPlayer::InputQ, this);
+	
 
 	Movement = SpawnObject<MovementComponent>();
 	Movement->SetTarget(dynamic_cast<Actor*>(this));
@@ -92,6 +79,25 @@ ForestPlayer::ForestPlayer() : Player()
 	Movement->SetMaxSpeed(Speed);
 
 	GetCamera()->SetPostProcess("PostProcessForest");
+}
+
+void ForestPlayer::RegisterInputs(InputComponent* com) 
+{
+	com->RegisterKeyContinuousInput(87, &ForestPlayer::RunInputW, this);
+	com->RegisterKeyContinuousInput(65, &ForestPlayer::RunInputA, this);
+	com->RegisterKeyContinuousInput(83, &ForestPlayer::RunInputS, this);
+	com->RegisterKeyContinuousInput(68, &ForestPlayer::RunInputD, this);
+	com->RegisterKeyInput(32, &ForestPlayer::RunInputSpace, this);
+	com->RegisterKeyInput(340, &ForestPlayer::RunInputShift, this);
+	com->RegisterKeyInput(0, &ForestPlayer::LeftMouseDown, this);
+	com->RegisterKeyInput(1, &ForestPlayer::RightMouseDown, this);
+	com->RegisterKeyInput(49, &ForestPlayer::InputOne, this);
+	com->RegisterKeyInput(50, &ForestPlayer::InputTwo, this);
+	com->RegisterKeyInput(256, &ForestPlayer::InputExit, this);
+	com->RegisterKeyInput(257, &ForestPlayer::OpenConsole, this);
+	com->RegisterMouseInput(0, &ForestPlayer::MouseMoved, this);
+	com->RegisterKeyInput(69, &ForestPlayer::ItemPickE, this);
+	com->RegisterKeyInput(81, &ForestPlayer::InputQ, this);
 }
 
 void ForestPlayer::RunInputW(float delta, bool KeyDown)

@@ -67,59 +67,16 @@ public:
 	virtual void SetInputHandler(void(*Callback)(int, int, int, int) = 0) = 0;
 	virtual void ProcessInputs(float delta) = 0;
 	void SetTextMode(bool mode) { isText = mode; }
-
-	void ClearInputs() {
-		KeyCallers.clear();
-		KeyCallersHold.clear();
-		MouseCallers.clear();
-		TextCallers.clear();
-	}
-
-	template <class UserClass>
-	void RegisterKeyContinuousInput(int Key, void (UserClass::* Callback)(float, bool), UserClass* Caller)
-	{
-		using std::placeholders::_1;
-		using std::placeholders::_2;
-		std::function<void(float, bool)> f = std::bind(Callback, Caller, _1, _2);
-		KeyCallersHold.insert(std::pair<int, std::function<void(float, bool)>>(Key, f));
-	}
-
-	template <class UserClass>
-	void RegisterKeyInput(int Key, void (UserClass::* Callback)(bool), UserClass* Caller)
-	{
-		using std::placeholders::_1;
-		std::function<void(bool)> f = std::bind(Callback, Caller, _1);
-		KeyCallers.insert(std::pair<int, std::function<void(bool)>>(Key, f));
-	}
-
-	template <class UserClass>
-	void RegisterTextInput(void (UserClass::* Callback)(uint), UserClass* Caller)
-	{
-		using std::placeholders::_1;
-		std::function<void(uint)> f = std::bind(Callback, Caller, _1);
-		TextCallers.push_back(std::function<void(uint)>(f));
-	}
-
-	template <class UserClass>
-	void RegisterMouseInput(int Key, void (UserClass::* Callback)(float, float), UserClass* Caller)
-	{
-		using std::placeholders::_1;
-		using std::placeholders::_2;
-		std::function<void(float, float)> f = std::bind(Callback, Caller, _1, _2);
-		MouseCallers.insert(std::pair<int, std::function<void(float, float)>>(Key, f));
-	}
+	void RegisterInputComponent(InputComponent* com) { ICs.push_back(com); }
+	void UnregisterInputComponent(InputComponent* com) { ICs.remove(com); }
 
 protected:
-	std::multimap<int, std::function<void(float, bool)>> KeyCallersHold;
-	std::multimap<int, std::function<void(bool)>> KeyCallers;
-	std::list<std::function<void(uint)>> TextCallers;
-	std::multimap<int, std::function<void(float, float)>> MouseCallers;
-
+	std::list<InputComponent*> ICs;
+	bool isText;
 	float MouseX;
 	float MouseY;
-
-	bool isText;
 };
+
 
 struct AABB
 {

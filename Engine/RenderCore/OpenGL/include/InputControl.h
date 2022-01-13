@@ -1,6 +1,7 @@
 #pragma once
 #include "Core.h"
 #include "Interface/IRender.h"
+#include "Objects/InputComponent.h"
 #include <map>
 #include <queue>
 
