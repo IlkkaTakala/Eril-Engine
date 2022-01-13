@@ -33,23 +33,23 @@ Final Responsibilities
 ## Features
 
 These are the features we will add on top of the existing features:
+* Input system rework
 * Scripting
 * SSAO
 * Reflections
 * Shadows
 * Animations
-* Input system rework
-* CMake/Custom build system
-* Custom file types
-* LODs
 * Editors
-* UI Framework
+* UI Framework improvements
 * Collisions
 
 
 Addidional features if required features are finished:
 * Networking
 * Level editor
+* CMake/Custom build system
+* Custom file types
+* LODs
 
 ## Timeline
 
@@ -82,7 +82,7 @@ gantt
 dateFormat  DD-MM
 
 section Matti
-Input Rework           :active,    mdes3, 13-01, 3w
+Input Rework           :active,    mdes3, 13-01, 1w
 Collisions             :active,    mdes1, after mdes3, 3w
 UI Improvements        :           mdes2, after mdes1, 3w
 ```
