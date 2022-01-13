@@ -7,6 +7,7 @@ FuncStorage globalFuncs = {
 		return Value();
 	})},
 	{"time", new Function<>(0, []() {
-		return Value(EVT::Float, std::to_string((float)time(0)));
+		float tim = (float)time(NULL);
+		return Value(EVT::Float, std::to_string(tim));
 	})},
 };

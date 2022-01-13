@@ -2,7 +2,22 @@
 #include "Error.h"
 #include "Parser.h"
 #include "ScriptCore.h"
+#include <sstream>
 
+template <typename Out>
+void split(const String& s, char delim, Out result) {
+	std::istringstream iss(s);
+	String item;
+	while (std::getline(iss, item, delim)) {
+		*result++ = item;
+	}
+}
+
+std::vector<String> split(const String& s, char delim) {
+	std::vector<String> elems;
+	split(s, delim, std::back_inserter(elems));
+	return elems;
+}
 
 inline ECharType TypeOfChar(const char* c)
 {
@@ -22,7 +37,7 @@ inline ECharType TypeOfChar(const char* c)
 		return ECharType::Other;
 }
 
-const char* ReadWord(const char* ptr, int& len)
+String ReadWord(const char* ptr, int& len)
 {
 	String word;
 	len = 0;
@@ -31,7 +46,7 @@ const char* ReadWord(const char* ptr, int& len)
 		ptr++;
 		len++;
 	}
-	return word.c_str();
+	return word;
 }
 
 const char* ReadUntil(const char* ptr, char delim) {
@@ -39,29 +54,102 @@ const char* ReadUntil(const char* ptr, char delim) {
 	return ptr;
 }
 
-const char* ReadUntilWithinScope(const char* ptr, char delim) {
+String CopyUntil(const char* ptr, char delim) {
+	String copy;
+	while (*ptr != delim) {
+		copy += *ptr;
+		ptr++;
+	}
+	return copy;
+}
+
+const char* ReadUntilNonWhite(const char* ptr) {
+	while (isspace(*ptr)) ptr++;
+	return ptr;
+}
+
+const char* ReadUntilWithinScope(const char* ptr, char delim, char scopeBegin = '{', char scopeEnd = '}') {
 	int scope = 0;
 	while (*ptr != delim || scope != 0) {
-		if (*ptr == '{') scope++;
-		if (*ptr == '}') scope--;
+		if (*ptr == scopeBegin) scope++;
+		if (*ptr == scopeEnd) scope--;
 		if (*ptr == delim && scope == 0) break;
 		ptr++;
 	}
 	return ptr;
 }
 
-int Parser::BeginParse(const char* data, uint off, uint& end, Node** nodePtr)
-{
-	return false;
+String CopyUntilWithinScope(const char* ptr, char delim, char scopeBegin = '{', char scopeEnd = '}') {
+	int scope = 0;
+	String copy;
+	while (*ptr != delim || scope != 0) {
+		if (*ptr == scopeBegin) scope++;
+		if (*ptr == scopeEnd) scope--;
+		copy += *ptr;
+		ptr++;
+	}
+	return copy;
 }
 
-void Parser::ParseFunctions(Script* script)
+int BeginParse(Context& c, const char* data, uint off, uint& end, Node** nodePtr)
 {
-	//Node** ptr = &(Scripts[idx]->functions["execute"].first);
+	const char* ptr = data;
+	int wordLen = 0;
+	c.currentNode = nodePtr;
+	Node** prevScope = c.currentNode;
+
+	while (*ptr != '\0' && !isError()) {
+		c.considerValue = ReadWord(data, wordLen);
+		ptr += wordLen;
+		ptr = ReadUntilNonWhite(ptr);
+		switch (*ptr)
+		{
+		case '(':
+		{
+			ptr++;
+			c.conType = ECT::Function;
+			int param_count = BaseFunction::GetParamCount(c.considerValue);
+			*c.currentNode = FuncNodes[param_count](c.considerValue);
+			prevScope = c.currentNode;
+			c.currentNode = (*c.currentNode)->GetChild(0);
+			String params = CopyUntilWithinScope(ptr, ')', '(', ')');
+			auto par = split(params, ',');
+			if (!par.empty()) {
+				if (par.size() > param_count) warn(("Too many parameters in function call: " + c.considerValue).c_str(), &c);
+				for (int i = 0; i < par.size() && i < param_count; i++) {
+					uint off = 0;
+					BeginParse(c, par[i].c_str(), 0, off, c.currentNode);
+					c.currentNode = (*prevScope)->GetChild(i);
+				}
+			}
+			c.considerValue = "";
+			ptr = ReadUntilWithinScope(ptr, ')', '(', ')') + 1;
+		}
+		break;
+
+		case '"':
+		{
+			ptr++;
+			*c.currentNode = new ValueNode(EVT::String, CopyUntil(ptr, '"'));
+			ptr = ReadUntil(ptr, '"') + 1;
+			c.currentNode = (*c.currentNode)->GetChild();
+		}
+		break;
+
+		default:
+		{
+			// Operand, Variable or keyword
+		}
+			break;
+		}
+	}
+
+	return false;
 }
 
 void Parser::FindFunctions(const char* data, Script* script)
 {
+	Context c;
 	const char* ptr = data;
 	int depth = 0;
 	int functionCount = 0;
@@ -72,15 +160,17 @@ void Parser::FindFunctions(const char* data, Script* script)
 			if (*(ptr + 1) == 'e' && *(ptr + 2) == 'f' && *(ptr + 3) == ' ') {
 				ptr += 4;
 				int len = 0;
-				const char* fun = ReadWord(ptr, len);
+				String fun = ReadWord(ptr, len);
 				ptr += len;
 				if (*ptr == '(') {
 					Node** fir = &(script->functions[fun].first);
-					printf("Found function!\n");
 					ptr = ReadUntilWithinScope(ptr, '{');
+					uint off = 0;
+					BeginParse(c, ++ptr, 0, off, fir);
+					ptr += off;
 				}
 				else {
-					error("Invalid function definition");
+					error("Invalid function definition", &c);
 				}
 			}
 		}
@@ -91,7 +181,8 @@ void Parser::FindFunctions(const char* data, Script* script)
 	}
 	if (script->functions.find("execute") == script->functions.end()) {
 		Node** fir = &(script->functions["execute"].first);
-
+		uint off = 0;
+		BeginParse(c, data, 0, off, fir);
 	}
 }
 

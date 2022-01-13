@@ -57,6 +57,7 @@ struct FuncNode : public Node
 	std::array<Value, c> eval_params;
 
 	virtual Node** GetChild(uint idx) override {
+		if (idx >= params.size()) return nullptr;
 		return &params[idx];
 	}
 

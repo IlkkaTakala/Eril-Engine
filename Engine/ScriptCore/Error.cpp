@@ -5,10 +5,15 @@
 static bool errorFlag = false;
 static std::string errorText = "";
 
-void error(const char* string)
+void error(const char* string, Context* c)
 {
-	std::cout << "Error while compiling: " << string << '\n';
+	std::cout << "Row " << std::to_string(c->row) << ": " << string << '\n';
 	errorFlag = true;
+}
+
+void warn(const char* string, Context* c)
+{
+	std::cout << "Row " << std::to_string(c->row) << ": " << string << '\n';
 }
 
 bool isError()

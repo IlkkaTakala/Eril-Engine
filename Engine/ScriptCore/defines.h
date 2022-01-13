@@ -32,3 +32,23 @@ enum class ECharType : uint8
 	Space,
 	Other,
 };
+
+struct Node;
+
+struct Context
+{
+	Context() {
+		scope = 0;
+		varType = EVT::Unknown;
+		conType = ECT::Null;
+		currentNode = nullptr;
+		row = 0;
+	}
+
+	int scope;
+	EVT varType;
+	ECT conType;
+	String considerValue;
+	Node** currentNode;
+	int row;
+};

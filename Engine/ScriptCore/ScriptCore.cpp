@@ -3,7 +3,9 @@
 
 int BaseFunction::GetParamCount(const String& name)
 {
-	return globalFuncs[name]->param_count;
+	if (globalFuncs.find(name) == globalFuncs.end()) error(("Function: " + name + "not found").c_str());
+	else return globalFuncs.find(name)->second->param_count;
+	return 0;
 }
 
 Value ScriptFunction::invoke() const
