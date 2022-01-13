@@ -1,135 +1,100 @@
 #pragma once
+#include "defines.h"
 #include <functional>
 #include <any>
+#include <map>
+#include <iostream>
 
-typedef std::string String;
+#include "Node.h"
+#include "Error.h"
 
-typedef unsigned char uint8;
-typedef unsigned int uint;
-
-struct Value;
-struct BaseFunction;
 struct ScriptFunction;
 struct Scope;
-struct Node;
 
-typedef void(*FuncNoParam)();
+typedef std::map<String, Value*> VarStorage;
 
-typedef enum class EVariableType : uint8
-{
-	Null,
-	Unknown,
-	Float,
-	String,
-	Object,
-	Array,
-} EVT;
-
-typedef enum class EConsiderType : uint8
-{
-	Null,
-	Variable,
-	Function,
-	Operator,
-} ECT;
-
-enum class ECharType : uint8
-{
-	Digit,
-	Char,
-	Operand,
-	Space,
-	Other,
+template <class R, class... ARGS>
+struct function_ripper {
+	static constexpr int n_args = sizeof...(ARGS);
 };
 
-struct Value
+template <class R, class... ARGS>
+auto constexpr make_ripper(R(ARGS...)) {
+	return function_ripper<R, ARGS...>();
+}
+
+template <typename...Args, typename Func>
+BaseFunction* make_wrap(Func f) {
+	int c = decltype(make_ripper(f))::n_args;
+	return new Function<Args...>(c, [f](auto ...v) {
+		return f(v...);
+		});
+}
+
+
+static VarStorage globalVars;
+
+inline Value _invoke_local(const LocalFuncStorage& storage, const String& name) {
+	if (storage.find(name) != storage.end()) {
+		return storage.find(name)->second.invoke();
+	}
+	else
+		error(("Invalid function call: " + name).c_str());
+	return Value();
+}
+
+
+struct Script
 {
-	EVariableType type;
-	String value;
-
-	Value() : type(EVT::Null), value("") {}
-	Value(EVT type, const String& s) : type(type), value(s) {}
-
-	template <typename T>
-	Value(T in) : value(in), type(EVT::Unknown) { }
-
-	template<>
-	Value(float in) { value = std::to_string(in); type = EVT::Float; }
-
-	template<>
-	Value(int in) { value = std::to_string(in); type = EVT::Float; }
-
-	template <typename T>
-	T GetValue() const
+	Script()
 	{
-		
+	}
+	~Script()
+	{
 	}
 
-	template<>
-	float GetValue() const
-	{
-		return (float)atof(value.c_str());
-	}
+	LocalFuncStorage functions;
+	VarStorage vars;
 
-	template<>
-	String GetValue() const
+	void evaluate()
 	{
-		return value;
-	}
-
-	template<>
-	int GetValue() const
-	{
-		return (int)atof(value.c_str());
-	}
-
-	operator int() const
-	{
-		return (int)atof(value.c_str());
-	}
-
-	operator String() const 
-	{
-		return value;
+		_invoke_local(functions, "execute");
 	}
 };
 
-struct ScriptFunction
+
+struct Scope
 {
-	ScriptFunction() {
-		scope = nullptr;
-		first = nullptr;
-	}
-	~ScriptFunction();
+	int level;
+	int childIdx;
+	std::list<Scope*> childs;
+	Scope* parent;
 
-	Scope* scope;
+	VarStorage variables;
 
-	Node* first;
-
-	Value invoke() const;
-};
-
-struct BaseFunction
-{
-	BaseFunction(int c) : param_count(c) {}
-	virtual ~BaseFunction() {}
-	static int GetParamCount(const String& name);
-	int param_count;
-};
-
-template<typename...Args>
-struct Function : public BaseFunction
-{
-	typedef std::function<Value(Args...)> FuncParams;
-
-	Function(const int count, FuncParams func) : BaseFunction(count), call(func) {}
-	Function() : BaseFunction(0), call(nullptr) {}
-
-	FuncParams call;
-
-	Value operator()(Args... v) const {
-		if (call) return call(v...);
-		else return Value();
+	Value* FindVar(const String& name) const {
+		if (variables.find(name) != variables.end())
+			return variables.find(name)->second;
+		else if (parent == nullptr) {
+			return nullptr;
+		}
+		else return parent->FindVar(name);
 	}
 
+	Scope& operator[](uint idx) {
+		if (idx == level) return *this;
+		if (childs.size())
+			childs.push_back(new Scope());
+		return (*(*childs.rbegin()))[idx];
+	}
+
+	Scope() {
+		level = 0;
+		parent = nullptr;
+		childIdx = 0;
+	}
+	~Scope()
+	{
+		for (const auto& p : childs) delete p;
+	}
 };
