@@ -48,8 +48,71 @@ struct Value
 		return (int)atof(value.c_str());
 	}
 
+	operator float() const
+	{
+		return (float)atof(value.c_str());
+	}
+
 	operator String() const
 	{
 		return value;
+	}
+
+	friend Value operator+(const Value& lhs, const Value& rhs) {
+		switch (lhs.type)
+		{
+		case EVT::String:
+		{
+			return lhs.value + lhs.value;
+		} break;
+
+		case EVT::Float:
+		{
+			return (float)lhs + float(rhs);
+		} break;
+
+		case EVT::Null:
+		{
+			return rhs;
+		} break;
+		default:
+			return lhs;
+		}
+	}
+
+	friend Value operator-(const Value& lhs, const Value& rhs) {
+		switch (lhs.type)
+		{
+		case EVT::String:
+		{
+			size_t pos = std::string::npos;
+			String res = lhs;
+			while ((pos = lhs.value.find(rhs.value)) != std::string::npos)
+			{
+				res.erase(pos, rhs.value.length());
+			}
+			return Value(EVT::String, res);
+		} break;
+
+		case EVT::Float:
+		{
+			return Value(EVT::Float, std::to_string((float)lhs - float(rhs)));
+		} break;
+
+		case EVT::Null:
+		{
+			switch (rhs.type)
+			{
+			case EVT::Float:
+				return -(float)rhs;
+				break;
+			default:
+				return rhs;
+				break;
+			}
+		} break;
+		default:
+			return lhs;
+		}
 	}
 };

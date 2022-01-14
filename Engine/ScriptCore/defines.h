@@ -43,6 +43,9 @@ struct Context
 		conType = ECT::Null;
 		currentNode = nullptr;
 		row = 0;
+		ptr = nullptr;
+		begin = nullptr;
+		end = nullptr;
 	}
 
 	int scope;
@@ -51,4 +54,7 @@ struct Context
 	String considerValue;
 	Node** currentNode;
 	int row;
+	const char* ptr;
+	const char* begin;
+	const char* end;
 };

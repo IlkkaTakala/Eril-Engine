@@ -7,7 +7,7 @@ static std::string errorText = "";
 
 void error(const char* string, Context* c)
 {
-	std::cout << "Row " << std::to_string(c->row) << ": " << string << '\n';
+	std::cout << "Row " << std::to_string(c ? c->row : 0) << ": " << string << '\n';
 	errorFlag = true;
 }
 

@@ -4,6 +4,8 @@
 #include "ScriptCore.h"
 #include <sstream>
 
+Node* ParseArea(Context& c, const char* const begin, const char* const end);
+
 template <typename Out>
 void split(const String& s, char delim, Out result) {
 	std::istringstream iss(s);
@@ -37,14 +39,86 @@ inline ECharType TypeOfChar(const char* c)
 		return ECharType::Other;
 }
 
-String ReadWord(const char* ptr, int& len)
+bool isNumber(const String& line)
+{
+	if (line.size() == 0) return false;
+	bool hasDot = false;
+	const char* ptr = line.c_str();
+	while (*ptr != '\0') {
+		if (!(isdigit(*ptr) || (hasDot == false && *ptr == '.'))) return false;
+		if (*ptr == '.')
+		{
+			hasDot = true;
+		}
+		ptr++;
+	}
+	return true;
+}
+
+Node* MakeValueNode(Context& c)
+{
+	if (c.considerValue.size() == 0) return new ValueNode(EVT::Null, "");
+	if (isNumber(c.considerValue)) return new ValueNode(EVT::Float, c.considerValue);
+	return new ValueNode(EVT::String, c.considerValue);
+}
+
+static std::map<String, Node*(*)(Context&)> Operators = {
+	{"=", [](Context& c) {
+			//*c.currentNode = FuncNodes[2](s);
+			/*Node** lhs = (*c.currentNode)->GetChild(0);
+			Node** rhs = (*c.currentNode)->GetChild(1);
+			*lhs = MakeValueNode(c);
+			*rhs = MakeValueNode(c);
+			c.currentNode = &(*c.currentNode)->next;*/
+			return FuncNodes[2]("=");
+}},
+{"-", [](Context& c) {
+	Node* next = FuncNodes[2]("-");
+	*next->GetChild(0) = ParseArea(c, c.begin, c.ptr);
+	*next->GetChild(1) = ParseArea(c, c.ptr + 1, c.end);
+
+	return next;
+}},
+{"+", [](Context& c) {
+	Node* next = FuncNodes[2]("+");
+	*next->GetChild(0) = ParseArea(c, c.begin, c.ptr);
+	*next->GetChild(1) = ParseArea(c, c.ptr + 1, c.end);
+
+	return next;
+}},
+{"/", [](Context& c) {
+	return FuncNodes[2]("/");
+}},
+{"*", [](Context& c) {
+	return FuncNodes[2]("*");
+}},
+};
+
+String ReadWord(Context& c)
+{
+	bool hasDot = false;
+	String word;
+	//len = 0;
+	while (isalnum(*c.ptr) || (isdigit(word.size() ? *word.begin() : '0') && *c.ptr == '.')) {
+		if (*c.ptr == '.')
+		{
+			if (hasDot) error("Unexpected character: '.'", &c);
+			if (!word.size()) word = "0";
+			hasDot = true;
+		}
+		word += *c.ptr;
+		c.ptr++;
+		//len++;
+	}
+	return word;
+}
+
+String ReadNonAlpha(Context& c)
 {
 	String word;
-	len = 0;
-	while (isalnum(*ptr)) {
-		word += *ptr;
-		ptr++;
-		len++;
+	while (ispunct(*c.ptr)) {
+		word += *c.ptr;
+		c.ptr++;
 	}
 	return word;
 }
@@ -91,60 +165,125 @@ String CopyUntilWithinScope(const char* ptr, char delim, char scopeBegin = '{', 
 	return copy;
 }
 
-int BeginParse(Context& c, const char* data, uint off, uint& end, Node** nodePtr)
+void HandleVariable(Context& c)
 {
-	const char* ptr = data;
-	int wordLen = 0;
-	c.currentNode = nodePtr;
-	Node** prevScope = c.currentNode;
 
-	while (*ptr != '\0' && !isError()) {
-		c.considerValue = ReadWord(data, wordLen);
-		ptr += wordLen;
-		ptr = ReadUntilNonWhite(ptr);
-		switch (*ptr)
+}
+
+bool isEqual(const String& s, const char* c) {
+	for (const char& ch : s) {
+		if (*c != ch) return false;
+	}
+	return true;
+}
+
+Node* ParseArea(Context& c, const char* const begin, const char* const end)
+{
+	int scope = 0;
+	Context l = c;
+	Node* result = nullptr;
+	l.ptr = begin;
+	l.begin = begin;
+	l.end = end;
+	for (auto const& [key, func] : Operators) {
+		l.ptr = end;
+		while (--l.ptr >= begin) {
+			if (*l.ptr == '(') scope++;
+			if (*l.ptr == ')') scope--;
+			if (*l.ptr == '{') scope++;
+			if (*l.ptr == '}') scope--;
+			if (scope == 0 && *l.ptr == *key.c_str() && isEqual(key, l.ptr)) {
+				result = func(l);
+				return result;
+			}
+		}
+	}
+	l.ptr = begin;
+
+	while (l.ptr != end) {
+		l.considerValue = ReadWord(l);
+		l.ptr = ReadUntilNonWhite(l.ptr);
+		switch (*l.ptr)
 		{
 		case '(':
 		{
-			ptr++;
-			c.conType = ECT::Function;
-			int param_count = BaseFunction::GetParamCount(c.considerValue);
-			*c.currentNode = FuncNodes[param_count](c.considerValue);
-			prevScope = c.currentNode;
-			c.currentNode = (*c.currentNode)->GetChild(0);
-			String params = CopyUntilWithinScope(ptr, ')', '(', ')');
+			l.ptr++;
+			l.conType = ECT::Function;
+			int param_count = BaseFunction::GetParamCount(l.considerValue);
+			result = FuncNodes[param_count](l.considerValue);
+			String params = CopyUntilWithinScope(l.ptr, ')', '(', ')');
 			auto par = split(params, ',');
 			if (!par.empty()) {
-				if (par.size() > param_count) warn(("Too many parameters in function call: " + c.considerValue).c_str(), &c);
+				if (par.size() > param_count) warn(("Too many parameters in function call: " + l.considerValue).c_str(), &l);
 				for (int i = 0; i < par.size() && i < param_count; i++) {
 					uint off = 0;
-					BeginParse(c, par[i].c_str(), 0, off, c.currentNode);
-					c.currentNode = (*prevScope)->GetChild(i);
+					l.ptr = par[i].c_str();
+					*(result)->GetChild(0) = ParseArea(l, par[i].c_str(), par[i].c_str() + par[i].size());
 				}
 			}
-			c.considerValue = "";
-			ptr = ReadUntilWithinScope(ptr, ')', '(', ')') + 1;
+			l.ptr = end;
+			l.considerValue = "";
+			return result;
 		}
 		break;
 
 		case '"':
 		{
-			ptr++;
-			*c.currentNode = new ValueNode(EVT::String, CopyUntil(ptr, '"'));
-			ptr = ReadUntil(ptr, '"') + 1;
-			c.currentNode = (*c.currentNode)->GetChild();
+			l.ptr++;
+			result = new ValueNode(EVT::String, CopyUntil(l.ptr, '"'));
+			l.ptr = ReadUntil(l.ptr, '"') + 1;
+
+			return result;
 		}
 		break;
 
 		default:
 		{
-			// Operand, Variable or keyword
+			// Operator, Variable or keyword
+			if (isNumber(l.considerValue)) {
+				result = new ValueNode(EVT::Float, l.considerValue);
+				return result;
+			}
+			else if (ispunct(*l.ptr)) {
+				error((String("Unexpected character found: ") + *l.ptr + ' ').c_str(), &l);
+				l.ptr++;
+			}
+			//if (l.considerValue.empty()) l.ptr++;
 		}
-			break;
+		break;
 		}
 	}
+	//error("Something went wrong here", &l);
+	return nullptr;
+}
 
-	return false;
+void ReadLine(Context& c)
+{
+	Context l = c;
+	Node** prevScope = nullptr;
+	l.begin = c.ptr;
+	l.end = l.ptr;
+	while (*l.end != '\0' && *l.end != '\n' && *l.end != ';') l.end++;
+
+	*c.currentNode = ParseArea(l, l.begin, l.end);
+	
+	c.ptr = l.end;
+	c.row++;
+}
+
+int BeginParse(Context& c, const char* data, uint off, uint& end, Node** nodePtr)
+{
+	Context l;
+	l.ptr = data;
+	l.row = c.row;
+	int wordLen = 0;
+	l.currentNode = nodePtr;
+	Node** prevScope = l.currentNode;
+
+	while (*l.ptr != '\0' && !isError()) {
+		ReadLine(l);
+	}
+	return true;
 }
 
 void Parser::FindFunctions(const char* data, Script* script)
@@ -160,8 +299,7 @@ void Parser::FindFunctions(const char* data, Script* script)
 			if (*(ptr + 1) == 'e' && *(ptr + 2) == 'f' && *(ptr + 3) == ' ') {
 				ptr += 4;
 				int len = 0;
-				String fun = ReadWord(ptr, len);
-				ptr += len;
+				String fun = ReadWord(c);
 				if (*ptr == '(') {
 					Node** fir = &(script->functions[fun].first);
 					ptr = ReadUntilWithinScope(ptr, '{');
@@ -184,250 +322,4 @@ void Parser::FindFunctions(const char* data, Script* script)
 		uint off = 0;
 		BeginParse(c, data, 0, off, fir);
 	}
-}
-
-
-
-
-bool parseLine(const char* data, uint off, uint& end, Node** nodePtr)
-{
-	uint count = 0;
-	const char* ptr = data + off;
-	Node** prevScope = nullptr;
-	Node** currentNode = nodePtr;
-
-	String considerValue;
-	EConsiderType type = ECT::Null;
-	EVariableType valType = EVT::Null;
-
-	bool argument = false;
-	int param_count = 0;
-
-	while (*ptr != '\0' && !isError())
-	{
-		count++;
-		if (*ptr == '\n') {
-			count++;
-			end = count + off;
-			return true;
-		}
-
-
-		switch (TypeOfChar(ptr))
-		{
-		case ECharType::Digit:
-		{
-			switch (type)
-			{
-			case EConsiderType::Null:
-			{
-				type = ECT::Variable;
-				valType = EVT::Float;
-				considerValue = *ptr;
-			} break;
-			case EConsiderType::Variable:
-			{
-				considerValue += *ptr;
-			} break;
-			case EConsiderType::Function:
-				considerValue += *ptr;
-				break;
-			case EConsiderType::Operator:
-				// TODO End operator here!
-
-				type = ECT::Variable;
-				valType = EVT::Float;
-				considerValue = *ptr;
-
-				break;
-			default:
-				error("Unexpected error, found digit");
-				break;
-			}
-		}
-		break;
-		case ECharType::Char:
-		{
-			switch (type)
-			{
-			case EConsiderType::Null:
-				considerValue += *ptr;
-				break;
-			case EConsiderType::Variable:
-				switch (valType)
-				{
-				case EVariableType::Null:
-					break;
-				case EVariableType::Float:
-					error("Invalid number");
-					break;
-				case EVariableType::String:
-					considerValue += *ptr;
-					break;
-				case EVariableType::Object:
-					break;
-				case EVariableType::Array:
-					break;
-				default:
-					break;
-				}
-				break;
-			case EConsiderType::Function:
-				break;
-			case EConsiderType::Operator:
-				break;
-			default:
-				break;
-			}
-		}
-		break;
-		case ECharType::Operand:
-		{
-			switch (type)
-			{
-			case EConsiderType::Null:
-				switch (*ptr)
-				{
-				case '(':
-					*currentNode = FuncNodes[BaseFunction::GetParamCount(considerValue)](considerValue);
-					prevScope = currentNode;
-					currentNode = (*currentNode)->GetChild(0);
-					considerValue = "";
-					argument = true;
-					break;
-				case ')':
-					argument = false;
-					break;
-				case ',':
-					currentNode = (*prevScope)->GetChild(++param_count);
-					break;
-				case '"':
-					type = ECT::Variable;
-					valType = EVT::String;
-					break;
-				default:
-					break;
-				}
-				break;
-			case EConsiderType::Variable:
-				switch (*ptr)
-				{
-				case '"':
-					if (valType == EVT::String) {
-						*currentNode = new ValueNode(valType, considerValue);
-						valType = EVT::Null;
-						type = ECT::Null;
-					}
-					else error("Invalid \" here");
-					break;
-				default:
-					break;
-				}
-				break;
-			case EConsiderType::Function:
-				break;
-			case EConsiderType::Operator:
-				break;
-			default:
-				break;
-			}
-		}
-		break;
-		case ECharType::Space:
-		{
-			switch (type)
-			{
-			case EConsiderType::Null:
-			{
-				// TODO: variable name!
-
-				considerValue = "";
-			}
-			break;
-			case EConsiderType::Variable:
-			{
-				switch (valType)
-				{
-				case EVariableType::Null:
-					break;
-				case EVariableType::Float:
-					*currentNode = new ValueNode(valType, considerValue);
-					currentNode = (*currentNode)->GetChild();
-					considerValue = "";
-					type = ECT::Null;
-					valType = EVT::Null;
-					break;
-				case EVariableType::String:
-					considerValue += ' ';
-					break;
-				case EVariableType::Object:
-					break;
-				case EVariableType::Array:
-					break;
-				default:
-					break;
-				}
-			} break;
-			case EConsiderType::Function:
-				// Thinking function arguments?
-				break;
-			case EConsiderType::Operator:
-			{
-				// TODO: End operator here!
-
-				considerValue = "";
-				type = ECT::Null;
-			} break;
-			default:
-				error("Unexpected whitespace found");
-				break;
-			}
-		}
-		break;
-		case ECharType::Other:
-		{
-			error("Weird character found");
-		}
-		break;
-		default:
-			break;
-		}
-
-		ptr++;
-	}
-
-	if (isError()) return false;
-	switch (type)
-	{
-	case EConsiderType::Null:
-	{
-
-	}
-	break;
-	case EConsiderType::Variable:
-	{
-		*currentNode = new ValueNode(valType, considerValue);
-	}
-	break;
-	case EConsiderType::Function:
-	{
-
-	}
-	break;
-	case EConsiderType::Operator:
-	{
-
-	}
-	break;
-	default:
-		break;
-	}
-
-	end = count + off;
-	return false;
-}
-
-void parseBlock()
-{
-
 }
