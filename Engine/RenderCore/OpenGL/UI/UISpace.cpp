@@ -207,7 +207,7 @@ void UISpace::RemoveComponent(UI* com)
 	Focused = nullptr;
 }
 
-void UISpace::RegisterInput()
+void UISpace::RegisterInputs()
 {
 	if (UInputComp != nullptr) UInputComp->DestroyObject();
 	UInputComp = SpawnObject<InputComponent>();

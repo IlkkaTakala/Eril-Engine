@@ -8,6 +8,9 @@ public:
 	Actor() {}
 	virtual ~Actor() {};
 	virtual void LoadWithParameters(const String& args);
+	void DisableInput();
+	void EnableInput();
+	InputComponent* GetInputComponent();
 	//void SetModel(const char* NewModel) { Model = NewModel; }
 protected:
 	virtual void Tick(float Delta) override;

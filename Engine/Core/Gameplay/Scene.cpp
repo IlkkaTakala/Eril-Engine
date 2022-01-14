@@ -120,7 +120,7 @@ void Scene::LoadLevel()
 		LoopSceneChildren(base);
 	}
 
-	RI->GetUIManager()->RegisterInput();
+	RI->GetUIManager()->RegisterInputs();
 
 	newLevel = "";
 }

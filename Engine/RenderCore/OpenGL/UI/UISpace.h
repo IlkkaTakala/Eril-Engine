@@ -22,7 +22,7 @@ public:
 	uint GetColor() const { return Color; }
 	uint GetDepth() const { return Depth; }
 
-	void RegisterInput();
+	void RegisterInputs();
 
 	Vector2D GetCursorDelta() { return cursorDelta; }
 
@@ -54,6 +54,5 @@ private:
 	UIComponent* Focused;
 	UIComponent* Hovered;
 	Ref<InputComponent> UInputComp;
-
 };
 

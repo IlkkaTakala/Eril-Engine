@@ -30,6 +30,9 @@ public:
 	void HandleInputs(KeyActioni key, float delta);
 	void HandleMouse(float x, float y, float delta);
 
+	void SetInputDisabled(bool value) { InputDisabled = value; }
+	bool GetInputDisabled() const { return InputDisabled; }
+
 	void ClearInputs() {
 		KeyCallers.clear();
 		KeyCallersHold.clear();
@@ -83,4 +86,5 @@ protected:
 
 private:
 	std::map<int, KeyActioni> Hold;
+	bool InputDisabled;
 };

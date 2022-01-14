@@ -153,7 +153,7 @@ void ForestPlayer::RunInputShift(bool KeyDown)
 
 void ForestPlayer::LeftMouseDown(bool KeyDown)
 {
-
+	//DisableInput();
 }
 
 void ForestPlayer::RightMouseDown(bool KeyDown)

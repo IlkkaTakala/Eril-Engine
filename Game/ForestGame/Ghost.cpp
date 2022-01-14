@@ -43,10 +43,10 @@ void Ghost::Tick(float delta)
 		move->AddInput(targetLoc - Location);
 
 		if ((playerLoc - Location).Length() < 2.f) {
-			//caught = true;
+			caught = true;
 			Console::Log("Player caught, game over!");
-			//dynamic_cast<ForestPlayer*>(GetGameState()->CurrentPlayer.GetPointer())->Caught();
-			//move->SetAllowMovement(false);
+			dynamic_cast<ForestPlayer*>(GetGameState()->CurrentPlayer.GetPointer())->Caught();
+			move->SetAllowMovement(false);
 		}
 	}
 	else {
@@ -61,7 +61,7 @@ void Ghost::stopMoving()
 
 void Ghost::startMoving()
 {
-	move->SetAllowMovement(false);
+	move->SetAllowMovement(true);
 }
 
 void Ghost::SetNewTarget(float delta)

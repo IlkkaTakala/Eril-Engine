@@ -11,6 +11,7 @@ InputComponent::InputComponent()
 	MouseX = 0;
 	MouseY = 0;
 	isText = false;
+	InputDisabled = false;
 }
 
 void InputComponent::OnDestroyed()
@@ -20,6 +21,7 @@ void InputComponent::OnDestroyed()
 
 void InputComponent::Tick(float delta)
 {
+	if (InputDisabled) return;
 	for (auto const& [key, value] : Hold) {
 		auto t = KeyCallersHold.find(key);
 		if (t != KeyCallersHold.end()) {
