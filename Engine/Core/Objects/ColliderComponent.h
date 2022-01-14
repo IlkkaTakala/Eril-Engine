@@ -3,8 +3,7 @@
 #include "Physics/BulletPhysics.h"
 #include <Physics/BulletObject.h>
 
-class ColliderComponent :
-    public SceneComponent
+class ColliderComponent : public SceneComponent
 {
     // rigitbody
 

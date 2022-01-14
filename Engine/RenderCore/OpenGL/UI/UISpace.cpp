@@ -7,6 +7,7 @@
 #include <GLFW/glfw3.h>
 #include <Interface/WindowManager.h>
 #include <UI/TextBox.h>
+#include "Objects/InputComponent.h"
 
 UISpace::UISpace()
 {
@@ -208,8 +209,10 @@ void UISpace::RemoveComponent(UI* com)
 
 void UISpace::RegisterInputs()
 {
-	II->RegisterKeyInput(0, &UISpace::LeftClick, this);
-	II->RegisterTextInput(&UISpace::GetTextInput, this);
+	if (UInputComp != nullptr) UInputComp->DestroyObject();
+	UInputComp = SpawnObject<InputComponent>();
+	UInputComp->RegisterKeyInput(0, &UISpace::LeftClick, this);
+	UInputComp->RegisterTextInput(&UISpace::GetTextInput, this);
 }
 
 void UISpace::LeftClick(bool down)

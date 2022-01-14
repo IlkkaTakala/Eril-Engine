@@ -32,7 +32,7 @@ Button::Button()
 	glDeleteBuffers(1, &uniformBuffer);
 
 	normal = UIStyle(Vector(1.f), 1.f, RI->LoadTextureByName("Assets/Textures/button.png"));
-	UIStyleGLM n(style);
+	UIStyleGLM n(normal);
 	glGenBuffers(1, &normalBuffer);
 	glBindBuffer(GL_UNIFORM_BUFFER, normalBuffer);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(UIStyleGLM), &n, GL_DYNAMIC_DRAW);

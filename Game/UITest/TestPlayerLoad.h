@@ -45,6 +45,7 @@ private:
 
 	void OpenConsole(bool);
 	void UseCursor(bool);
+	void RegisterInputs(InputComponent* com);
 
 	Ref<MovementComponent> Movement;
 	Ref<VisibleObject> Mesh;

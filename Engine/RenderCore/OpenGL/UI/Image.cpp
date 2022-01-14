@@ -64,7 +64,7 @@ layout (std140, binding = 1) uniform style
 uniform sampler2D tex;
 void main() 
 { 
-	vec4 res = texture(tex, TexCoords) * tint;
+	vec4 res = texture(tex, TexCoords) * tint * color;
 	res.a *= color.a;
 	FragColor = res; 
 }

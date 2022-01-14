@@ -53,5 +53,6 @@ private:
 	std::list<Ref<UI>> TopLevel;
 	UIComponent* Focused;
 	UIComponent* Hovered;
+	Ref<InputComponent> UInputComp;
 };
 

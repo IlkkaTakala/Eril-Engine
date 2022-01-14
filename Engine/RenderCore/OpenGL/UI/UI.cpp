@@ -5,6 +5,7 @@
 #include <rapidxml.hpp>
 #include <UI/Panel.h>
 #include <UI/Button.h>
+#include "Objects/InputComponent.h"
 
 UI::UI()
 {
@@ -27,6 +28,10 @@ void UI::AddToScreen(UI* component, Player* Owner, int screen)
 	UISpace* manager = RI->GetUIManager();
 
 	manager->AddComponent(component);
+
+	component->InputComp = SpawnObject<InputComponent>();
+
+	component->RegisterInputs(component->InputComp);
 }
 
 void UI::RemoveAllUI()

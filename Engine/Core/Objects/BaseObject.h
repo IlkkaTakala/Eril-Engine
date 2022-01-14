@@ -4,6 +4,7 @@
 
 class ObjectManager;
 class Scene;
+class InputComponent;
 struct Record;
 
 class RefHold
@@ -49,7 +50,7 @@ class BaseObject : public Data
 public:
 	//void operator delete(void* ptr);
 	BaseObject();
-
+	virtual void RegisterInputs(InputComponent* IC);
 	virtual void BeginPlay() = 0;
 	virtual void OnDestroyed() {};
 	Scene* GetScene() const { return World; }

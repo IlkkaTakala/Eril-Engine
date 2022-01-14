@@ -8,10 +8,11 @@
 #include <RenderCore/OpenGL/UI/UISpace.h>
 #include <tinyfiledialogs.h>
 #include <Interface/FileManager.h>
+#include "Objects/InputComponent.h"
 
 Editor::Editor()
 {
-	II->RegisterKeyContinuousInput(1, &Editor::RightClick, this);
+
 }
 
 Editor::~Editor()
@@ -138,6 +139,11 @@ void Editor::Edit(UIComponent* parent, UIComponent* target, const String& name)
 	////	});
 	//TreeCanvas->AddChildAt(0, but);
 	//TreeCanvas->UpdateMatrices(Vector2D());
+}
+
+void Editor::RegisterInputs(InputComponent* com)
+{
+	com->RegisterKeyContinuousInput(1, &Editor::RightClick, this);
 }
 
 void Editor::SetActive(EditorItemWrapper* edit)
