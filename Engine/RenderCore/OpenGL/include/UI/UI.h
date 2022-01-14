@@ -58,6 +58,7 @@ private:
 
 	Player* Owner;
 	UIComponent* TopLevel;
+	Ref<InputComponent> InputComp;
 };
 
 #define REGISTER_UI(CLASSNAME) private: inline static bool Registered = UI::do_ui_register<CLASSNAME>(#CLASSNAME);

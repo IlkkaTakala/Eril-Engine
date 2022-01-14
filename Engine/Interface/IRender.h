@@ -69,6 +69,7 @@ public:
 	void SetTextMode(bool mode) { isText = mode; }
 	void RegisterInputComponent(InputComponent* com) { ICs.push_back(com); }
 	void UnregisterInputComponent(InputComponent* com) { ICs.remove(com); }
+	void ClearInputs() { ICs.clear(); }
 
 protected:
 	std::list<InputComponent*> ICs;

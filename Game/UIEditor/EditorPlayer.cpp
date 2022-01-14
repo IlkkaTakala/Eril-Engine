@@ -14,6 +14,7 @@ EditorPlayer::EditorPlayer()
 
 void EditorPlayer::LoadWithParameters(const String& args)
 {
+	Player::LoadWithParameters(args);
 	auto ui = SpawnObject<Editor>();
 	UI::AddToScreen(ui, this);
 

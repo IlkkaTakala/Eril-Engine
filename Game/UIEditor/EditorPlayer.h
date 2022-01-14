@@ -12,7 +12,7 @@ public:
 
 private:
 	void InputExit(bool);
-	void RegisterInputs(InputComponent* com);
+	virtual void RegisterInputs(InputComponent* com) override;
 
 	UI* paused;
 };

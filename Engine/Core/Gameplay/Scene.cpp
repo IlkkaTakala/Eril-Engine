@@ -89,6 +89,7 @@ void Scene::LoadLevel()
 	WindowManager::SetShowCursor(0, false);
 	if (Loop->World != nullptr) {
 		ObjectManager::CleanObjects();
+		II->ClearInputs();
 	}
 
 	IECS::ResetECSWorld();
