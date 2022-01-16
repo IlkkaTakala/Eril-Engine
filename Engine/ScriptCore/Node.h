@@ -114,3 +114,18 @@ struct ValueNode : public Node
 		return value;
 	}
 };
+
+struct VariableNode : public Node
+{
+	Value* value;
+
+	VariableNode(Value* ptr);
+
+	virtual ~VariableNode() {}
+
+	virtual Value evaluate() override
+	{
+		if (child) *value = child->evaluate();
+		return *value;
+	}
+};

@@ -63,7 +63,7 @@ struct Value
 		{
 		case EVT::String:
 		{
-			return lhs.value + lhs.value;
+			return lhs.value + rhs.value;
 		} break;
 
 		case EVT::Float:
@@ -85,9 +85,10 @@ struct Value
 		{
 		case EVT::String:
 		{
+			if (rhs.value.size() == 0) return lhs;
 			size_t pos = std::string::npos;
 			String res = lhs;
-			while ((pos = lhs.value.find(rhs.value)) != std::string::npos)
+			while ((pos = res.find(rhs.value)) != std::string::npos)
 			{
 				res.erase(pos, rhs.value.length());
 			}
@@ -107,7 +108,7 @@ struct Value
 				return -(float)rhs;
 				break;
 			default:
-				return rhs;
+				return lhs;
 				break;
 			}
 		} break;

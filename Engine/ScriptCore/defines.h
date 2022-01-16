@@ -34,25 +34,26 @@ enum class ECharType : uint8
 };
 
 struct Node;
+struct Scope;
 
 struct Context
 {
 	Context() {
-		scope = 0;
 		varType = EVT::Unknown;
 		conType = ECT::Null;
 		currentNode = nullptr;
+		scope = nullptr;
 		row = 0;
 		ptr = nullptr;
 		begin = nullptr;
 		end = nullptr;
 	}
 
-	int scope;
 	EVT varType;
 	ECT conType;
 	String considerValue;
 	Node** currentNode;
+	Scope* scope;
 	int row;
 	const char* ptr;
 	const char* begin;

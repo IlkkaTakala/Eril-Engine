@@ -21,6 +21,11 @@ std::vector<String> split(const String& s, char delim) {
 	return elems;
 }
 
+void ExitContext(Context& c, Context& l)
+{
+	c.scope = l.scope;
+}
+
 inline ECharType TypeOfChar(const char* c)
 {
 	if (isdigit(*c)) {
@@ -61,38 +66,6 @@ Node* MakeValueNode(Context& c)
 	if (isNumber(c.considerValue)) return new ValueNode(EVT::Float, c.considerValue);
 	return new ValueNode(EVT::String, c.considerValue);
 }
-
-static std::map<String, Node*(*)(Context&)> Operators = {
-	{"=", [](Context& c) {
-			//*c.currentNode = FuncNodes[2](s);
-			/*Node** lhs = (*c.currentNode)->GetChild(0);
-			Node** rhs = (*c.currentNode)->GetChild(1);
-			*lhs = MakeValueNode(c);
-			*rhs = MakeValueNode(c);
-			c.currentNode = &(*c.currentNode)->next;*/
-			return FuncNodes[2]("=");
-}},
-{"-", [](Context& c) {
-	Node* next = FuncNodes[2]("-");
-	*next->GetChild(0) = ParseArea(c, c.begin, c.ptr);
-	*next->GetChild(1) = ParseArea(c, c.ptr + 1, c.end);
-
-	return next;
-}},
-{"+", [](Context& c) {
-	Node* next = FuncNodes[2]("+");
-	*next->GetChild(0) = ParseArea(c, c.begin, c.ptr);
-	*next->GetChild(1) = ParseArea(c, c.ptr + 1, c.end);
-
-	return next;
-}},
-{"/", [](Context& c) {
-	return FuncNodes[2]("/");
-}},
-{"*", [](Context& c) {
-	return FuncNodes[2]("*");
-}},
-};
 
 String ReadWord(Context& c)
 {
@@ -165,27 +138,67 @@ String CopyUntilWithinScope(const char* ptr, char delim, char scopeBegin = '{', 
 	return copy;
 }
 
-void HandleVariable(Context& c)
-{
-
-}
-
 bool isEqual(const String& s, const char* c) {
 	for (const char& ch : s) {
 		if (*c != ch) return false;
+		c++;
 	}
 	return true;
 }
 
+static std::list<std::tuple<String, Node* (*)(Context&)>> Operators = {
+{"=", [](Context& c) {
+	Node* lhs = ParseArea(c, c.begin, c.ptr);
+	if (static_cast<VariableNode*>(lhs) == nullptr) {
+		error("Invalid operand in assignment", &c);
+		return (Node*)nullptr;
+	}
+	*lhs->GetChild(0) = ParseArea(c, c.ptr + 1, c.end);
+	return lhs;
+}},
+{"-", [](Context& c) {
+	Node* next = FuncNodes[2]("-");
+	*next->GetChild(0) = ParseArea(c, c.begin, c.ptr);
+	*next->GetChild(1) = ParseArea(c, c.ptr + 1, c.end);
+
+	return next;
+}},
+{"+", [](Context& c) {
+	Node* next = FuncNodes[2]("+");
+	*next->GetChild(0) = ParseArea(c, c.begin, c.ptr);
+	*next->GetChild(1) = ParseArea(c, c.ptr + 1, c.end);
+
+	return next;
+}},
+{"/", [](Context& c) {
+	return FuncNodes[2]("/");
+}},
+{"*", [](Context& c) {
+	return FuncNodes[2]("*");
+}},
+};
+
+
+static std::map<String, Node* (*)(Context&)> Keywords = {
+{"var ", [](Context& c) {
+	c.ptr += 4;
+	String name = ReadWord(c);
+	if (!name.size()) error("Invalid Variable name: " + name, &c);
+	auto it = c.scope->variables.emplace(name, new Value());
+	Node* next = new VariableNode(it.first->second);
+	return next;
+}}
+};
+
 Node* ParseArea(Context& c, const char* const begin, const char* const end)
 {
-	int scope = 0;
 	Context l = c;
 	Node* result = nullptr;
 	l.ptr = begin;
 	l.begin = begin;
 	l.end = end;
 	for (auto const& [key, func] : Operators) {
+		int scope = 0;
 		l.ptr = end;
 		while (--l.ptr >= begin) {
 			if (*l.ptr == '(') scope++;
@@ -194,13 +207,43 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 			if (*l.ptr == '}') scope--;
 			if (scope == 0 && *l.ptr == *key.c_str() && isEqual(key, l.ptr)) {
 				result = func(l);
-				return result;
+				break;
 			}
 		}
+		if (result) break;
 	}
-	l.ptr = begin;
+	if (!result)
+	for (auto const& [key, func] : Keywords) {
+		int scope = 0;
+		l.ptr = end;
+		while (--l.ptr >= begin) {
+			if (*l.ptr == '(') scope++;
+			if (*l.ptr == ')') scope--;
+			if (*l.ptr == '{') scope++;
+			if (*l.ptr == '}') scope--;
+			if (scope == 0) {
+				if (!isalnum(*l.ptr)) {
+					if (*(l.ptr + 1) == *key.c_str() && isEqual(key, l.ptr + 1)) {
+						l.ptr++;
+						result = func(l);
+						break;
+					}
+				}
+				else if (l.ptr == begin) {
+					if (*l.ptr == *key.c_str() && isEqual(key, l.ptr)) {
+						result = func(l);
+						break;
+					}
+				}
+			}
+		}
+		if (result) break;
+	}
 
-	while (l.ptr != end) {
+	l.ptr = begin;
+	bool found = false;
+	while (!isError() && l.ptr != end && (result == nullptr && !found)) {
+		l.ptr = ReadUntilNonWhite(l.ptr);
 		l.considerValue = ReadWord(l);
 		l.ptr = ReadUntilNonWhite(l.ptr);
 		switch (*l.ptr)
@@ -223,7 +266,7 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 			}
 			l.ptr = end;
 			l.considerValue = "";
-			return result;
+			break;
 		}
 		break;
 
@@ -233,28 +276,63 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 			result = new ValueNode(EVT::String, CopyUntil(l.ptr, '"'));
 			l.ptr = ReadUntil(l.ptr, '"') + 1;
 
-			return result;
+			break;
 		}
 		break;
+
+		case '{':
+		{
+			l.scope->childs.push_back(new Scope(l.scope));
+			l.scope = l.scope->childs.back();
+			l.ptr++;
+			result = ParseArea(l, l.ptr, l.end);
+			break;
+		} break;
+
+		case '}':
+		{
+			if (l.scope->parent) l.scope = l.scope->parent;
+			else
+			{
+				error("Unexpected character found: }", &c);
+				break;
+			}
+			l.ptr++;
+			result = ParseArea(l, l.ptr, l.end);
+			break;
+		} break;
 
 		default:
 		{
 			// Operator, Variable or keyword
 			if (isNumber(l.considerValue)) {
 				result = new ValueNode(EVT::Float, l.considerValue);
-				return result;
+				break;
 			}
-			else if (ispunct(*l.ptr)) {
+			else if (l.ptr != end && ispunct(*l.ptr)) {
 				error((String("Unexpected character found: ") + *l.ptr + ' ').c_str(), &l);
 				l.ptr++;
+				break;
 			}
-			//if (l.considerValue.empty()) l.ptr++;
+			else {
+
+				Value* val = l.scope->FindVar(l.considerValue);
+				if (val) {
+					result = new VariableNode(val);
+					break;
+				}
+				else
+				{
+					error("Unknown variable: " + l.considerValue, &c);
+					break;
+				}
+			}
 		}
 		break;
 		}
 	}
-	//error("Something went wrong here", &l);
-	return nullptr;
+	ExitContext(c, l);
+	return result;
 }
 
 void ReadLine(Context& c)
@@ -262,23 +340,26 @@ void ReadLine(Context& c)
 	Context l = c;
 	Node** prevScope = nullptr;
 	l.begin = c.ptr;
-	l.end = l.ptr;
+	l.end = l.begin;
 	while (*l.end != '\0' && *l.end != '\n' && *l.end != ';') l.end++;
 
 	*c.currentNode = ParseArea(l, l.begin, l.end);
+	c = l;
+	c.currentNode = &(*c.currentNode)->next;
 	
 	c.ptr = l.end;
+	if (*l.end != '\0') c.ptr += 1;
 	c.row++;
 }
 
 int BeginParse(Context& c, const char* data, uint off, uint& end, Node** nodePtr)
 {
-	Context l;
+	Context l = c;
 	l.ptr = data;
-	l.row = c.row;
+	//l.row = c.row;
 	int wordLen = 0;
 	l.currentNode = nodePtr;
-	Node** prevScope = l.currentNode;
+	//Node** prevScope = l.currentNode;
 
 	while (*l.ptr != '\0' && !isError()) {
 		ReadLine(l);
@@ -302,6 +383,8 @@ void Parser::FindFunctions(const char* data, Script* script)
 				String fun = ReadWord(c);
 				if (*ptr == '(') {
 					Node** fir = &(script->functions[fun].first);
+					c.scope = new Scope(nullptr);
+					script->functions[fun].scope = c.scope;
 					ptr = ReadUntilWithinScope(ptr, '{');
 					uint off = 0;
 					BeginParse(c, ++ptr, 0, off, fir);
@@ -319,6 +402,8 @@ void Parser::FindFunctions(const char* data, Script* script)
 	}
 	if (script->functions.find("execute") == script->functions.end()) {
 		Node** fir = &(script->functions["execute"].first);
+		c.scope = new Scope(nullptr);
+		script->functions["execute"].scope = c.scope;
 		uint off = 0;
 		BeginParse(c, data, 0, off, fir);
 	}

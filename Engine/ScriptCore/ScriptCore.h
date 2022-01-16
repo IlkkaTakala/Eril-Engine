@@ -81,16 +81,16 @@ struct Scope
 		else return parent->FindVar(name);
 	}
 
-	Scope& operator[](uint idx) {
-		if (idx == level) return *this;
-		if (childs.size())
-			childs.push_back(new Scope());
-		return (*(*childs.rbegin()))[idx];
-	}
+	//Scope& operator[](uint idx) {
+	//	if (idx == level) return *this;
+	//	if (childs.size())
+	//		childs.push_back(new Scope());
+	//	return (*(*childs.rbegin()))[idx];
+	//}
 
-	Scope() {
+	Scope(Scope* p) {
 		level = 0;
-		parent = nullptr;
+		parent = p;
 		childIdx = 0;
 	}
 	~Scope()

@@ -5,3 +5,8 @@ ValueNode::ValueNode(EVT type, const String& s)
 {
 	value = Value(type, s);
 }
+
+VariableNode::VariableNode(Value* ptr)
+{
+	value = ptr;
+}

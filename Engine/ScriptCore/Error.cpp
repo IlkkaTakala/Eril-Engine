@@ -11,6 +11,12 @@ void error(const char* string, Context* c)
 	errorFlag = true;
 }
 
+void error(const String& string, Context* c)
+{
+	std::cout << "Row " << std::to_string(c ? c->row : 0) << ": " << string << '\n';
+	errorFlag = true;
+}
+
 void warn(const char* string, Context* c)
 {
 	std::cout << "Row " << std::to_string(c->row) << ": " << string << '\n';
