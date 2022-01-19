@@ -101,12 +101,38 @@ const char* ReadUntil(const char* ptr, char delim) {
 	return ptr;
 }
 
+const char* ReadUntilWithLimit(const char* ptr, char delim, const char* end, bool* success = nullptr) {
+	while (*ptr != delim) {
+		if (ptr == end) {
+			if (success) *success = false;
+			return nullptr;
+		}
+		ptr++;
+	}
+	if (success) *success = true;
+	return ptr;
+}
+
 String CopyUntil(const char* ptr, char delim) {
 	String copy;
 	while (*ptr != delim) {
 		copy += *ptr;
 		ptr++;
 	}
+	return copy;
+}
+
+String CopyUntilWithLimit(const char* ptr, char delim, const char* end, bool* success = nullptr) {
+	String copy;
+	while (*ptr != delim) {
+		if (ptr == end) {
+			if (success) *success = false;
+			return nullptr;
+		}
+		copy += *ptr;
+		ptr++;
+	}
+	if (success) *success = true;
 	return copy;
 }
 
@@ -246,6 +272,7 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 		l.ptr = ReadUntilNonWhite(l.ptr);
 		l.considerValue = ReadWord(l);
 		l.ptr = ReadUntilNonWhite(l.ptr);
+		if (l.ptr == l.end && l.considerValue.size() == 0) break;
 		switch (*l.ptr)
 		{
 		case '(':
@@ -273,14 +300,15 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 		case '"':
 		{
 			l.ptr++;
-			result = new ValueNode(EVT::String, CopyUntil(l.ptr, '"'));
-			l.ptr = ReadUntil(l.ptr, '"') + 1;
-
+			bool succ = false;
+			result = new ValueNode(EVT::String, CopyUntilWithLimit(l.ptr, '"', end, &succ));
+			l.ptr = ReadUntilWithLimit(l.ptr, '"', end, &succ) + 1;
+			if (!succ) error("End of String not found", &c);
 			break;
 		}
 		break;
 
-		case '{':
+		/*case '{':
 		{
 			l.scope->childs.push_back(new Scope(l.scope));
 			l.scope = l.scope->childs.back();
@@ -300,7 +328,7 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 			l.ptr++;
 			result = ParseArea(l, l.ptr, l.end);
 			break;
-		} break;
+		} break;*/
 
 		default:
 		{
@@ -341,14 +369,35 @@ void ReadLine(Context& c)
 	Node** prevScope = nullptr;
 	l.begin = c.ptr;
 	l.end = l.begin;
-	while (*l.end != '\0' && *l.end != '\n' && *l.end != ';') l.end++;
+	while (*l.end != '\0' && *l.end != '\n' && *l.end != ';' && l.end != c.end) {
+		if (*l.end == '{') {
+			l.scope->childs.push_back(new Scope(l.scope));
+			l.scope = l.scope->childs.back();
+			l.begin = ++l.end;
+		}
+		else if (*l.end == '}') {
+			if (l.end != l.begin) {
+				break;
+			}
+			if (l.scope->parent) l.scope = l.scope->parent;
+			else
+			{
+				error("Unexpected character found: }", &c);
+				break;
+			}
+			l.begin++;
+		}
+		l.end++;
+	}
 
-	*c.currentNode = ParseArea(l, l.begin, l.end);
-	c = l;
-	c.currentNode = &(*c.currentNode)->next;
-	
+	Node* n = ParseArea(l, l.begin, l.end);
+	ExitContext(c, l);
+	if (n != nullptr) {
+		*c.currentNode = n;
+		c.currentNode = &(*c.currentNode)->next;
+	}
 	c.ptr = l.end;
-	if (*l.end != '\0') c.ptr += 1;
+	if (*l.end == '\n' || *l.end == ';') c.ptr += 1;
 	c.row++;
 }
 
@@ -361,14 +410,16 @@ int BeginParse(Context& c, const char* data, uint off, uint& end, Node** nodePtr
 	l.currentNode = nodePtr;
 	//Node** prevScope = l.currentNode;
 
-	while (*l.ptr != '\0' && !isError()) {
+	while (*l.ptr != '\0' && !isError() && l.ptr != c.end) {
 		ReadLine(l);
 	}
+	c.ptr = l.ptr;
 	return true;
 }
 
 void Parser::FindFunctions(const char* data, Script* script)
 {
+	const char* function_end = data;
 	Context c;
 	const char* ptr = data;
 	int depth = 0;
@@ -380,15 +431,18 @@ void Parser::FindFunctions(const char* data, Script* script)
 			if (*(ptr + 1) == 'e' && *(ptr + 2) == 'f' && *(ptr + 3) == ' ') {
 				ptr += 4;
 				int len = 0;
+				c.ptr = ptr;
 				String fun = ReadWord(c);
-				if (*ptr == '(') {
+				if (*c.ptr == '(') {
 					Node** fir = &(script->functions[fun].first);
 					c.scope = new Scope(nullptr);
 					script->functions[fun].scope = c.scope;
 					ptr = ReadUntilWithinScope(ptr, '{');
 					uint off = 0;
+					c.end = ReadUntilWithinScope(ptr, '}');
 					BeginParse(c, ++ptr, 0, off, fir);
-					ptr += off;
+					ptr = c.end + 1;
+					function_end = ptr;
 				}
 				else {
 					error("Invalid function definition", &c);
@@ -404,7 +458,10 @@ void Parser::FindFunctions(const char* data, Script* script)
 		Node** fir = &(script->functions["execute"].first);
 		c.scope = new Scope(nullptr);
 		script->functions["execute"].scope = c.scope;
+		c.begin = function_end;
+		c.ptr = function_end;
+		c.end = ReadUntil(function_end, '\0');
 		uint off = 0;
-		BeginParse(c, data, 0, off, fir);
+		BeginParse(c, function_end, 0, off, fir);
 	}
 }

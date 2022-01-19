@@ -19,8 +19,12 @@ Value Assign(Value lhs, Value rhs)
 	return lhs - rhs;
 }
 
-FuncStorage globalFuncs = {
+NativeFuncStorage nativeFuncs = {
 	{"print", new Function<Value>(1, [](auto v) {
+		if (v.type == EVT::Null) {
+			std::cout << ">> Undefined\n";
+			return Value();
+	}
 		std::cout << ">> " << v.GetValue<String>() << '\n';
 		return Value();
 	})},
@@ -35,8 +39,8 @@ FuncStorage globalFuncs = {
 
 int BaseFunction::GetParamCount(const String& name)
 {
-	if (globalFuncs.find(name) == globalFuncs.end()) error(("Function: " + name + " not found").c_str());
-	else return globalFuncs.find(name)->second->param_count;
+	if (nativeFuncs.find(name) == nativeFuncs.end()) error(("Function: " + name + " not found").c_str());
+	else return nativeFuncs.find(name)->second->param_count;
 	return 0;
 }
 

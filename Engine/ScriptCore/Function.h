@@ -13,8 +13,9 @@ struct ScriptFunction;
 
 typedef void(*FuncNoParam)();
 
-typedef std::map<String, BaseFunction*> FuncStorage;
+typedef std::map<String, BaseFunction*> NativeFuncStorage;
 typedef std::map<String, ScriptFunction> LocalFuncStorage;
+typedef std::map<String, ScriptFunction> GlobalFuncStorage;
 
 struct BaseFunction
 {
@@ -57,4 +58,5 @@ struct ScriptFunction
 };
 
 
-extern FuncStorage globalFuncs;
+extern NativeFuncStorage nativeFuncs;
+extern GlobalFuncStorage globalFuncs;

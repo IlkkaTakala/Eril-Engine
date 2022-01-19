@@ -9,8 +9,8 @@
 template <typename ...Args>
 inline Value _invoke(const String& name, Args... vals)
 {
-	if (globalFuncs.find(name) != globalFuncs.end()) {
-		auto c = dynamic_cast<Function<Args...>*>(globalFuncs[name]);
+	if (nativeFuncs.find(name) != nativeFuncs.end()) {
+		auto c = dynamic_cast<Function<Args...>*>(nativeFuncs[name]);
 		if (c) return (*c)(vals...);
 		else return Value();
 	}
@@ -20,8 +20,8 @@ inline Value _invoke(const String& name, Args... vals)
 template<>
 inline Value _invoke<>(const String& name)
 {
-	if (globalFuncs.find(name) != globalFuncs.end()) {
-		auto c = dynamic_cast<Function<>*>(globalFuncs[name]);
+	if (nativeFuncs.find(name) != nativeFuncs.end()) {
+		auto c = dynamic_cast<Function<>*>(nativeFuncs[name]);
 		if (c) return (*c)();
 		else return Value();
 	}
@@ -30,7 +30,6 @@ inline Value _invoke<>(const String& name)
 
 struct Node
 {
-	uint scope;
 	Node* parent;
 	Node* child;
 	Node* next;
@@ -39,7 +38,7 @@ struct Node
 		return &child;
 	}
 
-	Node() : scope(0), parent(nullptr), child(nullptr), next(nullptr) {}
+	Node() : parent(nullptr), child(nullptr), next(nullptr) {}
 	virtual ~Node()
 	{
 		delete child;

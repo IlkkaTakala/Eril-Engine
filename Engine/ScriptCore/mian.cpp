@@ -2,6 +2,7 @@
 #include <iostream>
 #include "defines.h"
 #include <sstream>
+#include <fstream>
 
 #include "Export.h"
 
@@ -16,14 +17,22 @@ int main()
 	while (true) {
 		std::cout << "Input your code: \n";
 		String data;
-		std::getline(std::cin, data);
+		//std::getline(std::cin, data);
 
-		uint id = CompileScript(data.c_str());
+		std::ifstream in("script.txt");
+
+		std::stringstream buffer;
+		buffer << in.rdbuf();
+		in.close();
+
+		uint id = CompileScript(buffer.str().c_str());
 
 		//std::cout << id;
 
 		EvaluateScript(id);
 		CleanScript(id);
+
+		std::getline(std::cin, data);
 	}
 	return 0;
 }
