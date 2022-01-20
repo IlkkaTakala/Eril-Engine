@@ -37,7 +37,7 @@ NativeFuncStorage nativeFuncs = {
 };
 
 
-int BaseFunction::GetParamCount(const String& name)
+int BaseFunction::GetParamCount(Context& c, const String& name)
 {
 	if (nativeFuncs.find(name) == nativeFuncs.end()) error(("Function: " + name + " not found").c_str());
 	else return nativeFuncs.find(name)->second->param_count;
