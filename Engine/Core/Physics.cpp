@@ -11,7 +11,7 @@ namespace Physics
 	{
 		std::list<RefWeak<VisibleObject>> Statics;
 		std::list<RefWeak<MovementComponent>> Movables;
-		std::list<RefWeak<ColliderComponent>> Colliders;
+		//std::list<RefWeak<ColliderComponent>> Colliders;
 		// -------------------------------------------------------------------> alla oleva koodi on alkuperäistä
 		/*bool intersect(AABB a, AABB b) {
 			return (a.mins.X <= b.maxs.X && a.maxs.X >= b.mins.X) &&
@@ -151,8 +151,8 @@ namespace Physics
 			if (i->GetPointer() == obj) Movables.erase(i);
 		}*/
 	}
-	void RegisterCollider(ColliderComponent* obj)
+	/*void RegisterCollider(ColliderComponent* obj)
 	{
 		Colliders.push_back(obj);
-	}
+	}*/
 }

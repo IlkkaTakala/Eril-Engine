@@ -1,19 +1,21 @@
 #pragma once
-#include "SceneComponent.h"
-#include "Physics/BulletPhysics.h"
-#include <Physics/BulletObject.h>
-#include "btBulletCollisionCommon.h"
+#include "btBulletDynamicsCommon.h"
+#include "BaseObject.h"
 
-class ColliderComponent : public SceneComponent
-{
-    ColliderComponent();
-    ~ColliderComponent();
-    btDefaultCollisionConfiguration* collisionConfiguration;
-    btCollisionObject* collisionObject;
+struct bulletObject {
+    bool hit;
+    btRigidBody* body;
 
-
-private:
-    bulletObject collider;
-
+    bulletObject(btRigidBody* b) : body(b), hit(false) {}
+    bulletObject() : body(nullptr), hit(false) {}
+    ~bulletObject() { delete body; }
 };
 
+class ColliderComponent : public BaseObject
+{
+public:
+    bool collisionCheck(btManifoldPoint& cp, const btCollisionObject* obj1, int id1, int index1, const btCollisionObject* obj2, int id2, int index2);
+
+private:
+    
+};

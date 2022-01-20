@@ -3,7 +3,7 @@
 
 class VisibleObject;
 class MovementComponent;
-class ColliderComponent;
+//class ColliderComponent;
 
 namespace Physics
 {
@@ -12,6 +12,6 @@ namespace Physics
 	void RemoveStatic(VisibleObject* obj);
 	void AddMovable(MovementComponent* obj);
 	void RemoveMovable(MovementComponent* obj);
-	void RegisterCollider(ColliderComponent* obj);
+	//void RegisterCollider(ColliderComponent* obj);
 };
 
