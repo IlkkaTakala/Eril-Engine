@@ -11,8 +11,6 @@
 struct ScriptFunction;
 struct Scope;
 
-typedef std::map<String, Value*> VarStorage;
-
 template <class R, class... ARGS>
 struct function_ripper {
 	static constexpr int n_args = sizeof...(ARGS);
@@ -34,39 +32,8 @@ BaseFunction* make_wrap(Func f) {
 
 static VarStorage globalVars;
 
-inline Value _invoke_local(const LocalFuncStorage& storage, const String& name) {
-	if (storage.find(name) != storage.end()) {
-		return storage.find(name)->second.invoke();
-	}
-	else
-		error(("Invalid function call: " + name).c_str());
-	return Value();
-}
-
-
-struct Script
-{
-	Script()
-	{
-	}
-	~Script()
-	{
-	}
-
-	LocalFuncStorage functions;
-	VarStorage vars;
-
-	void evaluate()
-	{
-		_invoke_local(functions, "execute");
-	}
-};
-
-
 struct Scope
 {
-	int level;
-	int childIdx;
 	std::list<Scope*> childs;
 	Scope* parent;
 
@@ -89,9 +56,7 @@ struct Scope
 	//}
 
 	Scope(Scope* p) {
-		level = 0;
 		parent = p;
-		childIdx = 0;
 	}
 	~Scope()
 	{

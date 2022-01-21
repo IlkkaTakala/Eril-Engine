@@ -11,11 +11,10 @@ struct Node;
 struct BaseFunction;
 struct ScriptFunction;
 
-typedef void(*FuncNoParam)();
-
-typedef std::map<String, BaseFunction*> NativeFuncStorage;
-typedef std::map<String, ScriptFunction> LocalFuncStorage;
-typedef std::map<String, ScriptFunction> GlobalFuncStorage;
+typedef std::unordered_map<String, BaseFunction*> NativeFuncStorage;
+typedef std::unordered_map<String, ScriptFunction> LocalFuncStorage;
+typedef std::unordered_map<String, ScriptFunction> GlobalFuncStorage;
+typedef std::unordered_map<String, Value*> VarStorage;
 
 struct BaseFunction
 {
@@ -49,7 +48,8 @@ struct ScriptFunction
 		first = nullptr;
 	}
 	~ScriptFunction();
-	std::unordered_map<String, Node*> params;
+	std::vector<Value> params;
+	std::map<String, int> param_names;
 
 	Scope* scope;
 
@@ -60,5 +60,6 @@ struct ScriptFunction
 
 
 extern NativeFuncStorage nativeFuncs;
-extern std::map<String, NativeFuncStorage> ObjectFuncs;
+extern std::unordered_map<String, NativeFuncStorage> ObjectFuncs;
+extern std::unordered_map<String, VarStorage> ObjectVars;
 extern GlobalFuncStorage globalFuncs;

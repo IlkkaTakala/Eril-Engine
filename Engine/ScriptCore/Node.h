@@ -5,6 +5,35 @@
 #include <map>
 
 #include "Function.h"
+#include "Error.h"
+
+inline Value _invoke_local(const LocalFuncStorage& storage, const String& name) {
+	if (storage.find(name) != storage.end()) {
+		return storage.find(name)->second.invoke();
+	}
+	else
+		error(("Invalid function call: " + name).c_str());
+	return Value();
+}
+
+
+struct Script
+{
+	Script()
+	{
+	}
+	~Script()
+	{
+	}
+
+	LocalFuncStorage functions;
+	VarStorage vars;
+
+	void evaluate()
+	{
+		_invoke_local(functions, "execute");
+	}
+};
 
 template <typename ...Args>
 inline Value _invoke(const String& name, Args... vals)
@@ -13,6 +42,12 @@ inline Value _invoke(const String& name, Args... vals)
 		auto c = dynamic_cast<Function<Args...>*>(nativeFuncs[name]);
 		if (c) return (*c)(vals...);
 		else return Value();
+	}
+	else if (globalFuncs.find(name) != globalFuncs.end()) {
+		
+	}
+	else if (ObjectFuncs.find(name) != ObjectFuncs.end()) {
+		
 	}
 	return Value();
 }
@@ -92,12 +127,43 @@ template<> inline Value FuncNode<0>::evaluate()
 };
 
 typedef std::function<Node* (String)> init_FuncNode;
-static std::map<int, init_FuncNode> FuncNodes{
-	{0, [](String name) {return new FuncNode<0>(name); }},
-	{1, [](String name) {return new FuncNode<1>(name); }},
-	{2, [](String name) {return new FuncNode<2>(name); }},
-	{3, [](String name) {return new FuncNode<3>(name); }},
-	{4, [](String name) {return new FuncNode<4>(name); }},
+static std::vector<init_FuncNode> FuncNodes{
+	{[](String name) {return new FuncNode<0>(name); }},
+	{[](String name) {return new FuncNode<1>(name); }},
+	{[](String name) {return new FuncNode<2>(name); }},
+	{[](String name) {return new FuncNode<3>(name); }},
+	{[](String name) {return new FuncNode<4>(name); }},
+};
+
+struct ScriptFuncNode : public Node
+{
+	ScriptFunction* value;
+	std::vector<Node*> params;
+
+	virtual Node** GetChild(uint idx) override {
+		if (idx >= params.size()) return nullptr;
+		return &params[idx];
+	}
+
+	virtual ~ScriptFuncNode() {
+		for (const auto& child : params) {
+			delete child;
+		}
+	}
+
+	ScriptFuncNode(Script* s, const String& f, int size)
+	{
+		value = &s->functions[f];
+		params.resize(size, nullptr);
+	}
+
+	virtual Value evaluate() override
+	{
+		for (int i = 0; i < value->params.size() && i < params.size(); i++) {
+			value->params[i] = (params[i] ? params[i]->evaluate() : Value());
+		}
+		return value->invoke();
+	}
 };
 
 struct ValueNode : public Node
@@ -125,6 +191,22 @@ struct VariableNode : public Node
 	virtual Value evaluate() override
 	{
 		if (child) *value = child->evaluate();
+		return *value;
+	}
+};
+
+struct ConstantVariableNode : public Node
+{
+	Value* value;
+
+	ConstantVariableNode(Value* ptr) {
+		value = ptr;
+	}
+
+	virtual ~ConstantVariableNode() {}
+
+	virtual Value evaluate() override
+	{
 		return *value;
 	}
 };

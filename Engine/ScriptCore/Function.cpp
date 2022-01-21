@@ -36,11 +36,36 @@ NativeFuncStorage nativeFuncs = {
 	{"-", new Function<Value, Value>(2, ArithMinus)},
 };
 
+GlobalFuncStorage globalFuncs;
+std::unordered_map<String, NativeFuncStorage> ObjectFuncs;
+std::unordered_map<String, VarStorage> ObjectVars;
+
 
 int BaseFunction::GetParamCount(Context& c, const String& name)
-{
-	if (nativeFuncs.find(name) == nativeFuncs.end()) error(("Function: " + name + " not found").c_str());
-	else return nativeFuncs.find(name)->second->param_count;
+{	
+	if (c.object) {
+		if (ObjectFuncs.find(c.considerValue) == ObjectFuncs.end()) {
+
+		}
+		else {
+			if (ObjectFuncs[c.considerValue].find(name) == ObjectFuncs[c.considerValue].end())
+				error(("Function: " + name + " not found from object: " + c.considerValue).c_str());
+			else
+				return ObjectFuncs[c.considerValue].find(c.considerValue)->second->param_count;
+		}
+	}
+	else {
+		if (c.topLevel->functions.find(name) == c.topLevel->functions.end()) {
+			if (globalFuncs.find(name) == globalFuncs.end()) {
+				if (nativeFuncs.find(name) == nativeFuncs.end()) {
+					error(("Function: " + name + " not found").c_str());
+				}
+				else return nativeFuncs.find(name)->second->param_count;
+			}
+			else return globalFuncs.find(name)->second.params.size();
+		}
+		else return c.topLevel->functions.find(name)->second.params.size();
+	}
 	return 0;
 }
 

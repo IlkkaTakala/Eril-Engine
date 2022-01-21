@@ -23,6 +23,7 @@ std::vector<String> split(const String& s, char delim) {
 
 void ExitContext(Context& c, Context& l)
 {
+	c.topLevel = l.topLevel;
 	c.scope = l.scope;
 }
 
@@ -172,8 +173,12 @@ bool isEqual(const String& s, const char* c) {
 	return true;
 }
 
-static std::list<std::tuple<String, Node* (*)(Context&)>> Operators = {
-{"=", [](Context& c) {
+static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
+{"return ", true, [](Context& c) {
+	c.ptr += 7;
+	return ParseArea(c, c.ptr, c.end);
+}},
+{"=", false, [](Context& c) {
 	Node* lhs = ParseArea(c, c.begin, c.ptr);
 	if (static_cast<VariableNode*>(lhs) == nullptr) {
 		error("Invalid operand in assignment", &c);
@@ -182,38 +187,34 @@ static std::list<std::tuple<String, Node* (*)(Context&)>> Operators = {
 	*lhs->GetChild(0) = ParseArea(c, c.ptr + 1, c.end);
 	return lhs;
 }},
-{"-", [](Context& c) {
+{"-", false, [](Context& c) {
 	Node* next = FuncNodes[2]("-");
 	*next->GetChild(0) = ParseArea(c, c.begin, c.ptr);
 	*next->GetChild(1) = ParseArea(c, c.ptr + 1, c.end);
 
 	return next;
 }},
-{"+", [](Context& c) {
+{"+", false, [](Context& c) {
 	Node* next = FuncNodes[2]("+");
 	*next->GetChild(0) = ParseArea(c, c.begin, c.ptr);
 	*next->GetChild(1) = ParseArea(c, c.ptr + 1, c.end);
 
 	return next;
 }},
-{"/", [](Context& c) {
+{"/", false, [](Context& c) {
 	return FuncNodes[2]("/");
 }},
-{"*", [](Context& c) {
+{"*", false, [](Context& c) {
 	return FuncNodes[2]("*");
 }},
-};
-
-
-static std::map<String, Node* (*)(Context&)> Keywords = {
-{"var ", [](Context& c) {
+{"var ", true, [](Context& c) {
 	c.ptr += 4;
 	String name = ReadWord(c);
 	if (!name.size()) error("Invalid Variable name: " + name, &c);
 	auto it = c.scope->variables.emplace(name, new Value());
 	Node* next = new VariableNode(it.first->second);
 	return next;
-}}
+}},
 };
 
 Node* ParseArea(Context& c, const char* const begin, const char* const end)
@@ -223,47 +224,46 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 	l.ptr = begin;
 	l.begin = begin;
 	l.end = end;
-	for (auto const& [key, func] : Operators) {
+	for (auto const& [key, alnum, func] : Operators) {
 		int scope = 0;
 		l.ptr = end;
-		while (--l.ptr >= begin) {
-			if (*l.ptr == '(') scope++;
-			if (*l.ptr == ')') scope--;
-			if (*l.ptr == '{') scope++;
-			if (*l.ptr == '}') scope--;
-			if (scope == 0 && *l.ptr == *key.c_str() && isEqual(key, l.ptr)) {
-				result = func(l);
-				break;
-			}
-		}
-		if (result) break;
-	}
-	if (!result)
-	for (auto const& [key, func] : Keywords) {
-		int scope = 0;
-		l.ptr = end;
-		while (--l.ptr >= begin) {
-			if (*l.ptr == '(') scope++;
-			if (*l.ptr == ')') scope--;
-			if (*l.ptr == '{') scope++;
-			if (*l.ptr == '}') scope--;
-			if (scope == 0) {
-				if (!isalnum(*l.ptr)) {
-					if (*(l.ptr + 1) == *key.c_str() && isEqual(key, l.ptr + 1)) {
-						l.ptr++;
-						result = func(l);
-						break;
+		if (alnum) {
+			while (--l.ptr >= begin) {
+				if (*l.ptr == '(') scope++;
+				if (*l.ptr == ')') scope--;
+				if (*l.ptr == '{') scope++;
+				if (*l.ptr == '}') scope--;
+				if (scope == 0) {
+					if (!isalnum(*l.ptr)) {
+						if (*(l.ptr + 1) == *key.c_str() && isEqual(key, l.ptr + 1)) {
+							l.ptr++;
+							result = func(l);
+							break;
+						}
 					}
-				}
-				else if (l.ptr == begin) {
-					if (*l.ptr == *key.c_str() && isEqual(key, l.ptr)) {
-						result = func(l);
-						break;
+					else if (l.ptr == begin) {
+						if (*l.ptr == *key.c_str() && isEqual(key, l.ptr)) {
+							result = func(l);
+							break;
+						}
 					}
 				}
 			}
+			if (result) break;
 		}
-		if (result) break;
+		else {
+			while (--l.ptr >= begin) {
+				if (*l.ptr == '(') scope++;
+				if (*l.ptr == ')') scope--;
+				if (*l.ptr == '{') scope++;
+				if (*l.ptr == '}') scope--;
+				if (scope == 0 && *l.ptr == *key.c_str() && isEqual(key, l.ptr)) {
+					result = func(l);
+					break;
+				}
+			}
+			if (result) break;
+		}
 	}
 
 	l.ptr = begin;
@@ -279,8 +279,15 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 		{
 			l.ptr++;
 			l.conType = ECT::Function;
-			int param_count = BaseFunction::GetParamCount(l.considerValue);
-			result = FuncNodes[param_count](l.considerValue);
+			int param_count = 0;
+			if (l.topLevel->functions.find(l.considerValue) != l.topLevel->functions.end()) {
+				param_count = (int)l.topLevel->functions[l.considerValue].params.size();
+				result = new ScriptFuncNode(l.topLevel, l.considerValue, param_count);
+			}
+			else {
+				param_count = BaseFunction::GetParamCount(l, l.considerValue);
+				result = FuncNodes[param_count](l.considerValue);
+			}
 			String params = CopyUntilWithinScope(l.ptr, ')', '(', ')');
 			auto par = split(params, ',');
 			if (!par.empty()) {
@@ -288,7 +295,7 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 				for (int i = 0; i < par.size() && i < param_count; i++) {
 					uint off = 0;
 					l.ptr = par[i].c_str();
-					*(result)->GetChild(0) = ParseArea(l, par[i].c_str(), par[i].c_str() + par[i].size());
+					*(result)->GetChild(i) = ParseArea(l, par[i].c_str(), par[i].c_str() + par[i].size());
 				}
 			}
 			l.ptr = end;
@@ -351,6 +358,10 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 				}
 				else
 				{
+					if (c.function->param_names.find(l.considerValue) != c.function->param_names.end()) {
+						result = new ConstantVariableNode(&c.function->params[c.function->param_names[l.considerValue]]);
+						break;
+					}
 					error("Unknown variable: " + l.considerValue, &c);
 					break;
 				}
@@ -421,6 +432,7 @@ void Parser::FindFunctions(const char* data, Script* script)
 {
 	const char* function_end = data;
 	Context c;
+	c.topLevel = script;
 	const char* ptr = data;
 	int depth = 0;
 	int functionCount = 0;
@@ -434,10 +446,22 @@ void Parser::FindFunctions(const char* data, Script* script)
 				c.ptr = ptr;
 				String fun = ReadWord(c);
 				if (*c.ptr == '(') {
+					c.ptr++;
 					Node** fir = &(script->functions[fun].first);
 					c.scope = new Scope(nullptr);
 					script->functions[fun].scope = c.scope;
+					c.function = &script->functions[fun];
+					ptr = ReadUntilWithinScope(ptr, ')');
+					while (c.ptr != ptr && *c.ptr != '\0') {
+						c.ptr = ReadUntilNonWhite(c.ptr);
+						c.function->param_names[ReadWord(c)] = c.function->param_names.size();
+						bool success = false;
+						c.ptr = ReadUntilWithLimit(c.ptr, ',', ptr, &success);
+						if (success) c.ptr++;
+						else break;
+					}
 					ptr = ReadUntilWithinScope(ptr, '{');
+					c.function->params.resize(c.function->param_names.size(), Value());
 					uint off = 0;
 					c.end = ReadUntilWithinScope(ptr, '}');
 					BeginParse(c, ++ptr, 0, off, fir);
@@ -458,6 +482,7 @@ void Parser::FindFunctions(const char* data, Script* script)
 		Node** fir = &(script->functions["execute"].first);
 		c.scope = new Scope(nullptr);
 		script->functions["execute"].scope = c.scope;
+		c.function = &script->functions["execute"];
 		c.begin = function_end;
 		c.ptr = function_end;
 		c.end = ReadUntil(function_end, '\0');

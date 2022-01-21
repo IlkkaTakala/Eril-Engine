@@ -35,10 +35,15 @@ enum class ECharType : uint8
 
 struct Node;
 struct Scope;
+struct Script;
+struct ScriptFunction;
 
 struct Context
 {
 	Context() {
+		topLevel = nullptr;
+		function = nullptr;
+		object = false;
 		varType = EVT::Unknown;
 		conType = ECT::Null;
 		currentNode = nullptr;
@@ -49,6 +54,9 @@ struct Context
 		end = nullptr;
 	}
 
+	Script* topLevel;
+	ScriptFunction* function;
+	bool object;
 	EVT varType;
 	ECT conType;
 	String considerValue;
