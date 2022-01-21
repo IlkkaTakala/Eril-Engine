@@ -62,22 +62,22 @@ int BaseFunction::GetParamCount(Context& c, const String& name)
 				}
 				else return nativeFuncs.find(name)->second->param_count;
 			}
-			else return globalFuncs.find(name)->second.params.size();
+			else return (int)globalFuncs.find(name)->second.params.size();
 		}
-		else return c.topLevel->functions.find(name)->second.params.size();
+		else return (int)c.topLevel->functions.find(name)->second.params.size();
 	}
 	return 0;
 }
 
-Value ScriptFunction::invoke() const
+Value ScriptFunction::invoke()
 {
 	if (first) {
 		Node* ptr = first;
-		while (ptr->next != nullptr) {
-			ptr->evaluate();
+		while (ptr != nullptr && !shouldReturn) {
+			ptr->evaluate(this);
 			ptr = ptr->next;
 		}
-		return ptr->evaluate();
+		return returnValue;
 	}
 	else return Value();
 }

@@ -7,7 +7,7 @@
 #include "Function.h"
 #include "Error.h"
 
-inline Value _invoke_local(const LocalFuncStorage& storage, const String& name) {
+inline Value _invoke_local(LocalFuncStorage& storage, const String& name) {
 	if (storage.find(name) != storage.end()) {
 		return storage.find(name)->second.invoke();
 	}
@@ -65,7 +65,6 @@ inline Value _invoke<>(const String& name)
 
 struct Node
 {
-	Node* parent;
 	Node* child;
 	Node* next;
 
@@ -73,14 +72,14 @@ struct Node
 		return &child;
 	}
 
-	Node() : parent(nullptr), child(nullptr), next(nullptr) {}
+	Node() : child(nullptr), next(nullptr) {}
 	virtual ~Node()
 	{
 		delete child;
 		delete next;
 	}
 
-	virtual Value evaluate() = 0;
+	virtual Value evaluate(ScriptFunction* caller) = 0;
 };
 
 template <int c>
@@ -108,9 +107,9 @@ struct FuncNode : public Node
 		eval_params.fill(Value());
 	}
 
-	virtual Value evaluate() override
+	virtual Value evaluate(ScriptFunction* caller) override
 	{
-		for (int i = 0; i < params.size(); i++) eval_params[i] = (params[i] ? params[i]->evaluate() : Value());
+		for (int i = 0; i < params.size(); i++) eval_params[i] = (params[i] ? params[i]->evaluate(caller) : Value());
 		return invoke_helper<c>(eval_params, std::make_index_sequence<c>());
 	}
 
@@ -121,7 +120,7 @@ private:
 	}
 };
 
-template<> inline Value FuncNode<0>::evaluate()
+template<> inline Value FuncNode<0>::evaluate(ScriptFunction* caller)
 {
 	return _invoke(value);
 };
@@ -157,10 +156,10 @@ struct ScriptFuncNode : public Node
 		params.resize(size, nullptr);
 	}
 
-	virtual Value evaluate() override
+	virtual Value evaluate(ScriptFunction* caller) override
 	{
 		for (int i = 0; i < value->params.size() && i < params.size(); i++) {
-			value->params[i] = (params[i] ? params[i]->evaluate() : Value());
+			value->params[i] = (params[i] ? params[i]->evaluate(caller) : Value());
 		}
 		return value->invoke();
 	}
@@ -174,7 +173,7 @@ struct ValueNode : public Node
 
 	virtual ~ValueNode() {}
 
-	virtual Value evaluate() override
+	virtual Value evaluate(ScriptFunction* caller) override
 	{
 		return value;
 	}
@@ -188,9 +187,9 @@ struct VariableNode : public Node
 
 	virtual ~VariableNode() {}
 
-	virtual Value evaluate() override
+	virtual Value evaluate(ScriptFunction* caller) override
 	{
-		if (child) *value = child->evaluate();
+		if (child) *value = child->evaluate(caller);
 		return *value;
 	}
 };
@@ -205,8 +204,23 @@ struct ConstantVariableNode : public Node
 
 	virtual ~ConstantVariableNode() {}
 
-	virtual Value evaluate() override
+	virtual Value evaluate(ScriptFunction* caller) override
 	{
 		return *value;
+	}
+};
+
+struct ControlNode : public Node
+{
+	ControlNode() {
+	}
+
+	virtual ~ControlNode() {}
+
+	virtual Value evaluate(ScriptFunction* caller) override
+	{
+		caller->returnValue = child->evaluate(caller);
+		caller->shouldReturn = true;
+		return caller->returnValue;
 	}
 };

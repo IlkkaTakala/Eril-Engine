@@ -46,6 +46,9 @@ struct ScriptFunction
 	ScriptFunction() {
 		scope = nullptr;
 		first = nullptr;
+		continueNode = nullptr;
+		shouldReturn = false;
+		returnValue = Value();
 	}
 	~ScriptFunction();
 	std::vector<Value> params;
@@ -54,8 +57,11 @@ struct ScriptFunction
 	Scope* scope;
 
 	Node* first;
+	Node* continueNode;
+	bool shouldReturn;
+	Value returnValue;
 
-	Value invoke() const;
+	Value invoke();
 };
 
 

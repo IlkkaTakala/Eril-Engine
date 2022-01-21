@@ -63,7 +63,7 @@ struct Value
 		{
 		case EVT::String:
 		{
-			return lhs.value + rhs.value;
+			return Value(EVT::String, lhs.value + rhs.value);
 		} break;
 
 		case EVT::Float:

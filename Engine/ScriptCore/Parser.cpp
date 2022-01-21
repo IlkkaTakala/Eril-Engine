@@ -6,6 +6,8 @@
 
 Node* ParseArea(Context& c, const char* const begin, const char* const end);
 
+static const char* returnNode = "e";
+
 template <typename Out>
 void split(const String& s, char delim, Out result) {
 	std::istringstream iss(s);
@@ -123,12 +125,12 @@ String CopyUntil(const char* ptr, char delim) {
 	return copy;
 }
 
-String CopyUntilWithLimit(const char* ptr, char delim, const char* end, bool* success = nullptr) {
+String CopyUntilWithLimit(const char*& ptr, char delim, const char* end, bool* success = nullptr) {
 	String copy;
 	while (*ptr != delim) {
 		if (ptr == end) {
 			if (success) *success = false;
-			return nullptr;
+			return String();
 		}
 		copy += *ptr;
 		ptr++;
@@ -147,16 +149,39 @@ const char* ReadUntilWithinScope(const char* ptr, char delim, char scopeBegin = 
 	while (*ptr != delim || scope != 0) {
 		if (*ptr == scopeBegin) scope++;
 		if (*ptr == scopeEnd) scope--;
+		//if (*ptr == delim && scope == 0) break;
+		ptr++;
+	}
+	return ptr;
+}
+
+const char* ReadUntilWithinScopeWithLimit(const char* ptr, char delim, const char* end, char scopeBegin = '{', char scopeEnd = '}', bool* success = nullptr) {
+	int scope = 0;
+	while ((*ptr != delim || scope != 0) && ptr != end) {
+		if (*ptr == scopeBegin) scope++;
+		if (*ptr == scopeEnd) scope--;
 		if (*ptr == delim && scope == 0) break;
 		ptr++;
 	}
 	return ptr;
 }
 
-String CopyUntilWithinScope(const char* ptr, char delim, char scopeBegin = '{', char scopeEnd = '}') {
+String CopyUntilWithinScope(const char*& ptr, char delim, char scopeBegin = '{', char scopeEnd = '}') {
 	int scope = 0;
 	String copy;
 	while (*ptr != delim || scope != 0) {
+		if (*ptr == scopeBegin) scope++;
+		if (*ptr == scopeEnd) scope--;
+		copy += *ptr;
+		ptr++;
+	}
+	return copy;
+}
+
+String CopyUntilWithinScopeWithLimit(const char*& ptr, char delim, const char* end, char scopeBegin = '{', char scopeEnd = '}', bool* success = false) {
+	int scope = 0;
+	String copy;
+	while ((*ptr != delim || scope != 0) && ptr != end) {
 		if (*ptr == scopeBegin) scope++;
 		if (*ptr == scopeEnd) scope--;
 		copy += *ptr;
@@ -176,7 +201,10 @@ bool isEqual(const String& s, const char* c) {
 static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 {"return ", true, [](Context& c) {
 	c.ptr += 7;
-	return ParseArea(c, c.ptr, c.end);
+	Node* next = new ControlNode();
+	next->child = ParseArea(c, c.ptr, c.end);
+	next->next = (Node*)returnNode;
+	return next;
 }},
 {"=", false, [](Context& c) {
 	Node* lhs = ParseArea(c, c.begin, c.ptr);
@@ -288,14 +316,21 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 				param_count = BaseFunction::GetParamCount(l, l.considerValue);
 				result = FuncNodes[param_count](l.considerValue);
 			}
-			String params = CopyUntilWithinScope(l.ptr, ')', '(', ')');
-			auto par = split(params, ',');
-			if (!par.empty()) {
-				if (par.size() > param_count) warn(("Too many parameters in function call: " + l.considerValue).c_str(), &l);
-				for (int i = 0; i < par.size() && i < param_count; i++) {
+			const char* aend = ReadUntilWithinScope(l.ptr, ')', '(', ')');
+			std::vector<String> params;// = CopyUntilWithinScope(l.ptr, ')', '(', ')');
+			//auto par = split(params, ',');
+			while (l.ptr != aend && *l.ptr != '\0') {
+				l.ptr = ReadUntilNonWhite(l.ptr);
+				params.emplace_back(CopyUntilWithinScopeWithLimit(l.ptr, ',', aend, '(', ')'));
+				l.ptr = ReadUntilNonWhite(l.ptr);
+				if (*l.ptr == ',') l.ptr++;// = ReadUntilWithinScopeWithLimit(l.ptr, ',', aend, '(', ')');
+			}
+			if (!params.empty()) {
+				if (params.size() > param_count) warn(("Too many parameters in function call: " + l.considerValue).c_str(), &l);
+				for (int i = 0; i < params.size() && i < param_count; i++) {
 					uint off = 0;
-					l.ptr = par[i].c_str();
-					*(result)->GetChild(i) = ParseArea(l, par[i].c_str(), par[i].c_str() + par[i].size());
+					l.ptr = params[i].c_str();
+					*(result)->GetChild(i) = ParseArea(l, params[i].c_str(), params[i].c_str() + params[i].size());
 				}
 			}
 			l.ptr = end;
@@ -309,7 +344,7 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 			l.ptr++;
 			bool succ = false;
 			result = new ValueNode(EVT::String, CopyUntilWithLimit(l.ptr, '"', end, &succ));
-			l.ptr = ReadUntilWithLimit(l.ptr, '"', end, &succ) + 1;
+			l.ptr++; //= ReadUntilWithLimit(l.ptr, '"', end, &succ) + 1;
 			if (!succ) error("End of String not found", &c);
 			break;
 		}
@@ -405,7 +440,11 @@ void ReadLine(Context& c)
 	ExitContext(c, l);
 	if (n != nullptr) {
 		*c.currentNode = n;
-		c.currentNode = &(*c.currentNode)->next;
+		if (n->next != (Node*)returnNode) c.currentNode = &(*c.currentNode)->next;
+		else {
+			(*c.currentNode)->next = nullptr;
+			c.currentNode = nullptr;
+		}
 	}
 	c.ptr = l.end;
 	if (*l.end == '\n' || *l.end == ';') c.ptr += 1;
@@ -421,7 +460,7 @@ int BeginParse(Context& c, const char* data, uint off, uint& end, Node** nodePtr
 	l.currentNode = nodePtr;
 	//Node** prevScope = l.currentNode;
 
-	while (*l.ptr != '\0' && !isError() && l.ptr != c.end) {
+	while (*l.ptr != '\0' && !isError() && l.ptr != c.end && l.currentNode) {
 		ReadLine(l);
 	}
 	c.ptr = l.ptr;
@@ -454,13 +493,13 @@ void Parser::FindFunctions(const char* data, Script* script)
 					ptr = ReadUntilWithinScope(ptr, ')');
 					while (c.ptr != ptr && *c.ptr != '\0') {
 						c.ptr = ReadUntilNonWhite(c.ptr);
-						c.function->param_names[ReadWord(c)] = c.function->param_names.size();
+						c.function->param_names[ReadWord(c)] = (int)c.function->param_names.size();
 						bool success = false;
 						c.ptr = ReadUntilWithLimit(c.ptr, ',', ptr, &success);
 						if (success) c.ptr++;
 						else break;
 					}
-					ptr = ReadUntilWithinScope(ptr, '{');
+					ptr = ReadUntilWithinScope(ptr, '{') + 1;
 					c.function->params.resize(c.function->param_names.size(), Value());
 					uint off = 0;
 					c.end = ReadUntilWithinScope(ptr, '}');
