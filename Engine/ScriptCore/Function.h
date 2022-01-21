@@ -27,16 +27,16 @@ struct BaseFunction
 template<typename...Args>
 struct Function : public BaseFunction
 {
-	typedef std::function<Value(Args...)> FuncParams;
+	typedef std::function<Value(const Args&...)> FuncParams;
 
 	Function(const int count, FuncParams func) : BaseFunction(count), call(func) {}
 	Function() : BaseFunction(0), call(nullptr) {}
 
 	FuncParams call;
 
-	Value operator()(Args... v) const {
-		if (call) return call(v...);
-		else return Value();
+	void operator()(Value& value, const Args&... v) const {
+		if (call) value = std::move(call(v...));
+		else value = {};
 	}
 
 };
@@ -48,7 +48,7 @@ struct ScriptFunction
 		first = nullptr;
 		continueNode = nullptr;
 		shouldReturn = false;
-		returnValue = Value();
+		returnValue;
 	}
 	~ScriptFunction();
 	std::vector<Value> params;
@@ -61,7 +61,7 @@ struct ScriptFunction
 	bool shouldReturn;
 	Value returnValue;
 
-	Value invoke();
+	void invoke(Value& value);
 };
 
 

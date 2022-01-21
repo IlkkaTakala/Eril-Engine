@@ -3,7 +3,7 @@
 #include "defines.h"
 #include <sstream>
 #include <fstream>
-
+#include <windows.h>
 #include "Export.h"
 
 String funner(String s, int i) {
@@ -14,6 +14,12 @@ String funner(String s, int i) {
 
 int main()
 {
+	HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
+	
+	COORD c = { 200, 5000 }; 
+
+	//Change the internal buffer size:
+	SetConsoleScreenBufferSize(hStdout, c);
 	while (true) {
 		std::cout << "Input your code: \n";
 		String data;
@@ -26,8 +32,6 @@ int main()
 		in.close();
 
 		uint id = CompileScript(buffer.str().c_str());
-
-		//std::cout << id;
 
 		EvaluateScript(id);
 		CleanScript(id);

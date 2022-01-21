@@ -47,8 +47,9 @@ inline ECharType TypeOfChar(const char* c)
 		return ECharType::Other;
 }
 
-bool isNumber(const String& line)
+bool isNumber(const String& line, bool* isFloat = nullptr)
 {
+	if (isFloat) *isFloat = false;
 	if (line.size() == 0) return false;
 	bool hasDot = false;
 	const char* ptr = line.c_str();
@@ -60,6 +61,7 @@ bool isNumber(const String& line)
 		}
 		ptr++;
 	}
+	if (isFloat) *isFloat = hasDot;
 	return true;
 }
 
@@ -74,7 +76,6 @@ String ReadWord(Context& c)
 {
 	bool hasDot = false;
 	String word;
-	//len = 0;
 	while (isalnum(*c.ptr) || (isdigit(word.size() ? *word.begin() : '0') && *c.ptr == '.')) {
 		if (*c.ptr == '.')
 		{
@@ -84,7 +85,6 @@ String ReadWord(Context& c)
 		}
 		word += *c.ptr;
 		c.ptr++;
-		//len++;
 	}
 	return word;
 }
@@ -149,7 +149,6 @@ const char* ReadUntilWithinScope(const char* ptr, char delim, char scopeBegin = 
 	while (*ptr != delim || scope != 0) {
 		if (*ptr == scopeBegin) scope++;
 		if (*ptr == scopeEnd) scope--;
-		//if (*ptr == delim && scope == 0) break;
 		ptr++;
 	}
 	return ptr;
@@ -157,10 +156,14 @@ const char* ReadUntilWithinScope(const char* ptr, char delim, char scopeBegin = 
 
 const char* ReadUntilWithinScopeWithLimit(const char* ptr, char delim, const char* end, char scopeBegin = '{', char scopeEnd = '}', bool* success = nullptr) {
 	int scope = 0;
-	while ((*ptr != delim || scope != 0) && ptr != end) {
+	*success = true;
+	while (*ptr != delim || scope != 0) {
+		if (ptr == end) {
+			*success = false;
+			break;
+		}
 		if (*ptr == scopeBegin) scope++;
 		if (*ptr == scopeEnd) scope--;
-		if (*ptr == delim && scope == 0) break;
 		ptr++;
 	}
 	return ptr;
@@ -230,10 +233,18 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	return next;
 }},
 {"/", false, [](Context& c) {
-	return FuncNodes[2]("/");
+	Node* next = FuncNodes[2]("/");
+	*next->GetChild(0) = ParseArea(c, c.begin, c.ptr);
+	*next->GetChild(1) = ParseArea(c, c.ptr + 1, c.end);
+
+	return next;
 }},
 {"*", false, [](Context& c) {
-	return FuncNodes[2]("*");
+	Node* next = FuncNodes[2]("*");
+	*next->GetChild(0) = ParseArea(c, c.begin, c.ptr);
+	*next->GetChild(1) = ParseArea(c, c.ptr + 1, c.end);
+
+	return next;
 }},
 {"var ", true, [](Context& c) {
 	c.ptr += 4;
@@ -306,36 +317,49 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 		case '(':
 		{
 			l.ptr++;
-			l.conType = ECT::Function;
-			int param_count = 0;
-			if (l.topLevel->functions.find(l.considerValue) != l.topLevel->functions.end()) {
-				param_count = (int)l.topLevel->functions[l.considerValue].params.size();
-				result = new ScriptFuncNode(l.topLevel, l.considerValue, param_count);
-			}
-			else {
-				param_count = BaseFunction::GetParamCount(l, l.considerValue);
-				result = FuncNodes[param_count](l.considerValue);
-			}
-			const char* aend = ReadUntilWithinScope(l.ptr, ')', '(', ')');
-			std::vector<String> params;// = CopyUntilWithinScope(l.ptr, ')', '(', ')');
-			//auto par = split(params, ',');
-			while (l.ptr != aend && *l.ptr != '\0') {
-				l.ptr = ReadUntilNonWhite(l.ptr);
-				params.emplace_back(CopyUntilWithinScopeWithLimit(l.ptr, ',', aend, '(', ')'));
-				l.ptr = ReadUntilNonWhite(l.ptr);
-				if (*l.ptr == ',') l.ptr++;// = ReadUntilWithinScopeWithLimit(l.ptr, ',', aend, '(', ')');
-			}
-			if (!params.empty()) {
-				if (params.size() > param_count) warn(("Too many parameters in function call: " + l.considerValue).c_str(), &l);
-				for (int i = 0; i < params.size() && i < param_count; i++) {
-					uint off = 0;
-					l.ptr = params[i].c_str();
-					*(result)->GetChild(i) = ParseArea(l, params[i].c_str(), params[i].c_str() + params[i].size());
+			if (l.considerValue.size() != 0) {
+				l.conType = ECT::Function;
+				int param_count = 0;
+				if (l.topLevel->functions.find(l.considerValue) != l.topLevel->functions.end()) {
+					param_count = (int)l.topLevel->functions[l.considerValue].params.size();
+					result = new ScriptFuncNode(l.topLevel, l.considerValue, param_count);
 				}
+				else {
+					param_count = BaseFunction::GetParamCount(l, l.considerValue);
+					result = FuncNodes[param_count](l.considerValue);
+				}
+				const char* aend = ReadUntilWithinScope(l.ptr, ')', '(', ')');
+				std::vector<String> params;
+				while (l.ptr != aend && *l.ptr != '\0') {
+					l.ptr = ReadUntilNonWhite(l.ptr);
+					params.emplace_back(CopyUntilWithinScopeWithLimit(l.ptr, ',', aend, '(', ')'));
+					l.ptr = ReadUntilNonWhite(l.ptr);
+					if (*l.ptr == ',') l.ptr++;
+				}
+				if (!params.empty()) {
+					if (params.size() > param_count) warn(("Too many parameters in function call: " + l.considerValue).c_str(), &l);
+					for (int i = 0; i < params.size() && i < param_count; i++) {
+						uint off = 0;
+						l.ptr = params[i].c_str();
+						*(result)->GetChild(i) = ParseArea(l, params[i].c_str(), params[i].c_str() + params[i].size());
+					}
+				}
+				l.ptr = end;
+				l.considerValue = "";
+				break;
 			}
-			l.ptr = end;
-			l.considerValue = "";
-			break;
+			else
+			{
+				bool success = false;
+				l.end = ReadUntilWithinScopeWithLimit(l.ptr, ')', end, '(', ')', &success);
+				if (!success) {
+					error("Expected ')'", &l);
+					result = nullptr;
+					break;
+				}
+				result = ParseArea(l, l.ptr, l.end);
+				break;
+			}
 		}
 		break;
 
@@ -344,39 +368,17 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 			l.ptr++;
 			bool succ = false;
 			result = new ValueNode(EVT::String, CopyUntilWithLimit(l.ptr, '"', end, &succ));
-			l.ptr++; //= ReadUntilWithLimit(l.ptr, '"', end, &succ) + 1;
+			l.ptr++;
 			if (!succ) error("End of String not found", &c);
 			break;
 		}
 		break;
 
-		/*case '{':
-		{
-			l.scope->childs.push_back(new Scope(l.scope));
-			l.scope = l.scope->childs.back();
-			l.ptr++;
-			result = ParseArea(l, l.ptr, l.end);
-			break;
-		} break;
-
-		case '}':
-		{
-			if (l.scope->parent) l.scope = l.scope->parent;
-			else
-			{
-				error("Unexpected character found: }", &c);
-				break;
-			}
-			l.ptr++;
-			result = ParseArea(l, l.ptr, l.end);
-			break;
-		} break;*/
-
 		default:
 		{
-			// Operator, Variable or keyword
-			if (isNumber(l.considerValue)) {
-				result = new ValueNode(EVT::Float, l.considerValue);
+			bool isfloat = false;
+			if (isNumber(l.considerValue, &isfloat)) {
+				result = new ValueNode(isfloat ? EVT::Float : EVT::Int, l.considerValue);
 				break;
 			}
 			else if (l.ptr != end && ispunct(*l.ptr)) {
@@ -455,10 +457,8 @@ int BeginParse(Context& c, const char* data, uint off, uint& end, Node** nodePtr
 {
 	Context l = c;
 	l.ptr = data;
-	//l.row = c.row;
 	int wordLen = 0;
 	l.currentNode = nodePtr;
-	//Node** prevScope = l.currentNode;
 
 	while (*l.ptr != '\0' && !isError() && l.ptr != c.end && l.currentNode) {
 		ReadLine(l);
@@ -500,7 +500,7 @@ void Parser::FindFunctions(const char* data, Script* script)
 						else break;
 					}
 					ptr = ReadUntilWithinScope(ptr, '{') + 1;
-					c.function->params.resize(c.function->param_names.size(), Value());
+					c.function->params.resize(c.function->param_names.size(), {});
 					uint off = 0;
 					c.end = ReadUntilWithinScope(ptr, '}');
 					BeginParse(c, ++ptr, 0, off, fir);

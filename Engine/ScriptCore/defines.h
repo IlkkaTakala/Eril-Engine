@@ -11,6 +11,7 @@ typedef enum class EVariableType : uint8
 	Null,
 	Unknown,
 	Float,
+	Int,
 	String,
 	Object,
 	Array,

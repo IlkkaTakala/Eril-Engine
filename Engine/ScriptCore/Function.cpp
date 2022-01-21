@@ -4,36 +4,48 @@
 #include "Node.h"
 #include "ScriptCore.h"
 
-Value ArithPlus(Value lhs, Value rhs)
+Value ArithPlus(const Value& lhs, const Value& rhs)
 {
 	return lhs + rhs;
 }
 
-Value ArithMinus(Value lhs, Value rhs)
+Value ArithMinus(const Value& lhs, const Value& rhs)
 {
 	return lhs - rhs;
 }
 
-Value Assign(Value lhs, Value rhs)
+Value ArithMult(const Value& lhs, const Value& rhs)
+{
+	return lhs * rhs;
+}
+
+Value ArithDiv(const Value& lhs, const Value& rhs)
+{
+	return lhs / rhs;
+}
+
+Value Assign(const Value& lhs, const Value& rhs)
 {
 	return lhs - rhs;
 }
 
 NativeFuncStorage nativeFuncs = {
-	{"print", new Function<Value>(1, [](auto v) {
-		if (v.type == EVT::Null) {
+	{"print", new Function<const Value&>(1, [](auto v) {
+		if (v.type() == EVT::Null) {
 			std::cout << ">> Undefined\n";
-			return Value();
+			return Value{};
 	}
 		std::cout << ">> " << v.GetValue<String>() << '\n';
-		return Value();
+		return Value{};
 	})},
 	{"time", new Function<>(0, []() {
 		float tim = (float)time(NULL);
 		return Value(EVT::Float, std::to_string(tim));
 	})},
-	{"+", new Function<Value, Value>(2, ArithPlus)},
-	{"-", new Function<Value, Value>(2, ArithMinus)},
+	{"+", new Function<const Value&, const Value&>(2, ArithPlus)},
+	{"-", new Function<const Value&, const Value&>(2, ArithMinus)},
+	{"*", new Function<const Value&, const Value&>(2, ArithMult)},
+	{"/", new Function<const Value&, const Value&>(2, ArithDiv)},
 };
 
 GlobalFuncStorage globalFuncs;
@@ -69,17 +81,17 @@ int BaseFunction::GetParamCount(Context& c, const String& name)
 	return 0;
 }
 
-Value ScriptFunction::invoke()
+void ScriptFunction::invoke(Value& value)
 {
 	if (first) {
 		Node* ptr = first;
 		while (ptr != nullptr && !shouldReturn) {
-			ptr->evaluate(this);
+			ptr->evaluate(this, returnValue);
 			ptr = ptr->next;
 		}
-		return returnValue;
+		value = std::move(returnValue);
 	}
-	else return Value();
+	else value = {};
 }
 
 ScriptFunction::~ScriptFunction()
