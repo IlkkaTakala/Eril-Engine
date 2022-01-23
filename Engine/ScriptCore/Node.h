@@ -41,7 +41,7 @@ template <typename ...Args>
 inline void _invoke(Value& value, const String& name, const Args&... vals)
 {
 	if (nativeFuncs.find(name) != nativeFuncs.end()) {
-		auto c = dynamic_cast<Function<const Args&...>*>(nativeFuncs[name]);
+		auto c = dynamic_cast<Function<Args...>*>(nativeFuncs[name]);
 		if (c) (*c)(value, vals...);
 		else value = {};
 		return;
@@ -75,6 +75,8 @@ struct Node
 	virtual Node** GetChild(uint idx = 0) {
 		return &child;
 	}
+	virtual void SetChild(uint idx, Node* n) { child = n; }
+	virtual void SetValue(uint idx, const Value& v) {}
 
 	Node() : child(nullptr), next(nullptr) {}
 	virtual ~Node()
@@ -84,6 +86,21 @@ struct Node
 	}
 
 	virtual void evaluate(ScriptFunction* caller, Value& node) = 0;
+};
+
+struct ValueNode : public Node
+{
+	Value value;
+
+	ValueNode(EVT type, const String& s) : value(Value(type, s)) {}
+	ValueNode(const Value& v) : value(v) {}
+
+	virtual ~ValueNode() {}
+
+	virtual void evaluate(ScriptFunction* caller, Value& node) override
+	{
+		node = std::move(value);
+	}
 };
 
 template <int c>
@@ -96,6 +113,23 @@ struct FuncNode : public Node
 	virtual Node** GetChild(uint idx) override {
 		if (idx >= params.size()) return nullptr;
 		return &params[idx];
+	}
+
+	virtual void SetChild(uint idx, Node* n) override {
+		if (idx >= params.size()) return;
+		if (ValueNode* val(dynamic_cast<ValueNode*>(n)); val) {
+			params[idx] = nullptr;
+			val->evaluate(nullptr, eval_params[idx]);
+		}
+		else {
+			params[idx] = n;
+		}
+		return;
+	}
+
+	virtual void SetValue(uint idx, const Value& v) override {
+		if (idx >= c) return;
+		else eval_params[idx] = std::move(v);
 	}
 
 	virtual ~FuncNode() {
@@ -113,7 +147,7 @@ struct FuncNode : public Node
 
 	virtual void evaluate(ScriptFunction* caller, Value& node) override
 	{
-		for (int i = 0; i < params.size(); i++) if (params[i]) params[i]->evaluate(caller, eval_params[i]); else eval_params[i] = {};
+		for (int i = 0; i < params.size(); i++) if (params[i]) params[i]->evaluate(caller, eval_params[i]);
 		invoke_helper<c>(eval_params, std::make_index_sequence<c>(), node);
 	}
 
@@ -170,32 +204,18 @@ struct ScriptFuncNode : public Node
 	}
 };
 
-struct ValueNode : public Node
-{
-	Value value;
-
-	ValueNode(EVT type, const String& s);
-
-	virtual ~ValueNode() {}
-
-	virtual void evaluate(ScriptFunction* caller, Value& node) override
-	{
-		node = std::move(value);
-	}
-};
-
 struct VariableNode : public Node
 {
-	Value* value;
+	Variable* value;
 
-	VariableNode(Value* ptr);
+	VariableNode(Variable* ptr) : value(ptr) {}
 
 	virtual ~VariableNode() {}
 
 	virtual void evaluate(ScriptFunction* caller, Value& node) override
 	{
-		if (child) child->evaluate(caller, *value);
-		node = std::move(*value);
+		if (child && value->type == 0) child->evaluate(caller, *(value->value));
+		node = std::move(*value->value);
 	}
 };
 

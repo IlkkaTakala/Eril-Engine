@@ -30,7 +30,7 @@ Value Assign(const Value& lhs, const Value& rhs)
 }
 
 NativeFuncStorage nativeFuncs = {
-	{"print", new Function<const Value&>(1, [](auto v) {
+	{"print", new Function<Value>(1, [](auto v) {
 		if (v.type() == EVT::Null) {
 			std::cout << ">> Undefined\n";
 			return Value{};
@@ -42,10 +42,10 @@ NativeFuncStorage nativeFuncs = {
 		float tim = (float)time(NULL);
 		return Value(EVT::Float, std::to_string(tim));
 	})},
-	{"+", new Function<const Value&, const Value&>(2, ArithPlus)},
-	{"-", new Function<const Value&, const Value&>(2, ArithMinus)},
-	{"*", new Function<const Value&, const Value&>(2, ArithMult)},
-	{"/", new Function<const Value&, const Value&>(2, ArithDiv)},
+	{"+", new Function<Value, Value>(2, &ArithPlus)},
+	{"-", new Function<Value, Value>(2, &ArithMinus)},
+	{"*", new Function<Value, Value>(2, &ArithMult)},
+	{"/", new Function<Value, Value>(2, &ArithDiv)},
 };
 
 GlobalFuncStorage globalFuncs;

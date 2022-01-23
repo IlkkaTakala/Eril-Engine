@@ -43,11 +43,11 @@ struct Value
 
 	Value(const Value& val) : value(val.value) {}
 
-	Value(int in) { value = in; }
+	Value(int in) : value(in) {}
 
-	Value(float in) { value = in; }
+	Value(float in) : value(in) {}
 
-	Value(const String& in) { value = in; }
+	Value(const String& in) : value(in) {}
 
 	template <typename T>
 	T GetValue() const

@@ -39,21 +39,17 @@ struct Scope
 
 	VarStorage variables;
 
-	Value* FindVar(const String& name) const {
+	Variable* FindVar(const String& name) {
 		if (variables.find(name) != variables.end())
-			return variables.find(name)->second;
+			return &variables.find(name)->second;
 		else if (parent == nullptr) {
+			if (globalVars.find(name) != globalVars.end()) {
+				return &globalVars.find(name)->second;
+			}
 			return nullptr;
 		}
 		else return parent->FindVar(name);
 	}
-
-	//Scope& operator[](uint idx) {
-	//	if (idx == level) return *this;
-	//	if (childs.size())
-	//		childs.push_back(new Scope());
-	//	return (*(*childs.rbegin()))[idx];
-	//}
 
 	Scope(Scope* p) {
 		parent = p;

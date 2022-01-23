@@ -7,6 +7,7 @@
 Node* ParseArea(Context& c, const char* const begin, const char* const end);
 
 static const char* returnNode = "e";
+static const char* skipNode = "s";
 
 template <typename Out>
 void split(const String& s, char delim, Out result) {
@@ -211,49 +212,185 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 }},
 {"=", false, [](Context& c) {
 	Node* lhs = ParseArea(c, c.begin, c.ptr);
-	if (static_cast<VariableNode*>(lhs) == nullptr) {
+	auto var(dynamic_cast<VariableNode*>(lhs));
+	if (var == nullptr) {
 		error("Invalid operand in assignment", &c);
 		return (Node*)nullptr;
 	}
+	if (var->value->type > 0 && var->value->init)
+	{
+		error("Trying to assing to constant", &c);
+		return (Node*)nullptr;
+	}
+	if (var->value->type == 2) {
+		Node* rhs = ParseArea(c, c.ptr + 1, c.end);
+		auto rhsv = dynamic_cast<ValueNode*>(rhs);
+		if (rhsv) {
+			var->value->init = true;
+			*var->value->value = rhsv->value;
+			delete lhs;
+			delete rhs;
+			return (Node*)skipNode;
+		}
+		error("Trying to assing non-constant expression to static variable", &c);
+		return (Node*)nullptr;
+	}
+	var->value->init = true;
 	*lhs->GetChild(0) = ParseArea(c, c.ptr + 1, c.end);
 	return lhs;
 }},
 {"-", false, [](Context& c) {
-	Node* next = FuncNodes[2]("-");
-	*next->GetChild(0) = ParseArea(c, c.begin, c.ptr);
-	*next->GetChild(1) = ParseArea(c, c.ptr + 1, c.end);
-
+	Node* lhs = ParseArea(c, c.begin, c.ptr);
+	Node* rhs = ParseArea(c, c.ptr + 1, c.end);
+	Node* next = nullptr;
+	if (auto lhsv(dynamic_cast<ValueNode*>(lhs)); lhsv) {
+		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
+			next = new ValueNode(lhsv->value - rhsv->value);
+			delete lhs;
+			delete rhs;
+		}
+		else {
+			next = FuncNodes[2]("-");
+			next->SetValue(0, lhsv->value);
+			next->SetChild(1, rhs);
+			delete lhs;
+		}
+	}
+	else {
+		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
+			next = FuncNodes[2]("-");
+			next->SetChild(0, lhs);
+			next->SetValue(1, rhsv->value);
+			delete rhs;
+		}
+		else {
+			next = FuncNodes[2]("-");
+			next->SetChild(0, lhs);
+			next->SetChild(1, rhs);
+		}
+	}
 	return next;
 }},
 {"+", false, [](Context& c) {
-	Node* next = FuncNodes[2]("+");
-	*next->GetChild(0) = ParseArea(c, c.begin, c.ptr);
-	*next->GetChild(1) = ParseArea(c, c.ptr + 1, c.end);
-
+	Node* lhs = ParseArea(c, c.begin, c.ptr);
+	Node* rhs = ParseArea(c, c.ptr + 1, c.end);
+	Node* next = nullptr;
+	if (auto lhsv(dynamic_cast<ValueNode*>(lhs)); lhsv) {
+		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
+			next = new ValueNode(lhsv->value + rhsv->value);
+			delete lhs;
+			delete rhs;
+		}
+		else {
+			next = FuncNodes[2]("+");
+			next->SetValue(0, lhsv->value);
+			next->SetChild(1, rhs);
+			delete lhs;
+		}
+	}
+	else {
+		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
+			next = FuncNodes[2]("+");
+			next->SetChild(0, lhs);
+			next->SetValue(1, rhsv->value);
+			delete lhs;
+		}
+		else {
+			next = FuncNodes[2]("+");
+			next->SetChild(0, lhs);
+			next->SetChild(1, rhs);
+		}
+	}
 	return next;
 }},
 {"/", false, [](Context& c) {
-	Node* next = FuncNodes[2]("/");
-	*next->GetChild(0) = ParseArea(c, c.begin, c.ptr);
-	*next->GetChild(1) = ParseArea(c, c.ptr + 1, c.end);
-
+	Node* lhs = ParseArea(c, c.begin, c.ptr);
+	Node* rhs = ParseArea(c, c.ptr + 1, c.end);
+	Node* next = nullptr;
+	if (auto lhsv(dynamic_cast<ValueNode*>(lhs)); lhsv) {
+		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
+			next = new ValueNode(lhsv->value / rhsv->value);
+			delete lhs;
+			delete rhs;
+		}
+		else {
+			next = FuncNodes[2]("/");
+			next->SetValue(0, lhsv->value);
+			next->SetChild(1, rhs);
+			delete lhs;
+		}
+	}
+	else {
+		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
+			next = FuncNodes[2]("/");
+			next->SetChild(0, lhs);
+			next->SetValue(1, rhsv->value);
+			delete lhs;
+		}
+		else {
+			next = FuncNodes[2]("/");
+			next->SetChild(0, lhs);
+			next->SetChild(1, rhs);
+		}
+	}
 	return next;
 }},
 {"*", false, [](Context& c) {
-	Node* next = FuncNodes[2]("*");
-	*next->GetChild(0) = ParseArea(c, c.begin, c.ptr);
-	*next->GetChild(1) = ParseArea(c, c.ptr + 1, c.end);
-
+	Node* lhs = ParseArea(c, c.begin, c.ptr);
+	Node* rhs = ParseArea(c, c.ptr + 1, c.end);
+	Node* next = nullptr;
+	if (auto lhsv(dynamic_cast<ValueNode*>(lhs)); lhsv) {
+		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
+			next = new ValueNode(lhsv->value * rhsv->value);
+			delete lhs;
+			delete rhs;
+		}
+		else {
+			next = FuncNodes[2]("*");
+			next->SetValue(0, lhsv->value);
+			next->SetChild(1, rhs);
+			delete lhs;
+		}
+	}
+	else {
+		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
+			next = FuncNodes[2]("*");
+			next->SetChild(0, lhs);
+			next->SetValue(1, rhsv->value);
+			delete lhs;
+		}
+		else {
+			next = FuncNodes[2]("*");
+			next->SetChild(0, lhs);
+			next->SetChild(1, rhs);
+		}
+	}
 	return next;
 }},
 {"var ", true, [](Context& c) {
 	c.ptr += 4;
 	String name = ReadWord(c);
 	if (!name.size()) error("Invalid Variable name: " + name, &c);
-	auto it = c.scope->variables.emplace(name, new Value());
-	Node* next = new VariableNode(it.first->second);
+	auto it = c.scope->variables.emplace(name, Variable(new Value(), 0, false));
+	Node* next = new VariableNode(&it.first->second);
 	return next;
 }},
+{ "const ", true, [](Context& c) {
+	c.ptr += 6;
+	String name = ReadWord(c);
+	if (!name.size()) error("Invalid Variable name: " + name, &c);
+	auto it = c.scope->variables.emplace(name, Variable(new Value(), 1, false));
+	Node* next = new VariableNode(&it.first->second);
+	return next;
+}},
+{ "static ", true, [](Context& c) {
+	c.ptr += 7;
+	String name = ReadWord(c);
+	if (!name.size()) error("Invalid Variable name: " + name, &c);
+	auto it = c.scope->variables.emplace(name, Variable(new Value(), 2, false));
+	Node* next = new VariableNode(&it.first->second);
+	return next;
+} }
 };
 
 Node* ParseArea(Context& c, const char* const begin, const char* const end)
@@ -341,7 +478,7 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 					for (int i = 0; i < params.size() && i < param_count; i++) {
 						uint off = 0;
 						l.ptr = params[i].c_str();
-						*(result)->GetChild(i) = ParseArea(l, params[i].c_str(), params[i].c_str() + params[i].size());
+						result->SetChild(i, ParseArea(l, params[i].c_str(), params[i].c_str() + params[i].size()));
 					}
 				}
 				l.ptr = end;
@@ -388,9 +525,12 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 			}
 			else {
 
-				Value* val = l.scope->FindVar(l.considerValue);
+				Variable* val = l.scope->FindVar(l.considerValue);
 				if (val) {
-					result = new VariableNode(val);
+					if (val->type == 2)
+						result = new ValueNode(*val->value);
+					else
+						result = new VariableNode(val);
 					break;
 				}
 				else
@@ -441,11 +581,13 @@ void ReadLine(Context& c)
 	Node* n = ParseArea(l, l.begin, l.end);
 	ExitContext(c, l);
 	if (n != nullptr) {
-		*c.currentNode = n;
-		if (n->next != (Node*)returnNode) c.currentNode = &(*c.currentNode)->next;
-		else {
-			(*c.currentNode)->next = nullptr;
-			c.currentNode = nullptr;
+		if (n != (Node*)skipNode) {
+			*c.currentNode = n;
+			if (n->next != (Node*)returnNode) c.currentNode = &(*c.currentNode)->next;
+			else {
+				(*c.currentNode)->next = nullptr;
+				c.currentNode = nullptr;
+			}
 		}
 	}
 	c.ptr = l.end;
@@ -476,6 +618,7 @@ void Parser::FindFunctions(const char* data, Script* script)
 	int depth = 0;
 	int functionCount = 0;
 	while (*ptr != '\0') {
+		if (*ptr == '\n' || *ptr == ';') c.row++;
 		if (*ptr == '{') depth++;
 		if (*ptr == '}') depth--;
 		if (*ptr == 'd' && depth == 0) {
