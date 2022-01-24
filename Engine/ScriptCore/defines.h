@@ -13,6 +13,7 @@ typedef enum class EVariableType : uint8
 	Float,
 	Int,
 	String,
+	Boolean,
 	Object,
 	Array,
 } EVT;
@@ -35,6 +36,7 @@ enum class ECharType : uint8
 };
 
 struct Node;
+struct ScopeNode;
 struct Scope;
 struct Script;
 struct ScriptFunction;
@@ -48,6 +50,8 @@ struct Context
 		varType = EVT::Unknown;
 		conType = ECT::Null;
 		currentNode = nullptr;
+		loopNode = nullptr;
+		scopeNode = nullptr;
 		scope = nullptr;
 		row = 0;
 		ptr = nullptr;
@@ -62,6 +66,8 @@ struct Context
 	ECT conType;
 	String considerValue;
 	Node** currentNode;
+	Node* loopNode;
+	ScopeNode* scopeNode;
 	Scope* scope;
 	int row;
 	const char* ptr;

@@ -24,6 +24,11 @@ Value ArithDiv(const Value& lhs, const Value& rhs)
 	return lhs / rhs;
 }
 
+Value BooleanEqual(const Value& lhs, const Value& rhs)
+{
+	return lhs == rhs;
+}
+
 Value Assign(const Value& lhs, const Value& rhs)
 {
 	return lhs - rhs;
@@ -46,6 +51,7 @@ NativeFuncStorage nativeFuncs = {
 	{"-", new Function<Value, Value>(2, &ArithMinus)},
 	{"*", new Function<Value, Value>(2, &ArithMult)},
 	{"/", new Function<Value, Value>(2, &ArithDiv)},
+	{"==", new Function<Value, Value>(2, &BooleanEqual)},
 };
 
 GlobalFuncStorage globalFuncs;

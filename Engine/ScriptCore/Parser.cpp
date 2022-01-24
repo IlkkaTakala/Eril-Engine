@@ -28,6 +28,8 @@ void ExitContext(Context& c, Context& l)
 {
 	c.topLevel = l.topLevel;
 	c.scope = l.scope;
+	c.loopNode = l.loopNode;
+	c.scopeNode = l.scopeNode;
 }
 
 inline ECharType TypeOfChar(const char* c)
@@ -157,10 +159,10 @@ const char* ReadUntilWithinScope(const char* ptr, char delim, char scopeBegin = 
 
 const char* ReadUntilWithinScopeWithLimit(const char* ptr, char delim, const char* end, char scopeBegin = '{', char scopeEnd = '}', bool* success = nullptr) {
 	int scope = 0;
-	*success = true;
+	if (success) *success = true;
 	while (*ptr != delim || scope != 0) {
 		if (ptr == end) {
-			*success = false;
+			if (success) *success = false;
 			break;
 		}
 		if (*ptr == scopeBegin) scope++;
@@ -203,11 +205,76 @@ bool isEqual(const String& s, const char* c) {
 }
 
 static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
+{"for", true, [](Context& c) {
+	c.ptr += 3;
+	c.ptr = ReadUntilNonWhite(c.ptr);
+	if (*c.ptr == '(') {
+		const char* end = ReadUntilWithinScopeWithLimit(c.ptr, ')', c.end);
+	}
+	Node* next = new ControlNode();
+	next->child = ParseArea(c, c.ptr, c.end);
+	next->next = (Node*)returnNode;
+	return next;
+}},
+{"if", true, [](Context& c) {
+	c.ptr += 2;
+	c.ptr = ReadUntilNonWhite(c.ptr);
+	if (*c.ptr == '(') {
+		bool succ = false;
+		const char* end = ReadUntilWithinScopeWithLimit(c.ptr, ')', c.end, '{', '}', &succ);
+		if (!succ) {
+			error("Invalid if statement", &c);
+			return (Node*)nullptr;
+		}
+		IfNode* next = new IfNode();
+		next->child = ParseArea(c, c.ptr, end);
+		Node* rest = ParseArea(c, end + 1, c.end);
+		if (rest) {
+			*c.currentNode = next;
+			c.currentNode = &(*c.currentNode)->next;
+			return rest;
+		}
+		return (Node*)next;
+	}
+	error("No statement found", &c);
+	return (Node*)nullptr;
+}},
 {"return ", true, [](Context& c) {
 	c.ptr += 7;
 	Node* next = new ControlNode();
 	next->child = ParseArea(c, c.ptr, c.end);
-	next->next = (Node*)returnNode;
+	return next;
+}},
+{"==", false, [](Context& c) {
+	Node* lhs = ParseArea(c, c.begin, c.ptr);
+	Node* rhs = ParseArea(c, c.ptr + 2, c.end);
+	Node* next = nullptr;
+	if (auto lhsv(dynamic_cast<ValueNode*>(lhs)); lhsv) {
+		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
+			next = new ValueNode(lhsv->value == rhsv->value);
+			delete lhs;
+			delete rhs;
+		}
+		else {
+			next = FuncNodes[2]("==");
+			next->SetValue(0, lhsv->value);
+			next->SetChild(1, rhs);
+			delete lhs;
+		}
+	}
+	else {
+		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
+			next = FuncNodes[2]("==");
+			next->SetChild(0, lhs);
+			next->SetValue(1, rhsv->value);
+			delete rhs;
+		}
+		else {
+			next = FuncNodes[2]("==");
+			next->SetChild(0, lhs);
+			next->SetChild(1, rhs);
+		}
+	}
 	return next;
 }},
 {"=", false, [](Context& c) {
@@ -293,7 +360,7 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 			next = FuncNodes[2]("+");
 			next->SetChild(0, lhs);
 			next->SetValue(1, rhsv->value);
-			delete lhs;
+			delete rhs;
 		}
 		else {
 			next = FuncNodes[2]("+");
@@ -325,7 +392,7 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 			next = FuncNodes[2]("/");
 			next->SetChild(0, lhs);
 			next->SetValue(1, rhsv->value);
-			delete lhs;
+			delete rhs;
 		}
 		else {
 			next = FuncNodes[2]("/");
@@ -335,7 +402,7 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	}
 	return next;
 }},
-{"*", false, [](Context& c) {
+{ "*", false, [](Context& c) {
 	Node* lhs = ParseArea(c, c.begin, c.ptr);
 	Node* rhs = ParseArea(c, c.ptr + 1, c.end);
 	Node* next = nullptr;
@@ -357,7 +424,7 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 			next = FuncNodes[2]("*");
 			next->SetChild(0, lhs);
 			next->SetValue(1, rhsv->value);
-			delete lhs;
+			delete rhs;
 		}
 		else {
 			next = FuncNodes[2]("*");
@@ -366,7 +433,7 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 		}
 	}
 	return next;
-}},
+} },
 {"var ", true, [](Context& c) {
 	c.ptr += 4;
 	String name = ReadWord(c);
@@ -465,7 +532,7 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 					param_count = BaseFunction::GetParamCount(l, l.considerValue);
 					result = FuncNodes[param_count](l.considerValue);
 				}
-				const char* aend = ReadUntilWithinScope(l.ptr, ')', '(', ')');
+				const char* aend = ReadUntilWithinScopeWithLimit(l.ptr, ')', end, '(', ')');
 				std::vector<String> params;
 				while (l.ptr != aend && *l.ptr != '\0') {
 					l.ptr = ReadUntilNonWhite(l.ptr);
@@ -524,7 +591,14 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 				break;
 			}
 			else {
-
+				if (l.considerValue == "true") {
+					result = new ValueNode(true);
+					break;
+				}
+				else if (l.considerValue == "false") {
+					result = new ValueNode(false);
+					break;
+				}
 				Variable* val = l.scope->FindVar(l.considerValue);
 				if (val) {
 					if (val->type == 2)
@@ -559,7 +633,15 @@ void ReadLine(Context& c)
 	l.end = l.begin;
 	while (*l.end != '\0' && *l.end != '\n' && *l.end != ';' && l.end != c.end) {
 		if (*l.end == '{') {
+			if (l.end != l.begin) {
+				break;
+			}
 			l.scope->childs.push_back(new Scope(l.scope));
+			ScopeNode* sn = new ScopeNode();
+			sn->parent = l.scopeNode;
+			l.scopeNode = sn;
+			*c.currentNode = l.scopeNode;
+			c.currentNode = &(*c.currentNode)->child;
 			l.scope = l.scope->childs.back();
 			l.begin = ++l.end;
 		}
@@ -567,7 +649,11 @@ void ReadLine(Context& c)
 			if (l.end != l.begin) {
 				break;
 			}
-			if (l.scope->parent) l.scope = l.scope->parent;
+			if (l.scope->parent) {
+				l.scope = l.scope->parent;
+				c.currentNode = &l.scopeNode->next;
+				l.scopeNode = l.scopeNode->parent;
+			}
 			else
 			{
 				error("Unexpected character found: }", &c);

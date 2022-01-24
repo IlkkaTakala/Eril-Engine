@@ -99,7 +99,7 @@ struct ValueNode : public Node
 
 	virtual void evaluate(ScriptFunction* caller, Value& node) override
 	{
-		node = std::move(value);
+		node = value;
 	}
 };
 
@@ -182,6 +182,12 @@ struct ScriptFuncNode : public Node
 		return &params[idx];
 	}
 
+	virtual void SetChild(uint idx, Node* n) override {
+		if (idx >= params.size()) return;
+		params[idx] = n;
+		return;
+	}
+
 	virtual ~ScriptFuncNode() {
 		for (const auto& child : params) {
 			delete child;
@@ -215,7 +221,7 @@ struct VariableNode : public Node
 	virtual void evaluate(ScriptFunction* caller, Value& node) override
 	{
 		if (child && value->type == 0) child->evaluate(caller, *(value->value));
-		node = std::move(*value->value);
+		node = *value->value;
 	}
 };
 
@@ -247,5 +253,72 @@ struct ControlNode : public Node
 		child->evaluate(caller, caller->returnValue);
 		caller->shouldReturn = true;
 		node = std::move(caller->returnValue);
+	}
+};
+
+struct ForNode : public Node
+{
+	ForNode() {
+		begin = nullptr;
+		test = nullptr;
+		end = nullptr;
+	}
+	virtual ~ForNode() {}
+
+	Node* begin;
+	Node* test;
+	Node* end;
+	Value beginVal;
+
+	virtual void evaluate(ScriptFunction* caller, Value& node) override
+	{
+		if (begin) begin->evaluate(caller, beginVal);
+		if (test)
+		child->evaluate(caller, caller->returnValue);
+		caller->shouldReturn = true;
+		node = std::move(caller->returnValue);
+	}
+};
+
+struct IfNode : public Node
+{
+	IfNode() {
+		body = nullptr;
+	}
+	virtual ~IfNode() {}
+
+	Node* body;
+
+	virtual void evaluate(ScriptFunction* caller, Value& node) override
+	{
+		if (child) {
+			Value testV;
+			child->evaluate(caller, testV);
+			if (testV.GetValue<bool>()) 
+				next->evaluate(caller, node);
+			if (!body) body = next;
+			if (next) next = body->next;
+		}
+	}
+};
+
+struct ScopeNode : public Node
+{
+	ScopeNode() {
+		parent = nullptr;
+	}
+	virtual ~ScopeNode() {}
+
+	ScopeNode* parent;
+
+	virtual void evaluate(ScriptFunction* caller, Value& node) override
+	{
+		if (child) {
+			Node* ptr = child;
+			while (ptr) {
+				ptr->evaluate(caller, node);
+				ptr = ptr->next;
+			}
+		}
 	}
 };
