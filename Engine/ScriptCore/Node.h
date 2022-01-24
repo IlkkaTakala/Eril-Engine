@@ -262,21 +262,33 @@ struct ForNode : public Node
 		begin = nullptr;
 		test = nullptr;
 		end = nullptr;
+		body = nullptr;
 	}
 	virtual ~ForNode() {}
 
 	Node* begin;
 	Node* test;
 	Node* end;
+	Node* body;
 	Value beginVal;
 
 	virtual void evaluate(ScriptFunction* caller, Value& node) override
 	{
+		if (next && !body) {
+			body = next;
+			next = next->next;
+		}
 		if (begin) begin->evaluate(caller, beginVal);
 		if (test)
-		child->evaluate(caller, caller->returnValue);
-		caller->shouldReturn = true;
-		node = std::move(caller->returnValue);
+			for (test->evaluate(caller, beginVal); beginVal; test->evaluate(caller, beginVal)) {
+				body->evaluate(caller, node);
+				end->evaluate(caller, beginVal);
+			}
+		else
+			for (;;) {
+				body->evaluate(caller, node);
+				end->evaluate(caller, beginVal);
+			}
 	}
 };
 

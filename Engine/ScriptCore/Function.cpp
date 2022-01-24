@@ -4,35 +4,35 @@
 #include "Node.h"
 #include "ScriptCore.h"
 
-Value ArithPlus(const Value& lhs, const Value& rhs)
-{
-	return lhs + rhs;
-}
+Value ArithPlus(const Value& lhs, const Value& rhs)				{ return lhs + rhs; }
 
-Value ArithMinus(const Value& lhs, const Value& rhs)
-{
-	return lhs - rhs;
-}
+Value ArithMinus(const Value& lhs, const Value& rhs)			{ return lhs - rhs; }
 
-Value ArithMult(const Value& lhs, const Value& rhs)
-{
-	return lhs * rhs;
-}
+Value ArithMult(const Value& lhs, const Value& rhs)				{ return lhs * rhs; }
 
-Value ArithDiv(const Value& lhs, const Value& rhs)
-{
-	return lhs / rhs;
-}
+Value ArithDiv(const Value& lhs, const Value& rhs)				{ return lhs / rhs; }
 
-Value BooleanEqual(const Value& lhs, const Value& rhs)
-{
-	return lhs == rhs;
-}
+//Value ArithPlusAs(const Value& lhs, const Value& rhs)			{ return lhs += rhs; }
+//
+//Value ArithMinusAs(const Value& lhs, const Value& rhs)			{ return lhs -= rhs; }
+//
+//Value ArithMultAs(const Value& lhs, const Value& rhs)			{ return lhs *= rhs; }
+//
+//Value ArithDivAs(const Value& lhs, const Value& rhs)			{ return lhs /= rhs; }
 
-Value Assign(const Value& lhs, const Value& rhs)
-{
-	return lhs - rhs;
-}
+Value BooleanEqual(const Value& lhs, const Value& rhs)			{ return lhs == rhs; }
+
+Value BooleanNot(const Value& rhs)								{ return !rhs; }
+
+Value BooleanNotEqual(const Value& lhs, const Value& rhs)		{ return !(lhs == rhs); }
+
+Value BooleanLess(const Value& lhs, const Value& rhs)			{ return lhs < rhs; }
+
+Value BooleanGreater(const Value& lhs, const Value& rhs)		{ return lhs > rhs; }
+
+Value BooleanLessEqual(const Value& lhs, const Value& rhs)		{ return lhs < rhs || lhs == rhs; }
+
+Value BooleanGreaterEqual(const Value& lhs, const Value& rhs)	{ return lhs > rhs || lhs == rhs; }
 
 NativeFuncStorage nativeFuncs = {
 	{"print", new Function<Value>(1, [](auto v) {
@@ -52,6 +52,12 @@ NativeFuncStorage nativeFuncs = {
 	{"*", new Function<Value, Value>(2, &ArithMult)},
 	{"/", new Function<Value, Value>(2, &ArithDiv)},
 	{"==", new Function<Value, Value>(2, &BooleanEqual)},
+	{"!", new Function<Value>(1, &BooleanNot)},
+	{"!=", new Function<Value, Value>(2, &BooleanNotEqual)},
+	{"<", new Function<Value, Value>(2, &BooleanLess)},
+	{">", new Function<Value, Value>(2, &BooleanGreater)},
+	{"<=", new Function<Value, Value>(2, &BooleanLessEqual)},
+	{">=", new Function<Value, Value>(2, &BooleanGreaterEqual)},
 };
 
 GlobalFuncStorage globalFuncs;

@@ -182,6 +182,11 @@ struct Value
 		return GetValue<String>();
 	}
 
+	operator bool() const
+	{
+		return GetValue<bool>();
+	}
+
 	friend Value operator+(const Value& lhs, const Value& rhs) {
 		switch (lhs.type())
 		{
@@ -381,5 +386,107 @@ struct Value
 		default:
 			return false;
 		}
+	}
+
+	friend Value operator!=(const Value& lhs, const Value& rhs) {
+		return !(lhs == rhs);
+	}
+
+	friend Value operator<(const Value& lhs, const Value& rhs) {
+		switch (lhs.type())
+		{
+		case EVT::String:
+		{
+			return lhs.GetValue<String>() < rhs.GetValue<String>();
+		} break;
+
+		case EVT::Float:
+		{
+			float one = lhs.GetValue<float>();
+			float two = rhs.GetValue<float>();
+			return one < two;
+		} break;
+
+		case EVT::Int:
+		{
+			switch (rhs.type()) {
+			case EVT::Int:
+				return lhs.GetValue<int>() < rhs.GetValue<int>();
+			case EVT::Float: {
+				float one = lhs.GetValue<float>();
+				float two = rhs.GetValue<float>();
+				return one < two;
+			}
+			default:
+				return false;
+				break;
+			}
+		} break;
+
+		case EVT::Boolean:
+		{
+			return lhs.GetValue<bool>() < rhs.GetValue<bool>();
+		} break;
+
+		case EVT::Null:
+		{
+			return false;
+		} break;
+		default:
+			return false;
+		}
+	}
+
+	friend Value operator>(const Value& lhs, const Value& rhs) {
+		switch (lhs.type())
+		{
+		case EVT::String:
+		{
+			return lhs.GetValue<String>() > rhs.GetValue<String>();
+		} break;
+
+		case EVT::Float:
+		{
+			float one = lhs.GetValue<float>();
+			float two = rhs.GetValue<float>();
+			return one > two;
+		} break;
+
+		case EVT::Int:
+		{
+			switch (rhs.type()) {
+			case EVT::Int:
+				return lhs.GetValue<int>() > rhs.GetValue<int>();
+			case EVT::Float: {
+				float one = lhs.GetValue<float>();
+				float two = rhs.GetValue<float>();
+				return one > two;
+			}
+			default:
+				return false;
+				break;
+			}
+		} break;
+
+		case EVT::Boolean:
+		{
+			return lhs.GetValue<bool>() > rhs.GetValue<bool>();
+		} break;
+
+		case EVT::Null:
+		{
+			return false;
+		} break;
+		default:
+			return false;
+		}
+	}
+
+	friend Value operator<=(const Value& lhs, const Value& rhs) {
+		return lhs < rhs || lhs == rhs;
+	}
+
+	friend Value operator>=(const Value& lhs, const Value& rhs) {
+		return lhs > rhs || lhs == rhs;
 	}
 };
