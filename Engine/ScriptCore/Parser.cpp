@@ -279,7 +279,7 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 			delete rhs;
 		}
 		else {
-			next = FuncNodes[2]("==");
+			next = FuncNodes[2]("op", "==");
 			next->SetValue(0, lhsv->value);
 			next->SetChild(1, rhs);
 			delete lhs;
@@ -287,13 +287,13 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	}
 	else {
 		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = FuncNodes[2]("==");
+			next = FuncNodes[2]("op", "==");
 			next->SetChild(0, lhs);
 			next->SetValue(1, rhsv->value);
 			delete rhs;
 		}
 		else {
-			next = FuncNodes[2]("==");
+			next = FuncNodes[2]("op", "==");
 			next->SetChild(0, lhs);
 			next->SetChild(1, rhs);
 		}
@@ -304,12 +304,12 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	Node* rhs = ParseArea(c, c.ptr + 1, c.end);
 	Node* next = nullptr;
 	if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-		next = FuncNodes[1]("!");
+		next = FuncNodes[1]("op", "!");
 		next->SetValue(0, rhsv->value);
 		delete rhs;
 	}
 	else {
-		next = FuncNodes[1]("!");
+		next = FuncNodes[1]("op", "!");
 		next->SetChild(0, rhs);
 	}
 	return next;
@@ -325,7 +325,7 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 			delete rhs;
 		}
 		else {
-			next = FuncNodes[2]("!=");
+			next = FuncNodes[2]("op", "!=");
 			next->SetValue(0, lhsv->value);
 			next->SetChild(1, rhs);
 			delete lhs;
@@ -333,13 +333,13 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	}
 	else {
 		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = FuncNodes[2]("!=");
+			next = FuncNodes[2]("op", "!=");
 			next->SetChild(0, lhs);
 			next->SetValue(1, rhsv->value);
 			delete rhs;
 		}
 		else {
-			next = FuncNodes[2]("!=");
+			next = FuncNodes[2]("op", "!=");
 			next->SetChild(0, lhs);
 			next->SetChild(1, rhs);
 		}
@@ -357,7 +357,7 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 			delete rhs;
 		}
 		else {
-			next = FuncNodes[2]("<=");
+			next = FuncNodes[2]("op", "<=");
 			next->SetValue(0, lhsv->value);
 			next->SetChild(1, rhs);
 			delete lhs;
@@ -365,13 +365,13 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	}
 	else {
 		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = FuncNodes[2]("<=");
+			next = FuncNodes[2]("op", "<=");
 			next->SetChild(0, lhs);
 			next->SetValue(1, rhsv->value);
 			delete rhs;
 		}
 		else {
-			next = FuncNodes[2]("<=");
+			next = FuncNodes[2]("op", "<=");
 			next->SetChild(0, lhs);
 			next->SetChild(1, rhs);
 		}
@@ -389,7 +389,7 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 			delete rhs;
 		}
 		else {
-			next = FuncNodes[2](">=");
+			next = FuncNodes[2]("op", ">=");
 			next->SetValue(0, lhsv->value);
 			next->SetChild(1, rhs);
 			delete lhs;
@@ -397,13 +397,13 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	}
 	else {
 		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = FuncNodes[2](">=");
+			next = FuncNodes[2]("op", ">=");
 			next->SetChild(0, lhs);
 			next->SetValue(1, rhsv->value);
 			delete rhs;
 		}
 		else {
-			next = FuncNodes[2](">=");
+			next = FuncNodes[2]("op", ">=");
 			next->SetChild(0, lhs);
 			next->SetChild(1, rhs);
 		}
@@ -421,7 +421,7 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 			delete rhs;
 		}
 		else {
-			next = FuncNodes[2]("<");
+			next = FuncNodes[2]("op", "<");
 			next->SetValue(0, lhsv->value);
 			next->SetChild(1, rhs);
 			delete lhs;
@@ -429,13 +429,13 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	}
 	else {
 		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = FuncNodes[2]("<");
+			next = FuncNodes[2]("op", "<");
 			next->SetChild(0, lhs);
 			next->SetValue(1, rhsv->value);
 			delete rhs;
 		}
 		else {
-			next = FuncNodes[2]("<");
+			next = FuncNodes[2]("op", "<");
 			next->SetChild(0, lhs);
 			next->SetChild(1, rhs);
 		}
@@ -453,7 +453,7 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 			delete rhs;
 		}
 		else {
-			next = FuncNodes[2](">");
+			next = FuncNodes[2]("op", ">");
 			next->SetValue(0, lhsv->value);
 			next->SetChild(1, rhs);
 			delete lhs;
@@ -461,13 +461,13 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	}
 	else {
 		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = FuncNodes[2](">");
+			next = FuncNodes[2]("op", ">");
 			next->SetChild(0, lhs);
 			next->SetValue(1, rhsv->value);
 			delete rhs;
 		}
 		else {
-			next = FuncNodes[2](">");
+			next = FuncNodes[2]("op", ">");
 			next->SetChild(0, lhs);
 			next->SetChild(1, rhs);
 		}
@@ -514,7 +514,7 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 			delete rhs;
 		}
 		else {
-			next = FuncNodes[2]("-");
+			next = FuncNodes[2]("op", "-");
 			next->SetValue(0, lhsv->value);
 			next->SetChild(1, rhs);
 			delete lhs;
@@ -522,13 +522,13 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	}
 	else {
 		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = FuncNodes[2]("-");
+			next = FuncNodes[2]("op", "-");
 			next->SetChild(0, lhs);
 			next->SetValue(1, rhsv->value);
 			delete rhs;
 		}
 		else {
-			next = FuncNodes[2]("-");
+			next = FuncNodes[2]("op", "-");
 			next->SetChild(0, lhs);
 			next->SetChild(1, rhs);
 		}
@@ -546,7 +546,7 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 			delete rhs;
 		}
 		else {
-			next = FuncNodes[2]("+");
+			next = FuncNodes[2]("op", "+");
 			next->SetValue(0, lhsv->value);
 			next->SetChild(1, rhs);
 			delete lhs;
@@ -554,13 +554,13 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	}
 	else {
 		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = FuncNodes[2]("+");
+			next = FuncNodes[2]("op", "+");
 			next->SetChild(0, lhs);
 			next->SetValue(1, rhsv->value);
 			delete rhs;
 		}
 		else {
-			next = FuncNodes[2]("+");
+			next = FuncNodes[2]("op", "+");
 			next->SetChild(0, lhs);
 			next->SetChild(1, rhs);
 		}
@@ -578,7 +578,7 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 			delete rhs;
 		}
 		else {
-			next = FuncNodes[2]("/");
+			next = FuncNodes[2]("op", "/");
 			next->SetValue(0, lhsv->value);
 			next->SetChild(1, rhs);
 			delete lhs;
@@ -586,13 +586,13 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	}
 	else {
 		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = FuncNodes[2]("/");
+			next = FuncNodes[2]("op", "/");
 			next->SetChild(0, lhs);
 			next->SetValue(1, rhsv->value);
 			delete rhs;
 		}
 		else {
-			next = FuncNodes[2]("/");
+			next = FuncNodes[2]("op", "/");
 			next->SetChild(0, lhs);
 			next->SetChild(1, rhs);
 		}
@@ -610,7 +610,7 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 			delete rhs;
 		}
 		else {
-			next = FuncNodes[2]("*");
+			next = FuncNodes[2]("op", "*");
 			next->SetValue(0, lhsv->value);
 			next->SetChild(1, rhs);
 			delete lhs;
@@ -618,13 +618,13 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	}
 	else {
 		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = FuncNodes[2]("*");
+			next = FuncNodes[2]("op", "*");
 			next->SetChild(0, lhs);
 			next->SetValue(1, rhsv->value);
 			delete rhs;
 		}
 		else {
-			next = FuncNodes[2]("*");
+			next = FuncNodes[2]("op", "*");
 			next->SetChild(0, lhs);
 			next->SetChild(1, rhs);
 		}
@@ -654,7 +654,23 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	auto it = c.scope->variables.emplace(name, Variable(new Value(), 2, false));
 	Node* next = new VariableNode(&it.first->second);
 	return next;
-}}
+}},
+{"++", false, [](Context& c) {
+	Node* lhs = ParseArea(c, c.begin, c.ptr);
+	if (auto lhsv(dynamic_cast<VariableNode*>(lhs)); lhsv) {
+		Node* next = FuncNodes[2]("op", "+");
+		VariableNode* nextVar = new VariableNode(lhsv->value);
+		next->SetChild(0, nextVar);
+		next->SetValue(1, 1);
+		lhs->SetChild(0, next);
+	}
+	else {
+		error("Cannot increment values", &c);
+		delete lhs;
+		return (Node*)nullptr;
+	}
+	return lhs;
+}},
 };
 
 Node* ParseArea(Context& c, const char* const begin, const char* const end)
@@ -698,7 +714,8 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 				if (*l.ptr == '{') scope++;
 				if (*l.ptr == '}') scope--;
 				if (scope == 0 && *l.ptr == *key.c_str() && isEqual(key, l.ptr)) {
-					result = func(l);
+					if (*(l.ptr - 1) == '(' || *(l.ptr - 1) == ')' || *(l.ptr - 1) == '{' || *(l.ptr - 1) == '}' || std::isalnum(*(l.ptr - 1)) || std::isspace(*(l.ptr - 1)))
+						result = func(l);
 					break;
 				}
 			}
@@ -713,6 +730,13 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 		l.considerValue = ReadWord(l);
 		l.ptr = ReadUntilNonWhite(l.ptr);
 		if (l.ptr == l.end && l.considerValue.size() == 0) break;
+		if (*l.ptr == '.') {
+			l.ptr++;
+			l.considerScope = l.considerValue;
+			l.considerValue = ReadWord(l);
+			l.ptr = ReadUntilNonWhite(l.ptr);
+			if (l.ptr == l.end && l.considerValue.size() == 0) break;
+		}
 		switch (*l.ptr)
 		{
 		case '(':
@@ -721,13 +745,22 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 			if (l.considerValue.size() != 0) {
 				l.conType = ECT::Function;
 				int param_count = 0;
-				if (l.topLevel->functions.find(l.considerValue) != l.topLevel->functions.end()) {
-					param_count = (int)l.topLevel->functions[l.considerValue].params.size();
-					result = new ScriptFuncNode(l.topLevel, l.considerValue, param_count);
+				if (l.considerScope.size() != 0) {
+					Variable* val = l.scope->FindVar(l.considerScope);
+					if (val) {
+						param_count = BaseFunction::GetParamCount(l, "variable", l.considerValue);
+						result = FuncNodes[param_count]("variable", l.considerValue);
+					}
 				}
 				else {
-					param_count = BaseFunction::GetParamCount(l, l.considerValue);
-					result = FuncNodes[param_count](l.considerValue);
+					if (l.topLevel->functions.find(l.considerValue) != l.topLevel->functions.end()) {
+						param_count = (int)l.topLevel->functions[l.considerValue].params.size();
+						result = new ScriptFuncNode(l.topLevel, l.considerValue, param_count);
+					}
+					else {
+						param_count = BaseFunction::GetParamCount(l, "global", l.considerValue);
+						result = FuncNodes[param_count]("global", l.considerValue);
+					}
 				}
 				const char* aend = ReadUntilWithinScopeWithLimit(l.ptr, ')', end, '(', ')');
 				std::vector<String> params;

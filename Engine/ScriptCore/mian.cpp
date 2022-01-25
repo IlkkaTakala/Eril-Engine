@@ -23,7 +23,6 @@ int main()
 	while (true) {
 		std::cout << "Input your code: \n";
 		String data;
-		//std::getline(std::cin, data);
 
 		std::ifstream in("script.txt");
 

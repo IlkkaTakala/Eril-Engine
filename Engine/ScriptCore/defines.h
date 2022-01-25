@@ -65,6 +65,7 @@ struct Context
 	EVT varType;
 	ECT conType;
 	String considerValue;
+	String considerScope;
 	Node** currentNode;
 	Node* loopNode;
 	ScopeNode* scopeNode;

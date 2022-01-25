@@ -38,7 +38,7 @@ struct BaseFunction
 {
 	BaseFunction(int c) : param_count(c) {}
 	virtual ~BaseFunction() {}
-	static int GetParamCount(Context& c, const String& name);
+	static int GetParamCount(Context& c, const String& scope, const String& name);
 	int param_count;
 };
 
@@ -83,7 +83,6 @@ struct ScriptFunction
 };
 
 
-extern NativeFuncStorage nativeFuncs;
-extern std::unordered_map<String, NativeFuncStorage> ObjectFuncs;
+extern std::unordered_map<String, NativeFuncStorage> nativeFuncs;
 extern std::unordered_map<String, VarStorage> ObjectVars;
 extern GlobalFuncStorage globalFuncs;

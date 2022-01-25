@@ -38,10 +38,10 @@ struct Script
 };
 
 template <typename ...Args>
-inline void _invoke(Value& value, const String& name, const Args&... vals)
+inline void _invoke(Value& value, const String& scope, const String& name, const Args&... vals)
 {
-	if (nativeFuncs.find(name) != nativeFuncs.end()) {
-		auto c = dynamic_cast<Function<Args...>*>(nativeFuncs[name]);
+	if (nativeFuncs.find(scope) != nativeFuncs.end() && nativeFuncs[scope].find(name) != nativeFuncs[scope].end()) {
+		auto c = dynamic_cast<Function<Args...>*>(nativeFuncs[scope][name]);
 		if (c) (*c)(value, vals...);
 		else value = {};
 		return;
@@ -49,17 +49,14 @@ inline void _invoke(Value& value, const String& name, const Args&... vals)
 	else if (globalFuncs.find(name) != globalFuncs.end()) {
 		
 	}
-	else if (ObjectFuncs.find(name) != ObjectFuncs.end()) {
-		
-	}
 	value = {};
 }
 
 template<>
-inline void _invoke<>(Value& value, const String& name)
+inline void _invoke<>(Value& value, const String& scope, const String& name)
 {
-	if (nativeFuncs.find(name) != nativeFuncs.end()) {
-		auto c = dynamic_cast<Function<>*>(nativeFuncs[name]);
+	if (nativeFuncs.find(scope) != nativeFuncs.end() && nativeFuncs[name].find(name) != nativeFuncs[name].end()) {
+		auto c = dynamic_cast<Function<>*>(nativeFuncs[scope][name]);
 		if (c) (*c)(value);
 		else value = {};
 		return;
@@ -107,6 +104,7 @@ template <int c>
 struct FuncNode : public Node
 {
 	String value;
+	String scope;
 	std::array<Node*, c> params;
 	std::array<Value, c> eval_params;
 
@@ -138,9 +136,10 @@ struct FuncNode : public Node
 		}
 	}
 
-	FuncNode(const String& s)
+	FuncNode(const String& s, const String& f)
 	{
-		value = s;
+		value = f;
+		scope = s;
 		params.fill(nullptr);
 		eval_params.fill({});
 	}
@@ -154,22 +153,22 @@ struct FuncNode : public Node
 private:
 	template <std::size_t N, typename T, std::size_t... Indices>
 	void invoke_helper(const std::array<T, N>& v, std::index_sequence<Indices...>, Value& node) {
-		_invoke(node, value, std::get<Indices>(v)...);
+		_invoke(node, scope, value, std::get<Indices>(v)...);
 	}
 };
 
 template<> inline void FuncNode<0>::evaluate(ScriptFunction* caller, Value& node)
 {
-	_invoke(node, value);
+	_invoke(node, scope, value);
 };
 
-typedef std::function<Node* (String)> init_FuncNode;
+typedef std::function<Node* (const String&, const String&)> init_FuncNode;
 static std::vector<init_FuncNode> FuncNodes{
-	{[](String name) {return new FuncNode<0>(name); }},
-	{[](String name) {return new FuncNode<1>(name); }},
-	{[](String name) {return new FuncNode<2>(name); }},
-	{[](String name) {return new FuncNode<3>(name); }},
-	{[](String name) {return new FuncNode<4>(name); }},
+	{[](const String& scope, const String& name) {return new FuncNode<0>(scope, name); }},
+	{[](const String& scope, const String& name) {return new FuncNode<1>(scope, name); }},
+	{[](const String& scope, const String& name) {return new FuncNode<2>(scope, name); }},
+	{[](const String& scope, const String& name) {return new FuncNode<3>(scope, name); }},
+	{[](const String& scope, const String& name) {return new FuncNode<4>(scope, name); }},
 };
 
 struct ScriptFuncNode : public Node
