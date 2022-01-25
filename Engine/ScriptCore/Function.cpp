@@ -4,13 +4,13 @@
 #include "Node.h"
 #include "ScriptCore.h"
 
-Value ArithPlus(const Value& lhs, const Value& rhs)				{ return lhs + rhs; }
+Value ArithPlus(void*, const Value& lhs, const Value& rhs)				{ return lhs + rhs; }
 
-Value ArithMinus(const Value& lhs, const Value& rhs)			{ return lhs - rhs; }
+Value ArithMinus(void*, const Value& lhs, const Value& rhs)			{ return lhs - rhs; }
 
-Value ArithMult(const Value& lhs, const Value& rhs)				{ return lhs * rhs; }
+Value ArithMult(void*, const Value& lhs, const Value& rhs)				{ return lhs * rhs; }
 
-Value ArithDiv(const Value& lhs, const Value& rhs)				{ return lhs / rhs; }
+Value ArithDiv(void*, const Value& lhs, const Value& rhs)				{ return lhs / rhs; }
 
 //Value ArithPlusAs(const Value& lhs, const Value& rhs)			{ return lhs += rhs; }
 //
@@ -20,31 +20,31 @@ Value ArithDiv(const Value& lhs, const Value& rhs)				{ return lhs / rhs; }
 //
 //Value ArithDivAs(const Value& lhs, const Value& rhs)			{ return lhs /= rhs; }
 
-Value BooleanEqual(const Value& lhs, const Value& rhs)			{ return lhs == rhs; }
+Value BooleanEqual(void*, const Value& lhs, const Value& rhs)			{ return lhs == rhs; }
 
-Value BooleanNot(const Value& rhs)								{ return !rhs; }
+Value BooleanNot(void*, const Value& rhs)								{ return !rhs; }
 
-Value BooleanNotEqual(const Value& lhs, const Value& rhs)		{ return !(lhs == rhs); }
+Value BooleanNotEqual(void*, const Value& lhs, const Value& rhs)		{ return !(lhs == rhs); }
 
-Value BooleanLess(const Value& lhs, const Value& rhs)			{ return lhs < rhs; }
+Value BooleanLess(void*, const Value& lhs, const Value& rhs)			{ return lhs < rhs; }
 
-Value BooleanGreater(const Value& lhs, const Value& rhs)		{ return lhs > rhs; }
+Value BooleanGreater(void*, const Value& lhs, const Value& rhs)		{ return lhs > rhs; }
 
-Value BooleanLessEqual(const Value& lhs, const Value& rhs)		{ return lhs < rhs || lhs == rhs; }
+Value BooleanLessEqual(void*, const Value& lhs, const Value& rhs)		{ return lhs < rhs || lhs == rhs; }
 
-Value BooleanGreaterEqual(const Value& lhs, const Value& rhs)	{ return lhs > rhs || lhs == rhs; }
+Value BooleanGreaterEqual(void*, const Value& lhs, const Value& rhs)	{ return lhs > rhs || lhs == rhs; }
 
 std::unordered_map<String, NativeFuncStorage> nativeFuncs = {
 {"global", NativeFuncStorage {
-		{"print", new Function<Value>(1, [](auto v) {
+	{"print", new Function<Value>(1, [](void*, auto v) {
 		if (v.type() == EVT::Null) {
 			std::cout << ">> Undefined\n";
 			return Value{};
-	}
+		}
 		std::cout << ">> " << v.GetValue<String>() << '\n';
 		return Value{};
 	})},
-	{"time", new Function<>(0, []() {
+	{"time", new Function<>(0, [](void*) {
 		float tim = (float)time(NULL);
 		return Value(EVT::Float, std::to_string(tim));
 	})},
@@ -63,9 +63,19 @@ std::unordered_map<String, NativeFuncStorage> nativeFuncs = {
 	{">=", new Function<Value, Value>(2, &BooleanGreaterEqual)},
 }},
 {"variable", NativeFuncStorage {
-	{"type", new Function<Value>(1, [](auto v) {
-		return Value((int)v.type());
-	})}
+	{"type", new Function<Value>(1, [](void* val, auto v) {
+		if (Variable* c = static_cast<Variable*>(val); c)
+			return Value(typeName(c->value->type()));
+		else return Value();
+	})},
+	{"unset", new Function<Value>(1, [](void* val, auto v) {
+		if (Variable* c = static_cast<Variable*>(val); c) {
+			*c->value = Value();
+			c->init = false;
+			return *c->value;
+		}
+		else return Value();
+	})},
 }}
 };
 
@@ -84,8 +94,8 @@ int BaseFunction::GetParamCount(Context& c, const String& scope, const String& n
 	else {
 		if (c.topLevel->functions.find(name) == c.topLevel->functions.end()) {
 			if (globalFuncs.find(name) == globalFuncs.end()) {
-				if (nativeFuncs.find(scope) == nativeFuncs.end() && nativeFuncs[scope].find(name) == nativeFuncs[scope].end()) {
-					error(("Function: " + name + " not found").c_str());
+				if (nativeFuncs.find(scope) == nativeFuncs.end() || nativeFuncs[scope].find(name) == nativeFuncs[scope].end()) {
+					error(("Function: " + scope + "." + name + " not found").c_str(), &c);
 				}
 				else return nativeFuncs.find(scope)->second.find(name)->second->param_count;
 			}

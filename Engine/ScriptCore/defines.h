@@ -5,6 +5,7 @@ typedef std::string String;
 
 typedef unsigned char uint8;
 typedef unsigned int uint;
+typedef __int64 int64;
 
 typedef enum class EVariableType : uint8
 {
@@ -15,8 +16,33 @@ typedef enum class EVariableType : uint8
 	String,
 	Boolean,
 	Object,
-	Array,
+	Array
 } EVT;
+
+
+inline String typeName(EVT t) {
+	switch (t)
+	{
+	case EVT::Null:
+		return "null";
+	case EVT::Unknown:
+		return "unknown";
+	case EVT::Float:
+		return "float";
+	case EVT::Int:
+		return "int";
+	case EVT::String:
+		return "string";
+	case EVT::Boolean:
+		return "boolean";
+	case EVT::Object:
+		return "object";
+	case EVT::Array:
+		return "array";
+	default:
+		return "unknown";
+	}
+}
 
 typedef enum class EConsiderType : uint8
 {

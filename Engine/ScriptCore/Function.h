@@ -45,15 +45,15 @@ struct BaseFunction
 template<typename...Args>
 struct Function : public BaseFunction
 {
-	typedef std::function<Value(const Args&...)> FuncParams;
+	typedef std::function<Value(void*, const Args&...)> FuncParams;
 
 	Function(int count, FuncParams func) : BaseFunction(count), call(func) {}
 	Function() : BaseFunction(0), call(nullptr) {}
 
 	FuncParams call;
 
-	void operator()(Value& value, const Args&... v) const {
-		if (call) value = std::move(call(v...));
+	void operator()(Value& value, void* ptr, const Args&... v) const {
+		if (call) value = std::move(call(ptr, v...));
 		else value = {};
 	}
 
