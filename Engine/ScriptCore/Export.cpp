@@ -21,12 +21,16 @@ unsigned __int32 CompileScript(const char* data)
 	uint idx = Scripts.size() ? Scripts.rbegin()->first + 1 : 1;
 	Scripts[idx] = new Script();
 	activeScript = idx;
+	Parser::FindVariables(data, Scripts[idx]);
 	Parser::FindFunctions(data, Scripts[idx]);
 
 	if (isError()) {
 		CleanScript(idx);
 		return 0;
 	}
+
+	Value v;
+	Scripts[idx]->setup->invoke(v);
 
 	return idx;
 }

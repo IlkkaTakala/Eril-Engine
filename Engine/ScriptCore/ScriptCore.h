@@ -36,6 +36,7 @@ struct Scope
 {
 	std::list<Scope*> childs;
 	Scope* parent;
+	Script* script;
 
 	VarStorage variables;
 
@@ -43,7 +44,10 @@ struct Scope
 		if (variables.find(name) != variables.end())
 			return &variables.find(name)->second;
 		else if (parent == nullptr) {
-			if (globalVars.find(name) != globalVars.end()) {
+			if (script->vars.find(name) != script->vars.end()) {
+				return &script->vars.find(name)->second;
+			}
+			else if (globalVars.find(name) != globalVars.end()) {
 				return &globalVars.find(name)->second;
 			}
 			return nullptr;
@@ -51,8 +55,9 @@ struct Scope
 		else return parent->FindVar(name);
 	}
 
-	Scope(Scope* p) {
+	Scope(Scope* p, Script* s) {
 		parent = p;
+		script = s;
 	}
 	~Scope()
 	{

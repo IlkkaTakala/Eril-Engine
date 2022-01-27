@@ -79,6 +79,7 @@ struct Context
 		loopNode = nullptr;
 		scopeNode = nullptr;
 		scope = nullptr;
+		loopScope = nullptr;
 		row = 0;
 		ptr = nullptr;
 		begin = nullptr;
@@ -96,6 +97,7 @@ struct Context
 	Node* loopNode;
 	ScopeNode* scopeNode;
 	Scope* scope;
+	Scope* loopScope;
 	int row;
 	const char* ptr;
 	const char* begin;

@@ -29,6 +29,7 @@ void ExitContext(Context& c, Context& l)
 	c.topLevel = l.topLevel;
 	c.scope = l.scope;
 	c.loopNode = l.loopNode;
+	c.loopScope = l.loopScope;
 	c.scopeNode = l.scopeNode;
 }
 
@@ -102,8 +103,8 @@ String ReadNonAlpha(Context& c)
 	return word;
 }
 
-const char* ReadUntil(const char* ptr, char delim) {
-	while (*ptr != delim) ptr++;
+inline const char* ReadUntil(const char* ptr, char delim) {
+	while (*ptr != delim && *ptr != '\0') ptr++;
 	return ptr;
 }
 
@@ -149,7 +150,7 @@ const char* ReadUntilNonWhite(const char* ptr) {
 
 const char* ReadUntilWithinScope(const char* ptr, char delim, char scopeBegin = '{', char scopeEnd = '}') {
 	int scope = 0;
-	while (*ptr != delim || scope != 0) {
+	while (*ptr && (*ptr != delim || scope != 0)) {
 		if (*ptr == scopeBegin) scope++;
 		if (*ptr == scopeEnd) scope--;
 		ptr++;
@@ -224,6 +225,9 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 			return (Node*)nullptr;
 		}
 		ForNode* next = new ForNode();
+		c.loopScope = c.scope;
+		c.scope = new Scope(c.scope, c.topLevel);
+		c.loopNode = next;
 		next->begin = ParseArea(c, s[0].c_str(), s[0].c_str() + s[0].size());
 		next->test = ParseArea(c, s[1].c_str(), s[1].c_str() + s[1].size());
 		next->end = ParseArea(c, s[2].c_str(), s[2].c_str() + s[2].size());
@@ -635,8 +639,15 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	c.ptr += 4;
 	String name = ReadWord(c);
 	if (!name.size()) error("Invalid Variable name: " + name, &c);
-	auto it = c.scope->variables.emplace(name, Variable(new Value(), 0, false));
-	Node* next = new VariableNode(&it.first->second);
+	Node* next;
+	if (c.scope) {
+		auto it = c.scope->variables.emplace(name, Variable(new Value(), 0, false));
+		next = new VariableNode(&it.first->second);
+	}
+	else {
+		auto it = c.topLevel->vars.emplace(name, Variable(new Value(), 0, false));
+		next = new VariableNode(&it.first->second);
+	}
 	return next;
 }},
 {"const ", true, [](Context& c) {
@@ -869,7 +880,7 @@ void ReadLine(Context& c)
 			if (l.end != l.begin) {
 				break;
 			}
-			l.scope->childs.push_back(new Scope(l.scope));
+			l.scope->childs.push_back(new Scope(l.scope, l.topLevel));
 			ScopeNode* sn = new ScopeNode();
 			sn->parent = l.scopeNode;
 			l.scopeNode = sn;
@@ -886,6 +897,11 @@ void ReadLine(Context& c)
 				l.scope = l.scope->parent;
 				c.currentNode = &l.scopeNode->next;
 				l.scopeNode = l.scopeNode->parent;
+				if (l.loopNode) {
+					l.scope = l.loopScope;
+					l.loopNode = nullptr;
+					l.loopScope = nullptr;
+				}
 			}
 			else
 			{
@@ -898,7 +914,6 @@ void ReadLine(Context& c)
 	}
 
 	Node* n = ParseArea(l, l.begin, l.end);
-	ExitContext(c, l);
 	if (n != nullptr) {
 		if (n != (Node*)skipNode) {
 			*c.currentNode = n;
@@ -909,6 +924,12 @@ void ReadLine(Context& c)
 			}
 		}
 	}
+	if (l.loopNode && l.loopNode->next == n) {
+		l.scope = l.loopScope;
+		l.loopNode = nullptr;
+		l.loopScope = nullptr;
+	}
+	ExitContext(c, l);
 	c.ptr = l.end;
 	if (*l.end == '\n' || *l.end == ';') c.ptr += 1;
 	c.row++;
@@ -949,7 +970,7 @@ void Parser::FindFunctions(const char* data, Script* script)
 				if (*c.ptr == '(') {
 					c.ptr++;
 					Node** fir = &(script->functions[fun].first);
-					c.scope = new Scope(nullptr);
+					c.scope = new Scope(nullptr, script);
 					script->functions[fun].scope = c.scope;
 					c.function = &script->functions[fun];
 					ptr = ReadUntilWithinScope(ptr, ')');
@@ -981,7 +1002,7 @@ void Parser::FindFunctions(const char* data, Script* script)
 	}
 	if (script->functions.find("execute") == script->functions.end()) {
 		Node** fir = &(script->functions["execute"].first);
-		c.scope = new Scope(nullptr);
+		c.scope = new Scope(nullptr, script);
 		script->functions["execute"].scope = c.scope;
 		c.function = &script->functions["execute"];
 		c.begin = function_end;
@@ -989,5 +1010,28 @@ void Parser::FindFunctions(const char* data, Script* script)
 		c.end = ReadUntil(function_end, '\0');
 		uint off = 0;
 		BeginParse(c, function_end, 0, off, fir);
+	}
+}
+
+void Parser::FindVariables(const char* data, Script* script)
+{
+	if (script->setup) delete script->setup;
+
+	script->setup = new ScriptFunction();
+	const char* ptr = data;
+	Context c;
+	c.topLevel = script;
+	c.currentNode = &(script->setup->first);
+	while (*ptr != '\0') {
+
+		ptr = ReadUntilWithinScope(ptr, 'v');
+
+		if (isEqual("var ", ptr)) {
+			const char* end = ptr;
+			while (*end != '\0' && *end != '\n' && *end != ';') end++;
+			*c.currentNode = ParseArea(c, ptr, end);
+			c.currentNode = &(*c.currentNode)->next;
+		}
+		ptr++;
 	}
 }

@@ -22,12 +22,14 @@ struct Script
 {
 	Script()
 	{
+		setup = nullptr;
 	}
 	~Script()
 	{
 	}
 
 	LocalFuncStorage functions;
+	ScriptFunction* setup;
 	VarStorage vars;
 	Value execReturn;
 
