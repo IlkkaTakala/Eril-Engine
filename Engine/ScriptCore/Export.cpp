@@ -20,9 +20,10 @@ unsigned __int32 CompileScript(const char* data)
 	uint off = 0;
 	uint idx = Scripts.size() ? Scripts.rbegin()->first + 1 : 1;
 	Scripts[idx] = new Script();
+	Script* s = Scripts[idx];
 	activeScript = idx;
-	Parser::FindVariables(data, Scripts[idx]);
-	Parser::FindFunctions(data, Scripts[idx]);
+	Parser::FindVariables(data, s);
+	Parser::FindFunctions(data, s);
 
 	if (isError()) {
 		CleanScript(idx);
@@ -30,7 +31,9 @@ unsigned __int32 CompileScript(const char* data)
 	}
 
 	Value v;
-	Scripts[idx]->setup->invoke(v);
+	s->setup->invoke(v);
+	delete s->setup;
+	s->setup = nullptr;
 
 	return idx;
 }
@@ -41,9 +44,12 @@ void EvaluateScript(unsigned __int32 s)
 	Scripts[s]->evaluate();
 }
 
-void AddFuncs(std::any fun)
+void AddWrapped(const char* scope, const char* name, BaseFunction* function)
 {
-	//globalFuncs["funner"] = make_wrap<Value, Value>(fun);
+	if (auto it = nativeFuncs[scope].find(name); it != nativeFuncs[scope].end()) {
+		delete it->second;
+	}
+	nativeFuncs[scope][name] = function;
 }
 
 void CleanScript(unsigned __int32 script)

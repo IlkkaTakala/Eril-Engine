@@ -172,6 +172,11 @@ struct Value
 		return GetValue<int64>();
 	}
 
+	operator int() const
+	{
+		return (int)GetValue<int64>();
+	}
+
 	operator float() const
 	{
 		return GetValue<float>();

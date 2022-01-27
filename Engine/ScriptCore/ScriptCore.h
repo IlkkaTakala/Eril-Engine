@@ -11,25 +11,6 @@
 struct ScriptFunction;
 struct Scope;
 
-template <class R, class... ARGS>
-struct function_ripper {
-	static constexpr int n_args = sizeof...(ARGS);
-};
-
-template <class R, class... ARGS>
-auto constexpr make_ripper(R(ARGS...)) {
-	return function_ripper<R, ARGS...>();
-}
-
-template <typename...Args, typename Func>
-BaseFunction* make_wrap(Func f) {
-	int c = decltype(make_ripper(f))::n_args;
-	return new Function<Args...>(c, [f](auto ...v) {
-		return f(v...);
-		});
-}
-
-
 static VarStorage globalVars;
 
 struct Scope
