@@ -63,16 +63,28 @@ std::unordered_map<String, NativeFuncStorage> nativeFuncs = {
 	{">=", new Function<Value, Value>(2, &BooleanGreaterEqual)},
 }},
 {"variable", NativeFuncStorage {
-	{"type", new Function<Value>(1, [](void* val, auto v) {
+	{"type", new Function<>(0, [](void* val) {
 		if (Variable* c = static_cast<Variable*>(val); c)
 			return Value(typeName(c->value->type()));
 		else return Value();
 	})},
-	{"unset", new Function<Value>(1, [](void* val, auto v) {
+	{"unset", new Function<>(0, [](void* val) {
 		if (Variable* c = static_cast<Variable*>(val); c) {
 			*c->value = Value();
 			c->init = false;
 			return *c->value;
+		}
+		else return Value();
+	})},
+	{"copy", new Function<>(0, [](void* val) {
+		if (Variable* c = static_cast<Variable*>(val); c) {
+			return c->value->DeepCopy();
+		}
+		else return Value();
+	})},
+	{"size", new Function<>(0, [](void* val) {
+		if (Variable* c = static_cast<Variable*>(val); c) {
+			return Value(c->value->GetSize());
 		}
 		else return Value();
 	})},
@@ -108,6 +120,7 @@ int BaseFunction::GetParamCount(Context& c, const String& scope, const String& n
 
 void ScriptFunction::invoke(Value& value)
 {
+	shouldReturn = false;
 	if (first) {
 		Node* ptr = first;
 		while (ptr != nullptr && !shouldReturn) {

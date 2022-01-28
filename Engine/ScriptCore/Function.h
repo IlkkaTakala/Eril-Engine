@@ -24,6 +24,26 @@ struct Variable
 	Variable(Variable&& old) noexcept : value(std::move(old.value)), type(std::move(old.type)), init(std::move(old.init)) {
 		old.value = nullptr;
 	}
+	Variable& operator=(Variable& old) {
+		if (this == &old)
+			return *this;
+		delete value;
+		value = old.value;
+		type = old.type;
+		init = old.init;
+		old.value = nullptr;
+		return *this;
+	}
+	Variable& operator=(Variable&& old) noexcept {
+		if (this == &old)
+			return *this;
+		delete value;
+		value = old.value;
+		type = old.type;
+		init = old.init;
+		old.value = nullptr;
+		return *this;
+	}
 	Value* value;
 	uint8 type; // 0 = normal, 1 = constant, 2 = static
 	bool init;
@@ -66,11 +86,9 @@ struct ScriptFunction
 		first = nullptr;
 		continueNode = nullptr;
 		shouldReturn = false;
-		returnValue;
 	}
 	~ScriptFunction();
-	std::vector<Value> params;
-	std::map<String, int> param_names;
+	VarStorage params;
 
 	Scope* scope;
 

@@ -2,11 +2,15 @@
 #include "defines.h"
 #include <variant>
 #include "Error.h"
+#include <list>
 
 struct Value
 {
-	std::variant<void*, float, int64, String, bool> value;
-
+	typedef std::vector<Value> Array;
+	typedef std::pair<int, Array>* ArrayPtr;
+	std::variant<void*, float, int64, String, bool, ArrayPtr> value;
+	static inline std::list<std::pair<int, Array>> arrays;
+	
 	Value() : value((void*)0) {}
 
 	explicit Value(EVT type, const String& s) 
@@ -25,35 +29,106 @@ struct Value
 		case EVT::Boolean:
 			value = s == "true" ? true : false;
 			break;
+		case EVT::Array:
+			value = &arrays.emplace_back(1, Array());
+			break;
 		default:
 			value = (void*)0;
 			break;
 		}
 	}
 
+	void Clean() {
+		if (value.index() == 5 && std::get<ArrayPtr>(value) != nullptr) {
+			std::get<ArrayPtr>(value)->first--;
+		}
+		value = (void*)0;
+	}
+
+	static void CleanArrays() {
+		arrays.remove_if([](auto& p) { return p.first < 1; });
+	}
+
+	void Reset() {
+		switch (value.index())
+		{
+		case 1:
+			value = 0.f;
+			break;
+		case 2:
+			value = 0LL;
+			break;
+		case 3:
+			value = "";
+			break;
+		case 4:
+			value = false;
+			break;
+		case 5:
+			if (std::get<ArrayPtr>(value) != nullptr) {
+				std::get<ArrayPtr>(value)->second.clear();
+			} break;
+
+		default:
+			value = (void*)0;
+		}
+	}
+
 	Value& operator=(const Value& val) {
+		if (this == &val)
+			return *this;
+
 		value = val.value;
+		if (value.index() == 5) std::get<ArrayPtr>(value)->first++;
 		return *this;
 	}
 
 	Value& operator=(Value&& val) noexcept {
+		if (this == &val)
+			return *this;
+
 		if (value.index() != 3) value = std::move(val.value);
 		else value = val.value;
+		if (value.index() == 5) {
+			std::get<ArrayPtr>(value)->first++;
+		}
 		return *this;
 	} 
 
-	~Value() {}
+	~Value() {
+		if (value.index() == 5) {
+			std::get<ArrayPtr>(value)->first--;
+		}
+	}
 
 	Value(Value&& val) noexcept {
 		if (value.index() != 3) value = std::move(val.value);
 		else value = val.value;
+		if (value.index() == 5) std::get<ArrayPtr>(value)->first++;
 	};
 
-	Value(const Value& val) : value(val.value) {}
+	Value(const Value& val) : value(val.value) {
+		if (value.index() == 5) std::get<ArrayPtr>(value)->first++;
+	}
+
+	Value&& DeepCopy() {
+		Value res;
+		if (value.index() == 5) {
+			res.value = &arrays.emplace_back(1, std::get<ArrayPtr>(value)->second);
+		}
+		else {
+			res.value = value;
+		}
+		return std::forward<Value>(res);
+	}
 
 	Value(int64 in) : value(in) {}
 
+	Value(int in) : value((int64)in) {}
+
 	Value(float in) : value(in) {}
+
+	Value(double in) : value((float)in) {}
 
 	Value(bool in) : value(in) {}
 
@@ -116,7 +191,7 @@ struct Value
 		switch (value.index())
 		{
 		case 0:
-			return "";
+			return "Undefined";
 		case 1:
 			return std::to_string(std::get<float>(value));
 		case 2:
@@ -125,8 +200,15 @@ struct Value
 			return std::get<String>(value);
 		case 4:
 			return std::get<bool>(value) ? "true" : "false";
+		case 5: 
+		{
+			String res = "{ ";
+			for (const auto& v : std::get<ArrayPtr>(value)->second)
+				res += (String)v + " ";
+			return res + "}";
+		}
 		default:
-			return "";
+			return "Undefined";
 		}
 	}
 
@@ -162,6 +244,8 @@ struct Value
 			return EVT::String;
 		case 4:
 			return EVT::Boolean;
+		case 5:
+			return EVT::Array;
 		default:
 			return EVT::Unknown;
 		}
@@ -190,6 +274,35 @@ struct Value
 	operator bool() const
 	{
 		return GetValue<bool>();
+	}
+
+	Value* GetIndex(int idx) {
+		if (value.index() == 5) {
+			Array& a = std::get<ArrayPtr>(value)->second;
+			if (a.size() > idx && idx >= 0) {
+				return &a.at(idx);
+			}
+			else {
+				error("Index out of bounds: " + std::to_string(idx) + " from size of " + std::to_string(a.size()));
+				return nullptr;
+			}
+		}
+		else return this;
+	}
+
+	int GetSize() {
+		if (value.index() == 5) {
+			Array& a = std::get<ArrayPtr>(value)->second;
+			return (int)a.size();
+		}
+		else return 1;
+	}
+
+	Value* PushIndex() {
+		if (value.index() == 5) {
+			return &std::get<ArrayPtr>(value)->second.emplace_back();
+		}
+		else return this;
 	}
 
 	friend Value operator+(const Value& lhs, const Value& rhs) {

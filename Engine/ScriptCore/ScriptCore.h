@@ -1,15 +1,11 @@
 #pragma once
 #include "defines.h"
-#include <functional>
-#include <any>
 #include <map>
-#include <iostream>
 
 #include "Node.h"
 #include "Error.h"
 
 struct ScriptFunction;
-struct Scope;
 
 static VarStorage globalVars;
 
@@ -43,5 +39,35 @@ struct Scope
 	~Scope()
 	{
 		for (const auto& p : childs) delete p;
+		for (const auto& v : variables) {
+			v.second.value->Clean();
+		}
+	}
+};
+
+struct ScopeNode : public Node
+{
+	ScopeNode() {
+		scope = nullptr;
+		parent = nullptr;
+	}
+	virtual ~ScopeNode() {}
+
+	ScopeNode* parent;
+	Scope* scope;
+
+	virtual void evaluate(ScriptFunction* caller, Value& node) override
+	{
+		if (child) {
+			Node* ptr = child;
+			while (ptr) {
+				ptr->evaluate(caller, node);
+				ptr = ptr->next;
+			}
+		}
+		if (scope)
+			for (const auto& v : scope->variables) {
+				v.second.value->Reset();
+			}
 	}
 };

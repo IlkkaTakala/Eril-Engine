@@ -42,6 +42,7 @@ void EvaluateScript(unsigned __int32 s)
 {
 	if (Scripts.find(s) == Scripts.end()) return;
 	Scripts[s]->evaluate();
+	Value::CleanArrays();
 }
 
 void AddWrapped(const char* scope, const char* name, BaseFunction* function)
@@ -56,6 +57,7 @@ void CleanScript(unsigned __int32 script)
 {
 	if (Scripts.find(script) != Scripts.end()) delete Scripts[script];
 	Scripts.erase(script);
+	Value::CleanArrays();
 }
 
 void GetError(const char* error, size_t size)

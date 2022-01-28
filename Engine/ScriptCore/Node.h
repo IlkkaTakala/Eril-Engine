@@ -51,18 +51,20 @@ inline void _invoke(Value& value, const String& scope, const String& name, void*
 	else if (globalFuncs.find(name) != globalFuncs.end()) {
 		
 	}
+	error("Function " + scope + '.' + name + " not found");
 	value = {};
 }
 
 template<>
 inline void _invoke<>(Value& value, const String& scope, const String& name, void* ptr)
 {
-	if (nativeFuncs.find(scope) != nativeFuncs.end() && nativeFuncs[name].find(name) != nativeFuncs[name].end()) {
+	if (nativeFuncs.find(scope) != nativeFuncs.end() && nativeFuncs[scope].find(name) != nativeFuncs[scope].end()) {
 		auto c = dynamic_cast<Function<>*>(nativeFuncs[scope][name]);
 		if (c) (*c)(value, ptr);
 		else value = {};
 		return;
 	}
+	error("Function " + scope + '.' + name + " not found");
 	value = {};
 }
 
@@ -121,6 +123,7 @@ struct FuncNode : public Node
 		if (ValueNode* val(dynamic_cast<ValueNode*>(n)); val) {
 			params[idx] = nullptr;
 			val->evaluate(nullptr, eval_params[idx]);
+			delete val;
 		}
 		else {
 			params[idx] = n;
@@ -152,6 +155,7 @@ struct FuncNode : public Node
 	{
 		for (int i = 0; i < params.size(); i++) if (params[i]) params[i]->evaluate(caller, eval_params[i]);
 		invoke_helper<c>(eval_params, std::make_index_sequence<c>(), node);
+		for (int i = 0; i < params.size(); i++) if (params[i]) eval_params[i].Clean();
 	}
 
 private:
@@ -200,31 +204,58 @@ struct ScriptFuncNode : public Node
 	ScriptFuncNode(Script* s, const String& f, int size)
 	{
 		value = &s->functions[f];
-		params.resize(size, nullptr);
+		params.resize(size);
 	}
 
 	virtual void evaluate(ScriptFunction* caller, Value& node) override
 	{
-		for (int i = 0; i < value->params.size() && i < params.size(); i++) {
-			if (params[i]) params[i]->evaluate(caller, value->params[i]);
-			else value->params[i] = {};
+		int i = 0;
+		for (auto it = value->params.begin(); it != value->params.end(); it++) {
+			if (i >= params.size()) break;
+			if (params[i]) params[i]->evaluate(caller, *it->second.value);
+			else *it->second.value = {};
+			i++;
 		}
 		value->invoke(node);
+		for (auto& p : value->params)
+			p.second.value->Clean();
 	}
 };
 
 struct VariableNode : public Node
 {
 	Variable* value;
+	Node* index;
+	bool isArray;
 
-	VariableNode(Variable* ptr) : value(ptr) {}
+	VariableNode(Variable* ptr, bool array = false, Node* idx = nullptr, bool shouldDestroy = false) : value(ptr), isArray(array), index(idx) {}
 
-	virtual ~VariableNode() {}
+	virtual ~VariableNode() { 
+		delete index; 
+	}
 
 	virtual void evaluate(ScriptFunction* caller, Value& node) override
 	{
-		if (child && value->type == 0) child->evaluate(caller, *(value->value));
-		node = *value->value;
+		if (value->value->type() == EVT::Array && isArray) {
+			int idx = 0;
+			Value* v = nullptr;
+			if (index) {
+				Value idxv;
+				index->evaluate(caller, idxv);
+				v = value->value->GetIndex(idxv);
+			}
+			else {
+				v = value->value->PushIndex();
+			}
+			if (v) {
+				if (child && value->type == 0) child->evaluate(caller, *v);
+				node = *v;
+			}
+		}
+		else {
+			if (child && value->type == 0) child->evaluate(caller, *(value->value));
+			node = *value->value;
+		}
 	}
 };
 
@@ -232,11 +263,9 @@ struct ConstantVariableNode : public Node
 {
 	Value* value;
 
-	ConstantVariableNode(Value* ptr) {
-		value = ptr;
-	}
+	ConstantVariableNode(Value* ptr) : value(ptr){}
 
-	virtual ~ConstantVariableNode() {}
+	virtual ~ConstantVariableNode() { }
 
 	virtual void evaluate(ScriptFunction* caller, Value& node) override
 	{
@@ -253,7 +282,8 @@ struct ControlNode : public Node
 
 	virtual void evaluate(ScriptFunction* caller, Value& node) override
 	{
-		child->evaluate(caller, caller->returnValue);
+		if (child) child->evaluate(caller, caller->returnValue);
+		else caller->returnValue.Clean();
 		caller->shouldReturn = true;
 		node = std::move(caller->returnValue);
 	}
@@ -267,7 +297,12 @@ struct ForNode : public Node
 		end = nullptr;
 		body = nullptr;
 	}
-	virtual ~ForNode() {}
+	virtual ~ForNode() { 
+		delete begin;
+		delete end;
+		delete test;
+		delete body;
+	}
 
 	Node* begin;
 	Node* test;
@@ -280,6 +315,7 @@ struct ForNode : public Node
 		if (next && !body) {
 			body = next;
 			next = next->next;
+			body->next = nullptr;
 		}
 		if (begin) begin->evaluate(caller, beginVal);
 		if (test)
@@ -300,7 +336,9 @@ struct IfNode : public Node
 	IfNode() {
 		body = nullptr;
 	}
-	virtual ~IfNode() {}
+	virtual ~IfNode() {
+		delete body;
+	}
 
 	Node* body;
 
@@ -312,27 +350,9 @@ struct IfNode : public Node
 			if (testV.GetValue<bool>()) 
 				next->evaluate(caller, node);
 			if (!body) body = next;
-			if (next) next = body->next;
-		}
-	}
-};
-
-struct ScopeNode : public Node
-{
-	ScopeNode() {
-		parent = nullptr;
-	}
-	virtual ~ScopeNode() {}
-
-	ScopeNode* parent;
-
-	virtual void evaluate(ScriptFunction* caller, Value& node) override
-	{
-		if (child) {
-			Node* ptr = child;
-			while (ptr) {
-				ptr->evaluate(caller, node);
-				ptr = ptr->next;
+			if (next) {
+				next = body->next;
+				body->next = nullptr;
 			}
 		}
 	}

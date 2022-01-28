@@ -31,6 +31,8 @@ void ExitContext(Context& c, Context& l)
 	c.loopNode = l.loopNode;
 	c.loopScope = l.loopScope;
 	c.scopeNode = l.scopeNode;
+	c.row = l.row;
+	c.currentNode = l.currentNode;
 }
 
 inline ECharType TypeOfChar(const char* c)
@@ -80,7 +82,7 @@ String ReadWord(Context& c)
 {
 	bool hasDot = false;
 	String word;
-	while (isalnum(*c.ptr) || (isdigit(word.size() ? *word.begin() : '0') && *c.ptr == '.')) {
+	while (isalnum(*c.ptr) || *c.ptr == '_' || (isdigit(word.size() ? *word.begin() : '0') && *c.ptr == '.')) {
 		if (*c.ptr == '.')
 		{
 			if (hasDot) error("Unexpected character: '.'", &c);
@@ -148,6 +150,11 @@ const char* ReadUntilNonWhite(const char* ptr) {
 	return ptr;
 }
 
+const char* ReadUntilNonWhiteWithLimit(const char* ptr, const char* end) {
+	while (isspace(*ptr) && ptr != end) ptr++;
+	return ptr;
+}
+
 const char* ReadUntilWithinScope(const char* ptr, char delim, char scopeBegin = '{', char scopeEnd = '}') {
 	int scope = 0;
 	while (*ptr && (*ptr != delim || scope != 0)) {
@@ -199,6 +206,15 @@ String CopyUntilWithinScopeWithLimit(const char*& ptr, char delim, const char* e
 	return copy;
 }
 
+bool isEqualWord(const String& s, const char* c) {
+	for (const char& ch : s) {
+		if (*c != ch) return false;
+		c++;
+	}
+	if (isalnum(*c)) return false;
+	return true;
+}
+
 bool isEqual(const String& s, const char* c) {
 	for (const char& ch : s) {
 		if (*c != ch) return false;
@@ -214,7 +230,7 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	if (*c.ptr == '(') {
 		c.ptr++;
 		bool succ = false;
-		String params = CopyUntilWithinScopeWithLimit(c.ptr, ')', c.end, '{', '}', &succ);
+		String params = CopyUntilWithinScopeWithLimit(c.ptr, ')', c.end, '(', ')', &succ);
 		if (!succ) {
 			error("Invalid 'for' statement", &c);
 			return (Node*)nullptr;
@@ -227,6 +243,8 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 		ForNode* next = new ForNode();
 		c.loopScope = c.scope;
 		c.scope = new Scope(c.scope, c.topLevel);
+		c.scope->parent = c.loopScope;
+		c.loopScope->childs.push_back(c.scope);
 		c.loopNode = next;
 		next->begin = ParseArea(c, s[0].c_str(), s[0].c_str() + s[0].size());
 		next->test = ParseArea(c, s[1].c_str(), s[1].c_str() + s[1].size());
@@ -247,8 +265,9 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	c.ptr += 2;
 	c.ptr = ReadUntilNonWhite(c.ptr);
 	if (*c.ptr == '(') {
+		c.ptr++;
 		bool succ = false;
-		const char* end = ReadUntilWithinScopeWithLimit(c.ptr, ')', c.end, '{', '}', &succ);
+		const char* end = ReadUntilWithinScopeWithLimit(c.ptr, ')', c.end, '(', ')', &succ);
 		if (!succ) {
 			error("Invalid if statement", &c);
 			return (Node*)nullptr;
@@ -266,7 +285,7 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	error("No statement found", &c);
 	return (Node*)nullptr;
 }},
-{"return ", true, [](Context& c) {
+{"return", true, [](Context& c) {
 	c.ptr += 7;
 	Node* next = new ControlNode();
 	next->child = ParseArea(c, c.ptr, c.end);
@@ -635,22 +654,31 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	}
 	return next;
 } },
-{"var ", true, [](Context& c) {
+{"var", true, [](Context& c) {
 	c.ptr += 4;
 	String name = ReadWord(c);
 	if (!name.size()) error("Invalid Variable name: " + name, &c);
 	Node* next;
+	c.ptr = ReadUntilNonWhite(c.ptr);
+	bool isArray = false;
+	Value* val = nullptr;
+	if (*c.ptr == '[' && *(c.ptr + 1) == ']') {
+		val = new Value(EVT::Array, "");
+		//isArray = true;
+	}
+	else
+		val = new Value();
 	if (c.scope) {
-		auto it = c.scope->variables.emplace(name, Variable(new Value(), 0, false));
-		next = new VariableNode(&it.first->second);
+		auto it = c.scope->variables.emplace(name, Variable(val, 0, false));
+		next = new VariableNode(&it.first->second, isArray);
 	}
 	else {
-		auto it = c.topLevel->vars.emplace(name, Variable(new Value(), 0, false));
-		next = new VariableNode(&it.first->second);
+		auto it = c.topLevel->vars.emplace(name, Variable(val, 0, false));
+		next = new VariableNode(&it.first->second, isArray);
 	}
 	return next;
 }},
-{"const ", true, [](Context& c) {
+{"const", true, [](Context& c) {
 	c.ptr += 6;
 	String name = ReadWord(c);
 	if (!name.size()) error("Invalid Variable name: " + name, &c);
@@ -658,7 +686,7 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	Node* next = new VariableNode(&it.first->second);
 	return next;
 }},
-{"static ", true, [](Context& c) {
+{"static", true, [](Context& c) {
 	c.ptr += 7;
 	String name = ReadWord(c);
 	if (!name.size()) error("Invalid Variable name: " + name, &c);
@@ -702,14 +730,14 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 				if (*l.ptr == '}') scope--;
 				if (scope == 0) {
 					if (!isalnum(*l.ptr)) {
-						if (*(l.ptr + 1) == *key.c_str() && isEqual(key, l.ptr + 1)) {
+						if (*(l.ptr + 1) == *key.c_str() && isEqualWord(key, l.ptr + 1)) {
 							l.ptr++;
 							result = func(l);
 							break;
 						}
 					}
 					else if (l.ptr == begin) {
-						if (*l.ptr == *key.c_str() && isEqual(key, l.ptr)) {
+						if (*l.ptr == *key.c_str() && isEqualWord(key, l.ptr)) {
 							result = func(l);
 							break;
 						}
@@ -737,9 +765,9 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 	l.ptr = begin;
 	bool found = false;
 	while (!isError() && l.ptr != end && (result == nullptr && !found)) {
-		l.ptr = ReadUntilNonWhite(l.ptr);
+		l.ptr = ReadUntilNonWhiteWithLimit(l.ptr, end);
 		l.considerValue = ReadWord(l);
-		l.ptr = ReadUntilNonWhite(l.ptr);
+		l.ptr = ReadUntilNonWhiteWithLimit(l.ptr, end);
 		if (l.ptr == l.end && l.considerValue.size() == 0) break;
 		if (*l.ptr == '.') {
 			l.ptr++;
@@ -761,6 +789,12 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 					if (val) {
 						param_count = BaseFunction::GetParamCount(l, "variable", l.considerValue);
 						result = FuncNodes[param_count]("variable", l.considerValue, val);
+					}
+					else {
+						if (auto it = c.function->params.find(l.considerScope); it != c.function->params.end()) {
+							param_count = BaseFunction::GetParamCount(l, "variable", l.considerValue);
+							result = FuncNodes[param_count]("variable", l.considerValue, &it->second);
+						}
 					}
 				}
 				else {
@@ -789,7 +823,7 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 						result->SetChild(i, ParseArea(l, params[i].c_str(), params[i].c_str() + params[i].size()));
 					}
 				}
-				l.ptr = end;
+				l.ptr = aend + 1;
 				l.considerValue = "";
 				break;
 			}
@@ -818,6 +852,46 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 			break;
 		}
 		break;
+
+		case '[':
+		{
+			l.ptr++;
+			l.ptr = ReadUntilNonWhite(l.ptr);
+			bool succ = false;
+			const char* aend = ReadUntilWithinScopeWithLimit(l.ptr, ']', end, '(', ')', &succ);
+			if (succ) {
+				Variable* val = l.scope->FindVar(l.considerValue);
+				if (val && val->value->type() == EVT::Array) {
+					Node* index = ParseArea(l, l.ptr, aend);
+					if (val->type == 2) {
+						if (ValueNode* n = dynamic_cast<ValueNode*>(index); n) {
+							result = new ValueNode(n->value);
+						}
+						else {
+							error("Cannot use non-static access with static variables", &l);
+							delete index;
+							break;
+						}
+					}
+					else
+						result = new VariableNode(val, true, index);
+				}
+				else
+				{
+					if (auto it = c.function->params.find(l.considerValue); it != c.function->params.end()) {
+						Node* index = ParseArea(l, l.ptr, aend);
+						result = new VariableNode(&it->second, true, index);
+						break;
+					}
+					error("Unknown array: " + l.considerValue, &c);
+					break;
+				}
+			}
+			else { 
+				error("No matching token found: ']'", &l);
+				break;
+			}
+		} break;
 
 		default:
 		{
@@ -850,8 +924,8 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 				}
 				else
 				{
-					if (c.function->param_names.find(l.considerValue) != c.function->param_names.end()) {
-						result = new ConstantVariableNode(&c.function->params[c.function->param_names[l.considerValue]]);
+					if (c.function->params.find(l.considerValue) != c.function->params.end()) {
+						result = new VariableNode(&c.function->params[l.considerValue]);
 						break;
 					}
 					error("Unknown variable: " + l.considerValue, &c);
@@ -887,6 +961,7 @@ void ReadLine(Context& c)
 			*c.currentNode = l.scopeNode;
 			c.currentNode = &(*c.currentNode)->child;
 			l.scope = l.scope->childs.back();
+			sn->scope = l.scope;
 			l.begin = ++l.end;
 		}
 		else if (*l.end == '}') {
@@ -914,6 +989,7 @@ void ReadLine(Context& c)
 	}
 
 	Node* n = ParseArea(l, l.begin, l.end);
+	ExitContext(c, l);
 	if (n != nullptr) {
 		if (n != (Node*)skipNode) {
 			*c.currentNode = n;
@@ -946,6 +1022,7 @@ int BeginParse(Context& c, const char* data, uint off, uint& end, Node** nodePtr
 		ReadLine(l);
 	}
 	c.ptr = l.ptr;
+	ExitContext(c, l);
 	return true;
 }
 
@@ -969,21 +1046,23 @@ void Parser::FindFunctions(const char* data, Script* script)
 				String fun = ReadWord(c);
 				if (*c.ptr == '(') {
 					c.ptr++;
-					Node** fir = &(script->functions[fun].first);
+					ScopeNode* scopeN = new ScopeNode();
+					script->functions[fun].first = scopeN;
+					Node** fir = &(scopeN->child);
 					c.scope = new Scope(nullptr, script);
+					scopeN->scope = c.scope;
 					script->functions[fun].scope = c.scope;
 					c.function = &script->functions[fun];
 					ptr = ReadUntilWithinScope(ptr, ')');
 					while (c.ptr != ptr && *c.ptr != '\0') {
 						c.ptr = ReadUntilNonWhite(c.ptr);
-						c.function->param_names[ReadWord(c)] = (int)c.function->param_names.size();
+						c.function->params[ReadWord(c)] = std::move(Variable(new Value, 0, false));
 						bool success = false;
 						c.ptr = ReadUntilWithLimit(c.ptr, ',', ptr, &success);
 						if (success) c.ptr++;
 						else break;
 					}
 					ptr = ReadUntilWithinScope(ptr, '{') + 1;
-					c.function->params.resize(c.function->param_names.size(), {});
 					uint off = 0;
 					c.end = ReadUntilWithinScope(ptr, '}');
 					BeginParse(c, ++ptr, 0, off, fir);
@@ -995,14 +1074,15 @@ void Parser::FindFunctions(const char* data, Script* script)
 				}
 			}
 		}
-
-
-
-		ptr++;
+		if (*ptr != '\0')
+			ptr++;
 	}
 	if (script->functions.find("execute") == script->functions.end()) {
-		Node** fir = &(script->functions["execute"].first);
+		ScopeNode* scopeN = new ScopeNode();
+		script->functions["execute"].first = scopeN;
+		Node** fir = &(scopeN->child);
 		c.scope = new Scope(nullptr, script);
+		scopeN->scope = c.scope;
 		script->functions["execute"].scope = c.scope;
 		c.function = &script->functions["execute"];
 		c.begin = function_end;
@@ -1026,7 +1106,7 @@ void Parser::FindVariables(const char* data, Script* script)
 
 		ptr = ReadUntilWithinScope(ptr, 'v');
 
-		if (isEqual("var ", ptr)) {
+		if (isEqualWord("var", ptr)) {
 			const char* end = ptr;
 			while (*end != '\0' && *end != '\n' && *end != ';') end++;
 			*c.currentNode = ParseArea(c, ptr, end);
