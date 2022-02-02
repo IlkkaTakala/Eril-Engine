@@ -13,6 +13,7 @@
 #include "EndScreen.h"
 #include "StartScreen.h"
 #include "Objects/InputComponent.h"
+#include "Objects/ColliderComponent.h"
 
 //ECS
 #include <Interface/IECS.h>
@@ -23,6 +24,10 @@
 #include <ECS/Systems/AudioControllerSystem.h>
 
 class Ghost;
+
+void ColliderComponent::Sim() {
+
+}
 
 void ForestPlayer::OpenConsole(bool) {
 	Console::Create();

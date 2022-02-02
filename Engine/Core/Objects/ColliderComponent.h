@@ -1,20 +1,14 @@
 #pragma once
 #include "btBulletDynamicsCommon.h"
-#include "BaseObject.h"
+#include <external/bullet3/examples/CommonInterfaces/CommonRigidBodyBase.h>
 
-struct bulletObject {
-    bool hit;
-    btRigidBody* body;
-
-    bulletObject(btRigidBody* b) : body(b), hit(false) {}
-    bulletObject() : body(nullptr), hit(false) {}
-    ~bulletObject() { delete body; }
-};
-
-class ColliderComponent : public BaseObject
+class ColliderComponent : public CommonRigidBodyBase
 {
 public:
-    bool collisionCheck(btManifoldPoint& cp, const btCollisionObject* obj1, int id1, int index1, const btCollisionObject* obj2, int id2, int index2);
+    ColliderComponent(struct GUIHelperInterface* helper) : CommonRigidBodyBase(helper){}
+    virtual ~ColliderComponent(){}
+    virtual void initColliders();
+
 
 private:
     
