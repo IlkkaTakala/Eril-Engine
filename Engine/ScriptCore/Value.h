@@ -225,6 +225,30 @@ struct Value
 			return std::get<int64>(value);
 		case 3:
 			return std::stoi(std::get<String>(value));
+		case 4:
+			return (int64)std::get<bool>(value);
+		default:
+			return 0;
+		}
+	}
+
+	template<>
+	Array* GetValue() const
+	{
+		switch (value.index())
+		{
+		case 0:
+			return nullptr;
+		case 1:
+			return nullptr;
+		case 2:
+			return nullptr;
+		case 3:
+			return nullptr;
+		case 4:
+			return nullptr;
+		case 5:
+			return &std::get<ArrayPtr>(value)->second;
 		default:
 			return 0;
 		}

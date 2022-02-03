@@ -32,7 +32,7 @@ void ExitContext(Context& c, Context& l)
 	c.loopScope = l.loopScope;
 	c.scopeNode = l.scopeNode;
 	c.row = l.row;
-	c.currentNode = l.currentNode;
+	//c.currentNode = l.currentNode;
 }
 
 inline ECharType TypeOfChar(const char* c)
@@ -250,12 +250,12 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 		next->test = ParseArea(c, s[1].c_str(), s[1].c_str() + s[1].size());
 		next->end = ParseArea(c, s[2].c_str(), s[2].c_str() + s[2].size());
 
-		Node* rest = ParseArea(c, c.ptr + 1, c.end);
+		/*Node* rest = ParseArea(c, c.ptr + 1, c.end);
 		if (rest) {
 			*c.currentNode = next;
 			c.currentNode = &(*c.currentNode)->next;
 			return rest;
-		}
+		}*/
 		return (Node*)next;
 	}
 	error("No statement found", &c);
@@ -275,11 +275,11 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 		IfNode* next = new IfNode();
 		next->child = ParseArea(c, c.ptr, end);
 		Node* rest = ParseArea(c, end + 1, c.end);
-		if (rest) {
+		/*if (rest) {
 			*c.currentNode = next;
 			c.currentNode = &(*c.currentNode)->next;
 			return rest;
-		}
+		}*/
 		return (Node*)next;
 	}
 	error("No statement found", &c);
@@ -526,6 +526,30 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	*lhs->GetChild(0) = ParseArea(c, c.ptr + 1, c.end);
 	return lhs;
 }},
+{"*=", false, [](Context& c) {
+	Node* lhs = ParseArea(c, c.begin, c.ptr);
+	Node* rhs = ParseArea(c, c.ptr + 2, c.end);
+	Node* next = nullptr;
+	if (auto lhsv(dynamic_cast<VariableNode*>(lhs)); lhsv && rhs) {
+		next = FuncNodes[2]("op", "*=", nullptr);
+		next->SetChild(0, lhs);
+		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
+			next->SetValue(1, rhsv->value);
+			delete rhs;
+		}
+		else {
+			next->SetChild(1, rhs);
+		}
+		return next;
+	}
+	else {
+		delete lhs;
+		delete rhs;
+		error("Cannot assign to values", &c);
+		return (Node*)nullptr;
+	}
+	return next;
+} },
 {"-", false, [](Context& c) {
 	Node* lhs = ParseArea(c, c.begin, c.ptr);
 	Node* rhs = ParseArea(c, c.ptr + 1, c.end);
@@ -664,7 +688,7 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	Value* val = nullptr;
 	if (*c.ptr == '[' && *(c.ptr + 1) == ']') {
 		val = new Value(EVT::Array, "");
-		//isArray = true;
+		isArray = true;
 	}
 	else
 		val = new Value();
@@ -710,6 +734,22 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	}
 	return lhs;
 }},
+{"--", false, [](Context& c) {
+	Node* lhs = ParseArea(c, c.begin, c.ptr);
+	if (auto lhsv(dynamic_cast<VariableNode*>(lhs)); lhsv) {
+		Node* next = FuncNodes[2]("op", "-", nullptr);
+		VariableNode* nextVar = new VariableNode(lhsv->value);
+		next->SetChild(0, nextVar);
+		next->SetValue(1, 1LL);
+		lhs->SetChild(0, next);
+	}
+	else {
+		error("Cannot decrement values", &c);
+		delete lhs;
+		return (Node*)nullptr;
+	}
+	return lhs;
+} },
 };
 
 Node* ParseArea(Context& c, const char* const begin, const char* const end)
@@ -790,12 +830,19 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 						param_count = BaseFunction::GetParamCount(l, "variable", l.considerValue);
 						result = FuncNodes[param_count]("variable", l.considerValue, val);
 					}
-					else {
-						if (auto it = c.function->params.find(l.considerScope); it != c.function->params.end()) {
-							param_count = BaseFunction::GetParamCount(l, "variable", l.considerValue);
-							result = FuncNodes[param_count]("variable", l.considerValue, &it->second);
-						}
+					else if (auto it = c.function->params.find(l.considerScope); it != c.function->params.end()) {
+						param_count = BaseFunction::GetParamCount(l, "variable", l.considerValue);
+						result = FuncNodes[param_count]("variable", l.considerValue, &it->second);
 					}
+					else if (auto it = nativeFuncs.find(l.considerScope); it != nativeFuncs.end()) {
+						param_count = BaseFunction::GetParamCount(l, l.considerScope, l.considerValue);
+						result = FuncNodes[param_count](l.considerScope, l.considerValue, nullptr);
+					}
+					else {
+						error("Cannot find scope " + l.considerScope, &c);
+						break;
+					}
+					
 				}
 				else {
 					if (l.topLevel->functions.find(l.considerValue) != l.topLevel->functions.end()) {
@@ -948,6 +995,10 @@ void ReadLine(Context& c)
 	l.end = l.begin;
 	int scope = 0;
 	while (*l.end != '\0' && *l.end != '\n' && (*l.end != ';' || scope != 0) && l.end != c.end) {
+		if (*l.end == '#') {
+			while (*l.end != '\n' && *l.end != '\0') l.end++;
+			l.begin = l.end;
+		}
 		if (*l.end == '(') scope++;
 		if (*l.end == ')') scope--;
 		if (*l.end == '{') {
@@ -1000,11 +1051,11 @@ void ReadLine(Context& c)
 			}
 		}
 	}
-	if (l.loopNode && l.loopNode->next == n) {
+	/*if (l.loopNode && l.loopNode->next == n) {
 		l.scope = l.loopScope;
 		l.loopNode = nullptr;
 		l.loopScope = nullptr;
-	}
+	}*/
 	ExitContext(c, l);
 	c.ptr = l.end;
 	if (*l.end == '\n' || *l.end == ';') c.ptr += 1;

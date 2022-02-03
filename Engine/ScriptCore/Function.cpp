@@ -6,19 +6,19 @@
 
 Value ArithPlus(void*, const Value& lhs, const Value& rhs)				{ return lhs + rhs; }
 
-Value ArithMinus(void*, const Value& lhs, const Value& rhs)			{ return lhs - rhs; }
+Value ArithMinus(void*, const Value& lhs, const Value& rhs)				{ return lhs - rhs; }
 
 Value ArithMult(void*, const Value& lhs, const Value& rhs)				{ return lhs * rhs; }
 
 Value ArithDiv(void*, const Value& lhs, const Value& rhs)				{ return lhs / rhs; }
 
-//Value ArithPlusAs(const Value& lhs, const Value& rhs)			{ return lhs += rhs; }
+//Value ArithPlusAs(const Value& lhs, const Value& rhs)					{ return lhs += rhs; }
 //
-//Value ArithMinusAs(const Value& lhs, const Value& rhs)			{ return lhs -= rhs; }
+//Value ArithMinusAs(const Value& lhs, const Value& rhs)				{ return lhs -= rhs; }
 //
-//Value ArithMultAs(const Value& lhs, const Value& rhs)			{ return lhs *= rhs; }
+Value ArithMultAs(void*, Value& lhs, const Value& rhs)					{ return lhs = lhs * rhs; }
 //
-//Value ArithDivAs(const Value& lhs, const Value& rhs)			{ return lhs /= rhs; }
+//Value ArithDivAs(const Value& lhs, const Value& rhs)					{ return lhs /= rhs; }
 
 Value BooleanEqual(void*, const Value& lhs, const Value& rhs)			{ return lhs == rhs; }
 
@@ -28,7 +28,7 @@ Value BooleanNotEqual(void*, const Value& lhs, const Value& rhs)		{ return !(lhs
 
 Value BooleanLess(void*, const Value& lhs, const Value& rhs)			{ return lhs < rhs; }
 
-Value BooleanGreater(void*, const Value& lhs, const Value& rhs)		{ return lhs > rhs; }
+Value BooleanGreater(void*, const Value& lhs, const Value& rhs)			{ return lhs > rhs; }
 
 Value BooleanLessEqual(void*, const Value& lhs, const Value& rhs)		{ return lhs < rhs || lhs == rhs; }
 
@@ -36,7 +36,7 @@ Value BooleanGreaterEqual(void*, const Value& lhs, const Value& rhs)	{ return lh
 
 std::unordered_map<String, NativeFuncStorage> nativeFuncs = {
 {"global", NativeFuncStorage {
-	{"print", new Function<Value>(1, [](void*, auto v) {
+	{"print", new Function<const Value>(1, [](void*, auto& v) {
 		if (v.type() == EVT::Null) {
 			std::cout << ">> Undefined\n";
 			return Value{};
@@ -50,17 +50,18 @@ std::unordered_map<String, NativeFuncStorage> nativeFuncs = {
 	})},
 }},
 {"op", NativeFuncStorage {
-	{"+", new Function<Value, Value>(2, &ArithPlus)},
-	{"-", new Function<Value, Value>(2, &ArithMinus)},
-	{"*", new Function<Value, Value>(2, &ArithMult)},
-	{"/", new Function<Value, Value>(2, &ArithDiv)},
-	{"==", new Function<Value, Value>(2, &BooleanEqual)},
-	{"!", new Function<Value>(1, &BooleanNot)},
-	{"!=", new Function<Value, Value>(2, &BooleanNotEqual)},
-	{"<", new Function<Value, Value>(2, &BooleanLess)},
-	{">", new Function<Value, Value>(2, &BooleanGreater)},
-	{"<=", new Function<Value, Value>(2, &BooleanLessEqual)},
-	{">=", new Function<Value, Value>(2, &BooleanGreaterEqual)},
+	{"+", new Function<const Value, const Value>(2, &ArithPlus)},
+	{"-", new Function<const Value, const Value>(2, &ArithMinus)},
+	{"*", new Function<const Value, const Value>(2, &ArithMult)},
+	{"*", new Function<Value, const Value>(2, &ArithMultAs)},
+	{"/", new Function<const Value, const Value>(2, &ArithDiv)},
+	{"==", new Function<const Value, const Value>(2, &BooleanEqual)},
+	{"!", new Function<const Value>(1, &BooleanNot)},
+	{"!=", new Function<const Value, const Value>(2, &BooleanNotEqual)},
+	{"<", new Function<const Value, const Value>(2, &BooleanLess)},
+	{">", new Function<const Value, const Value>(2, &BooleanGreater)},
+	{"<=", new Function<const Value, const Value>(2, &BooleanLessEqual)},
+	{">=", new Function<const Value, const Value>(2, &BooleanGreaterEqual)},
 }},
 {"variable", NativeFuncStorage {
 	{"type", new Function<>(0, [](void* val) {
@@ -88,7 +89,19 @@ std::unordered_map<String, NativeFuncStorage> nativeFuncs = {
 		}
 		else return Value();
 	})},
-}}
+}},
+{"array", NativeFuncStorage {
+	{"init", new Function<const Value, const Value>(2, [](void*, auto c, auto v) {
+		Value arr(EVT::Array, "");
+		auto a = arr.GetValue<std::vector<Value>*>();
+		if (a) {
+			a->clear();
+			a->resize((int)c);
+			std::fill(a->begin(), a->end(), v);
+		}
+		return arr;
+	})}
+}} 
 };
 
 GlobalFuncStorage globalFuncs;
@@ -117,9 +130,17 @@ int BaseFunction::GetParamCount(Context& c, const String& scope, const String& n
 	}
 	return 0;
 }
-
+static int depth = 0;
+static void* firstPtr = nullptr;
+static void* lastPtr = nullptr;
 void ScriptFunction::invoke(Value& value)
 {
+	depth++;
+	int here = 1;
+	if (!firstPtr) firstPtr = &here;
+	printf("Pointer: %p | Distance: %lu | Total: %lu\n", (void*)&here, (unsigned long)lastPtr - (unsigned long)&here, (unsigned long)firstPtr - (unsigned long)&here);
+	lastPtr = &here;
+	printf("%d\n", depth);
 	shouldReturn = false;
 	if (first) {
 		Node* ptr = first;

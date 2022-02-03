@@ -40,7 +40,7 @@ struct Script
 };
 
 template <typename ...Args>
-inline void _invoke(Value& value, const String& scope, const String& name, void* ptr, const Args&... vals)
+inline void _invoke(Value& value, const String& scope, const String& name, void* ptr, Args&... vals)
 {
 	if (nativeFuncs.find(scope) != nativeFuncs.end() && nativeFuncs[scope].find(name) != nativeFuncs[scope].end()) {
 		auto c = dynamic_cast<Function<Args...>*>(nativeFuncs[scope][name]);
@@ -80,6 +80,7 @@ struct Node
 	virtual void SetValue(uint idx, const Value& v) {}
 
 	Node() : child(nullptr), next(nullptr) {}
+	Node(const Node& node) : child(node.child), next(node.next) {}
 	virtual ~Node()
 	{
 		delete child;
@@ -245,8 +246,14 @@ struct VariableNode : public Node
 				v = value->value->GetIndex(idxv);
 			}
 			else {
-				v = value->value->PushIndex();
+				if (value->init) {
+					v = value->value->PushIndex();
+				}
+				else {
+					child->evaluate(caller, *value->value);
+				}
 			}
+			
 			if (v) {
 				if (child && value->type == 0) child->evaluate(caller, *v);
 				node = *v;
