@@ -54,30 +54,7 @@ typedef std::unordered_map<String, ScriptFunction> LocalFuncStorage;
 typedef std::unordered_map<String, ScriptFunction> GlobalFuncStorage;
 typedef std::unordered_map<String, Variable> VarStorage;
 
-struct BaseFunction
-{
-	BaseFunction(int c) : param_count(c) {}
-	virtual ~BaseFunction() {}
-	static int GetParamCount(Context& c, const String& scope, const String& name);
-	int param_count;
-};
-
-template<typename...Args>
-struct Function : public BaseFunction
-{
-	typedef std::function<Value(void*, const Args&...)> FuncParams;
-
-	Function(int count, FuncParams func) : BaseFunction(count), call(func) {}
-	Function() : BaseFunction(0), call(nullptr) {}
-
-	FuncParams call;
-
-	void operator()(Value& value, void* ptr, const Args&... v) const {
-		if (call) value = std::move(call(ptr, v...));
-		else value = {};
-	}
-
-};
+int GetParamCount(Context& c, const String& scope, const String& name);
 
 struct ScriptFunction
 {

@@ -1,7 +1,6 @@
-#include "pch.h"
 #include "Error.h"
 #include "Parser.h"
-#include "ScriptCore.h"
+#include "Scope.h"
 #include <sstream>
 
 Node* ParseArea(Context& c, const char* const begin, const char* const end);
@@ -787,12 +786,12 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 				if (l.considerScope.size() != 0) {
 					Variable* val = l.scope->FindVar(l.considerScope);
 					if (val) {
-						param_count = BaseFunction::GetParamCount(l, "variable", l.considerValue);
+						param_count = GetParamCount(l, "variable", l.considerValue);
 						result = FuncNodes[param_count]("variable", l.considerValue, val);
 					}
 					else {
 						if (auto it = c.function->params.find(l.considerScope); it != c.function->params.end()) {
-							param_count = BaseFunction::GetParamCount(l, "variable", l.considerValue);
+							param_count = GetParamCount(l, "variable", l.considerValue);
 							result = FuncNodes[param_count]("variable", l.considerValue, &it->second);
 						}
 					}
@@ -803,7 +802,7 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 						result = new ScriptFuncNode(l.topLevel, l.considerValue, param_count);
 					}
 					else {
-						param_count = BaseFunction::GetParamCount(l, "global", l.considerValue);
+						param_count = GetParamCount(l, "global", l.considerValue);
 						result = FuncNodes[param_count]("global", l.considerValue, nullptr);
 					}
 				}

@@ -1,5 +1,4 @@
-#include "pch.h"
-#include "Export.h"
+#include "ScriptCore.h"
 
 #include "defines.h"
 #include <map>
@@ -8,7 +7,7 @@
 
 #include "Parser.h"
 #include "Error.h"
-#include "ScriptCore.h"
+#include "Scope.h"
 
 
 static std::map<uint, Script*> Scripts;

@@ -1,12 +1,17 @@
-#include "pch.h"
 #include <iostream>
 #include "defines.h"
 #include <sstream>
 #include <fstream>
 #include <windows.h>
-#include "Export.h"
+#include <ScriptCore.h>
 
 String someCppNativeFunction(String s, int i) {
+	std::ostringstream repeated;
+	std::fill_n(std::ostream_iterator<String>(repeated), i, s);
+	return repeated.str();
+}
+
+String someCpp(String s, int i) {
 	std::ostringstream repeated;
 	std::fill_n(std::ostream_iterator<String>(repeated), i, s);
 	return repeated.str();

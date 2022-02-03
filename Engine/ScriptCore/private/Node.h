@@ -4,6 +4,7 @@
 #include <functional>
 #include <map>
 
+#include <ScriptCore.h>
 #include "Function.h"
 #include "Error.h"
 
@@ -60,7 +61,7 @@ inline void _invoke<>(Value& value, const String& scope, const String& name, voi
 {
 	if (nativeFuncs.find(scope) != nativeFuncs.end() && nativeFuncs[scope].find(name) != nativeFuncs[scope].end()) {
 		auto c = dynamic_cast<Function<>*>(nativeFuncs[scope][name]);
-		if (c) (*c)(value, ptr);
+		if (c) value = std::forward((*c)(ptr));
 		else value = {};
 		return;
 	}

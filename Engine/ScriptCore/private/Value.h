@@ -3,6 +3,7 @@
 #include <variant>
 #include "Error.h"
 #include <list>
+#include <vector>
 
 struct Value
 {
@@ -94,6 +95,15 @@ struct Value
 		}
 		return *this;
 	} 
+
+	Value& operator=(void) {
+		if (this == &val)
+			return *this;
+
+		value = val.value;
+		if (value.index() == 5) std::get<ArrayPtr>(value)->first++;
+		return *this;
+	}
 
 	~Value() {
 		if (value.index() == 5) {

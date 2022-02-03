@@ -1,12 +1,11 @@
-#include "pch.h"
 #include "Function.h"
 #include "Error.h"
 #include "Node.h"
-#include "ScriptCore.h"
+#include "Scope.h"
 
 Value ArithPlus(void*, const Value& lhs, const Value& rhs)				{ return lhs + rhs; }
 
-Value ArithMinus(void*, const Value& lhs, const Value& rhs)			{ return lhs - rhs; }
+Value ArithMinus(void*, const Value& lhs, const Value& rhs)				{ return lhs - rhs; }
 
 Value ArithMult(void*, const Value& lhs, const Value& rhs)				{ return lhs * rhs; }
 
@@ -20,26 +19,25 @@ Value ArithDiv(void*, const Value& lhs, const Value& rhs)				{ return lhs / rhs;
 //
 //Value ArithDivAs(const Value& lhs, const Value& rhs)			{ return lhs /= rhs; }
 
-Value BooleanEqual(void*, const Value& lhs, const Value& rhs)			{ return lhs == rhs; }
+bool BooleanEqual(void*, const Value& lhs, const Value& rhs)			{ return lhs == rhs; }
 
-Value BooleanNot(void*, const Value& rhs)								{ return !rhs; }
+bool BooleanNot(void*, const Value& rhs)								{ return !rhs; }
 
-Value BooleanNotEqual(void*, const Value& lhs, const Value& rhs)		{ return !(lhs == rhs); }
+bool BooleanNotEqual(void*, const Value& lhs, const Value& rhs)			{ return !(lhs == rhs); }
 
-Value BooleanLess(void*, const Value& lhs, const Value& rhs)			{ return lhs < rhs; }
+bool BooleanLess(void*, const Value& lhs, const Value& rhs)				{ return lhs < rhs; }
 
-Value BooleanGreater(void*, const Value& lhs, const Value& rhs)		{ return lhs > rhs; }
+bool BooleanGreater(void*, const Value& lhs, const Value& rhs)			{ return lhs > rhs; }
 
-Value BooleanLessEqual(void*, const Value& lhs, const Value& rhs)		{ return lhs < rhs || lhs == rhs; }
+bool BooleanLessEqual(void*, const Value& lhs, const Value& rhs)		{ return lhs < rhs || lhs == rhs; }
 
-Value BooleanGreaterEqual(void*, const Value& lhs, const Value& rhs)	{ return lhs > rhs || lhs == rhs; }
+bool BooleanGreaterEqual(void*, const Value& lhs, const Value& rhs)		{ return lhs > rhs || lhs == rhs; }
 
 std::unordered_map<String, NativeFuncStorage> nativeFuncs = {
 {"global", NativeFuncStorage {
-	{"print", new Function<Value>(1, [](void*, auto v) {
+	{"print", new Function<void, Value>(1, [](void*, auto v) {
 		if (v.type() == EVT::Null) {
 			std::cout << ">> Undefined\n";
-			return Value{};
 		}
 		std::cout << ">> " << v.GetValue<String>() << '\n';
 		return Value{};
@@ -50,17 +48,17 @@ std::unordered_map<String, NativeFuncStorage> nativeFuncs = {
 	})},
 }},
 {"op", NativeFuncStorage {
-	{"+", new Function<Value, Value>(2, &ArithPlus)},
-	{"-", new Function<Value, Value>(2, &ArithMinus)},
-	{"*", new Function<Value, Value>(2, &ArithMult)},
-	{"/", new Function<Value, Value>(2, &ArithDiv)},
-	{"==", new Function<Value, Value>(2, &BooleanEqual)},
-	{"!", new Function<Value>(1, &BooleanNot)},
-	{"!=", new Function<Value, Value>(2, &BooleanNotEqual)},
-	{"<", new Function<Value, Value>(2, &BooleanLess)},
-	{">", new Function<Value, Value>(2, &BooleanGreater)},
-	{"<=", new Function<Value, Value>(2, &BooleanLessEqual)},
-	{">=", new Function<Value, Value>(2, &BooleanGreaterEqual)},
+	{"+", new Function<Value, Value, Value>(2, &ArithPlus)},
+	{"-", new Function<Value, Value, Value>(2, &ArithMinus)},
+	{"*", new Function<Value, Value, Value>(2, &ArithMult)},
+	{"/", new Function<Value, Value, Value>(2, &ArithDiv)},
+	{"==", new Function<bool, Value, Value>(2, &BooleanEqual)},
+	{"!", new Function<bool, Value>(1, &BooleanNot)},
+	{"!=", new Function<bool, Value, Value>(2, &BooleanNotEqual)},
+	{"<", new Function<bool, Value, Value>(2, &BooleanLess)},
+	{">", new Function<bool, Value, Value>(2, &BooleanGreater)},
+	{"<=", new Function<bool, Value, Value>(2, &BooleanLessEqual)},
+	{">=", new Function<bool, Value, Value>(2, &BooleanGreaterEqual)},
 }},
 {"variable", NativeFuncStorage {
 	{"type", new Function<>(0, [](void* val) {
@@ -95,7 +93,7 @@ GlobalFuncStorage globalFuncs;
 std::unordered_map<String, VarStorage> ObjectVars;
 
 
-int BaseFunction::GetParamCount(Context& c, const String& scope, const String& name)
+int GetParamCount(Context& c, const String& scope, const String& name)
 {	
 	if (c.object) {
 		/*if (ObjectFuncs[c.considerValue].find(name) == ObjectFuncs[c.considerValue].end())
