@@ -73,7 +73,8 @@ dateFormat  DD-MM
 title Personal timelines
 
 section Ilkka
-Scripting               :active,    ides1, 13-01, 5d
+Scripting               :active,    ides1, 13-01, 10-02
+Animations              :           ides2, after ides1, 03-03
 Git control             :           ides3, 13-01, 18w
 Lead dev/assistance     :           ides4, 13-01, 18w
 ```
