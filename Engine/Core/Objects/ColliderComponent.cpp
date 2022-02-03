@@ -1,70 +1,93 @@
 #include "ColliderComponent.h"
+#include <Physics/BulletPhysics.h>
+#include <Physics.h>
+#include "MovementComponent.h"
 
-void ColliderComponent::initColliders()
+
+ColliderComponent::ColliderComponent()
 {
-	m_guiHelper->setUpAxis(1);
+	body = nullptr;
+	type = 0;
+}
 
-	createEmptyDynamicsWorld();
-	//m_dynamicsWorld->setGravity(btVector3(0,0,0));
-	m_guiHelper->createPhysicsDebugDrawer(m_dynamicsWorld);
+void ColliderComponent::OnDestroyed()
+{
+	Physics::RemoveCollider(this);
+}
 
-	if (m_dynamicsWorld->getDebugDrawer())
-		m_dynamicsWorld->getDebugDrawer()->setDebugMode(btIDebugDraw::DBG_DrawWireframe + btIDebugDraw::DBG_DrawContactPoints);
+void ColliderComponent::BeginPlay()
+{
+	body = Physics::addBox(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 10, 1);
+	Physics::AddCollider(this);
+}
 
-	///create a few basic rigid bodies
-	btBoxShape* groundShape = createBoxShape(btVector3(btScalar(50.), btScalar(50.), btScalar(50.)));
-
-	//groundShape->initializePolyhedralFeatures();
-	//btCollisionShape* groundShape = new btStaticPlaneShape(btVector3(0,1,0),50);
-
-	m_collisionShapes.push_back(groundShape);
-
-	btTransform groundTransform;
-	groundTransform.setIdentity();
-	groundTransform.setOrigin(btVector3(0, -50, 0));
-
+void ColliderComponent::SetType(int t)
+{
+	type = t;
+	switch (type)
 	{
-		btScalar mass(0.);
-		createRigidBody(mass, groundTransform, groundShape, btVector4(0, 0, 1, 1));
+	case 0:
+		body->setCollisionFlags(btCollisionObject::CF_STATIC_OBJECT);
+		break;
+	case 1:
+		body->setCollisionFlags(btCollisionObject::CF_DYNAMIC_OBJECT);
+		break;
+	case 2:
+		body->setCollisionFlags(btCollisionObject::CF_KINEMATIC_OBJECT);
+		break;
 	}
+}
 
-	{
-		//create a few dynamic rigidbodies
-		// Re-using the same collision is better for memory usage and performance
+void ColliderComponent::SetSize(AABB s)
+{
+	float width = s.maxs.X - s.mins.X;
+	float height = s.maxs.Z - s.mins.Z;
+	float depth = s.maxs.Y - s.mins.Y;
+	size = s;
+	btBoxShape* box = new btBoxShape(btVector3(width, height, depth));
+	body->setCollisionShape(box);
+}
 
-		btBoxShape* colShape = createBoxShape(btVector3(.1, .1, .1));
+void ColliderComponent::SetTarget(MovementComponent* m)
+{
+	Object = m;
+}
 
-		//btCollisionShape* colShape = new btSphereShape(btScalar(1.));
-		m_collisionShapes.push_back(colShape);
+void ColliderComponent::SetLocation(const Vector& NewLocation, bool force)
+{
+	SceneComponent::SetLocation(NewLocation, force);
+	body->getWorldTransform().setOrigin(btVector3(NewLocation.X, NewLocation.Z, NewLocation.Y));
+}
 
-		/// Create Dynamic Objects
-		btTransform startTransform;
-		startTransform.setIdentity();
+void ColliderComponent::SetRotation(const Vector& NewRotation, bool force)
+{
+	SceneComponent::SetRotation(NewRotation, force);
+	body->getWorldTransform().setRotation(btQuaternion(NewRotation.Y, NewRotation.Z, NewRotation.X));
+}
 
-		btScalar mass(1.f);
-
-		//rigidbody is dynamic if and only if mass is non zero, otherwise static
-		bool isDynamic = (mass != 0.f);
-
-		btVector3 localInertia(0, 0, 0);
-		if (isDynamic)
-			colShape->calculateLocalInertia(mass, localInertia);
-
-		for (int k = 0; k < 5; k++)
-		{
-			for (int i = 0; i < 5; i++)
-			{
-				for (int j = 0; j < 5; j++)
-				{
-					startTransform.setOrigin(btVector3(
-						btScalar(0.2 * i),
-						btScalar(2 + .2 * k),
-						btScalar(0.2 * j)));
-
-					createRigidBody(mass, startTransform, colShape);
-				}
-			}
+void ColliderComponent::Tick(float Delta)
+{
+	Vector location = GetWorldLocation();
+	btTransform colliderloc;
+	colliderloc.setIdentity();
+	colliderloc.setOrigin(btVector3(location.X, location.Z, location.Y));
+	body->setWorldTransform(colliderloc);
+	
+	if (type == 1) {
+		if (Object) {
+			Vector velocity = Object->DesiredState.velocity;
+			body->setLinearVelocity(btVector3(velocity.X, velocity.Z, velocity.Y));
 		}
 	}
-	m_guiHelper->autogenerateGraphicsObjects(m_dynamicsWorld);
 }
+
+void ColliderComponent::ApplyCollision()
+{
+	if (type == 1) {
+		if (Object) {
+			auto l = body->getWorldTransform().getOrigin();
+			Object->DesiredState.location = Vector(l[0], l[2], l[1]);
+		}
+	}
+}
+

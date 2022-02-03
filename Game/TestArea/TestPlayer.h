@@ -58,6 +58,8 @@ private:
 	Ref<Actor> Collider;
 	Ref<MovementComponent> ColliderModelMove;
 	Ref<VisibleObject> ColliderModel;
+	Ref<ColliderComponent> ColliderObjComp;
+	Ref<ColliderComponent> Collision;
 
 
 	PauseUI* pause;

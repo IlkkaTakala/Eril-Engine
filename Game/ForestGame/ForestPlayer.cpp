@@ -25,10 +25,6 @@
 
 class Ghost;
 
-void ColliderComponent::Sim() {
-
-}
-
 void ForestPlayer::OpenConsole(bool) {
 	Console::Create();
 }

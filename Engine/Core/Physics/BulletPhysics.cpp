@@ -70,19 +70,20 @@ btRigidBody* Physics::addCone(float d, float h, float x, float y, float z, float
 }
 
 
-btRigidBody* Physics::addBox(float width, float height, float depth, float x, float y, float z, float mass)
+btRigidBody* Physics::addBox(float width, float height, float depth, float x, float y, float z, float mass, int type)
 {
     btTransform t;
     t.setIdentity();
     t.setOrigin(btVector3(x, y, z));
-    btBoxShape* sphere = new btBoxShape(btVector3(width / 2.0, height / 2.0, depth / 2.0));
+    btBoxShape* box = new btBoxShape(btVector3(width / 2.0, height / 2.0, depth / 2.0));
     btVector3 inertia(0, 0, 0);
     if (mass != 0.0)
-        sphere->calculateLocalInertia(mass, inertia);
+        box->calculateLocalInertia(mass, inertia);
 
     btMotionState* motion = new btDefaultMotionState(t);
-    btRigidBody::btRigidBodyConstructionInfo info(mass, motion, sphere, inertia);
+    btRigidBody::btRigidBodyConstructionInfo info(mass, motion, box, inertia);
     btRigidBody* body = new btRigidBody(info);
+    //body->setCollisionFlags(btCollisionObject::CF_STATIC_OBJECT);
     world->addRigidBody(body);
     /*bodies.push_back(new bulletObject(body));
     body->setUserPointer(bodies[bodies.size() - 1]);*/
@@ -104,9 +105,9 @@ btDynamicsWorld* Physics::GetWorld()
     return world;
 }
 
-bulletObject* Physics::MakeRigidBoby(AABB box, Vector pos)
+bulletObject* Physics::MakeRigidBoby(AABB box, Vector pos, float mass, int type)
 {
-    return new bulletObject(Physics::addBox(box.maxs.X - box.mins.X, box.maxs.Z - box.mins.Z, box.maxs.Y - box.mins.Y, pos.X, pos.Y, pos.Z, 10));
+    return new bulletObject(Physics::addBox(box.maxs.X - box.mins.X, box.maxs.Z - box.mins.Z, box.maxs.Y - box.mins.Y, pos.X, pos.Y, pos.Z, mass, type));
 }
 
 bool Physics::callbackFunc(btManifoldPoint& cp, const btCollisionObject* obj1, int id1, int index1, const btCollisionObject* obj2, int id2, int index2)

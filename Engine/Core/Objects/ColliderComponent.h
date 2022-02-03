@@ -1,15 +1,28 @@
 #pragma once
 #include "btBulletDynamicsCommon.h"
-#include <external/bullet3/examples/CommonInterfaces/CommonRigidBodyBase.h>
+#include "SceneComponent.h"
 
-class ColliderComponent : public CommonRigidBodyBase
+class MovementComponent;
+
+class ColliderComponent : public SceneComponent, public Tickable
 {
+    REGISTER(ColliderComponent);
 public:
-    ColliderComponent(struct GUIHelperInterface* helper) : CommonRigidBodyBase(helper){}
-    virtual ~ColliderComponent(){}
-    virtual void initColliders();
-
+    ColliderComponent();
+    virtual void OnDestroyed() override;
+    virtual void BeginPlay() override;
+    virtual void Tick(float) override;
+    void SetType(int t);
+    void SetSize(AABB s);
+    void SetTarget(MovementComponent* m);
+    virtual void SetLocation(const Vector& NewLocation, bool force = false) override;
+    virtual void SetRotation(const Vector& NewRotation, bool force = false) override;
+    void ApplyCollision();
+    int GetType() const { return type; }
 
 private:
-    
+    btRigidBody* body;
+    int type;
+    AABB size;
+    Ref<MovementComponent> Object;
 };

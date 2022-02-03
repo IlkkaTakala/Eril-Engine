@@ -4,6 +4,7 @@
 #include "Physics.h"
 #include <cassert>
 #include "Physics/BulletPhysics.h"
+#include "Objects/ColliderComponent.h"
 
 namespace Physics
 {
@@ -11,7 +12,7 @@ namespace Physics
 	{
 		std::list<RefWeak<VisibleObject>> Statics;
 		std::list<RefWeak<MovementComponent>> Movables;
-		//std::list<RefWeak<ColliderComponent>> Colliders;
+		std::list<RefWeak<ColliderComponent>> Colliders;
 		// -------------------------------------------------------------------> alla oleva koodi on alkuperäistä
 		/*bool intersect(AABB a, AABB b) {
 			return (a.mins.X <= b.maxs.X && a.maxs.X >= b.mins.X) &&
@@ -115,10 +116,14 @@ namespace Physics
 		{
 			auto it = Movables.remove_if([](const auto& v) { return v == nullptr; });
 			auto it2 = Statics.remove_if([](const auto& v) { return v == nullptr; });
+			auto it3 = Colliders.remove_if([](const auto& v) { return v == nullptr; });
 		}
 
 		Physics::GetWorld()->stepSimulation(delta);
-
+		
+		for (const auto& c : Colliders) {
+			c->ApplyCollision();
+		}
 
 		for (const auto& m : Movables) {
 			m->ApplyMovement();
@@ -151,8 +156,14 @@ namespace Physics
 			if (i->GetPointer() == obj) Movables.erase(i);
 		}*/
 	}
-	/*void RegisterCollider(ColliderComponent* obj)
+
+	void AddCollider(ColliderComponent* obj)
 	{
 		Colliders.push_back(obj);
-	}*/
+	}
+
+	void RemoveCollider(ColliderComponent* obj)
+	{
+		Colliders.remove(obj);
+	}
 }

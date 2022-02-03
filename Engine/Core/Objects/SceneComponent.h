@@ -12,13 +12,15 @@ public:
 	virtual void OnDestroyed() override;
 	virtual void LoadWithParameters(const String& args) override;
 
-	void SetLocation(const Vector& NewLocation, bool force = false);
-	void SetRotation(const Vector& NewRotation, bool force = false);
+	virtual void SetLocation(const Vector& NewLocation, bool force = false);
+	virtual void SetRotation(const Vector& NewRotation, bool force = false);
 	void SetScale(const Vector& NewScale, bool force = false);
 	void AddLocation(const Vector& NewLocation) { SetLocation(NewLocation + Location); };
 	void AddRotation(const Vector& NewRotation) { SetRotation(NewRotation + Rotation); };
 	const Vector GetLocation() const { return Location; }
 	const Vector GetRotation() const { return Rotation; }
+	const Vector GetWorldLocation() const { return (Parent ? Parent->GetWorldLocation() : Vector(0.f)) + Location; }
+	const Vector GetWorldRotation() const { return Rotation; }
 	const Vector GetScale() const { return Scale; }
 	Transformation GetTransformation() const { return Transformation(Location, Rotation, Scale); }
 
@@ -32,7 +34,7 @@ public:
 protected:
 	friend class MovementComponent;
 
-	SceneComponent* Parent;
+	Ref<SceneComponent> Parent;
 	std::list<RefWeak<SceneComponent>> Children;
 
 	Vector Location;

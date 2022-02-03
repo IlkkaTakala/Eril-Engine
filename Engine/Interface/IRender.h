@@ -59,6 +59,7 @@ public:
 	virtual void GameStart() = 0;
 	virtual void DestroyWindow() = 0;
 	virtual UISpace* GetUIManager(int screen = 0) const = 0;
+
 };
 
 class IInput

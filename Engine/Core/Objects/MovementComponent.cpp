@@ -18,7 +18,7 @@ MovementComponent::MovementComponent()
 	brake = 2000.f;
 	air_control = 0.05f;
 	Physics::AddMovable(this);
-	rigid = nullptr;
+	//rigid = nullptr;
 }
 
 void MovementComponent::LoadWithParameters(const String& args)
@@ -42,6 +42,11 @@ void MovementComponent::Tick(float time)
 	if (!allowMovement || Object == nullptr) return;
 	DesiredState.location = Object->GetLocation();
 	
+	//btTransform colliderloc;
+	//colliderloc.setIdentity();
+	//colliderloc.setOrigin(btVector3(DesiredState.location.X, DesiredState.location.Z, DesiredState.location.Y));
+	//rigid->body->setWorldTransform(colliderloc);
+
 	OldState = DesiredState;
 	if (Object == nullptr) return;
 	switch (isPhysics)
@@ -96,12 +101,8 @@ void MovementComponent::Tick(float time)
 			velocity.Z = 0.f;
 			DesiredState.location.Z = Terra->GetHeight(DesiredState.location.X, DesiredState.location.Y);
 		}
-		btVector3 colliderloc;
-		colliderloc.setValue(DesiredState.location.X, DesiredState.location.Z, DesiredState.location.Y);
-		rigid->body->getWorldTransform().setOrigin(colliderloc);
-
 		DesiredState.velocity = velocity;
-		rigid->body->setLinearVelocity(btVector3(velocity.X, velocity.Z, velocity.Y));
+		/*rigid->body->setLinearVelocity(btVector3(velocity.X, velocity.Z, velocity.Y));*/
 	}
 	break;
 	}
@@ -111,10 +112,10 @@ void MovementComponent::Tick(float time)
 }
 
 
-void MovementComponent::SetTarget(SceneComponent* t, const AABB bound)
+void MovementComponent::SetTarget(SceneComponent* t, const AABB bound, float mass, int type)
 {
 	Object = t;
-	rigid = Physics::MakeRigidBoby(bound, t->GetLocation());
+	//rigid = Physics::MakeRigidBoby(bound, t->GetLocation(), mass, type);
 	//OldState.location = t->GetLocation();
 	//DesiredState.location = t->GetLocation();
 	//Physics::RemoveStatic(t);
@@ -134,8 +135,8 @@ void MovementComponent::ApplyMovement()
 		Object->transformForce = false;
 	}
 	else {
-		auto l = rigid->body->getWorldTransform().getOrigin();
-		Object->Location = Vector(l[0], l[2], l[1]);
+		/*auto l = rigid->body->getWorldTransform().getOrigin();*/
+		Object->Location = DesiredState.location;//Vector(l[0], l[2], l[1]);
 	}
 }
 

@@ -11,6 +11,7 @@
 #include <Interface/AudioManager.h>
 #include <GamePlay/Scene.h>
 #include "Objects/InputComponent.h"
+#include "Objects/ColliderComponent.h"
 
 //ECS
 #include <Interface/IECS.h>
@@ -67,14 +68,20 @@ TestPlayer::TestPlayer() : Player()
 	//Player Model
 	Mesh = SpawnObject<VisibleObject>();
 	Mesh->SetModel("Cube");
-	Mesh->GetModel()->SetAABB(AABB(Vector(-1.f), Vector(1.f)));
-	
-	SetLocation(Vector(0, 0, 2));
+	Mesh->GetModel()->SetAABB(AABB(Vector(-1), Vector(1)));
+	//SetLocation(Vector(0, 0, 2));
 
 	//Player Movement
 	Movement = SpawnObject<MovementComponent>();
 	Movement->SetTarget(dynamic_cast<Actor*>(this), Mesh->GetModel()->GetAABB());
 	Movement->SetGravity(true);
+
+	Collision = SpawnObject<ColliderComponent>();
+	Collision->SetLocation(GetLocation(), true);
+	Collision->SetType(1);
+	Collision->SetSize(Mesh->GetModel()->GetAABB());
+	AddComponent(Collision);
+	Collision->SetTarget(Movement);
 
 	//Skybox
 	Sky = SpawnObject<VisibleObject>();
@@ -95,14 +102,21 @@ TestPlayer::TestPlayer() : Player()
 	//Moment Model -> ColliderModel
 	ColliderModel = SpawnObject<VisibleObject>();
 	ColliderModel->SetModel("Cube");
-	ColliderModel->GetModel()->SetAABB(AABB(Vector(-0.5f), Vector(0.5f)));
+	ColliderModel->GetModel()->SetAABB(AABB(Vector(-1.0f), Vector(1.0f)));
 
 	Collider->AddComponent(ColliderModel);
 	Collider->SetLocation(Vector(20, 2, 1));
-	
+
+	ColliderObjComp = SpawnObject<ColliderComponent>();
+	ColliderObjComp->SetLocation(Collider->GetLocation(), true);
+	ColliderObjComp->SetType(1);
+	ColliderObjComp->SetSize(ColliderModel->GetModel()->GetAABB());
+	Collider->AddComponent(ColliderObjComp);
+
 
 	ColliderModelMove = SpawnObject<MovementComponent>();
-	ColliderModelMove->SetTarget(Collider, ColliderModel->GetModel()->GetAABB());
+	ColliderModelMove->SetTarget(Collider, ColliderModel->GetModel()->GetAABB(), 10);
+	ColliderObjComp->SetTarget(ColliderModelMove);
 
 	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
 
@@ -111,7 +125,7 @@ TestPlayer::TestPlayer() : Player()
 void TestPlayer::TestTimer(float d)
 {
 	Console::Log("Location changed");
-	Collider->SetLocation(Vector(30, 0, 1), true);
+	//Collider->SetLocation(Vector(30, 0, 1), true);
 }
 
 
