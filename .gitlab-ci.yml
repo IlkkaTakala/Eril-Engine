@@ -25,4 +25,5 @@ test:
   tags:
     - build_server
   script:
+    - cd ..
     - make test
