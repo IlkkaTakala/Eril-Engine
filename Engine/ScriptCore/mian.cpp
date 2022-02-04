@@ -3,7 +3,7 @@
 #include "defines.h"
 #include <sstream>
 #include <fstream>
-#include <windows.h>
+//#include <windows.h>
 #include "Export.h"
 
 String someCppNativeFunction(String s, int i) {
