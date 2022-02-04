@@ -8,6 +8,16 @@ option(SCRIPT_TESTS "Include tests" ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+MACRO( ENABLE_IF_SUPPORTED variable flag )
+  STRING( REGEX REPLACE "^-" "" flagName "${flag}" )
+  CHECK_CXX_COMPILER_FLAG( "${flag}"
+    HAVE_FLAG_${flagName}
+    )
+  IF( HAVE_FLAG_${flagName} )
+    SET( ${variable} "${${variable}} ${flag}")
+  ENDIF()
+ENDMACRO()
+
 IF( CMAKE_CXX_COMPILER_ID MATCHES "GNU" )
 	ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-fno-implicit-templates" )
 	ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-Wall" )
