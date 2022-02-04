@@ -15,9 +15,6 @@ build:
     paths:
       - build
       - build/BuildLog.txt
-  only:
-    changes:
-      - Engine/ScriptCore/*
 
 
 test:
