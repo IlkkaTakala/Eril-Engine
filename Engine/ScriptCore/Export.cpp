@@ -62,5 +62,5 @@ void CleanScript(unsigned __int32 script)
 
 void GetError(const char* error, size_t size)
 {
-
+	
 }
