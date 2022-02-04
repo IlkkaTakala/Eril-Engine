@@ -8,6 +8,8 @@ option(SCRIPT_TESTS "Include tests" ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+INCLUDE( CheckCXXCompilerFlag )
+
 MACRO( ENABLE_IF_SUPPORTED variable flag )
   STRING( REGEX REPLACE "^-" "" flagName "${flag}" )
   CHECK_CXX_COMPILER_FLAG( "${flag}"
