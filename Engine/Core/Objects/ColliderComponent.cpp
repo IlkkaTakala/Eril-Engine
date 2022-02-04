@@ -13,11 +13,12 @@ ColliderComponent::ColliderComponent()
 void ColliderComponent::OnDestroyed()
 {
 	Physics::RemoveCollider(this);
+	Physics::RemoveBody(body);
 }
 
-void ColliderComponent::BeginPlay()
+void ColliderComponent::LoadWithParameters(const String& args)
 {
-	body = Physics::addBox(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 10, 1);
+	body = Physics::addBox(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 10, 0);
 	Physics::AddCollider(this);
 }
 
@@ -28,6 +29,7 @@ void ColliderComponent::SetType(int t)
 	{
 	case 0:
 		body->setCollisionFlags(btCollisionObject::CF_STATIC_OBJECT);
+		body->setMassProps(0, btVector3(0.f , 0.f, 0.f));
 		break;
 	case 1:
 		body->setCollisionFlags(btCollisionObject::CF_DYNAMIC_OBJECT);
@@ -44,8 +46,13 @@ void ColliderComponent::SetSize(AABB s)
 	float height = s.maxs.Z - s.mins.Z;
 	float depth = s.maxs.Y - s.mins.Y;
 	size = s;
-	btBoxShape* box = new btBoxShape(btVector3(width, height, depth));
+	btBoxShape* box = new btBoxShape(btVector3(width / 2.f, height / 2.f, depth / 2.f));
 	body->setCollisionShape(box);
+}
+
+void ColliderComponent::SetMass(float m)
+{
+	
 }
 
 void ColliderComponent::SetTarget(MovementComponent* m)
@@ -56,7 +63,8 @@ void ColliderComponent::SetTarget(MovementComponent* m)
 void ColliderComponent::SetLocation(const Vector& NewLocation, bool force)
 {
 	SceneComponent::SetLocation(NewLocation, force);
-	body->getWorldTransform().setOrigin(btVector3(NewLocation.X, NewLocation.Z, NewLocation.Y));
+	Vector loc = GetWorldLocation();
+	body->getWorldTransform().setOrigin(btVector3(loc.X, loc.Z, loc.Y));
 }
 
 void ColliderComponent::SetRotation(const Vector& NewRotation, bool force)
@@ -73,21 +81,55 @@ void ColliderComponent::Tick(float Delta)
 	colliderloc.setOrigin(btVector3(location.X, location.Z, location.Y));
 	body->setWorldTransform(colliderloc);
 	
-	if (type == 1) {
+	switch (type)
+	{
+	case 0:
+		if (Object) {
+			//Vector velocity = Object->DesiredState.velocity;
+			//body->setLinearVelocity(btVector3(velocity.X, velocity.Z, velocity.Y));
+		}
+		break;
+	case 1:
 		if (Object) {
 			Vector velocity = Object->DesiredState.velocity;
 			body->setLinearVelocity(btVector3(velocity.X, velocity.Z, velocity.Y));
 		}
+		break;
+	case 2:
+		if (Object) {
+			Vector velocity = Object->DesiredState.velocity;
+			body->setLinearVelocity(btVector3(velocity.X, velocity.Z, velocity.Y));
+		}
+		break;
 	}
 }
 
 void ColliderComponent::ApplyCollision()
 {
-	if (type == 1) {
+	switch (type)
+	{
+	case 0:
 		if (Object) {
 			auto l = body->getWorldTransform().getOrigin();
-			Object->DesiredState.location = Vector(l[0], l[2], l[1]);
+			Vector world(l[0], l[2], l[1]);
+			Object->DesiredState.location = world - Location;
+			Object->DesiredState.velocity = Vector(0.f);
 		}
+		break;
+	case 1:
+		if (Object) {
+			auto l = body->getWorldTransform().getOrigin();
+			Vector world(l[0], l[2], l[1]);
+			Object->DesiredState.location = world - Location;
+		}
+		break;
+	case 2:
+		if (Object) {
+			auto l = body->getWorldTransform().getOrigin();
+			Vector world(l[0], l[2], l[1]);
+			Object->DesiredState.location = world - Location;
+		}
+		break;
 	}
 }
 

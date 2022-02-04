@@ -61,27 +61,26 @@ TestPlayer::TestPlayer() : Player()
 	InputMode = true;
 	cursorState = true;
 	spawnCounter = 0;
-
-	//Reqister used Inputs
+	
 	
 
 	//Player Model
 	Mesh = SpawnObject<VisibleObject>();
 	Mesh->SetModel("Cube");
-	Mesh->GetModel()->SetAABB(AABB(Vector(-1), Vector(1)));
-	//SetLocation(Vector(0, 0, 2));
+	Mesh->GetModel()->SetAABB(AABB(Vector(-1.f, -1.f, 0.f), Vector(1.f, 1.f, 2.f)));
+	SetLocation(Vector(0, 0, 2));
 
 	//Player Movement
 	Movement = SpawnObject<MovementComponent>();
 	Movement->SetTarget(dynamic_cast<Actor*>(this), Mesh->GetModel()->GetAABB());
 	Movement->SetGravity(true);
 
-	Collision = SpawnObject<ColliderComponent>();
-	Collision->SetLocation(GetLocation(), true);
-	Collision->SetType(1);
-	Collision->SetSize(Mesh->GetModel()->GetAABB());
-	AddComponent(Collision);
-	Collision->SetTarget(Movement);
+	PlayerCol = SpawnObject<ColliderComponent>();
+	PlayerCol->SetLocation(Vector(0, 0, 1.f), true);
+	PlayerCol->SetType(1);
+	PlayerCol->SetSize(Mesh->GetModel()->GetAABB());
+	AddComponent(PlayerCol);
+	PlayerCol->SetTarget(Movement);
 
 	//Skybox
 	Sky = SpawnObject<VisibleObject>();
@@ -95,28 +94,38 @@ TestPlayer::TestPlayer() : Player()
 
 	pause = nullptr;
 
+	Plane = SpawnObject<VisibleObject>();
+	Plane->SetModel("Cube");
+	Plane->GetModel()->SetAABB(AABB(Vector(-20.f, -20.f, -0.5f), Vector(20.f, 20.f, 0.5f)));
+	Plane->SetScale(Vector(20.f, 20.f, 0.5f));
+	Plane->SetLocation(Vector(10.f, 10.f, 0.f));
 
-		
-	Collider = SpawnObject<Actor>();
+	PlaneCol = SpawnObject<ColliderComponent>();
+	PlaneCol->SetType(0);
+	PlaneCol->SetSize(Plane->GetModel()->GetAABB());
+	Plane->AddComponent(PlaneCol);
+
+	Box = SpawnObject<Actor>();
 
 	//Moment Model -> ColliderModel
-	ColliderModel = SpawnObject<VisibleObject>();
-	ColliderModel->SetModel("Cube");
-	ColliderModel->GetModel()->SetAABB(AABB(Vector(-1.0f), Vector(1.0f)));
+	BoxModel = SpawnObject<VisibleObject>();
+	BoxModel->SetModel("Cube");
+	BoxModel->GetModel()->SetAABB(AABB(Vector(-1.0f), Vector(1.0f)));
 
-	Collider->AddComponent(ColliderModel);
-	Collider->SetLocation(Vector(20, 2, 1));
+	Box->AddComponent(BoxModel);
+	Box->SetLocation(Vector(10.f, 10.f, 10.f));
 
-	ColliderObjComp = SpawnObject<ColliderComponent>();
-	ColliderObjComp->SetLocation(Collider->GetLocation(), true);
-	ColliderObjComp->SetType(1);
-	ColliderObjComp->SetSize(ColliderModel->GetModel()->GetAABB());
-	Collider->AddComponent(ColliderObjComp);
-
-
-	ColliderModelMove = SpawnObject<MovementComponent>();
-	ColliderModelMove->SetTarget(Collider, ColliderModel->GetModel()->GetAABB(), 10);
-	ColliderObjComp->SetTarget(ColliderModelMove);
+	BoxCol = SpawnObject<ColliderComponent>();
+	//BoxCol->SetLocation(Box->GetLocation(), true);
+	BoxCol->SetType(1);
+	BoxCol->SetSize(BoxModel->GetModel()->GetAABB());
+	Box->AddComponent(BoxCol);
+	
+	BoxModelMove = SpawnObject<MovementComponent>();
+	BoxModelMove->SetTarget(Box, BoxModel->GetModel()->GetAABB());
+	BoxModelMove->SetGravity(true);
+	//BoxModelMove->SetPhysics(true);
+	BoxCol->SetTarget(BoxModelMove);
 
 	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
 
@@ -124,7 +133,7 @@ TestPlayer::TestPlayer() : Player()
 
 void TestPlayer::TestTimer(float d)
 {
-	Console::Log("Location changed");
+	//Console::Log("Location changed");
 	//Collider->SetLocation(Vector(30, 0, 1), true);
 }
 
@@ -230,8 +239,12 @@ void TimeFunction (float d)
 
 void TestPlayer::Tick(float deltaTime)
 {
-	
-	Vector loc = Collider->GetLocation();
+	Console::Log((BoxCol->GetWorldLocation()).ToString() + " BoxCol");
+	Console::Log((Box->GetWorldLocation()).ToString() + " Box");
+	//Console::Log((GetWorldLocation()).ToString() + " Player");
+	//Console::Log((PlayerCol->GetWorldLocation()).ToString() + " PlayerCol");
+
+	Vector loc = Box->GetLocation();
 	GetCamera()->SetLocation(Location + Vector(0.f, 0.f, 1.5f));
 	GetCamera()->SetRotation(Rotation);
 	Sky->SetLocation(Location);

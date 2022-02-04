@@ -112,7 +112,7 @@ void MovementComponent::Tick(float time)
 }
 
 
-void MovementComponent::SetTarget(SceneComponent* t, const AABB bound, float mass, int type)
+void MovementComponent::SetTarget(SceneComponent* t, const AABB bound)
 {
 	Object = t;
 	//rigid = Physics::MakeRigidBoby(bound, t->GetLocation(), mass, type);

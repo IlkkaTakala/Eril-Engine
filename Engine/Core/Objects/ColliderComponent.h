@@ -10,10 +10,11 @@ class ColliderComponent : public SceneComponent, public Tickable
 public:
     ColliderComponent();
     virtual void OnDestroyed() override;
-    virtual void BeginPlay() override;
+    virtual void LoadWithParameters(const String& args) override;
     virtual void Tick(float) override;
     void SetType(int t);
     void SetSize(AABB s);
+    void SetMass(float m);
     void SetTarget(MovementComponent* m);
     virtual void SetLocation(const Vector& NewLocation, bool force = false) override;
     virtual void SetRotation(const Vector& NewRotation, bool force = false) override;

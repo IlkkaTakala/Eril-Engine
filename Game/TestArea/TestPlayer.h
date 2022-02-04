@@ -55,12 +55,14 @@ private:
 	bool InputMode;
 	Ref<Light> DirLight;
 	Ref<VisibleObject> Sky;
-	Ref<Actor> Collider;
-	Ref<MovementComponent> ColliderModelMove;
-	Ref<VisibleObject> ColliderModel;
-	Ref<ColliderComponent> ColliderObjComp;
-	Ref<ColliderComponent> Collision;
+	Ref<Actor> Box;
+	Ref<MovementComponent> BoxModelMove;
+	Ref<VisibleObject> BoxModel;
+	Ref<ColliderComponent> BoxCol;
+	Ref<ColliderComponent> PlayerCol;
 
+	Ref<VisibleObject> Plane;
+	Ref<ColliderComponent> PlaneCol;
 
 	PauseUI* pause;
 

@@ -17,6 +17,7 @@ btRigidBody* addCone(float d, float h, float x, float y, float z, float mass);
 
 btRigidBody* addBox(float width, float height, float depth, float x, float y, float z, float mass, int type);
 
+void RemoveBody(btRigidBody*& body);
 
 void init();
 
