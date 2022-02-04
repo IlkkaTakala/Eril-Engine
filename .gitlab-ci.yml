@@ -17,6 +17,7 @@ build:
   # before_script:
   #   - apt update && apt -y install make autoconf
   script:
+    - cd Engine/ScriptCore
     - mkdir build
     - cd build
     - cmake ..
