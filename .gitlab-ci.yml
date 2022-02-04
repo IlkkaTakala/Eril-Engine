@@ -21,6 +21,9 @@ build:
     - cd build
     - cmake ..
     - cmake --build .
+  only:
+    changes:
+      - Engine/ScriptCore/*
   artifacts:
         paths:
             - build
