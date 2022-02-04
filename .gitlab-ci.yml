@@ -21,13 +21,14 @@ build:
     - mkdir build
     - cd build
     - cmake ..
-    - cmake --build .
+    - cmake --build . > BuildLog.txt
+  artifacts:
+    paths:
+      - build
+      - build/BuildLog.txt
   only:
     changes:
       - Engine/ScriptCore/*
-  artifacts:
-        paths:
-            - build
 
 # run tests using the binary built before
 test:
