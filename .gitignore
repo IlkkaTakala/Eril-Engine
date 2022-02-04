@@ -4,4 +4,4 @@ build/
 *.mtl
 __pycache__
 *.aps
-*.txt
+Log.txt
