@@ -19,6 +19,8 @@ btRigidBody* addBox(float width, float height, float depth, float x, float y, fl
 
 void RemoveBody(btRigidBody*& body);
 
+void Destroy();
+
 void init();
 
 btDynamicsWorld* GetWorld();

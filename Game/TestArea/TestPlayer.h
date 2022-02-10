@@ -56,9 +56,12 @@ private:
 	Ref<Light> DirLight;
 	Ref<VisibleObject> Sky;
 	Ref<Actor> Box;
+	Ref<Actor> Box2;
 	Ref<MovementComponent> BoxModelMove;
 	Ref<VisibleObject> BoxModel;
 	Ref<ColliderComponent> BoxCol;
+	Ref<VisibleObject> BoxModel2;
+	Ref<ColliderComponent> BoxCol2;
 	Ref<ColliderComponent> PlayerCol;
 
 	Ref<VisibleObject> Plane;

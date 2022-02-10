@@ -80,7 +80,7 @@ btRigidBody* Physics::addBox(float width, float height, float depth, float x, fl
     if (mass != 0.0)
         box->calculateLocalInertia(mass, inertia);
 
-    btDefaultMotionState* motion = new btDefaultMotionState(t);
+    btMotionState* motion = new btDefaultMotionState(t);
     btRigidBody::btRigidBodyConstructionInfo info(mass, motion, box, inertia);
     btRigidBody* body = new btRigidBody(info);
     //body->setCollisionFlags(btCollisionObject::CF_STATIC_OBJECT);
@@ -90,11 +90,31 @@ btRigidBody* Physics::addBox(float width, float height, float depth, float x, fl
     return body;
 }
 
+
 void Physics::RemoveBody(btRigidBody*& body)
 {
     world->removeRigidBody(body);
     delete body;
     body = nullptr;
+}
+
+void Physics::Destroy()
+{
+    delete world;
+    world = nullptr;
+
+    delete solver;
+    solver = nullptr;
+
+    delete broadphase;
+    broadphase = nullptr;
+
+    delete dispatcher;
+    dispatcher = nullptr;
+
+    delete collisionConfig;
+    collisionConfig = nullptr;
+
 }
 
 void Physics::init()
@@ -104,7 +124,7 @@ void Physics::init()
     broadphase = new btDbvtBroadphase();
     solver = new btSequentialImpulseConstraintSolver();
     world = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfig);
-    world->setGravity(btVector3(0, -110, 0));
+    world->setGravity(btVector3(0, -10, 0));
 }
 
 btDynamicsWorld* Physics::GetWorld()

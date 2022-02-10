@@ -25,5 +25,6 @@ private:
     btRigidBody* body;
     int type;
     AABB size;
+    float mass;
     Ref<MovementComponent> Object;
 };

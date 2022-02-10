@@ -7,6 +7,7 @@
 #include "RenderCore/OpenGL/UI/UISpace.h"
 #include <Interface/WindowManager.h>
 #include <Interface/IECS.h>
+#include <Physics/BulletPhysics.h>
 
 String Scene::newLevel = "";
 
@@ -96,6 +97,7 @@ void Scene::LoadLevel()
 	if (Loop->World != nullptr) {
 		ObjectManager::CleanObjects();
 		II->ClearInputs();
+		Physics::Destroy();
 	}
 
 	IECS::ResetECSWorld();
@@ -105,6 +107,7 @@ void Scene::LoadLevel()
 	ObjectManager::PrepareRecord(1, Constants::Record::LOADED);
 	Loop->World = SpawnObject<Scene>();
 	Loop->World->bLoading = true;
+	Physics::init();
 
 	ObjectManager::PrepareRecord(2, Constants::Record::LOADED);
 	Ref<GameState> State = SpawnObject<GameState>();

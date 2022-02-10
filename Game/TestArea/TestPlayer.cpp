@@ -113,11 +113,11 @@ TestPlayer::TestPlayer() : Player()
 	BoxModel->GetModel()->SetAABB(AABB(Vector(-1.0f), Vector(1.0f)));
 
 	Box->AddComponent(BoxModel);
-	Box->SetLocation(Vector(10.f, 10.f, 10.f));
+	Box->SetLocation(Vector(10.f, 10.f, 2.f));
 
 	BoxCol = SpawnObject<ColliderComponent>();
 	//BoxCol->SetLocation(Box->GetLocation(), true);
-	BoxCol->SetType(1);
+	BoxCol->SetType(0);
 	BoxCol->SetSize(BoxModel->GetModel()->GetAABB());
 	Box->AddComponent(BoxCol);
 	
@@ -126,6 +126,27 @@ TestPlayer::TestPlayer() : Player()
 	BoxModelMove->SetGravity(true);
 	//BoxModelMove->SetPhysics(true);
 	BoxCol->SetTarget(BoxModelMove);
+
+	Box2 = SpawnObject<Actor>();
+
+	BoxModel2 = SpawnObject<VisibleObject>();
+	BoxModel2->SetModel("Cube");
+	BoxModel2->GetModel()->SetAABB(AABB(Vector(-1.0f), Vector(1.0f)));
+
+	Box2->AddComponent(BoxModel2);
+	Box2->SetLocation(Vector(10.f, 10.f, 12.f));
+
+	BoxCol2 = SpawnObject<ColliderComponent>();
+	//BoxCol->SetLocation(Box->GetLocation(), true);
+	BoxCol2->SetType(1);
+	BoxCol2->SetSize(BoxModel2->GetModel()->GetAABB());
+	Box2->AddComponent(BoxCol2);
+
+	BoxModelMove = SpawnObject<MovementComponent>();
+	BoxModelMove->SetTarget(Box2, BoxModel2->GetModel()->GetAABB());
+	BoxModelMove->SetGravity(true);
+	//BoxModelMove->SetPhysics(true);
+	BoxCol2->SetTarget(BoxModelMove);
 
 	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
 
@@ -239,8 +260,8 @@ void TimeFunction (float d)
 
 void TestPlayer::Tick(float deltaTime)
 {
-	Console::Log((BoxCol->GetWorldLocation()).ToString() + " BoxCol");
-	Console::Log((Box->GetWorldLocation()).ToString() + " Box");
+	//Console::Log((BoxCol->GetWorldLocation()).ToString() + " BoxCol");
+	//Console::Log((Box->GetWorldLocation()).ToString() + " Box");
 	//Console::Log((GetWorldLocation()).ToString() + " Player");
 	//Console::Log((PlayerCol->GetWorldLocation()).ToString() + " PlayerCol");
 

@@ -71,7 +71,7 @@ int GameLoop::Start()
 	AudioManager::Init();
 	
 	Console::Log("Creating defaults...\n");
-	Physics::init();
+	//Physics::init();
 	EngineInterface::CreateDefaults();
 	Collector = new GC();
 
@@ -114,7 +114,9 @@ int GameLoop::MainLoop()
 		ECSWorldSystemsManager->UpdateSystems(duration.count());
 
 		Timer::UpdateTimers(duration.count());
-		Physics::CheckCollisions(duration.count());
+		if (Physics::GetWorld() != nullptr) {
+			Physics::CheckCollisions(duration.count());
+		}
 
 		RI->Render(duration.count());
 

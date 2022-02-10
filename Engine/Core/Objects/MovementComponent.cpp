@@ -41,6 +41,8 @@ void MovementComponent::Tick(float time)
 {
 	if (!allowMovement || Object == nullptr) return;
 	DesiredState.location = Object->GetLocation();
+	DesiredState.rotation = Object->GetRotation();
+	//getrotation
 	
 	//btTransform colliderloc;
 	//colliderloc.setIdentity();
@@ -133,10 +135,13 @@ void MovementComponent::ApplyMovement()
 	if (Object->transformForce) {
 		Object->Location = Object->desired.Location;
 		Object->transformForce = false;
+
 	}
 	else {
 		/*auto l = rigid->body->getWorldTransform().getOrigin();*/
 		Object->Location = DesiredState.location;//Vector(l[0], l[2], l[1]);
+		//Object->Rotation = DesiredState.rotation;
+		//rotation
 	}
 }
 
