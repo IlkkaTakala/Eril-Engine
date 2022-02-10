@@ -41,7 +41,7 @@ std::unordered_map<String, NativeFuncStorage> nativeFuncs = {
 			std::cout << ">> Undefined\n";
 			return Value{};
 		}
-		std::cout << ">> " << v.GetValue<String>() << '\n';
+		std::cout << ">> " << (String)v << '\n';
 		return Value{};
 	})},
 	{"time", new Function<>(0, [](void*) {
@@ -93,7 +93,7 @@ std::unordered_map<String, NativeFuncStorage> nativeFuncs = {
 {"array", NativeFuncStorage {
 	{"init", new Function<const Value, const Value>(2, [](void*, auto c, auto v) {
 		Value arr(EVT::Array, "");
-		auto a = arr.GetValue<std::vector<Value>*>();
+		auto a = (Value::Array*)arr;
 		if (a) {
 			a->clear();
 			a->resize((int)c);
@@ -130,17 +130,17 @@ int BaseFunction::GetParamCount(Context& c, const String& scope, const String& n
 	}
 	return 0;
 }
-static int depth = 0;
-static void* firstPtr = nullptr;
-static void* lastPtr = nullptr;
+//static int depth = 0;
+//static void* firstPtr = nullptr;
+//static void* lastPtr = nullptr;
 void ScriptFunction::invoke(Value& value)
 {
-	depth++;
+	/*depth++;
 	int here = 1;
 	if (!firstPtr) firstPtr = &here;
 	printf("Pointer: %p | Distance: %lu | Total: %lu\n", (void*)&here, (unsigned long)lastPtr - (unsigned long)&here, (unsigned long)firstPtr - (unsigned long)&here);
 	lastPtr = &here;
-	printf("%d\n", depth);
+	printf("%d\n", depth);*/
 	shouldReturn = false;
 	if (first) {
 		Node* ptr = first;

@@ -354,7 +354,7 @@ struct IfNode : public Node
 		if (child) {
 			Value testV;
 			child->evaluate(caller, testV);
-			if (testV.GetValue<bool>()) 
+			if ((bool)testV) 
 				next->evaluate(caller, node);
 			if (!body) body = next;
 			if (next) {
