@@ -238,12 +238,11 @@ struct VariableNode : public Node
 	virtual void evaluate(ScriptFunction* caller, Value& node) override
 	{
 		if (value->value->type() == EVT::Array && isArray) {
-			int idx = 0;
 			Value* v = nullptr;
 			if (index) {
 				Value idxv;
 				index->evaluate(caller, idxv);
-				v = value->value->GetIndex(idxv);
+				v = value->value->GetIndex((int64)idxv);
 			}
 			else {
 				if (value->init) {

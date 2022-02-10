@@ -257,7 +257,7 @@ struct Value
 		}
 	}
 
-	Value* GetIndex(int idx) {
+	Value* GetIndex(unsigned int idx) {
 		if (value.index() == 5) {
 			Array& a = std::get<ArrayPtr>(value)->second;
 			if (a.size() > idx && idx >= 0) {

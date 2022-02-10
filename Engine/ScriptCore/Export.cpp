@@ -14,7 +14,7 @@
 static std::map<uint, Script*> Scripts;
 uint activeScript = 0;
 
-unsigned __int32 CompileScript(const char* data)
+unsigned long CompileScript(const char* data)
 {
 	ClearError();
 	uint off = 0;
@@ -38,7 +38,7 @@ unsigned __int32 CompileScript(const char* data)
 	return idx;
 }
 
-void EvaluateScript(unsigned __int32 s)
+void EvaluateScript(unsigned long s)
 {
 	if (Scripts.find(s) == Scripts.end()) return;
 	Scripts[s]->evaluate();
@@ -53,7 +53,7 @@ void AddWrapped(const char* scope, const char* name, BaseFunction* function)
 	nativeFuncs[scope][name] = function;
 }
 
-void CleanScript(unsigned __int32 script)
+void CleanScript(unsigned long script)
 {
 	if (Scripts.find(script) != Scripts.end()) delete Scripts[script];
 	Scripts.erase(script);

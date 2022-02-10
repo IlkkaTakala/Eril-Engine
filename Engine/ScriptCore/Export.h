@@ -4,13 +4,13 @@
 
 #define REGISTER_FUNCTION(NAME, SCOPE, ARG_C) static bool reg = AddFuncs<ARG_C>(#SCOPE, #NAME, &NAME);
 
-unsigned __int32 CompileScript(const char* data);
+unsigned long CompileScript(const char* data);
 
-void EvaluateScript(unsigned __int32 s);
+void EvaluateScript(unsigned long s);
 
 void AddWrapped(const char* scope, const char* name, BaseFunction* function);
 
-void CleanScript(unsigned __int32 script);
+void CleanScript(unsigned long script);
 
 void GetError(const char* error, size_t size);
 
