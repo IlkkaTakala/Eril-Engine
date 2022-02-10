@@ -8,7 +8,7 @@ typedef unsigned int uint;
 #ifdef _WIN32
 typedef __int64 int64;
 #elif defined(unix) || defined(__unix__) || defined(__unix)
-typedef __int64_t int64;
+typedef long long int64;
 #endif
 
 typedef enum class EVariableType : uint8
