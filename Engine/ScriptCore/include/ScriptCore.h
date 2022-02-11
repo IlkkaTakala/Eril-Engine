@@ -3,17 +3,17 @@
 #include <functional>
 #include "Value.h"
 
-#ifdef SCRIPTCORE_EXPORTS
-#define SCRIPTCORE_API __declspec(dllexport)
-#else
-#define SCRIPTCORE_API __declspec(dllimport)
-#endif
-
 #define REGISTER_FUNCTION(NAME, SCOPE, ARG_C) static bool reg_ ## SCOPE ## _ ## NAME = ScriptCore::AddFuncs<ARG_C>(#SCOPE, #NAME, &NAME);
 
 namespace ScriptCore {
 
 #ifdef _WIN32
+
+	#ifdef SCRIPTCORE_EXPORTS
+	#define SCRIPTCORE_API __declspec(dllexport)
+	#else
+	#define SCRIPTCORE_API __declspec(dllimport)
+	#endif
 
 	SCRIPTCORE_API unsigned long CompileScript(const char* data);
 	SCRIPTCORE_API unsigned long CompileScript(const char* name, const char* data);
@@ -25,6 +25,7 @@ namespace ScriptCore {
 	SCRIPTCORE_API void CleanScript(unsigned long script);
 
 	SCRIPTCORE_API void GetError(const char* error, size_t size);
+	SCRIPTCORE_API void AddWrapped(const char* scope, const char* name, BaseFunction* function);
 
 #elif defined(unix) || defined(__unix__) || defined(__unix)
 
@@ -38,6 +39,7 @@ namespace ScriptCore {
 	void CleanScript(unsigned long script);
 
 	void GetError(const char* error, size_t size);
+	void AddWrapped(const char* scope, const char* name, BaseFunction* function);
 
 #endif
 
@@ -73,8 +75,6 @@ namespace ScriptCore {
 		}
 
 	};
-
-	SCRIPTCORE_API void AddWrapped(const char* scope, const char* name, BaseFunction* function);
 
 	template <typename ...Args>
 	struct make_sig_from_tuple<std::tuple<Args...>> {
