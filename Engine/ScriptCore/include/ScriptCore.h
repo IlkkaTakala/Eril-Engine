@@ -12,6 +12,9 @@
 #define REGISTER_FUNCTION(NAME, SCOPE, ARG_C) static bool reg_ ## SCOPE ## _ ## NAME = ScriptCore::AddFuncs<ARG_C>(#SCOPE, #NAME, &NAME);
 
 namespace ScriptCore {
+
+#ifdef _WIN32
+
 	SCRIPTCORE_API unsigned long CompileScript(const char* data);
 	SCRIPTCORE_API unsigned long CompileScript(const char* name, const char* data);
 
@@ -23,6 +26,20 @@ namespace ScriptCore {
 
 	SCRIPTCORE_API void GetError(const char* error, size_t size);
 
+#elif defined(unix) || defined(__unix__) || defined(__unix)
+
+	unsigned long CompileScript(const char* data);
+	unsigned long CompileScript(const char* name, const char* data);
+
+	void EvaluateScript(unsigned long s);
+	void EvaluateScript(const char* name);
+	void EvaluateAll();
+
+	void CleanScript(unsigned long script);
+
+	void GetError(const char* error, size_t size);
+
+#endif
 
 
 	//
