@@ -104,6 +104,7 @@ void MovementComponent::Tick(float time)
 			DesiredState.location.Z = Terra->GetHeight(DesiredState.location.X, DesiredState.location.Y);
 		}
 		DesiredState.velocity = velocity;
+
 		/*rigid->body->setLinearVelocity(btVector3(velocity.X, velocity.Z, velocity.Y));*/
 	}
 	break;
@@ -134,13 +135,14 @@ void MovementComponent::ApplyMovement()
 
 	if (Object->transformForce) {
 		Object->Location = Object->desired.Location;
+		Object->Rotation = Object->desired.Rotation;
 		Object->transformForce = false;
 
 	}
 	else {
 		/*auto l = rigid->body->getWorldTransform().getOrigin();*/
 		Object->Location = DesiredState.location;//Vector(l[0], l[2], l[1]);
-		//Object->Rotation = DesiredState.rotation;
+		Object->Rotation = DesiredState.rotation;
 		//rotation
 	}
 }

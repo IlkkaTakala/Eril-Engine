@@ -75,6 +75,7 @@ btRigidBody* Physics::addBox(float width, float height, float depth, float x, fl
     btTransform t;
     t.setIdentity();
     t.setOrigin(btVector3(x, y, z));
+    t.setRotation(btQuaternion(0, 0, 0, 1));
     btBoxShape* box = new btBoxShape(btVector3(width / 2.0, height / 2.0, depth / 2.0));
     btVector3 inertia(0, 0, 0);
     if (mass != 0.0)

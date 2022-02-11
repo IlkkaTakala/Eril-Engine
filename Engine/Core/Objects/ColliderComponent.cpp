@@ -87,6 +87,7 @@ void ColliderComponent::Tick(float Delta)
 	colliderloc.setOrigin(btVector3(location.X, location.Z, location.Y));
 	colliderloc.setRotation(btQuaternion(rotation.Y, rotation.Z, rotation.X));
 	body->setWorldTransform(colliderloc);
+	body->setCenterOfMassTransform(colliderloc);
 	
 	switch (type)
 	{
@@ -100,12 +101,20 @@ void ColliderComponent::Tick(float Delta)
 		if (Object) {
 			Vector velocity = Object->DesiredState.velocity;
 			body->setLinearVelocity(btVector3(velocity.X, velocity.Z, velocity.Y));
+
+			Vector rotation = Object->DesiredState.rotation;
+			body->setAngularVelocity(btVector3(rotation.Z, rotation.Y, rotation.X));
 		}
 		break;
 	case 2:
 		if (Object) {
-			Vector velocity = Object->DesiredState.velocity;
-			body->setLinearVelocity(btVector3(velocity.X, velocity.Z, velocity.Y));
+			btTransform trans;
+			body->getMotionState()->getWorldTransform(trans);
+			trans.getOrigin() += btVector3(0.02, 0, 0.02);
+			body->getMotionState()->setWorldTransform(trans);
+			
+			//Vector velocity = Object->DesiredState.velocity;
+			//body->setLinearVelocity(btVector3(velocity.X, velocity.Z, velocity.Y));
 		}
 		break;
 	}
@@ -129,8 +138,14 @@ void ColliderComponent::ApplyCollision()
 			auto l = body->getWorldTransform().getOrigin();
 			Vector world(l[0], l[2], l[1]);
 			Object->DesiredState.location = world - Location;
-			btVector3 wr = body->getAngularVelocity();
-			Object->DesiredState.rotation = Vector(wr[2], wr[1], wr[0]);
+
+			auto r = body->getWorldTransform().getRotation();
+			Vector com(r[2], r[1], r[0]);
+			Object->DesiredState.rotation = com - Rotation;
+
+			//btQuaternion wr = body->getOrientation();
+			//Object->DesiredState.rotation = Vector(wr[2], wr[1], wr[0]);
+
 			btVector3 lv = body->getLinearVelocity();
 			Object->DesiredState.velocity = Vector(lv[0], lv[2], lv[1]);
 		}
@@ -140,8 +155,14 @@ void ColliderComponent::ApplyCollision()
 			auto l = body->getWorldTransform().getOrigin();
 			Vector world(l[0], l[2], l[1]);
 			Object->DesiredState.location = world - Location;
-			btVector3 wr = body->getAngularVelocity();
-			Object->DesiredState.rotation = Vector(wr[2], wr[1], wr[0]);
+
+			auto r = body->getWorldTransform().getRotation();
+			Vector com(r[2], r[1], r[0]);
+			Object->DesiredState.rotation = com - Rotation;
+
+			//btQuaternion wr = body->getOrientation();
+			//Object->DesiredState.rotation = Vector(wr[2], wr[1], wr[0]);
+
 			btVector3 lv = body->getLinearVelocity();
 			Object->DesiredState.velocity = Vector(lv[0], lv[2], lv[1]);
 		}
