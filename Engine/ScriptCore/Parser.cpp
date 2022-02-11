@@ -32,7 +32,6 @@ void ExitContext(Context& c, Context& l)
 	c.loopScope = l.loopScope;
 	c.scopeNode = l.scopeNode;
 	c.row = l.row;
-	//c.currentNode = l.currentNode;
 }
 
 inline ECharType TypeOfChar(const char* c)
@@ -192,7 +191,7 @@ String CopyUntilWithinScope(const char*& ptr, char delim, char scopeBegin = '{',
 	return copy;
 }
 
-String CopyUntilWithinScopeWithLimit(const char*& ptr, char delim, const char* end, char scopeBegin = '{', char scopeEnd = '}', bool* success = false) {
+String CopyUntilWithinScopeWithLimit(const char*& ptr, char delim, const char* end, char scopeBegin = '{', char scopeEnd = '}', bool* success = nullptr) {
 	int scope = 0;
 	String copy;
 	if (success) *success = true;
@@ -250,12 +249,12 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 		next->test = ParseArea(c, s[1].c_str(), s[1].c_str() + s[1].size());
 		next->end = ParseArea(c, s[2].c_str(), s[2].c_str() + s[2].size());
 
-		/*Node* rest = ParseArea(c, c.ptr + 1, c.end);
+		Node* rest = ParseArea(c, c.ptr + 1, c.end);
 		if (rest) {
 			*c.currentNode = next;
 			c.currentNode = &(*c.currentNode)->next;
 			return rest;
-		}*/
+		}
 		return (Node*)next;
 	}
 	error("No statement found", &c);
@@ -275,11 +274,11 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 		IfNode* next = new IfNode();
 		next->child = ParseArea(c, c.ptr, end);
 		Node* rest = ParseArea(c, end + 1, c.end);
-		/*if (rest) {
+		if (rest) {
 			*c.currentNode = next;
 			c.currentNode = &(*c.currentNode)->next;
 			return rest;
-		}*/
+		}
 		return (Node*)next;
 	}
 	error("No statement found", &c);
@@ -947,6 +946,17 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 				result = new ValueNode(isfloat ? EVT::Float : EVT::Int, l.considerValue);
 				break;
 			}
+			Variable* val = l.scope->FindVar(l.considerValue);
+			if (val) {
+				if (val->type == 2)
+					result = new ValueNode(*val->value);
+				else {
+					result = new VariableNode(val);
+					if (*l.ptr == '&')
+						result->ref = true;
+				}
+				break;
+			}
 			else if (l.ptr != end && ispunct(*l.ptr)) {
 				error((String("Unexpected character found: ") + *l.ptr + ' ').c_str(), &l);
 				l.ptr++;
@@ -959,14 +969,6 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 				}
 				else if (l.considerValue == "false") {
 					result = new ValueNode(false);
-					break;
-				}
-				Variable* val = l.scope->FindVar(l.considerValue);
-				if (val) {
-					if (val->type == 2)
-						result = new ValueNode(*val->value);
-					else
-						result = new VariableNode(val);
 					break;
 				}
 				else
@@ -1038,11 +1040,12 @@ void ReadLine(Context& c)
 		}
 		l.end++;
 	}
-
+	c.ptr = l.end;
 	Node* n = ParseArea(l, l.begin, l.end);
 	ExitContext(c, l);
 	if (n != nullptr) {
 		if (n != (Node*)skipNode) {
+			while (*c.currentNode) c.currentNode = &(*c.currentNode)->next;
 			*c.currentNode = n;
 			if (n->next != (Node*)returnNode) c.currentNode = &(*c.currentNode)->next;
 			else {
@@ -1051,11 +1054,10 @@ void ReadLine(Context& c)
 			}
 		}
 	}
-	/*if (l.loopNode && l.loopNode->next == n) {
-		l.scope = l.loopScope;
-		l.loopNode = nullptr;
-		l.loopScope = nullptr;
-	}*/
+	if (c.ptr != l.end) {
+		c.ptr = l.end + 1;
+		ReadLine(c);
+	}
 	ExitContext(c, l);
 	c.ptr = l.end;
 	if (*l.end == '\n' || *l.end == ';') c.ptr += 1;

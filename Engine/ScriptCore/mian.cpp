@@ -6,9 +6,10 @@
 //#include <windows.h>
 #include "Export.h"
 
-String someCppNativeFunction(String s, int i) {
+String someCppNativeFunction(String* s, int i) {
 	std::ostringstream repeated;
-	std::fill_n(std::ostream_iterator<String>(repeated), i, s);
+	std::fill_n(std::ostream_iterator<String>(repeated), i, *s);
+	*s = "Hello, repeated";
 	return repeated.str();
 }
 

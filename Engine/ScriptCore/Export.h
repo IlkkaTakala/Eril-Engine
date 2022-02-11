@@ -5,8 +5,11 @@
 #define REGISTER_FUNCTION(NAME, SCOPE, ARG_C) static bool reg = AddFuncs<ARG_C>(#SCOPE, #NAME, &NAME);
 
 unsigned long CompileScript(const char* data);
+unsigned long CompileScript(const char* name, const char* data);
 
 void EvaluateScript(unsigned long s);
+void EvaluateScript(const char* name);
+void EvaluateAll();
 
 void AddWrapped(const char* scope, const char* name, BaseFunction* function);
 
@@ -47,7 +50,7 @@ using generate_sig_t = typename generate_sig<T, N>::type;
 
 template <int n, typename Func>
 BaseFunction* make_wrap(Func f) {
-	return new generate_sig_t<Value, n>(n, [f](void*, auto ...v) {
+	return new generate_sig_t<Value, n>(n, [f](void*, auto& ...v) {
 		return f(v...);
 	});
 }

@@ -34,8 +34,9 @@ def execute()
 	print(array.type());
 	
 	other_function(true, scriptGlobalVar);
+	for (var i = 0; i < 3; i++) print(i)
 	
-	var testString = someCppNativeFunction(scriptGlobalVar, 3);
+	var testString = someCppNativeFunction(scriptGlobalVar&, 3);
 	print(testString);
 	
 	print(scriptGlobalVar);

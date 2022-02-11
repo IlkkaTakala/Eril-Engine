@@ -134,7 +134,7 @@ struct Value
 
 	Value(const String& in) : value(in) {}
 
-	operator bool() const
+	bool toBool() const
 	{
 		switch (value.index())
 		{
@@ -151,6 +151,11 @@ struct Value
 		default:
 			return 0.f;
 		}
+	}
+
+	operator bool() const
+	{
+		return toBool();
 	}
 
 	operator float() const 
@@ -196,6 +201,25 @@ struct Value
 		}
 	}
 
+	operator int() const
+	{
+		switch (value.index())
+		{
+		case 0:
+			return 0;
+		case 1:
+			return (int)std::get<float>(value);
+		case 2:
+			return (int)std::get<int64>(value);
+		case 3:
+			return std::stoi(std::get<String>(value));
+		case 4:
+			return (int)std::get<bool>(value);
+		default:
+			return 0;
+		}
+	}
+
 	operator int64() const
 	{
 		switch (value.index())
@@ -207,12 +231,143 @@ struct Value
 		case 2:
 			return std::get<int64>(value);
 		case 3:
-			return std::stoi(std::get<String>(value));
+			return std::stoll(std::get<String>(value));
 		case 4:
 			return (int64)std::get<bool>(value);
 		default:
 			return 0;
 		}
+	}
+
+	operator bool()
+	{
+		return toBool();
+	}
+
+	operator float()
+	{
+		switch (value.index())
+		{
+		case 0:
+			return 0.f;
+		case 1:
+			return std::get<float>(value);
+		case 2:
+			return (float)std::get<int64>(value);
+		case 3:
+			return std::stof(std::get<String>(value));
+		default:
+			return 0.f;
+		}
+	}
+
+	operator String()
+	{
+		switch (value.index())
+		{
+		case 0:
+			return "Undefined";
+		case 1:
+			return std::to_string(std::get<float>(value));
+		case 2:
+			return std::to_string(std::get<int64>(value));
+		case 3:
+			return std::get<String>(value);
+		case 4:
+			return std::get<bool>(value) ? "true" : "false";
+		case 5:
+		{
+			String res = "{ ";
+			for (const auto& v : std::get<ArrayPtr>(value)->second)
+				res += (String)v + " ";
+			return res + "}";
+		}
+		default:
+			return "Undefined";
+		}
+	}
+
+	operator int()
+	{
+		switch (value.index())
+		{
+		case 0:
+			return 0;
+		case 1:
+			return (int)std::get<float>(value);
+		case 2:
+			return (int)std::get<int64>(value);
+		case 3:
+			return std::stoi(std::get<String>(value));
+		case 4:
+			return (int)std::get<bool>(value);
+		default:
+			return 0;
+		}
+	}
+
+	operator int64()
+	{
+		switch (value.index())
+		{
+		case 0:
+			return 0;
+		case 1:
+			return (int64)std::get<float>(value);
+		case 2:
+			return std::get<int64>(value);
+		case 3:
+			return std::stoll(std::get<String>(value));
+		case 4:
+			return (int64)std::get<bool>(value);
+		default:
+			return 0;
+		}
+	}
+
+	operator int*()
+	{
+		if (value.index() == 2) {
+			return &(int&)std::get<int64>(value);
+		}
+		return nullptr;
+	}
+
+	operator int64*()
+	{
+		return &std::get<int64>(value);
+	}
+
+	operator String*()
+	{
+		if (value.index() == 3) {
+			return &std::get<String>(value);
+		}
+		return nullptr;
+	}
+
+	operator float*()
+	{
+		if (value.index() == 1) {
+			return &std::get<float>(value);
+		}
+		return nullptr;
+	}
+
+	operator bool*()
+	{
+		if (value.index() == 4) {
+			return &std::get<bool>(value);
+		}
+		return nullptr;
+	}
+
+	operator ArrayPtr*()
+	{
+		if (value.index() == 5) {
+			return &std::get<ArrayPtr>(value);
+		}
+		return nullptr;
 	}
 
 	operator Array*() const
@@ -475,7 +630,7 @@ struct Value
 		
 		case EVT::Boolean: 
 		{
-			return (bool)lhs == (bool)rhs;
+			return lhs.toBool() == rhs.toBool();
 		} break;
 
 		case EVT::Null:
@@ -524,7 +679,7 @@ struct Value
 
 		case EVT::Boolean:
 		{
-			return (bool)lhs < (bool)rhs;
+			return lhs.toBool() < rhs.toBool();
 		} break;
 
 		case EVT::Null:
@@ -569,7 +724,7 @@ struct Value
 
 		case EVT::Boolean:
 		{
-			return (bool)lhs > (bool)rhs;
+			return lhs.toBool() > rhs.toBool();
 		} break;
 
 		case EVT::Null:

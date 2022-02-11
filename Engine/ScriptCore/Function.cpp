@@ -36,7 +36,7 @@ Value BooleanGreaterEqual(void*, const Value& lhs, const Value& rhs)	{ return lh
 
 std::unordered_map<String, NativeFuncStorage> nativeFuncs = {
 {"global", NativeFuncStorage {
-	{"print", new Function<const Value>(1, [](void*, auto& v) {
+	{"print", new Function<Value>(1, [](void*, auto& v) {
 		if (v.type() == EVT::Null) {
 			std::cout << ">> Undefined\n";
 			return Value{};
@@ -50,18 +50,18 @@ std::unordered_map<String, NativeFuncStorage> nativeFuncs = {
 	})},
 }},
 {"op", NativeFuncStorage {
-	{"+", new Function<const Value, const Value>(2, &ArithPlus)},
-	{"-", new Function<const Value, const Value>(2, &ArithMinus)},
-	{"*", new Function<const Value, const Value>(2, &ArithMult)},
-	{"*", new Function<Value, const Value>(2, &ArithMultAs)},
-	{"/", new Function<const Value, const Value>(2, &ArithDiv)},
-	{"==", new Function<const Value, const Value>(2, &BooleanEqual)},
-	{"!", new Function<const Value>(1, &BooleanNot)},
-	{"!=", new Function<const Value, const Value>(2, &BooleanNotEqual)},
-	{"<", new Function<const Value, const Value>(2, &BooleanLess)},
-	{">", new Function<const Value, const Value>(2, &BooleanGreater)},
-	{"<=", new Function<const Value, const Value>(2, &BooleanLessEqual)},
-	{">=", new Function<const Value, const Value>(2, &BooleanGreaterEqual)},
+	{"+", new Function<Value, Value>(2, &ArithPlus)},
+	{"-", new Function<Value, Value>(2, &ArithMinus)},
+	{"*", new Function<Value, Value>(2, &ArithMult)},
+	{"*", new Function<Value, Value>(2, &ArithMultAs)},
+	{"/", new Function<Value, Value>(2, &ArithDiv)},
+	{"==", new Function<Value, Value>(2, &BooleanEqual)},
+	{"!", new Function<Value>(1, &BooleanNot)},
+	{"!=", new Function<Value, Value>(2, &BooleanNotEqual)},
+	{"<", new Function<Value, Value>(2, &BooleanLess)},
+	{">", new Function<Value, Value>(2, &BooleanGreater)},
+	{"<=", new Function<Value, Value>(2, &BooleanLessEqual)},
+	{">=", new Function<Value, Value>(2, &BooleanGreaterEqual)},
 }},
 {"variable", NativeFuncStorage {
 	{"type", new Function<>(0, [](void* val) {
@@ -91,7 +91,7 @@ std::unordered_map<String, NativeFuncStorage> nativeFuncs = {
 	})},
 }},
 {"array", NativeFuncStorage {
-	{"init", new Function<const Value, const Value>(2, [](void*, auto c, auto v) {
+	{"init", new Function<Value, Value>(2, [](void*, auto c, auto v) {
 		Value arr(EVT::Array, "");
 		auto a = (Value::Array*)arr;
 		if (a) {

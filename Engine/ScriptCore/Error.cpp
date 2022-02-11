@@ -21,7 +21,13 @@ void error(const String& string, Context* c)
 
 void warn(const char* string, Context* c)
 {
-	std::cout << "Line " << std::to_string(c->row) << ": " << string << '\n';
+	std::cout << "Line " << std::to_string(c ? c->row : 0) << ": " << string << '\n';
+	errorText += string + '\n';
+}
+
+void warn(const String& string, Context* c)
+{
+	std::cout << "Line " << std::to_string(c ? c->row : 0) << ": " << string << '\n';
 	errorText += string + '\n';
 }
 
