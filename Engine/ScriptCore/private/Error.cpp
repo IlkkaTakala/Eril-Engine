@@ -7,18 +7,27 @@ static std::string errorText = "";
 void error(const char* string, Context* c)
 {
 	std::cout << "Line " << std::to_string(c ? c->row : 0) << ": " << string << '\n';
+	errorText += string + '\n';
 	errorFlag = true;
 }
 
 void error(const String& string, Context* c)
 {
 	std::cout << "Line " << std::to_string(c ? c->row : 0) << ": " << string << '\n';
+	errorText += string + '\n';
 	errorFlag = true;
 }
 
 void warn(const char* string, Context* c)
 {
-	std::cout << "Line " << std::to_string(c->row) << ": " << string << '\n';
+	std::cout << "Line " << std::to_string(c ? c->row : 0) << ": " << string << '\n';
+	errorText += string + '\n';
+}
+
+void warn(const String& string, Context* c)
+{
+	std::cout << "Line " << std::to_string(c ? c->row : 0) << ": " << string << '\n';
+	errorText += string + '\n';
 }
 
 bool isError()

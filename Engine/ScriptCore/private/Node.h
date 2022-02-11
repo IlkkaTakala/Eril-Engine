@@ -41,12 +41,15 @@ struct Script
 };
 
 template <typename ...Args>
-inline void _invoke(Value& value, const String& scope, const String& name, void* ptr, const Args&... vals)
+inline void _invoke(Value& value, const String& scope, const String& name, void* ptr, Args&... vals)
 {
 	if (nativeFuncs.find(scope) != nativeFuncs.end() && nativeFuncs[scope].find(name) != nativeFuncs[scope].end()) {
 		auto c = dynamic_cast<Function<Args...>*>(nativeFuncs[scope][name]);
 		if (c) (*c)(value, ptr, vals...);
-		else value = {};
+		else {
+			warn(String("Function ") + name + " doesn't take arguments of type: " + ((typeName(vals.type()) + ", ") + ...));
+			value = {};
+		}
 		return;
 	}
 	else if (globalFuncs.find(name) != globalFuncs.end()) {
@@ -61,7 +64,7 @@ inline void _invoke<>(Value& value, const String& scope, const String& name, voi
 {
 	if (nativeFuncs.find(scope) != nativeFuncs.end() && nativeFuncs[scope].find(name) != nativeFuncs[scope].end()) {
 		auto c = dynamic_cast<Function<>*>(nativeFuncs[scope][name]);
-		if (c) value = std::forward((*c)(ptr));
+		if (c) (*c)(value, ptr);
 		else value = {};
 		return;
 	}
@@ -73,6 +76,7 @@ struct Node
 {
 	Node* child;
 	Node* next;
+	bool ref;
 
 	virtual Node** GetChild(uint idx = 0) {
 		return &child;
@@ -80,7 +84,8 @@ struct Node
 	virtual void SetChild(uint idx, Node* n) { child = n; }
 	virtual void SetValue(uint idx, const Value& v) {}
 
-	Node() : child(nullptr), next(nullptr) {}
+	Node() : child(nullptr), next(nullptr), ref(false) {}
+	Node(const Node& node) : child(node.child), next(node.next) {}
 	virtual ~Node()
 	{
 		delete child;
@@ -156,12 +161,17 @@ struct FuncNode : public Node
 	{
 		for (int i = 0; i < params.size(); i++) if (params[i]) params[i]->evaluate(caller, eval_params[i]);
 		invoke_helper<c>(eval_params, std::make_index_sequence<c>(), node);
-		for (int i = 0; i < params.size(); i++) if (params[i]) eval_params[i].Clean();
+		for (int i = 0; i < params.size(); i++) 
+			if (params[i]) {
+				if (params[i]->ref) 
+					params[i]->SetValue(i, eval_params[i]);
+				eval_params[i].Clean();
+			}
 	}
 
 private:
 	template <std::size_t N, typename T, std::size_t... Indices>
-	void invoke_helper(const std::array<T, N>& v, std::index_sequence<Indices...>, Value& node) {
+	void invoke_helper(std::array<T, N>& v, std::index_sequence<Indices...>, Value& node) {
 		_invoke(node, scope, value, ptr, std::get<Indices>(v)...);
 	}
 };
@@ -235,19 +245,28 @@ struct VariableNode : public Node
 		delete index; 
 	}
 
+	virtual void SetValue(uint idx, const Value& v) {
+		value->value->value = v.value;
+	}
+
 	virtual void evaluate(ScriptFunction* caller, Value& node) override
 	{
 		if (value->value->type() == EVT::Array && isArray) {
-			int idx = 0;
 			Value* v = nullptr;
 			if (index) {
 				Value idxv;
 				index->evaluate(caller, idxv);
-				v = value->value->GetIndex(idxv);
+				v = value->value->GetIndex((uint)(int64)idxv);
 			}
 			else {
-				v = value->value->PushIndex();
+				if (value->init) {
+					v = value->value->PushIndex();
+				}
+				else {
+					child->evaluate(caller, *value->value);
+				}
 			}
+			
 			if (v) {
 				if (child && value->type == 0) child->evaluate(caller, *v);
 				node = *v;
@@ -320,7 +339,7 @@ struct ForNode : public Node
 		}
 		if (begin) begin->evaluate(caller, beginVal);
 		if (test)
-			for (test->evaluate(caller, beginVal); beginVal; test->evaluate(caller, beginVal)) {
+			for (test->evaluate(caller, beginVal); beginVal.toBool(); test->evaluate(caller, beginVal)) {
 				body->evaluate(caller, node);
 				end->evaluate(caller, beginVal);
 			}
@@ -348,7 +367,7 @@ struct IfNode : public Node
 		if (child) {
 			Value testV;
 			child->evaluate(caller, testV);
-			if (testV.GetValue<bool>()) 
+			if (testV.toBool()) 
 				next->evaluate(caller, node);
 			if (!body) body = next;
 			if (next) {

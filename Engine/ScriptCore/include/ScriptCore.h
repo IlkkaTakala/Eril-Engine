@@ -8,13 +8,16 @@
 
 #define REGISTER_FUNCTION(NAME, SCOPE, ARG_C) static bool reg_ ## SCOPE ## _ ## NAME = AddFuncs<ARG_C>(#SCOPE, #NAME, &NAME);
 
-extern "C" SCRIPTCORE_API unsigned __int32 CompileScript(const char* data);
+SCRIPTCORE_API unsigned long CompileScript(const char* data);
+SCRIPTCORE_API unsigned long CompileScript(const char* name, const char* data);
 
-extern "C" SCRIPTCORE_API void EvaluateScript(unsigned __int32 s);
+SCRIPTCORE_API void EvaluateScript(unsigned long s);
+SCRIPTCORE_API void EvaluateScript(const char* name);
+SCRIPTCORE_API void EvaluateAll();
 
-extern "C" SCRIPTCORE_API void CleanScript(unsigned __int32 script);
+SCRIPTCORE_API void CleanScript(unsigned long script);
 
-extern "C" SCRIPTCORE_API void GetError(const char* error, size_t size);
+SCRIPTCORE_API void GetError(const char* error, size_t size);
 
 //
 // Helper functions 
@@ -22,6 +25,7 @@ extern "C" SCRIPTCORE_API void GetError(const char* error, size_t size);
 
 #include <tuple>
 #include <functional>
+#include "private/Value.h"
 
 template <typename>
 struct make_sig_from_tuple;
@@ -34,19 +38,19 @@ struct BaseFunction
 	int param_count;
 };
 
-template<typename R = void, typename...Args>
+template<typename...Args>
 struct Function : public BaseFunction
 {
-	typedef std::function<R(void*, const Args&...)> FuncParams;
+	typedef std::function<Value(void*, Args&...)> FuncParams;
 
 	Function(int count, FuncParams func) : BaseFunction(count), call(func) {}
 	Function() : BaseFunction(0), call(nullptr) {}
 
 	FuncParams call;
 
-	R operator()(void* ptr, const Args&... v) const {
-		if (call) return std::move(call(ptr, v...));
-		else return R();
+	void operator()(Value& val, void* ptr, Args&... v) const {
+		if (call) val = call(ptr, v...);
+		else val = {};
 	}
 
 };
@@ -81,7 +85,7 @@ using generate_sig_t = typename generate_sig<T, N>::type;
 
 template <int n, typename Func>
 BaseFunction* make_wrap(Func f) {
-	return new generate_sig_t<Value, n>(n, [f](void*, auto ...v) {
+	return new generate_sig_t<Value, n>(n, [f](void*, auto& ...v) {
 		return f(v...);
 	});
 }

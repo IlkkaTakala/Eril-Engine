@@ -96,14 +96,14 @@ struct Value
 		return *this;
 	} 
 
-	Value& operator=(void) {
+	/*Value& operator=(void val) {
 		if (this == &val)
 			return *this;
 
 		value = val.value;
 		if (value.index() == 5) std::get<ArrayPtr>(value)->first++;
 		return *this;
-	}
+	}*/
 
 	~Value() {
 		if (value.index() == 5) {
@@ -144,21 +144,7 @@ struct Value
 
 	Value(const String& in) : value(in) {}
 
-	template <typename T>
-	T GetValue() const
-	{
-		try {
-			return std::get<T>(value);
-		}
-		catch (const std::bad_variant_access& ex) {
-			std::cout << ex.what() << '\n';
-			error("Invalid type conversion");
-			return T();
-		}
-	}
-
-	template<>
-	bool GetValue() const
+	bool toBool() const
 	{
 		switch (value.index())
 		{
@@ -177,8 +163,12 @@ struct Value
 		}
 	}
 
-	template<>
-	float GetValue() const 
+	operator bool() const
+	{
+		return toBool();
+	}
+
+	operator float() const 
 	{
 		switch (value.index())
 		{
@@ -195,8 +185,7 @@ struct Value
 		}
 	}
 
-	template<>
-	String GetValue() const
+	operator String() const
 	{
 		switch (value.index())
 		{
@@ -222,8 +211,26 @@ struct Value
 		}
 	}
 
-	template<>
-	int64 GetValue() const
+	operator int() const
+	{
+		switch (value.index())
+		{
+		case 0:
+			return 0;
+		case 1:
+			return (int)std::get<float>(value);
+		case 2:
+			return (int)std::get<int64>(value);
+		case 3:
+			return std::stoi(std::get<String>(value));
+		case 4:
+			return (int)std::get<bool>(value);
+		default:
+			return 0;
+		}
+	}
+
+	operator int64() const
 	{
 		switch (value.index())
 		{
@@ -234,7 +241,161 @@ struct Value
 		case 2:
 			return std::get<int64>(value);
 		case 3:
+			return std::stoll(std::get<String>(value));
+		case 4:
+			return (int64)std::get<bool>(value);
+		default:
+			return 0;
+		}
+	}
+
+	operator bool()
+	{
+		return toBool();
+	}
+
+	operator float()
+	{
+		switch (value.index())
+		{
+		case 0:
+			return 0.f;
+		case 1:
+			return std::get<float>(value);
+		case 2:
+			return (float)std::get<int64>(value);
+		case 3:
+			return std::stof(std::get<String>(value));
+		default:
+			return 0.f;
+		}
+	}
+
+	operator String()
+	{
+		switch (value.index())
+		{
+		case 0:
+			return "Undefined";
+		case 1:
+			return std::to_string(std::get<float>(value));
+		case 2:
+			return std::to_string(std::get<int64>(value));
+		case 3:
+			return std::get<String>(value);
+		case 4:
+			return std::get<bool>(value) ? "true" : "false";
+		case 5:
+		{
+			String res = "{ ";
+			for (const auto& v : std::get<ArrayPtr>(value)->second)
+				res += (String)v + " ";
+			return res + "}";
+		}
+		default:
+			return "Undefined";
+		}
+	}
+
+	operator int()
+	{
+		switch (value.index())
+		{
+		case 0:
+			return 0;
+		case 1:
+			return (int)std::get<float>(value);
+		case 2:
+			return (int)std::get<int64>(value);
+		case 3:
 			return std::stoi(std::get<String>(value));
+		case 4:
+			return (int)std::get<bool>(value);
+		default:
+			return 0;
+		}
+	}
+
+	operator int64()
+	{
+		switch (value.index())
+		{
+		case 0:
+			return 0;
+		case 1:
+			return (int64)std::get<float>(value);
+		case 2:
+			return std::get<int64>(value);
+		case 3:
+			return std::stoll(std::get<String>(value));
+		case 4:
+			return (int64)std::get<bool>(value);
+		default:
+			return 0;
+		}
+	}
+
+	operator int*()
+	{
+		if (value.index() == 2) {
+			return &(int&)std::get<int64>(value);
+		}
+		return nullptr;
+	}
+
+	operator int64*()
+	{
+		return &std::get<int64>(value);
+	}
+
+	operator String*()
+	{
+		if (value.index() == 3) {
+			return &std::get<String>(value);
+		}
+		return nullptr;
+	}
+
+	operator float*()
+	{
+		if (value.index() == 1) {
+			return &std::get<float>(value);
+		}
+		return nullptr;
+	}
+
+	operator bool*()
+	{
+		if (value.index() == 4) {
+			return &std::get<bool>(value);
+		}
+		return nullptr;
+	}
+
+	operator ArrayPtr*()
+	{
+		if (value.index() == 5) {
+			return &std::get<ArrayPtr>(value);
+		}
+		return nullptr;
+	}
+
+	operator Array*() const
+	{
+		switch (value.index())
+		{
+		case 0:
+			return nullptr;
+		case 1:
+			return nullptr;
+		case 2:
+			return nullptr;
+		case 3:
+			return nullptr;
+		case 4:
+			return nullptr;
+		case 5:
+			return &std::get<ArrayPtr>(value)->second;
 		default:
 			return 0;
 		}
@@ -261,32 +422,7 @@ struct Value
 		}
 	}
 
-	operator int64() const
-	{
-		return GetValue<int64>();
-	}
-
-	operator int() const
-	{
-		return (int)GetValue<int64>();
-	}
-
-	operator float() const
-	{
-		return GetValue<float>();
-	}
-
-	operator String() const
-	{
-		return GetValue<String>();
-	}
-
-	operator bool() const
-	{
-		return GetValue<bool>();
-	}
-
-	Value* GetIndex(int idx) {
+	Value* GetIndex(unsigned int idx) {
 		if (value.index() == 5) {
 			Array& a = std::get<ArrayPtr>(value)->second;
 			if (a.size() > idx && idx >= 0) {
@@ -325,16 +461,16 @@ struct Value
 
 		case EVT::Float:
 		{
-			return lhs.GetValue<float>() + rhs.GetValue<float>();
+			return (float)lhs + (float)rhs;
 		} break;
 
 		case EVT::Int:
 		{
 			switch (rhs.type()) {
 			case EVT::Int:
-				return lhs.GetValue<int64>() + rhs.GetValue<int64>();
+				return (int64)lhs + (int64)rhs;
 			case EVT::Float:
-				return lhs.GetValue<float>() + rhs.GetValue<float>();
+				return (float)lhs + (float)rhs;
 			default:
 				return lhs;
 				break;
@@ -368,16 +504,16 @@ struct Value
 
 		case EVT::Float:
 		{
-			return lhs.GetValue<float>() - rhs.GetValue<float>();
+			return (float)lhs - (float)rhs;
 		} break;
 
 		case EVT::Int:
 		{
 			switch (rhs.type()) {
 			case EVT::Int:
-				return lhs.GetValue<int64>() - rhs.GetValue<int64>();
+				return (int64)lhs - (int64)rhs;
 			case EVT::Float:
-				return lhs.GetValue<float>() - rhs.GetValue<float>();
+				return (float)lhs - (float)rhs;
 			default:
 				return lhs;
 				break;
@@ -411,16 +547,16 @@ struct Value
 
 		case EVT::Float:
 		{
-			return lhs.GetValue<float>() * rhs.GetValue<float>();
+			return (float)lhs * (float)rhs;
 		} break;
 
 		case EVT::Int:
 		{
 			switch (rhs.type()) {
 			case EVT::Int:
-				return lhs.GetValue<int64>() * rhs.GetValue<int64>();
+				return (int64)lhs * (int64)rhs;
 			case EVT::Float:
-				return lhs.GetValue<float>() * rhs.GetValue<float>();
+				return (float)lhs * (float)rhs;
 			default:
 				return lhs;
 				break;
@@ -446,16 +582,16 @@ struct Value
 
 		case EVT::Float:
 		{
-			return lhs.GetValue<float>() / rhs.GetValue<float>();
+			return (float)lhs / (float)rhs;
 		} break;
 
 		case EVT::Int:
 		{
 			switch (rhs.type()) {
 			case EVT::Int:
-				return lhs.GetValue<int64>() / rhs.GetValue<int64>();
+				return (int64)lhs / (int64)rhs;
 			case EVT::Float:
-				return lhs.GetValue<float>() / rhs.GetValue<float>();
+				return (float)lhs / (float)rhs;
 			default:
 				return lhs;
 				break;
@@ -476,13 +612,13 @@ struct Value
 		{
 		case EVT::String:
 		{
-			return lhs.GetValue<String>() == rhs.GetValue<String>();
+			return (String)lhs == (String)rhs;
 		} break;
 
 		case EVT::Float:
 		{
-			float one = lhs.GetValue<float>();
-			float two = rhs.GetValue<float>();
+			float one = (float)lhs;
+			float two = (float)rhs;
 			return one == two || (one <= two + 0.0001 && one >= two - 0.0001);
 		} break;
 
@@ -490,10 +626,10 @@ struct Value
 		{
 			switch (rhs.type()) {
 			case EVT::Int:
-				return lhs.GetValue<int64>() == rhs.GetValue<int64>();
+				return (int64)lhs == (int64)rhs;
 			case EVT::Float: {
-				float one = lhs.GetValue<float>();
-				float two = rhs.GetValue<float>();
+				float one = (float)lhs;
+				float two = (float)rhs;
 				return one == two || (one <= two + 0.0001 && one >= two - 0.0001);
 			}
 			default:
@@ -504,7 +640,7 @@ struct Value
 		
 		case EVT::Boolean: 
 		{
-			return lhs.GetValue<bool>() == rhs.GetValue<bool>();
+			return lhs.toBool() == rhs.toBool();
 		} break;
 
 		case EVT::Null:
@@ -525,13 +661,13 @@ struct Value
 		{
 		case EVT::String:
 		{
-			return lhs.GetValue<String>() < rhs.GetValue<String>();
+			return (String)lhs < (String)rhs;
 		} break;
 
 		case EVT::Float:
 		{
-			float one = lhs.GetValue<float>();
-			float two = rhs.GetValue<float>();
+			float one = (float)lhs;
+			float two = (float)rhs;
 			return one < two;
 		} break;
 
@@ -539,10 +675,10 @@ struct Value
 		{
 			switch (rhs.type()) {
 			case EVT::Int:
-				return lhs.GetValue<int64>() < rhs.GetValue<int64>();
+				return (int64)lhs < (int64)rhs;
 			case EVT::Float: {
-				float one = lhs.GetValue<float>();
-				float two = rhs.GetValue<float>();
+				float one = (float)lhs;
+				float two = (float)rhs;
 				return one < two;
 			}
 			default:
@@ -553,7 +689,7 @@ struct Value
 
 		case EVT::Boolean:
 		{
-			return lhs.GetValue<bool>() < rhs.GetValue<bool>();
+			return lhs.toBool() < rhs.toBool();
 		} break;
 
 		case EVT::Null:
@@ -570,13 +706,13 @@ struct Value
 		{
 		case EVT::String:
 		{
-			return lhs.GetValue<String>() > rhs.GetValue<String>();
+			return (String)lhs > (String)rhs;
 		} break;
 
 		case EVT::Float:
 		{
-			float one = lhs.GetValue<float>();
-			float two = rhs.GetValue<float>();
+			float one = (float)lhs;
+			float two = (float)rhs;
 			return one > two;
 		} break;
 
@@ -584,10 +720,10 @@ struct Value
 		{
 			switch (rhs.type()) {
 			case EVT::Int:
-				return lhs.GetValue<int64>() > rhs.GetValue<int64>();
+				return (int64)lhs > (int64)rhs;
 			case EVT::Float: {
-				float one = lhs.GetValue<float>();
-				float two = rhs.GetValue<float>();
+				float one = (float)lhs;
+				float two = (float)rhs;
 				return one > two;
 			}
 			default:
@@ -598,7 +734,7 @@ struct Value
 
 		case EVT::Boolean:
 		{
-			return lhs.GetValue<bool>() > rhs.GetValue<bool>();
+			return lhs.toBool() > rhs.toBool();
 		} break;
 
 		case EVT::Null:

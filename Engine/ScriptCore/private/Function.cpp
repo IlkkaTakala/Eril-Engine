@@ -11,13 +11,13 @@ Value ArithMult(void*, const Value& lhs, const Value& rhs)				{ return lhs * rhs
 
 Value ArithDiv(void*, const Value& lhs, const Value& rhs)				{ return lhs / rhs; }
 
-//Value ArithPlusAs(const Value& lhs, const Value& rhs)			{ return lhs += rhs; }
+//Value ArithPlusAs(const Value& lhs, const Value& rhs)					{ return lhs += rhs; }
 //
-//Value ArithMinusAs(const Value& lhs, const Value& rhs)			{ return lhs -= rhs; }
+//Value ArithMinusAs(const Value& lhs, const Value& rhs)				{ return lhs -= rhs; }
 //
-//Value ArithMultAs(const Value& lhs, const Value& rhs)			{ return lhs *= rhs; }
+Value ArithMultAs(void*, Value& lhs, const Value& rhs)					{ return lhs = lhs * rhs; }
 //
-//Value ArithDivAs(const Value& lhs, const Value& rhs)			{ return lhs /= rhs; }
+//Value ArithDivAs(const Value& lhs, const Value& rhs)					{ return lhs /= rhs; }
 
 bool BooleanEqual(void*, const Value& lhs, const Value& rhs)			{ return lhs == rhs; }
 
@@ -35,11 +35,11 @@ bool BooleanGreaterEqual(void*, const Value& lhs, const Value& rhs)		{ return lh
 
 std::unordered_map<String, NativeFuncStorage> nativeFuncs = {
 {"global", NativeFuncStorage {
-	{"print", new Function<void, Value>(1, [](void*, auto v) {
+	{"print", new Function<Value>(1, [](void*, auto& v) {
 		if (v.type() == EVT::Null) {
 			std::cout << ">> Undefined\n";
 		}
-		std::cout << ">> " << v.GetValue<String>() << '\n';
+		std::cout << ">> " << (String)v << '\n';
 		return Value{};
 	})},
 	{"time", new Function<>(0, [](void*) {
@@ -48,17 +48,18 @@ std::unordered_map<String, NativeFuncStorage> nativeFuncs = {
 	})},
 }},
 {"op", NativeFuncStorage {
-	{"+", new Function<Value, Value, Value>(2, &ArithPlus)},
-	{"-", new Function<Value, Value, Value>(2, &ArithMinus)},
-	{"*", new Function<Value, Value, Value>(2, &ArithMult)},
-	{"/", new Function<Value, Value, Value>(2, &ArithDiv)},
-	{"==", new Function<bool, Value, Value>(2, &BooleanEqual)},
-	{"!", new Function<bool, Value>(1, &BooleanNot)},
-	{"!=", new Function<bool, Value, Value>(2, &BooleanNotEqual)},
-	{"<", new Function<bool, Value, Value>(2, &BooleanLess)},
-	{">", new Function<bool, Value, Value>(2, &BooleanGreater)},
-	{"<=", new Function<bool, Value, Value>(2, &BooleanLessEqual)},
-	{">=", new Function<bool, Value, Value>(2, &BooleanGreaterEqual)},
+	{"+", new Function<Value, Value>(2, &ArithPlus)},
+	{"-", new Function<Value, Value>(2, &ArithMinus)},
+	{"*", new Function<Value, Value>(2, &ArithMult)},
+	{"*=", new Function<Value, Value>(2, &ArithMultAs)},
+	{"/", new Function<Value, Value>(2, &ArithDiv)},
+	{"==", new Function<Value, Value>(2, &BooleanEqual)},
+	{"!", new Function<Value>(1, &BooleanNot)},
+	{"!=", new Function<Value, Value>(2, &BooleanNotEqual)},
+	{"<", new Function<Value, Value>(2, &BooleanLess)},
+	{">", new Function<Value, Value>(2, &BooleanGreater)},
+	{"<=", new Function<Value, Value>(2, &BooleanLessEqual)},
+	{">=", new Function<Value, Value>(2, &BooleanGreaterEqual)},
 }},
 {"variable", NativeFuncStorage {
 	{"type", new Function<>(0, [](void* val) {
@@ -86,7 +87,19 @@ std::unordered_map<String, NativeFuncStorage> nativeFuncs = {
 		}
 		else return Value();
 	})},
-}}
+}},
+{"array", NativeFuncStorage {
+	{"init", new Function<Value, Value>(2, [](void*, auto c, auto v) {
+		Value arr(EVT::Array, "");
+		auto a = (Value::Array*)arr;
+		if (a) {
+			a->clear();
+			a->resize((int)c);
+			std::fill(a->begin(), a->end(), v);
+		}
+		return arr;
+	})}
+}} 
 };
 
 GlobalFuncStorage globalFuncs;
@@ -115,9 +128,17 @@ int GetParamCount(Context& c, const String& scope, const String& name)
 	}
 	return 0;
 }
-
+//static int depth = 0;
+//static void* firstPtr = nullptr;
+//static void* lastPtr = nullptr;
 void ScriptFunction::invoke(Value& value)
 {
+	/*depth++;
+	int here = 1;
+	if (!firstPtr) firstPtr = &here;
+	printf("Pointer: %p | Distance: %lu | Total: %lu\n", (void*)&here, (unsigned long)lastPtr - (unsigned long)&here, (unsigned long)firstPtr - (unsigned long)&here);
+	lastPtr = &here;
+	printf("%d\n", depth);*/
 	shouldReturn = false;
 	if (first) {
 		Node* ptr = first;

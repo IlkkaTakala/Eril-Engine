@@ -1,0 +1,26 @@
+
+image: gcc
+
+build:
+  stage: build
+  tags:
+    - build_server
+  script:
+    - cd Engine/ScriptCore
+    - mkdir build
+    - cd build
+    - cmake ..
+    - cmake --build . > BuildLog.txt
+  artifacts:
+    paths:
+      - build
+      - build/BuildLog.txt
+
+
+test:
+  stage: test
+  tags:
+    - build_server
+  script:
+    - cd ..
+    - make test

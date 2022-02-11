@@ -31,7 +31,6 @@ void ExitContext(Context& c, Context& l)
 	c.loopScope = l.loopScope;
 	c.scopeNode = l.scopeNode;
 	c.row = l.row;
-	c.currentNode = l.currentNode;
 }
 
 inline ECharType TypeOfChar(const char* c)
@@ -191,7 +190,7 @@ String CopyUntilWithinScope(const char*& ptr, char delim, char scopeBegin = '{',
 	return copy;
 }
 
-String CopyUntilWithinScopeWithLimit(const char*& ptr, char delim, const char* end, char scopeBegin = '{', char scopeEnd = '}', bool* success = false) {
+String CopyUntilWithinScopeWithLimit(const char*& ptr, char delim, const char* end, char scopeBegin = '{', char scopeEnd = '}', bool* success = nullptr) {
 	int scope = 0;
 	String copy;
 	if (success) *success = true;
@@ -525,6 +524,30 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	*lhs->GetChild(0) = ParseArea(c, c.ptr + 1, c.end);
 	return lhs;
 }},
+{"*=", false, [](Context& c) {
+	Node* lhs = ParseArea(c, c.begin, c.ptr);
+	Node* rhs = ParseArea(c, c.ptr + 2, c.end);
+	Node* next = nullptr;
+	if (auto lhsv(dynamic_cast<VariableNode*>(lhs)); lhsv && rhs) {
+		next = FuncNodes[2]("op", "*=", nullptr);
+		next->SetChild(0, lhs);
+		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
+			next->SetValue(1, rhsv->value);
+			delete rhs;
+		}
+		else {
+			next->SetChild(1, rhs);
+		}
+		return next;
+	}
+	else {
+		delete lhs;
+		delete rhs;
+		error("Cannot assign to values", &c);
+		return (Node*)nullptr;
+	}
+	return next;
+} },
 {"-", false, [](Context& c) {
 	Node* lhs = ParseArea(c, c.begin, c.ptr);
 	Node* rhs = ParseArea(c, c.ptr + 1, c.end);
@@ -663,7 +686,7 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	Value* val = nullptr;
 	if (*c.ptr == '[' && *(c.ptr + 1) == ']') {
 		val = new Value(EVT::Array, "");
-		//isArray = true;
+		isArray = true;
 	}
 	else
 		val = new Value();
@@ -709,6 +732,22 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	}
 	return lhs;
 }},
+{"--", false, [](Context& c) {
+	Node* lhs = ParseArea(c, c.begin, c.ptr);
+	if (auto lhsv(dynamic_cast<VariableNode*>(lhs)); lhsv) {
+		Node* next = FuncNodes[2]("op", "-", nullptr);
+		VariableNode* nextVar = new VariableNode(lhsv->value);
+		next->SetChild(0, nextVar);
+		next->SetValue(1, 1LL);
+		lhs->SetChild(0, next);
+	}
+	else {
+		error("Cannot decrement values", &c);
+		delete lhs;
+		return (Node*)nullptr;
+	}
+	return lhs;
+} },
 };
 
 Node* ParseArea(Context& c, const char* const begin, const char* const end)
@@ -789,12 +828,19 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 						param_count = GetParamCount(l, "variable", l.considerValue);
 						result = FuncNodes[param_count]("variable", l.considerValue, val);
 					}
-					else {
-						if (auto it = c.function->params.find(l.considerScope); it != c.function->params.end()) {
-							param_count = GetParamCount(l, "variable", l.considerValue);
-							result = FuncNodes[param_count]("variable", l.considerValue, &it->second);
-						}
+					else if (auto it = c.function->params.find(l.considerScope); it != c.function->params.end()) {
+						param_count = GetParamCount(l, "variable", l.considerValue);
+						result = FuncNodes[param_count]("variable", l.considerValue, &it->second);
 					}
+					else if (auto it = nativeFuncs.find(l.considerScope); it != nativeFuncs.end()) {
+						param_count = GetParamCount(l, l.considerScope, l.considerValue);
+						result = FuncNodes[param_count](l.considerScope, l.considerValue, nullptr);
+					}
+					else {
+						error("Cannot find scope " + l.considerScope, &c);
+						break;
+					}
+					
 				}
 				else {
 					if (l.topLevel->functions.find(l.considerValue) != l.topLevel->functions.end()) {
@@ -899,6 +945,17 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 				result = new ValueNode(isfloat ? EVT::Float : EVT::Int, l.considerValue);
 				break;
 			}
+			Variable* val = l.scope->FindVar(l.considerValue);
+			if (val) {
+				if (val->type == 2)
+					result = new ValueNode(*val->value);
+				else {
+					result = new VariableNode(val);
+					if (*l.ptr == '&')
+						result->ref = true;
+				}
+				break;
+			}
 			else if (l.ptr != end && ispunct(*l.ptr)) {
 				error((String("Unexpected character found: ") + *l.ptr + ' ').c_str(), &l);
 				l.ptr++;
@@ -911,14 +968,6 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 				}
 				else if (l.considerValue == "false") {
 					result = new ValueNode(false);
-					break;
-				}
-				Variable* val = l.scope->FindVar(l.considerValue);
-				if (val) {
-					if (val->type == 2)
-						result = new ValueNode(*val->value);
-					else
-						result = new VariableNode(val);
 					break;
 				}
 				else
@@ -947,6 +996,10 @@ void ReadLine(Context& c)
 	l.end = l.begin;
 	int scope = 0;
 	while (*l.end != '\0' && *l.end != '\n' && (*l.end != ';' || scope != 0) && l.end != c.end) {
+		if (*l.end == '#') {
+			while (*l.end != '\n' && *l.end != '\0') l.end++;
+			l.begin = l.end;
+		}
 		if (*l.end == '(') scope++;
 		if (*l.end == ')') scope--;
 		if (*l.end == '{') {
@@ -986,11 +1039,12 @@ void ReadLine(Context& c)
 		}
 		l.end++;
 	}
-
+	c.ptr = l.end;
 	Node* n = ParseArea(l, l.begin, l.end);
 	ExitContext(c, l);
 	if (n != nullptr) {
 		if (n != (Node*)skipNode) {
+			while (*c.currentNode) c.currentNode = &(*c.currentNode)->next;
 			*c.currentNode = n;
 			if (n->next != (Node*)returnNode) c.currentNode = &(*c.currentNode)->next;
 			else {
@@ -999,10 +1053,9 @@ void ReadLine(Context& c)
 			}
 		}
 	}
-	if (l.loopNode && l.loopNode->next == n) {
-		l.scope = l.loopScope;
-		l.loopNode = nullptr;
-		l.loopScope = nullptr;
+	if (c.ptr != l.end) {
+		c.ptr = l.end + 1;
+		ReadLine(c);
 	}
 	ExitContext(c, l);
 	c.ptr = l.end;
