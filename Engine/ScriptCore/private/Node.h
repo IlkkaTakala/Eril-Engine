@@ -8,6 +8,8 @@
 #include "Function.h"
 #include "Error.h"
 
+using namespace ScriptCore;
+
 inline void _invoke_local(LocalFuncStorage& storage, const String& name, Value& value) {
 	if (storage.find(name) != storage.end()) {
 		storage.find(name)->second.invoke(value);

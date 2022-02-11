@@ -1,15 +1,15 @@
 #pragma once
 #include "defines.h"
 #include <map>
-#include <functional>
-#include <iostream>
 
 #include "Value.h"
+#include <ScriptCore.h>
 
 struct Scope;
 struct Node;
-struct BaseFunction;
 struct ScriptFunction;
+
+using namespace ScriptCore;
 
 struct Variable 
 { 

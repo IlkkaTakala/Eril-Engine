@@ -1,7 +1,7 @@
 #pragma once
-#include "defines.h"
+#include "../private/defines.h"
 #include <variant>
-#include "Error.h"
+#include "../private/Error.h"
 #include <list>
 #include <vector>
 

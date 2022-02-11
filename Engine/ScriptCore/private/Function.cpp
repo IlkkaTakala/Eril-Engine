@@ -3,6 +3,10 @@
 #include "Node.h"
 #include "Scope.h"
 
+#include <iostream>
+
+using namespace ScriptCore;
+
 Value ArithPlus(void*, const Value& lhs, const Value& rhs)				{ return lhs + rhs; }
 
 Value ArithMinus(void*, const Value& lhs, const Value& rhs)				{ return lhs - rhs; }

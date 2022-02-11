@@ -15,7 +15,7 @@ static std::deque<uint> freeIdx;
 
 uint lastIndex = 1;
 
-unsigned long CompileScript(const char* data)
+unsigned long ScriptCore::CompileScript(const char* data)
 {
 	ClearError();
 	uint idx = 0;
@@ -43,21 +43,21 @@ unsigned long CompileScript(const char* data)
 	return idx;
 }
 
-unsigned long CompileScript(const char* name, const char* data)
+unsigned long ScriptCore::CompileScript(const char* name, const char* data)
 {
 	uint idx = CompileScript(data);
 	ScriptNames.emplace(name, idx);
 	return idx;
 }
 
-void EvaluateScript(unsigned long s)
+void ScriptCore::EvaluateScript(unsigned long s)
 {
 	if (Scripts.find(s) == Scripts.end()) return;
 	Scripts[s]->evaluate();
 	Value::CleanArrays();
 }
 
-void EvaluateScript(const char* name)
+void ScriptCore::EvaluateScript(const char* name)
 {
 	uint idx = 0;
 	if (auto it(ScriptNames.find(name)); it != ScriptNames.end()) {
@@ -66,7 +66,7 @@ void EvaluateScript(const char* name)
 	}
 }
 
-void EvaluateAll()
+void ScriptCore::EvaluateAll()
 {
 	for (auto& [idx, s] : Scripts) {
 		s->evaluate();
@@ -74,7 +74,7 @@ void EvaluateAll()
 	Value::CleanArrays();
 }
 
-void AddWrapped(const char* scope, const char* name, BaseFunction* function)
+void ScriptCore::AddWrapped(const char* scope, const char* name, BaseFunction* function)
 {
 	if (auto it = nativeFuncs[scope].find(name); it != nativeFuncs[scope].end()) {
 		delete it->second;
@@ -82,7 +82,7 @@ void AddWrapped(const char* scope, const char* name, BaseFunction* function)
 	nativeFuncs[scope][name] = function;
 }
 
-void CleanScript(unsigned long script)
+void ScriptCore::CleanScript(unsigned long script)
 {
 	if (Scripts.find(script) != Scripts.end()) delete Scripts[script];
 	Scripts.erase(script);
@@ -90,7 +90,7 @@ void CleanScript(unsigned long script)
 	Value::CleanArrays();
 }
 
-void GetError(const char* error, size_t size)
+void ScriptCore::GetError(const char* error, size_t size)
 {
 	
 }

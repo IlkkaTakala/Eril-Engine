@@ -2,7 +2,6 @@
 #include "defines.h"
 #include <sstream>
 #include <fstream>
-#include <windows.h>
 #include <ScriptCore.h>
 
 String someCppNativeFunction(String* s, int i) {
@@ -44,11 +43,11 @@ int main(int argc, char* argv[])
 		buffer << in.rdbuf();
 		in.close();
 
-		uint id = CompileScript(buffer.str().c_str());
+		uint id = ScriptCore::CompileScript(buffer.str().c_str());
 
 		for (int i = 0; i < 1; i++)
-			EvaluateScript(id);
-		CleanScript(id);
+			ScriptCore::EvaluateScript(id);
+		ScriptCore::CleanScript(id);
 
 		std::getline(std::cin, data);
 	}

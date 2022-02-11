@@ -7,6 +7,7 @@ option(SCRIPT_TESTS "Include tests" ON)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+add_compile_definitions(SCRIPTCORE_EXPORTS)
 
 INCLUDE( CheckCXXCompilerFlag )
 
@@ -27,7 +28,8 @@ ENDIF()
 
 set(PROJECT_INCLUDE_DIR ${PROJECT_SOURCE_DIR}"/include")
 
-file(GLOB PROJECT_SOURCE_FILES "*.h" "*.hpp" "*.cpp")
+file(GLOB PROJECT_INCLUDE_FILES "include/*.h")
+file(GLOB PROJECT_SOURCE_FILES "private/*.hpp" "private/*.cpp" "private/*.h")
 
 macro(GroupSources curdir)
    file(GLOB children RELATIVE ${PROJECT_SOURCE_DIR}/${curdir}
@@ -53,6 +55,14 @@ if(SCRIPT_TESTS)
 	enable_testing()
 endif()
 
-include_directories()
+include_directories("include")
 
-add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_FILES})
+add_library(${PROJECT_NAME} SHARED ${PROJECT_INCLUDE_FILES} ${PROJECT_SOURCE_FILES})
+
+if (WIN32)
+set(TARGET_FILE_DIR /tests/$<CONFIGURATION>)
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD        # Adds a post-build event to MyTest
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
+        "${CMAKE_BINARY_DIR}/$<CONFIG>/${PROJECT_NAME}.dll"      # <--this is in-file
+        "${CMAKE_BINARY_DIR}/tests/$<CONFIG>/${PROJECT_NAME}.dll")                 # <--this is out-file path
+endif (WIN32)
