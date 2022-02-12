@@ -25,5 +25,5 @@ test:
   tags:
     - build_server
   script:
-    - cd build
+    - cd Engine/ScriptCore/build
     - make test
