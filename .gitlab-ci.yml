@@ -13,13 +13,7 @@ build:
     - cmake --build . > BuildLog.txt
   artifacts:
     paths:
-      - Engine/ScriptCore/build/*.a
-      - Engine/ScriptCore/build/Makefile
-      - Engine/ScriptCore/build/tests/*
-      - Engine/ScriptCore/build/BuildLog.txt
-    exclude:
-      - Engine/ScriptCore/build/tests/CMakeFiles/**/*
-      - Engine/ScriptCore/build/tests/*.cmake
+      - Engine/ScriptCore/build/**/*
 
 test:
   stage: test
