@@ -13,10 +13,9 @@ build:
     - cmake --build . > BuildLog.txt
   artifacts:
     paths:
-      - ./*.a
-      - build/*.a
-      - build/tests/*
-      - build/BuildLog.txt
+      - Engine/ScriptCore/build/*.a
+      - Engine/ScriptCore/build/tests/*
+      - Engine/ScriptCore/build/BuildLog.txt
 
 
 test:
