@@ -16,7 +16,9 @@ build:
       - Engine/ScriptCore/build/*.a
       - Engine/ScriptCore/build/tests/*
       - Engine/ScriptCore/build/BuildLog.txt
-
+    exclude:
+      - Engine/ScriptCore/build/tests/CMakeFiles/**/*
+      - Engine/ScriptCore/build/tests/*.cmake
 
 test:
   stage: test

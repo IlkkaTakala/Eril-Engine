@@ -48,9 +48,9 @@ add_library(${PROJECT_NAME} ${PROJECT_INCLUDE_FILES} ${PROJECT_SOURCE_FILES})
         # "${CMAKE_BINARY_DIR}/tests/$<CONFIG>/${PROJECT_NAME}.dll")                 # <--this is out-file path
 # endif (WIN32)
 
-if (UNIX)
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD        # Adds a post-build event to MyTest
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
-        "${CMAKE_BINARY_DIR}/lib${PROJECT_NAME}.a"      # <--this is in-file
-        "${CMAKE_BINARY_DIR}/tests/lib${PROJECT_NAME}.a")                 # <--this is out-file path
-endif (UNIX)
+# if (UNIX)
+# add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD        # Adds a post-build event to MyTest
+    # COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
+        # "${CMAKE_BINARY_DIR}/lib${PROJECT_NAME}.a"      # <--this is in-file
+        # "${CMAKE_BINARY_DIR}/tests/lib${PROJECT_NAME}.a")                 # <--this is out-file path
+# endif (UNIX)
