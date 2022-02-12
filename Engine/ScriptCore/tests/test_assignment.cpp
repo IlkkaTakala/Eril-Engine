@@ -39,7 +39,8 @@ REGISTER_FUNCTION(isEqual, global, 2);
 REGISTER_FUNCTION(isEqualStr, global, 2);
 
 int main() {
-
+	std::cout << "Running test assignment\n";
+	
 	using namespace ScriptCore;
 
 	try {
@@ -47,5 +48,8 @@ int main() {
 	}
 	catch (std::runtime_error e) {
 		std::cout << e.what();
+		return 1;
 	}
+	std::cout << "Success\n";
+	return 0;
 }

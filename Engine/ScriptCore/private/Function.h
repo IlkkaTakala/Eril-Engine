@@ -77,7 +77,9 @@ struct ScriptFunction
 	void invoke(Value& value);
 };
 
+std::unordered_map<String, NativeFuncStorage> MakeDefaults();
 
-extern std::unordered_map<String, NativeFuncStorage> nativeFuncs;
+std::unordered_map<String, NativeFuncStorage>& nativeFuncs();
+
 extern std::unordered_map<String, VarStorage> ObjectVars;
 extern GlobalFuncStorage globalFuncs;

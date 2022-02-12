@@ -832,7 +832,7 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 						param_count = GetParamCount(l, "variable", l.considerValue);
 						result = FuncNodes[param_count]("variable", l.considerValue, &it->second);
 					}
-					else if (auto it = nativeFuncs.find(l.considerScope); it != nativeFuncs.end()) {
+					else if (auto it = nativeFuncs().find(l.considerScope); it != nativeFuncs().end()) {
 						param_count = GetParamCount(l, l.considerScope, l.considerValue);
 						result = FuncNodes[param_count](l.considerScope, l.considerValue, nullptr);
 					}

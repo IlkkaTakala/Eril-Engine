@@ -8,6 +8,7 @@
 #include "Parser.h"
 #include "Error.h"
 #include "Scope.h"
+#include "Function.h"
 
 static std::unordered_map<String, int> ScriptNames;
 static std::unordered_map<uint, Script*> Scripts;
@@ -43,7 +44,7 @@ unsigned long ScriptCore::CompileScript(const char* data)
 	return idx;
 }
 
-unsigned long ScriptCore::CompileScript(const char* name, const char* data)
+unsigned long ScriptCore::CompileScriptWithName(const char* name, const char* data)
 {
 	uint idx = CompileScript(data);
 	ScriptNames.emplace(name, idx);
@@ -57,7 +58,7 @@ void ScriptCore::EvaluateScript(unsigned long s)
 	Value::CleanArrays();
 }
 
-void ScriptCore::EvaluateScript(const char* name)
+void ScriptCore::EvaluateScriptWithName(const char* name)
 {
 	uint idx = 0;
 	if (auto it(ScriptNames.find(name)); it != ScriptNames.end()) {
@@ -76,10 +77,10 @@ void ScriptCore::EvaluateAll()
 
 void ScriptCore::AddWrapped(const char* scope, const char* name, BaseFunction* function)
 {
-	if (auto it = nativeFuncs[scope].find(name); it != nativeFuncs[scope].end()) {
+	if (auto it = nativeFuncs()[scope].find(name); it != nativeFuncs()[scope].end()) {
 		delete it->second;
 	}
-	nativeFuncs[scope][name] = function;
+	nativeFuncs()[scope][name] = function;
 }
 
 void ScriptCore::CleanScript(unsigned long script)

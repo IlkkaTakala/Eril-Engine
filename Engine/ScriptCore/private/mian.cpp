@@ -2,6 +2,7 @@
 #include "defines.h"
 #include <sstream>
 #include <fstream>
+#include <iterator>
 #include <ScriptCore.h>
 
 String someCppNativeFunction(String* s, int i) {

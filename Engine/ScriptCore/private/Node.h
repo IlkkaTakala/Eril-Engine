@@ -45,8 +45,8 @@ struct Script
 template <typename ...Args>
 inline void _invoke(Value& value, const String& scope, const String& name, void* ptr, Args&... vals)
 {
-	if (nativeFuncs.find(scope) != nativeFuncs.end() && nativeFuncs[scope].find(name) != nativeFuncs[scope].end()) {
-		auto c = dynamic_cast<Function<Args...>*>(nativeFuncs[scope][name]);
+	if (nativeFuncs().find(scope) != nativeFuncs().end() && nativeFuncs()[scope].find(name) != nativeFuncs()[scope].end()) {
+		auto c = dynamic_cast<Function<Args...>*>(nativeFuncs()[scope][name]);
 		if (c) (*c)(value, ptr, vals...);
 		else {
 			warn(String("Function ") + name + " doesn't take arguments of type: " + ((typeName(vals.type()) + ", ") + ...));
@@ -64,8 +64,8 @@ inline void _invoke(Value& value, const String& scope, const String& name, void*
 template<>
 inline void _invoke<>(Value& value, const String& scope, const String& name, void* ptr)
 {
-	if (nativeFuncs.find(scope) != nativeFuncs.end() && nativeFuncs[scope].find(name) != nativeFuncs[scope].end()) {
-		auto c = dynamic_cast<Function<>*>(nativeFuncs[scope][name]);
+	if (nativeFuncs().find(scope) != nativeFuncs().end() && nativeFuncs()[scope].find(name) != nativeFuncs()[scope].end()) {
+		auto c = dynamic_cast<Function<>*>(nativeFuncs()[scope][name]);
 		if (c) (*c)(value, ptr);
 		else value = {};
 		return;

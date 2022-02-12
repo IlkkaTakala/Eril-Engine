@@ -10,36 +10,34 @@ namespace ScriptCore {
 #ifdef _WIN32
 
 	#ifdef SCRIPTCORE_EXPORTS
-	#define SCRIPTCORE_API __declspec(dllexport)
+	#define SCRIPTCORE_API extern "C" __declspec(dllexport)
 	#else
-	#define SCRIPTCORE_API __declspec(dllimport)
+	#define SCRIPTCORE_API extern "C" __declspec(dllimport)
 	#endif
 
 	SCRIPTCORE_API unsigned long CompileScript(const char* data);
-	SCRIPTCORE_API unsigned long CompileScript(const char* name, const char* data);
+	SCRIPTCORE_API unsigned long CompileScriptWithName(const char* name, const char* data);
 
 	SCRIPTCORE_API void EvaluateScript(unsigned long s);
-	SCRIPTCORE_API void EvaluateScript(const char* name);
+	SCRIPTCORE_API void EvaluateScriptWithName(const char* name);
 	SCRIPTCORE_API void EvaluateAll();
 
 	SCRIPTCORE_API void CleanScript(unsigned long script);
 
 	SCRIPTCORE_API void GetError(const char* error, size_t size);
-	SCRIPTCORE_API void AddWrapped(const char* scope, const char* name, BaseFunction* function);
 
 #elif defined(unix) || defined(__unix__) || defined(__unix)
 
-	unsigned long CompileScript(const char* data);
-	unsigned long CompileScript(const char* name, const char* data);
+	extern "C" unsigned long CompileScript(const char* data);
+	extern "C" unsigned long CompileScriptWithName(const char* name, const char* data);
 
-	void EvaluateScript(unsigned long s);
-	void EvaluateScript(const char* name);
-	void EvaluateAll();
+	extern "C" void EvaluateScript(unsigned long s);
+	extern "C" void EvaluateScriptWithName(const char* name);
+	extern "C" void EvaluateAll();
 
-	void CleanScript(unsigned long script);
+	extern "C" void CleanScript(unsigned long script);
 
-	void GetError(const char* error, size_t size);
-	void AddWrapped(const char* scope, const char* name, BaseFunction* function);
+	extern "C" void GetError(const char* error, size_t size);
 
 #endif
 
@@ -75,6 +73,12 @@ namespace ScriptCore {
 		}
 
 	};
+	
+#ifdef _WIN32
+	SCRIPTCORE_API void AddWrapped(const char* scope, const char* name, BaseFunction* function);
+#elif defined(unix) || defined(__unix__) || defined(__unix)
+	extern "C" void AddWrapped(const char* scope, const char* name, BaseFunction * function);
+#endif
 
 	template <typename ...Args>
 	struct make_sig_from_tuple<std::tuple<Args...>> {
