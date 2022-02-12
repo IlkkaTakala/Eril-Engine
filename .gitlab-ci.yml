@@ -13,7 +13,7 @@ build:
     - cmake --build . > BuildLog.txt
   artifacts:
     paths:
-      - build
+      - build/
       - build/BuildLog.txt
 
 
@@ -22,4 +22,5 @@ test:
   tags:
     - build_server
   script:
+    - cd build
     - make test
