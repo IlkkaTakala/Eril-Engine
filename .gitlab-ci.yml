@@ -13,6 +13,7 @@ build:
     - cmake --build . > BuildLog.txt
   artifacts:
     paths:
+      - ./*.a
       - build/*.a
       - build/tests/*
       - build/BuildLog.txt
