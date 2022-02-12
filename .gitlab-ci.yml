@@ -14,6 +14,7 @@ build:
   artifacts:
     paths:
       - Engine/ScriptCore/build/*.a
+      - Engine/ScriptCore/build/Makefile
       - Engine/ScriptCore/build/tests/*
       - Engine/ScriptCore/build/BuildLog.txt
     exclude:
