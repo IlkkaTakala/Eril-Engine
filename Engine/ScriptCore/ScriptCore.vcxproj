@@ -34,7 +34,6 @@
     <ClCompile Include="private\Error.cpp" />
     <ClCompile Include="private\Export.cpp" />
     <ClCompile Include="private\Function.cpp" />
-    <ClCompile Include="private\mian.cpp" />
     <ClCompile Include="private\Parser.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
