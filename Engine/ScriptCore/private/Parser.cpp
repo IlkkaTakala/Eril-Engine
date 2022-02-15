@@ -192,8 +192,9 @@ bool isEqual(const String& s, const char* c) {
 	return true;
 }
 
-#define OPERATION(NAME) Node* lhs = ParseArea(c, c.begin, c.ptr); \
-Node* rhs = ParseArea(c, c.ptr + 1, c.end);\
+#define OPERATION(NAME) {#NAME, false, [](Context& c) { \
+Node* lhs = ParseArea(c, c.begin, c.ptr); \
+Node* rhs = ParseArea(c, c.ptr + sizeof(#NAME) - 1, c.end);\
 Node* next = nullptr;\
 if (auto lhsv(dynamic_cast<ValueNode*>(lhs)); lhsv) {\
 	if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {\
@@ -222,6 +223,33 @@ else {\
 	}\
 }\
 return next;\
+}}\
+
+#define COPERATION(NAME) {#NAME, false, [](Context& c) {\
+Node* lhs = ParseArea(c, c.begin, c.ptr);\
+Node* rhs = ParseArea(c, c.ptr + 2, c.end);\
+Node* next = nullptr;\
+if (auto lhsv(dynamic_cast<VariableNode*>(lhs)); lhsv && rhs) {\
+	next = FuncNodes[2]("op", #NAME, nullptr);\
+	lhs->ref = true;\
+	next->SetChild(0, lhs);\
+	if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {\
+		next->SetValue(1, rhsv->value);\
+		delete rhs;\
+	}\
+	else {\
+		next->SetChild(1, rhs);\
+	}\
+	return next;\
+}\
+else {\
+	delete lhs;\
+	delete rhs;\
+	error("Cannot assign to values", &c);\
+	return (Node*)nullptr;\
+}\
+return next;\
+}}\
 
 static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 {"for", true, [](Context& c) {
@@ -291,38 +319,7 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	next->child = ParseArea(c, c.ptr, c.end);
 	return next;
 }},
-{"==", false, [](Context& c) {
-	Node* lhs = ParseArea(c, c.begin, c.ptr);
-	Node* rhs = ParseArea(c, c.ptr + 2, c.end);
-	Node* next = nullptr;
-	if (auto lhsv(dynamic_cast<ValueNode*>(lhs)); lhsv) {
-		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = new ValueNode(lhsv->value == rhsv->value);
-			delete lhs;
-			delete rhs;
-		}
-		else {
-			next = FuncNodes[2]("op", "==", nullptr);
-			next->SetValue(0, lhsv->value);
-			next->SetChild(1, rhs);
-			delete lhs;
-		}
-	}
-	else {
-		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = FuncNodes[2]("op", "==", nullptr);
-			next->SetChild(0, lhs);
-			next->SetValue(1, rhsv->value);
-			delete rhs;
-		}
-		else {
-			next = FuncNodes[2]("op", "==", nullptr);
-			next->SetChild(0, lhs);
-			next->SetChild(1, rhs);
-		}
-	}
-	return next;
-}},
+OPERATION(==),
 {"!", false, [](Context& c) {
 	Node* rhs = ParseArea(c, c.ptr + 1, c.end);
 	Node* next = nullptr;
@@ -337,166 +334,15 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	}
 	return next;
 }},
-{"!=", false, [](Context& c) {
-	Node* lhs = ParseArea(c, c.begin, c.ptr);
-	Node* rhs = ParseArea(c, c.ptr + 2, c.end);
-	Node* next = nullptr;
-	if (auto lhsv(dynamic_cast<ValueNode*>(lhs)); lhsv) {
-		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = new ValueNode(lhsv->value != rhsv->value);
-			delete lhs;
-			delete rhs;
-		}
-		else {
-			next = FuncNodes[2]("op", "!=", nullptr);
-			next->SetValue(0, lhsv->value);
-			next->SetChild(1, rhs);
-			delete lhs;
-		}
-	}
-	else {
-		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = FuncNodes[2]("op", "!=", nullptr);
-			next->SetChild(0, lhs);
-			next->SetValue(1, rhsv->value);
-			delete rhs;
-		}
-		else {
-			next = FuncNodes[2]("op", "!=", nullptr);
-			next->SetChild(0, lhs);
-			next->SetChild(1, rhs);
-		}
-	}
-	return next;
-}},
-{"<=", false, [](Context& c) {
-	Node* lhs = ParseArea(c, c.begin, c.ptr);
-	Node* rhs = ParseArea(c, c.ptr + 2, c.end);
-	Node* next = nullptr;
-	if (auto lhsv(dynamic_cast<ValueNode*>(lhs)); lhsv) {
-		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = new ValueNode(lhsv->value <= rhsv->value);
-			delete lhs;
-			delete rhs;
-		}
-		else {
-			next = FuncNodes[2]("op", "<=", nullptr);
-			next->SetValue(0, lhsv->value);
-			next->SetChild(1, rhs);
-			delete lhs;
-		}
-	}
-	else {
-		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = FuncNodes[2]("op", "<=", nullptr);
-			next->SetChild(0, lhs);
-			next->SetValue(1, rhsv->value);
-			delete rhs;
-		}
-		else {
-			next = FuncNodes[2]("op", "<=", nullptr);
-			next->SetChild(0, lhs);
-			next->SetChild(1, rhs);
-		}
-	}
-	return next;
-}},
-{">=", false, [](Context& c) {
-	Node* lhs = ParseArea(c, c.begin, c.ptr);
-	Node* rhs = ParseArea(c, c.ptr + 2, c.end);
-	Node* next = nullptr;
-	if (auto lhsv(dynamic_cast<ValueNode*>(lhs)); lhsv) {
-		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = new ValueNode(lhsv->value >= rhsv->value);
-			delete lhs;
-			delete rhs;
-		}
-		else {
-			next = FuncNodes[2]("op", ">=", nullptr);
-			next->SetValue(0, lhsv->value);
-			next->SetChild(1, rhs);
-			delete lhs;
-		}
-	}
-	else {
-		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = FuncNodes[2]("op", ">=", nullptr);
-			next->SetChild(0, lhs);
-			next->SetValue(1, rhsv->value);
-			delete rhs;
-		}
-		else {
-			next = FuncNodes[2]("op", ">=", nullptr);
-			next->SetChild(0, lhs);
-			next->SetChild(1, rhs);
-		}
-	}
-	return next;
-}},
-{"<", false, [](Context& c) {
-	Node* lhs = ParseArea(c, c.begin, c.ptr);
-	Node* rhs = ParseArea(c, c.ptr + 1, c.end);
-	Node* next = nullptr;
-	if (auto lhsv(dynamic_cast<ValueNode*>(lhs)); lhsv) {
-		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = new ValueNode(lhsv->value < rhsv->value);
-			delete lhs;
-			delete rhs;
-		}
-		else {
-			next = FuncNodes[2]("op", "<", nullptr);
-			next->SetValue(0, lhsv->value);
-			next->SetChild(1, rhs);
-			delete lhs;
-		}
-	}
-	else {
-		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = FuncNodes[2]("op", "<", nullptr);
-			next->SetChild(0, lhs);
-			next->SetValue(1, rhsv->value);
-			delete rhs;
-		}
-		else {
-			next = FuncNodes[2]("op", "<", nullptr);
-			next->SetChild(0, lhs);
-			next->SetChild(1, rhs);
-		}
-	}
-	return next;
-}},
-{">", false, [](Context& c) {
-	Node* lhs = ParseArea(c, c.begin, c.ptr);
-	Node* rhs = ParseArea(c, c.ptr + 1, c.end);
-	Node* next = nullptr;
-	if (auto lhsv(dynamic_cast<ValueNode*>(lhs)); lhsv) {
-		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = new ValueNode(lhsv->value > rhsv->value);
-			delete lhs;
-			delete rhs;
-		}
-		else {
-			next = FuncNodes[2]("op", ">", nullptr);
-			next->SetValue(0, lhsv->value);
-			next->SetChild(1, rhs);
-			delete lhs;
-		}
-	}
-	else {
-		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = FuncNodes[2]("op", ">", nullptr);
-			next->SetChild(0, lhs);
-			next->SetValue(1, rhsv->value);
-			delete rhs;
-		}
-		else {
-			next = FuncNodes[2]("op", ">", nullptr);
-			next->SetChild(0, lhs);
-			next->SetChild(1, rhs);
-		}
-	}
-	return next;
-}},
+OPERATION(!=),
+OPERATION(<=),
+OPERATION(>=),
+OPERATION(<),
+OPERATION(>),
+COPERATION(*=),
+COPERATION(/=),
+COPERATION(+=),
+COPERATION(-=),
 {"=", false, [](Context& c) {
 	Node* lhs = ParseArea(c, c.begin, c.ptr);
 	auto var(dynamic_cast<VariableNode*>(lhs));
@@ -526,234 +372,10 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	*lhs->GetChild(0) = ParseArea(c, c.ptr + 1, c.end);
 	return lhs;
 }},
-{"*=", false, [](Context& c) {
-	Node* lhs = ParseArea(c, c.begin, c.ptr);
-	Node* rhs = ParseArea(c, c.ptr + 2, c.end);
-	Node* next = nullptr;
-	if (auto lhsv(dynamic_cast<VariableNode*>(lhs)); lhsv && rhs) {
-		next = FuncNodes[2]("op", "*=", nullptr);
-		lhs->ref = true;
-		next->SetChild(0, lhs);
-		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next->SetValue(1, rhsv->value);
-			delete rhs;
-		}
-		else {
-			next->SetChild(1, rhs);
-		}
-		return next;
-	}
-	else {
-		delete lhs;
-		delete rhs;
-		error("Cannot assign to values", &c);
-		return (Node*)nullptr;
-	}
-	return next;
-}},
-{"/=", false, [](Context& c) {
-	Node* lhs = ParseArea(c, c.begin, c.ptr);
-	Node* rhs = ParseArea(c, c.ptr + 2, c.end);
-	Node* next = nullptr;
-	if (auto lhsv(dynamic_cast<VariableNode*>(lhs)); lhsv && rhs) {
-		next = FuncNodes[2]("op", "/=", nullptr);
-		lhs->ref = true;
-		next->SetChild(0, lhs);
-		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next->SetValue(1, rhsv->value);
-			delete rhs;
-		}
-		else {
-			next->SetChild(1, rhs);
-		}
-		return next;
-	}
-	else {
-		delete lhs;
-		delete rhs;
-		error("Cannot assign to values", &c);
-		return (Node*)nullptr;
-	}
-	return next;
-} },
-{"+=", false, [](Context& c) {
-	Node* lhs = ParseArea(c, c.begin, c.ptr);
-	Node* rhs = ParseArea(c, c.ptr + 2, c.end);
-	Node* next = nullptr;
-	if (auto lhsv(dynamic_cast<VariableNode*>(lhs)); lhsv && rhs) {
-		next = FuncNodes[2]("op", "+=", nullptr);
-		lhs->ref = true;
-		next->SetChild(0, lhs);
-		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next->SetValue(1, rhsv->value);
-			delete rhs;
-		}
-		else {
-			next->SetChild(1, rhs);
-		}
-		return next;
-	}
-	else {
-		delete lhs;
-		delete rhs;
-		error("Cannot assign to values", &c);
-		return (Node*)nullptr;
-	}
-	return next;
-} },
-{"-=", false, [](Context& c) {
-	Node* lhs = ParseArea(c, c.begin, c.ptr);
-	Node* rhs = ParseArea(c, c.ptr + 2, c.end);
-	Node* next = nullptr;
-	if (auto lhsv(dynamic_cast<VariableNode*>(lhs)); lhsv && rhs) {
-		next = FuncNodes[2]("op", "-=", nullptr);
-		lhs->ref = true;
-		next->SetChild(0, lhs);
-		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next->SetValue(1, rhsv->value);
-			delete rhs;
-		}
-		else {
-			next->SetChild(1, rhs);
-		}
-		return next;
-	}
-	else {
-		delete lhs;
-		delete rhs;
-		error("Cannot assign to values", &c);
-		return (Node*)nullptr;
-	}
-	return next;
-} },
-{"-", false, [](Context& c) {
-	Node* lhs = ParseArea(c, c.begin, c.ptr);
-	Node* rhs = ParseArea(c, c.ptr + 1, c.end);
-	Node* next = nullptr;
-	if (auto lhsv(dynamic_cast<ValueNode*>(lhs)); lhsv) {
-		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = new ValueNode(lhsv->value - rhsv->value);
-			delete lhs;
-			delete rhs;
-		}
-		else {
-			next = FuncNodes[2]("op", "-", nullptr);
-			next->SetValue(0, lhsv->value);
-			next->SetChild(1, rhs);
-			delete lhs;
-		}
-	}
-	else {
-		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = FuncNodes[2]("op", "-", nullptr);
-			next->SetChild(0, lhs);
-			next->SetValue(1, rhsv->value);
-			delete rhs;
-		}
-		else {
-			next = FuncNodes[2]("op", "-", nullptr);
-			next->SetChild(0, lhs);
-			next->SetChild(1, rhs);
-		}
-	}
-	return next;
-}},
-{"+", false, [](Context& c) {
-	Node* lhs = ParseArea(c, c.begin, c.ptr);
-	Node* rhs = ParseArea(c, c.ptr + 1, c.end);
-	Node* next = nullptr;
-	if (auto lhsv(dynamic_cast<ValueNode*>(lhs)); lhsv) {
-		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = new ValueNode(lhsv->value + rhsv->value);
-			delete lhs;
-			delete rhs;
-		}
-		else {
-			next = FuncNodes[2]("op", "+", nullptr);
-			next->SetValue(0, lhsv->value);
-			next->SetChild(1, rhs);
-			delete lhs;
-		}
-	}
-	else {
-		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = FuncNodes[2]("op", "+", nullptr);
-			next->SetChild(0, lhs);
-			next->SetValue(1, rhsv->value);
-			delete rhs;
-		}
-		else {
-			next = FuncNodes[2]("op", "+", nullptr);
-			next->SetChild(0, lhs);
-			next->SetChild(1, rhs);
-		}
-	}
-	return next;
-}},
-{"/", false, [](Context& c) {
-	Node* lhs = ParseArea(c, c.begin, c.ptr);
-	Node* rhs = ParseArea(c, c.ptr + 1, c.end);
-	Node* next = nullptr;
-	if (auto lhsv(dynamic_cast<ValueNode*>(lhs)); lhsv) {
-		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = new ValueNode(lhsv->value / rhsv->value);
-			delete lhs;
-			delete rhs;
-		}
-		else {
-			next = FuncNodes[2]("op", "/", nullptr);
-			next->SetValue(0, lhsv->value);
-			next->SetChild(1, rhs);
-			delete lhs;
-		}
-	}
-	else {
-		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = FuncNodes[2]("op", "/", nullptr);
-			next->SetChild(0, lhs);
-			next->SetValue(1, rhsv->value);
-			delete rhs;
-		}
-		else {
-			next = FuncNodes[2]("op", "/", nullptr);
-			next->SetChild(0, lhs);
-			next->SetChild(1, rhs);
-		}
-	}
-	return next;
-}},
-{"*", false, [](Context& c) {
-	Node* lhs = ParseArea(c, c.begin, c.ptr);
-	Node* rhs = ParseArea(c, c.ptr + 1, c.end);
-	Node* next = nullptr;
-	if (auto lhsv(dynamic_cast<ValueNode*>(lhs)); lhsv) {
-		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = new ValueNode(lhsv->value * rhsv->value);
-			delete lhs;
-			delete rhs;
-		}
-		else {
-			next = FuncNodes[2]("op", "*", nullptr);
-			next->SetValue(0, lhsv->value);
-			next->SetChild(1, rhs);
-			delete lhs;
-		}
-	}
-	else {
-		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
-			next = FuncNodes[2]("op", "*", nullptr);
-			next->SetChild(0, lhs);
-			next->SetValue(1, rhsv->value);
-			delete rhs;
-		}
-		else {
-			next = FuncNodes[2]("op", "*", nullptr);
-			next->SetChild(0, lhs);
-			next->SetChild(1, rhs);
-		}
-	}
-	return next;
-} },
+OPERATION(-),
+OPERATION(+),
+OPERATION(*),
+OPERATION(/),
 {"var", true, [](Context& c) {
 	c.ptr += 4;
 	String name = ReadWord(c);
