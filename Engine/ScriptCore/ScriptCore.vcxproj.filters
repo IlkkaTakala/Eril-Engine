@@ -39,7 +39,7 @@
     <ClInclude Include="private\Scope.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="private\Value.h">
+    <ClInclude Include="include\Value.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

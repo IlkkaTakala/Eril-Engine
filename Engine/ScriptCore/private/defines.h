@@ -48,23 +48,6 @@ inline String typeName(EVT t) {
 	}
 }
 
-typedef enum class EConsiderType : uint8
-{
-	Null,
-	Variable,
-	Function,
-	Operator,
-} ECT;
-
-enum class ECharType : uint8
-{
-	Digit,
-	Char,
-	Operand,
-	Space,
-	Other,
-};
-
 struct Node;
 struct ScopeNode;
 struct Scope;
@@ -76,9 +59,6 @@ struct Context
 	Context() {
 		topLevel = nullptr;
 		function = nullptr;
-		object = false;
-		varType = EVT::Unknown;
-		conType = ECT::Null;
 		currentNode = nullptr;
 		loopNode = nullptr;
 		scopeNode = nullptr;
@@ -92,9 +72,6 @@ struct Context
 
 	Script* topLevel;
 	ScriptFunction* function;
-	bool object;
-	EVT varType;
-	ECT conType;
 	String considerValue;
 	String considerScope;
 	Node** currentNode;

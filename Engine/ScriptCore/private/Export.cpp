@@ -28,8 +28,8 @@ unsigned long ScriptCore::CompileScript(const char* data)
 	}
 	Scripts[idx] = new Script();
 	Script* s = Scripts[idx];
-	Parser::FindVariables(data, s);
-	Parser::FindFunctions(data, s);
+	FindVariables(data, s);
+	FindFunctions(data, s);
 
 	if (isError()) {
 		CleanScript(idx);

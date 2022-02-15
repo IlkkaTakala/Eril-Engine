@@ -81,5 +81,4 @@ std::unordered_map<String, NativeFuncStorage> MakeDefaults();
 
 std::unordered_map<String, NativeFuncStorage>& nativeFuncs();
 
-extern std::unordered_map<String, VarStorage> ObjectVars;
 extern GlobalFuncStorage globalFuncs;

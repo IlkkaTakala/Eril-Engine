@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ScriptCore.h" />
+    <ClInclude Include="include\Value.h" />
     <ClInclude Include="private\defines.h" />
     <ClInclude Include="private\Error.h" />
     <ClInclude Include="private\framework.h" />
@@ -27,7 +28,6 @@
     <ClInclude Include="private\Node.h" />
     <ClInclude Include="private\Parser.h" />
     <ClInclude Include="private\Scope.h" />
-    <ClInclude Include="private\Value.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="private\dllmain.cpp" />

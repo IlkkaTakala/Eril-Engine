@@ -15,13 +15,13 @@ Value ArithMult(void*, const Value& lhs, const Value& rhs)				{ return lhs * rhs
 
 Value ArithDiv(void*, const Value& lhs, const Value& rhs)				{ return lhs / rhs; }
 
-//Value ArithPlusAs(const Value& lhs, const Value& rhs)					{ return lhs += rhs; }
-//
-//Value ArithMinusAs(const Value& lhs, const Value& rhs)				{ return lhs -= rhs; }
-//
+Value ArithPlusAs(void*, Value& lhs, const Value& rhs)					{ return lhs = lhs + rhs; }
+
+Value ArithMinusAs(void*, Value& lhs, const Value& rhs)					{ return lhs = lhs - rhs; }
+
 Value ArithMultAs(void*, Value& lhs, const Value& rhs)					{ return lhs = lhs * rhs; }
-//
-//Value ArithDivAs(const Value& lhs, const Value& rhs)					{ return lhs /= rhs; }
+
+Value ArithDivAs(void*, Value& lhs, const Value& rhs)					{ return lhs = lhs / rhs; }
 
 bool BooleanEqual(void*, const Value& lhs, const Value& rhs)			{ return lhs == rhs; }
 
@@ -57,7 +57,10 @@ std::unordered_map<String, NativeFuncStorage> MakeDefaults()
 		{"+", new Function<Value, Value>(2, &ArithPlus)},
 		{"-", new Function<Value, Value>(2, &ArithMinus)},
 		{"*", new Function<Value, Value>(2, &ArithMult)},
+		{"+=", new Function<Value, Value>(2, &ArithPlusAs)},
+		{"-=", new Function<Value, Value>(2, &ArithMinusAs)},
 		{"*=", new Function<Value, Value>(2, &ArithMultAs)},
+		{"/=", new Function<Value, Value>(2, &ArithDivAs)},
 		{"/", new Function<Value, Value>(2, &ArithDiv)},
 		{"==", new Function<Value, Value>(2, &BooleanEqual)},
 		{"!", new Function<Value>(1, &BooleanNot)},
@@ -116,43 +119,24 @@ std::unordered_map<String, NativeFuncStorage>& nativeFuncs()
 }
 
 GlobalFuncStorage globalFuncs;
-std::unordered_map<String, VarStorage> ObjectVars;
-
 
 int GetParamCount(Context& c, const String& scope, const String& name)
 {	
-	if (c.object) {
-		/*if (ObjectFuncs[c.considerValue].find(name) == ObjectFuncs[c.considerValue].end())
-			error(("Function: " + name + " not found from object: " + c.considerValue).c_str());
-		else
-			return ObjectFuncs[c.considerValue].find(c.considerValue)->second->param_count;*/
-	}
-	else {
-		if (c.topLevel->functions.find(name) == c.topLevel->functions.end()) {
-			if (globalFuncs.find(name) == globalFuncs.end()) {
-				if (nativeFuncs().find(scope) == nativeFuncs().end() || nativeFuncs()[scope].find(name) == nativeFuncs()[scope].end()) {
-					error(("Function: " + scope + "." + name + " not found").c_str(), &c);
-				}
-				else return nativeFuncs().find(scope)->second.find(name)->second->param_count;
+	if (c.topLevel->functions.find(name) == c.topLevel->functions.end()) {
+		if (globalFuncs.find(name) == globalFuncs.end()) {
+			if (nativeFuncs().find(scope) == nativeFuncs().end() || nativeFuncs()[scope].find(name) == nativeFuncs()[scope].end()) {
+				error(("Function: " + scope + "." + name + " not found").c_str(), &c);
+				return 0;
 			}
-			else return (int)globalFuncs.find(name)->second.params.size();
+			else return nativeFuncs().find(scope)->second.find(name)->second->param_count;
 		}
-		else return (int)c.topLevel->functions.find(name)->second.params.size();
+		else return (int)globalFuncs.find(name)->second.params.size();
 	}
-	return 0;
+	else return (int)c.topLevel->functions.find(name)->second.params.size();
 }
 
-//static int depth = 0;
-//static void* firstPtr = nullptr;
-//static void* lastPtr = nullptr;
 void ScriptFunction::invoke(Value& value)
 {
-	/*depth++;
-	int here = 1;
-	if (!firstPtr) firstPtr = &here;
-	printf("Pointer: %p | Distance: %lu | Total: %lu\n", (void*)&here, (unsigned long)lastPtr - (unsigned long)&here, (unsigned long)firstPtr - (unsigned long)&here);
-	lastPtr = &here;
-	printf("%d\n", depth);*/
 	shouldReturn = false;
 	if (first) {
 		Node* ptr = first;

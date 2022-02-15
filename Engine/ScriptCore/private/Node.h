@@ -20,7 +20,6 @@ inline void _invoke_local(LocalFuncStorage& storage, const String& name, Value& 
 	value = Value();
 }
 
-
 struct Script
 {
 	Script()
@@ -87,7 +86,7 @@ struct Node
 	virtual void SetValue(uint idx, const Value& v) {}
 
 	Node() : child(nullptr), next(nullptr), ref(false) {}
-	Node(const Node& node) : child(node.child), next(node.next) {}
+	Node(const Node& node) : child(node.child), next(node.next), ref(node.ref) {}
 	virtual ~Node()
 	{
 		delete child;
@@ -95,6 +94,10 @@ struct Node
 	}
 
 	virtual void evaluate(ScriptFunction* caller, Value& node) = 0;
+	virtual Value* getRef(ScriptFunction* caller) {
+		error("Cannot get reference");
+		return nullptr;
+	}
 };
 
 struct ValueNode : public Node
@@ -120,6 +123,7 @@ struct FuncNode : public Node
 	void* ptr;
 	std::array<Node*, c> params;
 	std::array<Value, c> eval_params;
+	std::array<Value*, c> eval_params_ref;
 
 	virtual Node** GetChild(uint idx) override {
 		if (idx >= params.size()) return nullptr;
@@ -157,24 +161,40 @@ struct FuncNode : public Node
 		scope = s;
 		params.fill(nullptr);
 		eval_params.fill({});
+		eval_params_ref.fill(nullptr);
 	}
 
 	virtual void evaluate(ScriptFunction* caller, Value& node) override
 	{
-		for (int i = 0; i < params.size(); i++) if (params[i]) params[i]->evaluate(caller, eval_params[i]);
-		invoke_helper<c>(eval_params, std::make_index_sequence<c>(), node);
-		for (int i = 0; i < params.size(); i++) 
+		for (int i = 0; i < params.size(); i++) {
 			if (params[i]) {
-				if (params[i]->ref) 
-					params[i]->SetValue(i, eval_params[i]);
+				if (params[i]->ref)
+					eval_params_ref[i] = params[i]->getRef(caller);
+				else {
+					params[i]->evaluate(caller, eval_params[i]);
+					eval_params_ref[i] = &eval_params[i];
+				}
+			}
+			if (!eval_params_ref[i])
+				eval_params_ref[i] = &eval_params[i];
+		}
+
+		invoke_helper<c>(eval_params_ref, std::make_index_sequence<c>(), node);
+
+		for (int i = 0; i < params.size(); i++) {
+			if (params[i]) {
+				/*if (params[i]->ref)
+					params[i]->SetValue(i, eval_params[i]);*/
 				eval_params[i].Clean();
 			}
+			eval_params_ref[i] = nullptr;
+		}
 	}
 
 private:
 	template <std::size_t N, typename T, std::size_t... Indices>
 	void invoke_helper(std::array<T, N>& v, std::index_sequence<Indices...>, Value& node) {
-		_invoke(node, scope, value, ptr, std::get<Indices>(v)...);
+		_invoke(node, scope, value, ptr, *std::get<Indices>(v)...);
 	}
 };
 
@@ -190,6 +210,8 @@ static std::vector<init_FuncNode> FuncNodes{
 	{[](const String& scope, const String& name, void* v) {return new FuncNode<2>(scope, name, v); }},
 	{[](const String& scope, const String& name, void* v) {return new FuncNode<3>(scope, name, v); }},
 	{[](const String& scope, const String& name, void* v) {return new FuncNode<4>(scope, name, v); }},
+	{[](const String& scope, const String& name, void* v) {return new FuncNode<5>(scope, name, v); }},
+	{[](const String& scope, const String& name, void* v) {return new FuncNode<6>(scope, name, v); }},
 };
 
 struct ScriptFuncNode : public Node
@@ -278,6 +300,10 @@ struct VariableNode : public Node
 			if (child && value->type == 0) child->evaluate(caller, *(value->value));
 			node = *value->value;
 		}
+	}
+
+	virtual Value* getRef(ScriptFunction* caller) override {
+		return value->value;
 	}
 };
 

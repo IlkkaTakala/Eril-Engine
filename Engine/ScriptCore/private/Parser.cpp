@@ -8,18 +8,14 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end);
 static const char* returnNode = "e";
 static const char* skipNode = "s";
 
-template <typename Out>
-void split(const String& s, char delim, Out result) {
+std::vector<String> split(const String& s, char delim) {
+	std::vector<String> elems;
 	std::istringstream iss(s);
 	String item;
+	auto result = std::back_inserter(elems);
 	while (std::getline(iss, item, delim)) {
 		*result++ = item;
 	}
-}
-
-std::vector<String> split(const String& s, char delim) {
-	std::vector<String> elems;
-	split(s, delim, std::back_inserter(elems));
 	return elems;
 }
 
@@ -31,24 +27,6 @@ void ExitContext(Context& c, Context& l)
 	c.loopScope = l.loopScope;
 	c.scopeNode = l.scopeNode;
 	c.row = l.row;
-}
-
-inline ECharType TypeOfChar(const char* c)
-{
-	if (isdigit(*c)) {
-		return ECharType::Digit;
-	}
-	else if (isalpha(*c)) {
-		return ECharType::Char;
-	}
-	else if (isspace(*c)) {
-		return ECharType::Digit;
-	}
-	else if (ispunct(*c)) {
-		return ECharType::Operand;
-	}
-	else
-		return ECharType::Other;
 }
 
 bool isNumber(const String& line, bool* isFloat = nullptr)
@@ -67,13 +45,6 @@ bool isNumber(const String& line, bool* isFloat = nullptr)
 	}
 	if (isFloat) *isFloat = hasDot;
 	return true;
-}
-
-Node* MakeValueNode(Context& c)
-{
-	if (c.considerValue.size() == 0) return new ValueNode(EVT::Null, "");
-	if (isNumber(c.considerValue)) return new ValueNode(EVT::Float, c.considerValue);
-	return new ValueNode(EVT::String, c.considerValue);
 }
 
 String ReadWord(Context& c)
@@ -220,6 +191,37 @@ bool isEqual(const String& s, const char* c) {
 	}
 	return true;
 }
+
+#define OPERATION(NAME) Node* lhs = ParseArea(c, c.begin, c.ptr); \
+Node* rhs = ParseArea(c, c.ptr + 1, c.end);\
+Node* next = nullptr;\
+if (auto lhsv(dynamic_cast<ValueNode*>(lhs)); lhsv) {\
+	if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {\
+		next = new ValueNode(lhsv->value NAME rhsv->value);\
+		delete lhs;\
+		delete rhs;\
+	}\
+	else {\
+		next = FuncNodes[2]("op", #NAME, nullptr);\
+		next->SetValue(0, lhsv->value);\
+		next->SetChild(1, rhs);\
+		delete lhs;\
+	}\
+}\
+else {\
+	if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {\
+		next = FuncNodes[2]("op", #NAME, nullptr);\
+		next->SetChild(0, lhs);\
+		next->SetValue(1, rhsv->value);\
+		delete rhs;\
+	}\
+	else {\
+		next = FuncNodes[2]("op", #NAME, nullptr);\
+		next->SetChild(0, lhs);\
+		next->SetChild(1, rhs);\
+	}\
+}\
+return next;\
 
 static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 {"for", true, [](Context& c) {
@@ -530,6 +532,82 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	Node* next = nullptr;
 	if (auto lhsv(dynamic_cast<VariableNode*>(lhs)); lhsv && rhs) {
 		next = FuncNodes[2]("op", "*=", nullptr);
+		lhs->ref = true;
+		next->SetChild(0, lhs);
+		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
+			next->SetValue(1, rhsv->value);
+			delete rhs;
+		}
+		else {
+			next->SetChild(1, rhs);
+		}
+		return next;
+	}
+	else {
+		delete lhs;
+		delete rhs;
+		error("Cannot assign to values", &c);
+		return (Node*)nullptr;
+	}
+	return next;
+}},
+{"/=", false, [](Context& c) {
+	Node* lhs = ParseArea(c, c.begin, c.ptr);
+	Node* rhs = ParseArea(c, c.ptr + 2, c.end);
+	Node* next = nullptr;
+	if (auto lhsv(dynamic_cast<VariableNode*>(lhs)); lhsv && rhs) {
+		next = FuncNodes[2]("op", "/=", nullptr);
+		lhs->ref = true;
+		next->SetChild(0, lhs);
+		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
+			next->SetValue(1, rhsv->value);
+			delete rhs;
+		}
+		else {
+			next->SetChild(1, rhs);
+		}
+		return next;
+	}
+	else {
+		delete lhs;
+		delete rhs;
+		error("Cannot assign to values", &c);
+		return (Node*)nullptr;
+	}
+	return next;
+} },
+{"+=", false, [](Context& c) {
+	Node* lhs = ParseArea(c, c.begin, c.ptr);
+	Node* rhs = ParseArea(c, c.ptr + 2, c.end);
+	Node* next = nullptr;
+	if (auto lhsv(dynamic_cast<VariableNode*>(lhs)); lhsv && rhs) {
+		next = FuncNodes[2]("op", "+=", nullptr);
+		lhs->ref = true;
+		next->SetChild(0, lhs);
+		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
+			next->SetValue(1, rhsv->value);
+			delete rhs;
+		}
+		else {
+			next->SetChild(1, rhs);
+		}
+		return next;
+	}
+	else {
+		delete lhs;
+		delete rhs;
+		error("Cannot assign to values", &c);
+		return (Node*)nullptr;
+	}
+	return next;
+} },
+{"-=", false, [](Context& c) {
+	Node* lhs = ParseArea(c, c.begin, c.ptr);
+	Node* rhs = ParseArea(c, c.ptr + 2, c.end);
+	Node* next = nullptr;
+	if (auto lhsv(dynamic_cast<VariableNode*>(lhs)); lhsv && rhs) {
+		next = FuncNodes[2]("op", "-=", nullptr);
+		lhs->ref = true;
 		next->SetChild(0, lhs);
 		if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
 			next->SetValue(1, rhsv->value);
@@ -820,7 +898,6 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 		{
 			l.ptr++;
 			if (l.considerValue.size() != 0) {
-				l.conType = ECT::Function;
 				int param_count = 0;
 				if (l.considerScope.size() != 0) {
 					Variable* val = l.scope->FindVar(l.considerScope);
@@ -1078,7 +1155,7 @@ int BeginParse(Context& c, const char* data, uint off, uint& end, Node** nodePtr
 	return true;
 }
 
-void Parser::FindFunctions(const char* data, Script* script)
+void FindFunctions(const char* data, Script* script)
 {
 	const char* function_end = data;
 	Context c;
@@ -1145,7 +1222,7 @@ void Parser::FindFunctions(const char* data, Script* script)
 	}
 }
 
-void Parser::FindVariables(const char* data, Script* script)
+void FindVariables(const char* data, Script* script)
 {
 	if (script->setup) delete script->setup;
 

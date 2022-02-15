@@ -79,8 +79,13 @@ struct Value
 		if (this == &val)
 			return *this;
 
+		if (value.index() == 5) {
+			std::get<ArrayPtr>(value)->first--;
+		}
 		value = val.value;
-		if (value.index() == 5) std::get<ArrayPtr>(value)->first++;
+		if (value.index() == 5) {
+			std::get<ArrayPtr>(value)->first++;
+		}
 		return *this;
 	}
 
@@ -88,6 +93,9 @@ struct Value
 		if (this == &val)
 			return *this;
 
+		if (value.index() == 5) {
+			std::get<ArrayPtr>(value)->first--;
+		}
 		if (value.index() != 3) value = std::move(val.value);
 		else value = val.value;
 		if (value.index() == 5) {
@@ -95,15 +103,6 @@ struct Value
 		}
 		return *this;
 	} 
-
-	/*Value& operator=(void val) {
-		if (this == &val)
-			return *this;
-
-		value = val.value;
-		if (value.index() == 5) std::get<ArrayPtr>(value)->first++;
-		return *this;
-	}*/
 
 	~Value() {
 		if (value.index() == 5) {

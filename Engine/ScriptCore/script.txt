@@ -23,11 +23,11 @@ def execute()
 	for (var i = 0; i <= 6; i++) {
 		array[] = i;
 	}
-	print(array);
+	print(array&);
 	
 	print(oneFunction(array.copy()));
 	print(array);
-	print(oneFunction(array));
+	print(oneFunction(array&));
 	print(array);
 	
 	array.unset();
@@ -40,4 +40,12 @@ def execute()
 	print(testString);
 	
 	print(scriptGlobalVar);
+
+	var t = 40;
+	t += 20;
+	t-=10;
+	print(t)
+	t*=2;
+	t /= 3;
+	print(t)
 }
