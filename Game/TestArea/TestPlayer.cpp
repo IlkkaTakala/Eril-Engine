@@ -73,14 +73,14 @@ TestPlayer::TestPlayer() : Player()
 	//Player Movement
 	Movement = SpawnObject<MovementComponent>();
 	Movement->SetTarget(dynamic_cast<Actor*>(this), Mesh->GetModel()->GetAABB());
-	Movement->SetGravity(true);
+	Movement->SetGravity(false);
 
 	PlayerCol = SpawnObject<ColliderComponent>();
-	PlayerCol->SetLocation(Vector(0, 0, 1.f), true);
-	PlayerCol->SetType(1);
-	PlayerCol->SetSize(Mesh->GetModel()->GetAABB());
 	AddComponent(PlayerCol);
-	PlayerCol->SetTarget(Movement);
+	PlayerCol->SetLocation(Vector(0, 0, 1.f), true);
+	PlayerCol->SetType(2);
+	PlayerCol->SetSize(Mesh->GetModel()->GetAABB());
+	PlayerCol->SetMovementTarget(Movement);
 
 	//Skybox
 	Sky = SpawnObject<VisibleObject>();
@@ -117,15 +117,15 @@ TestPlayer::TestPlayer() : Player()
 
 	BoxCol = SpawnObject<ColliderComponent>();
 	//BoxCol->SetLocation(Box->GetLocation(), true);
+	Box->AddComponent(BoxCol);
 	BoxCol->SetType(0);
 	BoxCol->SetSize(BoxModel->GetModel()->GetAABB());
-	Box->AddComponent(BoxCol);
 	
-	BoxModelMove = SpawnObject<MovementComponent>();
+	/*BoxModelMove = SpawnObject<MovementComponent>();
 	BoxModelMove->SetTarget(Box, BoxModel->GetModel()->GetAABB());
-	BoxModelMove->SetGravity(true);
+	BoxModelMove->SetGravity(true);*/
 	//BoxModelMove->SetPhysics(true);
-	BoxCol->SetTarget(BoxModelMove);
+	//BoxCol->SetTarget(Box);
 
 	Box2 = SpawnObject<Actor>();
 
@@ -137,16 +137,16 @@ TestPlayer::TestPlayer() : Player()
 	Box2->SetLocation(Vector(10.f, 10.f, 12.f));
 
 	BoxCol2 = SpawnObject<ColliderComponent>();
+	Box2->AddComponent(BoxCol2);
 	//BoxCol->SetLocation(Box->GetLocation(), true);
 	BoxCol2->SetType(1);
 	BoxCol2->SetSize(BoxModel2->GetModel()->GetAABB());
-	Box2->AddComponent(BoxCol2);
 
-	BoxModelMove = SpawnObject<MovementComponent>();
-	BoxModelMove->SetTarget(Box2, BoxModel2->GetModel()->GetAABB());
-	BoxModelMove->SetGravity(true);
-	//BoxModelMove->SetPhysics(true);
-	BoxCol2->SetTarget(BoxModelMove);
+	//BoxModelMove = SpawnObject<MovementComponent>();
+	//BoxModelMove->SetTarget(Box2, BoxModel2->GetModel()->GetAABB());
+	//BoxModelMove->SetGravity(true);
+	////BoxModelMove->SetPhysics(true);
+	//BoxCol2->SetTarget(BoxModelMove);
 
 	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
 

@@ -2,12 +2,86 @@
 #include <Physics/BulletPhysics.h>
 #include <Physics.h>
 #include "MovementComponent.h"
+#include <btBulletDynamicsCommon.h>
 
+class ErilMotion : public btMotionState
+{
+	btTransform m_centerOfMassOffset;
+	RefWeak<ColliderComponent> m_userPointer;
+public:
+
+	ErilMotion(ColliderComponent* c, const btTransform& startTrans = btTransform::getIdentity(), const btTransform& centerOfMassOffset = btTransform::getIdentity()) :
+		m_centerOfMassOffset(centerOfMassOffset),
+		m_userPointer(c)
+	{
+	}
+
+	///synchronizes world transform from user to physics
+	virtual void getWorldTransform(btTransform& centerOfMassWorldTrans) const
+	{
+		if (!m_userPointer->body) return;
+		switch (m_userPointer->GetType())
+		{
+		case 2:
+		{
+			if (!m_userPointer->moveObject) return;
+			Vector loc = m_userPointer->GetMovementTarget()->DesiredState.location;
+			Vector rot = m_userPointer->GetMovementTarget()->DesiredState.location;
+			btTransform local;
+			local.setIdentity();
+			local.setOrigin(btVector3(loc.X, loc.Z, loc.Y));
+			local.setRotation(btQuaternion(radians(rot.Y), radians(rot.Z), radians(rot.X)));
+			centerOfMassWorldTrans = local * m_centerOfMassOffset.inverse();
+		} break;
+
+		default: 
+		{
+			Transformation temp = m_userPointer->GetWorldTransformation();
+			btTransform local;
+			local.setIdentity();
+			local.setOrigin(btVector3(temp.Location.X, temp.Location.Z, temp.Location.Y));
+			local.setRotation(btQuaternion(radians(temp.Rotation.Y), radians(temp.Rotation.Z), radians(temp.Rotation.X)));
+			centerOfMassWorldTrans = local * m_centerOfMassOffset.inverse();
+		} break;
+		}
+	}
+
+	///synchronizes world transform from physics to user
+	///Bullet only calls the update of worldtransform for active objects
+	virtual void setWorldTransform(const btTransform& centerOfMassWorldTrans)
+	{
+		if (!m_userPointer->body) return;
+		btTransform temp = centerOfMassWorldTrans * m_centerOfMassOffset;
+		btVector3 loc = temp.getOrigin();
+		btQuaternion rot2 = temp.getRotation();
+		Vector rot;
+		rot2.getEulerZYX(rot.Y, rot.Z, rot.X);
+		rot.X = degrees(rot.X);
+		rot.Y = degrees(rot.Y);
+		rot.Z = degrees(rot.Z);
+
+		switch (m_userPointer->GetType())
+		{
+		case 2: {
+			if (!m_userPointer->moveObject) return;
+			m_userPointer->GetMovementTarget()->DesiredState.location = { loc[0], loc[2], loc[1] };
+			m_userPointer->GetMovementTarget()->DesiredState.rotation = rot;
+		} break;
+
+		default: 
+		{
+			Transformation local({ loc[0], loc[2], loc[1] }, rot, m_userPointer->GetTarget()->GetScale());
+			m_userPointer->GetTarget()->SetTransform(local);
+		} break;
+		}
+	}
+};
 
 ColliderComponent::ColliderComponent()
 {
 	body = nullptr;
 	type = 0;
+	mass = 0;
 }
 
 void ColliderComponent::OnDestroyed()
@@ -18,7 +92,6 @@ void ColliderComponent::OnDestroyed()
 
 void ColliderComponent::LoadWithParameters(const String& args)
 {
-	body = Physics::addBox(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 10, 0);
 	Physics::AddCollider(this);
 }
 
@@ -28,20 +101,20 @@ void ColliderComponent::SetType(int t)
 	switch (type)
 	{
 	case 0:
-		body->setCollisionFlags(btCollisionObject::CF_STATIC_OBJECT);
-		body->setMassProps(0, btVector3(0.f , 0.f, 0.f));
-		body->btRigidBody::setAngularFactor(0.f);
+		body = Physics::addBoxStatic(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, new ErilMotion(this));
 		break;
 	case 1:
-		body->setCollisionFlags(btCollisionObject::CF_DYNAMIC_OBJECT);
-		body->btRigidBody::setAngularFactor(1.f);
+		body = Physics::addBox(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 100, new ErilMotion(this));
+		body->setAngularFactor(1.f);
 		break;
 	case 2:
+		body = Physics::addBox(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 100, new ErilMotion(this));
 		body->setActivationState(DISABLE_DEACTIVATION);
 		body->setCollisionFlags(btCollisionObject::CF_KINEMATIC_OBJECT);
-		body->btRigidBody::setAngularFactor(0.f);
+		body->setAngularFactor(0.f);
 		break;
 	}
+	Refresh();
 }
 
 void ColliderComponent::SetSize(AABB s)
@@ -59,114 +132,40 @@ void ColliderComponent::SetMass(float m)
 	mass = m;
 }
 
-void ColliderComponent::SetTarget(MovementComponent* m)
+void ColliderComponent::SetTarget(SceneComponent* m)
 {
 	Object = m;
 }
 
-void ColliderComponent::SetLocation(const Vector& NewLocation, bool force)
+void ColliderComponent::SetMovementTarget(MovementComponent* m)
 {
-	SceneComponent::SetLocation(NewLocation, force);
+	moveObject = m;
+}
+
+SceneComponent* ColliderComponent::GetTarget() const
+{
+	return Object;
+}
+
+void ColliderComponent::SetParent(SceneComponent* parent)
+{
+	Parent = parent;
+	Object = parent;
+}
+
+void ColliderComponent::Refresh()
+{
+	if (!body) return;
 	Vector loc = GetWorldLocation();
-	body->getWorldTransform().setOrigin(btVector3(loc.X, loc.Z, loc.Y));
-}
-
-void ColliderComponent::SetRotation(const Vector& NewRotation, bool force)
-{
-	SceneComponent::SetRotation(NewRotation, force);
 	Vector rot = GetWorldRotation();
-	body->getWorldTransform().setRotation(btQuaternion(rot.Y, rot.Z, rot.X));
-}
-
-void ColliderComponent::Tick(float Delta)
-{
-	Vector location = GetWorldLocation();
-	Vector rotation = GetWorldRotation();
-	btTransform colliderloc;
-	colliderloc.setIdentity();
-	colliderloc.setOrigin(btVector3(location.X, location.Z, location.Y));
-	colliderloc.setRotation(btQuaternion(rotation.Y, rotation.Z, rotation.X));
-	body->setWorldTransform(colliderloc);
-	body->setCenterOfMassTransform(colliderloc);
-	
-	switch (type)
-	{
-	case 0:
-		if (Object) {
-			//Vector velocity = Object->DesiredState.velocity;
-			//body->setLinearVelocity(btVector3(velocity.X, velocity.Z, velocity.Y));
-		}
-		break;
-	case 1:
-		if (Object) {
-			Vector velocity = Object->DesiredState.velocity;
-			body->setLinearVelocity(btVector3(velocity.X, velocity.Z, velocity.Y));
-
-			Vector rotation = Object->DesiredState.rotation;
-			body->setAngularVelocity(btVector3(rotation.Z, rotation.Y, rotation.X));
-		}
-		break;
-	case 2:
-		if (Object) {
-			btTransform trans;
-			body->getMotionState()->getWorldTransform(trans);
-			trans.getOrigin() += btVector3(0.02, 0, 0.02);
-			body->getMotionState()->setWorldTransform(trans);
-			
-			//Vector velocity = Object->DesiredState.velocity;
-			//body->setLinearVelocity(btVector3(velocity.X, velocity.Z, velocity.Y));
-		}
-		break;
+	btTransform temp;
+	body->getMotionState()->getWorldTransform(temp);
+	temp.setOrigin(btVector3(loc.X, loc.Z, loc.Y));
+	temp.setRotation(btQuaternion(radians(rot.Y), radians(rot.Z), radians(rot.X)));
+	if (type == 0) {
+		body->setWorldTransform(temp);
+		Physics::ForceUpdate(body);
 	}
-}
-
-void ColliderComponent::ApplyCollision()
-{
-	switch (type)
-	{
-	case 0:
-		if (Object) {
-			auto l = body->getWorldTransform().getOrigin();
-			Vector world(l[0], l[2], l[1]);
-			//desiredstate rotation
-			Object->DesiredState.location = world - Location;
-			Object->DesiredState.velocity = Vector(0.f);
-		}
-		break;
-	case 1:
-		if (Object) {
-			auto l = body->getWorldTransform().getOrigin();
-			Vector world(l[0], l[2], l[1]);
-			Object->DesiredState.location = world - Location;
-
-			auto r = body->getWorldTransform().getRotation();
-			Vector com(r[2], r[1], r[0]);
-			Object->DesiredState.rotation = com - Rotation;
-
-			//btQuaternion wr = body->getOrientation();
-			//Object->DesiredState.rotation = Vector(wr[2], wr[1], wr[0]);
-
-			btVector3 lv = body->getLinearVelocity();
-			Object->DesiredState.velocity = Vector(lv[0], lv[2], lv[1]);
-		}
-		break;
-	case 2:
-		if (Object) {
-			auto l = body->getWorldTransform().getOrigin();
-			Vector world(l[0], l[2], l[1]);
-			Object->DesiredState.location = world - Location;
-
-			auto r = body->getWorldTransform().getRotation();
-			Vector com(r[2], r[1], r[0]);
-			Object->DesiredState.rotation = com - Rotation;
-
-			//btQuaternion wr = body->getOrientation();
-			//Object->DesiredState.rotation = Vector(wr[2], wr[1], wr[0]);
-
-			btVector3 lv = body->getLinearVelocity();
-			Object->DesiredState.velocity = Vector(lv[0], lv[2], lv[1]);
-		}
-		break;
-	}
+	else body->getMotionState()->setWorldTransform(temp);
 }
 

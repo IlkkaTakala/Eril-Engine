@@ -120,10 +120,6 @@ namespace Physics
 		}
 
 		Physics::GetWorld()->stepSimulation(delta);
-		
-		for (const auto& c : Colliders) {
-			c->ApplyCollision();
-		}
 
 		for (const auto& m : Movables) {
 			m->ApplyMovement();

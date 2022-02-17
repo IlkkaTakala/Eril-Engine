@@ -15,8 +15,10 @@ btRigidBody* addCylinder(float d, float h, float x, float y, float z, float mass
 
 btRigidBody* addCone(float d, float h, float x, float y, float z, float mass);
 
-btRigidBody* addBox(float width, float height, float depth, float x, float y, float z, float mass, int type);
+btRigidBody* addBox(float width, float height, float depth, float x, float y, float z, float mass, btMotionState* state);
+btRigidBody* addBoxStatic(float width, float height, float depth, float x, float y, float z, btMotionState* state);
 
+void ForceUpdate(btRigidBody* body);
 void RemoveBody(btRigidBody*& body);
 
 void Destroy();
@@ -24,8 +26,6 @@ void Destroy();
 void init();
 
 btDynamicsWorld* GetWorld();
-
-bulletObject* MakeRigidBoby(AABB box, Vector pos, float mass, int type);
 
 bool callbackFunc(btManifoldPoint& cp, const btCollisionObject* obj1, int id1, int index1, const btCollisionObject* obj2, int id2, int index2);
 

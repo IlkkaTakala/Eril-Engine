@@ -90,9 +90,9 @@ void MovementComponent::Tick(float time)
 
 		velocity = OldState.velocity + delta_a * time + brake_a;
 
-		//float drag = velocity.LengthSquared() * (0.5f / max_speed);
+		float drag = velocity.LengthSquared() * (0.5f / max_speed);
 
-		//velocity -= velocity.Normalize() * drag;
+		velocity -= velocity.Normalize() * drag;
 
 		if (velocity.LengthSquared() > max_speed * max_speed) velocity = velocity.Normalize() * max_speed;
 		

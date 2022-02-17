@@ -1124,7 +1124,7 @@ void Renderer::LightCulling(int width, int height)
 	LightCullingShader->Bind();
 
 	LightCullingShader->SetUniform("depthMap", 4);
-	int lightCount = Lights->size();
+	int lightCount = (int)Lights->size();
 	LightCullingShader->SetUniform("lightCount", lightCount);
 
 	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, LightBuffer);

@@ -118,6 +118,10 @@ inline float radians(const float& v) {
 	return v * PI / 180.f;
 }
 
+inline float degrees(const float& v) {
+	return v / PI * 180.f;
+}
+
 struct Vector
 {
 	float X, Y, Z;
@@ -304,7 +308,7 @@ struct Vector2D
 	friend bool operator==(const Vector2D& obj, const Vector2D& obj2) { return obj2.X == obj.X && obj2.Y == obj.Y; }
 };
 
-struct Transformation 
+typedef struct Transformation 
 {
 	Transformation() {
 		Location = Vector(0.f);
@@ -332,4 +336,4 @@ struct Transformation
 		lhs.Rotation += rhs.Rotation;
 		lhs.Scale *= rhs.Scale;
 	}
-};
+} Transform;
