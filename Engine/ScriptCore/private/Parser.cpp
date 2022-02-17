@@ -192,7 +192,14 @@ bool isEqual(const String& s, const char* c) {
 	return true;
 }
 
-#define OPERATION(NAME) {#NAME, false, [](Context& c) { \
+enum class OpType
+{
+	Word,
+	Two,
+	Single
+};
+
+#define OPERATION(NAME) {#NAME, OpType::Two, [](Context& c) { \
 Node* lhs = ParseArea(c, c.begin, c.ptr); \
 Node* rhs = ParseArea(c, c.ptr + sizeof(#NAME) - 1, c.end);\
 Node* next = nullptr;\
@@ -225,7 +232,7 @@ else {\
 return next;\
 }}\
 
-#define COPERATION(NAME) {#NAME, false, [](Context& c) {\
+#define COPERATION(NAME) {#NAME, OpType::Two, [](Context& c) {\
 Node* lhs = ParseArea(c, c.begin, c.ptr);\
 Node* rhs = ParseArea(c, c.ptr + 2, c.end);\
 Node* next = nullptr;\
@@ -251,8 +258,8 @@ else {\
 return next;\
 }}\
 
-static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
-{"for", true, [](Context& c) {
+static std::list<std::tuple<String, OpType, Node* (*)(Context&)>> Operators = {
+{"for", OpType::Word, [](Context& c) {
 	c.ptr += 3;
 	c.ptr = ReadUntilNonWhite(c.ptr);
 	if (*c.ptr == '(') {
@@ -289,7 +296,7 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	error("No statement found", &c);
 	return (Node*)nullptr;
 }},
-{"if", true, [](Context& c) {
+{"if", OpType::Word, [](Context& c) {
 	c.ptr += 2;
 	c.ptr = ReadUntilNonWhite(c.ptr);
 	if (*c.ptr == '(') {
@@ -313,14 +320,14 @@ static std::list<std::tuple<String, bool, Node* (*)(Context&)>> Operators = {
 	error("No statement found", &c);
 	return (Node*)nullptr;
 }},
-{"return", true, [](Context& c) {
+{"return", OpType::Word, [](Context& c) {
 	c.ptr += 7;
 	Node* next = new ControlNode();
 	next->child = ParseArea(c, c.ptr, c.end);
 	return next;
 }},
 OPERATION(==),
-{"!", false, [](Context& c) {
+{"!", OpType::Single, [](Context& c) {
 	Node* rhs = ParseArea(c, c.ptr + 1, c.end);
 	Node* next = nullptr;
 	if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
@@ -343,7 +350,7 @@ COPERATION(*=),
 COPERATION(/=),
 COPERATION(+=),
 COPERATION(-=),
-{"=", false, [](Context& c) {
+{"=", OpType::Two, [](Context& c) {
 	Node* lhs = ParseArea(c, c.begin, c.ptr);
 	auto var(dynamic_cast<VariableNode*>(lhs));
 	if (var == nullptr) {
@@ -372,11 +379,24 @@ COPERATION(-=),
 	*lhs->GetChild(0) = ParseArea(c, c.ptr + 1, c.end);
 	return lhs;
 }},
-OPERATION(-),
 OPERATION(+),
+OPERATION(-),
 OPERATION(*),
 OPERATION(/),
-{"var", true, [](Context& c) {
+{"-", OpType::Single, [](Context& c) {
+	Node* rhs = ParseArea(c, c.ptr + 1, c.end);
+	Node* next = nullptr;
+	if (auto rhsv(dynamic_cast<ValueNode*>(rhs)); rhsv) {
+		rhsv->value = -rhsv->value;
+		next = rhs;
+	}
+	else {
+		next = FuncNodes[2]("op", "-", nullptr);
+		next->SetChild(1, rhs);
+	}
+	return next;
+}},
+{"var", OpType::Word, [](Context& c) {
 	c.ptr += 4;
 	String name = ReadWord(c);
 	if (!name.size()) error("Invalid Variable name: " + name, &c);
@@ -400,7 +420,7 @@ OPERATION(/),
 	}
 	return next;
 }},
-{"const", true, [](Context& c) {
+{"const", OpType::Word, [](Context& c) {
 	c.ptr += 6;
 	String name = ReadWord(c);
 	if (!name.size()) error("Invalid Variable name: " + name, &c);
@@ -408,7 +428,7 @@ OPERATION(/),
 	Node* next = new VariableNode(&it.first->second);
 	return next;
 }},
-{"static", true, [](Context& c) {
+{"static", OpType::Word, [](Context& c) {
 	c.ptr += 7;
 	String name = ReadWord(c);
 	if (!name.size()) error("Invalid Variable name: " + name, &c);
@@ -416,7 +436,7 @@ OPERATION(/),
 	Node* next = new VariableNode(&it.first->second);
 	return next;
 }},
-{"++", false, [](Context& c) {
+{"++", OpType::Single, [](Context& c) {
 	Node* lhs = ParseArea(c, c.begin, c.ptr);
 	if (auto lhsv(dynamic_cast<VariableNode*>(lhs)); lhsv) {
 		Node* next = FuncNodes[2]("op", "+", nullptr);
@@ -432,7 +452,7 @@ OPERATION(/),
 	}
 	return lhs;
 }},
-{"--", false, [](Context& c) {
+{"--", OpType::Single, [](Context& c) {
 	Node* lhs = ParseArea(c, c.begin, c.ptr);
 	if (auto lhsv(dynamic_cast<VariableNode*>(lhs)); lhsv) {
 		Node* next = FuncNodes[2]("op", "-", nullptr);
@@ -460,7 +480,9 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 	for (auto const& [key, alnum, func] : Operators) {
 		int scope = 0;
 		l.ptr = end;
-		if (alnum) {
+		switch (alnum)
+		{
+		case OpType::Word:
 			while (--l.ptr >= begin) {
 				if (*l.ptr == '(') scope++;
 				if (*l.ptr == ')') scope--;
@@ -471,33 +493,57 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 						if (*(l.ptr + 1) == *key.c_str() && isEqualWord(key, l.ptr + 1)) {
 							l.ptr++;
 							result = func(l);
-							break;
+							if (result) break;
+							l.ptr--;
 						}
 					}
 					else if (l.ptr == begin) {
 						if (*l.ptr == *key.c_str() && isEqualWord(key, l.ptr)) {
 							result = func(l);
-							break;
+							if (result) break;
 						}
 					}
 				}
 			}
-			if (result) break;
-		}
-		else {
+			break;
+
+		case OpType::Two:
 			while (--l.ptr >= begin) {
 				if (*l.ptr == '(') scope++;
 				if (*l.ptr == ')') scope--;
 				if (*l.ptr == '{') scope++;
 				if (*l.ptr == '}') scope--;
 				if (scope == 0 && *l.ptr == *key.c_str() && isEqual(key, l.ptr)) {
-					if (*(l.ptr - 1) == '(' || *(l.ptr - 1) == ')' || *(l.ptr - 1) == '{' || *(l.ptr - 1) == '}' || std::isalnum(*(l.ptr - 1)) || std::isspace(*(l.ptr - 1)))
-						result = func(l);
-					break;
+					if (l.ptr == begin || *(l.ptr - 1) == '(' || *(l.ptr - 1) == ')' || *(l.ptr - 1) == '{' || *(l.ptr - 1) == '}' || std::isalnum(*(l.ptr - 1)) || std::isspace(*(l.ptr - 1))) {
+						const char* p = l.ptr;
+						while (isspace(*(--p)));
+						if (isalnum(*p) || *p == ')') {
+							result = func(l);
+							if (result) break;
+						}
+					}
 				}
 			}
-			if (result) break;
+			break;
+
+		case OpType::Single:
+			while (--l.ptr >= begin) {
+				if (*l.ptr == '(') scope++;
+				if (*l.ptr == ')') scope--;
+				if (*l.ptr == '{') scope++;
+				if (*l.ptr == '}') scope--;
+				if (scope == 0 && *l.ptr == *key.c_str() && isEqual(key, l.ptr)) {
+					if (l.ptr == begin || *(l.ptr - 1) == '(' || *(l.ptr - 1) == ')' || *(l.ptr - 1) == '{' || *(l.ptr - 1) == '}' || std::isspace(*(l.ptr - 1))) {
+						if (isalnum(*(l.ptr + 1))) {
+							result = func(l);
+							if (result) break;
+						}
+					}
+				}
+			}
+			break;
 		}
+		if (result) break;
 	}
 
 	l.ptr = begin;
