@@ -42,9 +42,6 @@ std::unordered_map<String, NativeFuncStorage> MakeDefaults()
 	return {
 	{"global", NativeFuncStorage {
 		{"print", new Function<Value>(1, [](void*, auto& v) {
-			if (v.type() == EVT::Null) {
-				std::cout << ">> Undefined\n";
-			}
 			std::cout << ">> " << (String)v << '\n';
 			return Value{};
 		})},
