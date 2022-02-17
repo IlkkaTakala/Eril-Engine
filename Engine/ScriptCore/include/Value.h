@@ -478,7 +478,18 @@ struct Value
 
 		case EVT::Null:
 		{
-			return rhs + lhs;
+			switch (rhs.type())
+			{
+			case EVT::Float:
+				return +(float)rhs;
+				break;
+			case EVT::Int:
+				return +(int64)rhs;
+				break;
+			default:
+				return lhs;
+				break;
+			}
 		} break;
 		default:
 			return lhs;
@@ -525,6 +536,9 @@ struct Value
 			{
 			case EVT::Float:
 				return -(float)rhs;
+				break;
+			case EVT::Int:
+				return -(int64)rhs;
 				break;
 			default:
 				return lhs;
@@ -751,5 +765,32 @@ struct Value
 
 	friend Value operator>=(const Value& lhs, const Value& rhs) {
 		return lhs > rhs || lhs == rhs;
+	}
+
+	friend Value operator-(const Value& rhs) {
+		switch (rhs.type())
+		{
+		case EVT::String:
+		{
+			return rhs;
+		} break;
+
+		case EVT::Float:
+		{
+			return -(float)rhs;
+		} break;
+
+		case EVT::Int:
+		{
+			return -(int64)rhs;
+		} break;
+
+		case EVT::Null:
+		{
+			return rhs;
+		} break;
+		default:
+			return rhs;
+		}
 	}
 };
