@@ -3,6 +3,7 @@
 #include <iostream>
 
 static char* script = R"~~~(
+def execute(){
 
 var testVar = 2;
 isEqual(testVar, 2);
@@ -18,7 +19,7 @@ isEqual(another, 50);
 
 testVar = testVar + another;
 isEqualStr(testVar, "Hello50");
-
+}
 )~~~";
 
 int isEqual(int i, int c) {
