@@ -19,5 +19,7 @@ Constantly updated documentation can be found on the "[docs](../../tree/docs/doc
 * Copy created library files to build/lib/
 * Run cmake on Engine/external/openal-soft/
 * Build the solution and copy openal library to build/lib/ and OpenAL32.dll to build/(BuildConfig)/
+* Run cmake on Engine/ScriptCore/
+* Build the solution and copy ErilScript.lib to build/lib/ and ErilScript.dll to build/(BuildConfig)/
 * Open Eril solution and rebuild solution
 * Game should build correctly after that, contact ilkkatakala@kamk.fi if the steps didn't work
