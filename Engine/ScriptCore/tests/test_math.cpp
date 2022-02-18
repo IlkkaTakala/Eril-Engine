@@ -1,6 +1,7 @@
 #include <ScriptCore.h>
 #include <stdexcept>
 #include <iostream>
+#include <math.h>
 
 static char* script = R"~~~(
 def execute(){
