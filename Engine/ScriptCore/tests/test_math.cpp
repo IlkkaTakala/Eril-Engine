@@ -24,17 +24,15 @@ int floatCalls;
 int intCalls;
 int stringCalls;
 int greaterCalls;
-
-int isEqualFloat(float i, float c, float maxRelDiff = FLT_EPSILON) {
+#define EPSILON 0e-6F
+int isEqualFloat(float i, float c) {
 	floatCalls++;
-	// Calculate the difference.
 	float diff = abs(i - c);
 	i = abs(i);
 	c = abs(c);
-	// Find the largest
 	float largest = (c > i) ? c : i;
 
-	if (diff <= largest * maxRelDiff) {	return 0; }
+	if (diff <= largest * EPSILON) { return 0; }
 	else {
 		throw std::runtime_error("Math failed: " + std::to_string(i) + ", " + std::to_string(c));
 	}
@@ -58,7 +56,7 @@ int isEqualStr(std::string* i, std::string* c) {
 
 REGISTER_FUNCTION(isEqual, global, 2);
 REGISTER_FUNCTION(isEqualStr, global, 2);
-REGISTER_FUNCTION(isEqualFloat, global, 3);
+REGISTER_FUNCTION(isEqualFloat, global, 2);
 
 
 int main() {
