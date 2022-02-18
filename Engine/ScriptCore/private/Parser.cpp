@@ -690,7 +690,11 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 				result = new ValueNode(isfloat ? EVT::Float : EVT::Int, l.considerValue);
 				break;
 			}
-			Variable* val = l.scope->FindVar(l.considerValue);
+			Variable* val = nullptr;
+			if (l.scope) val = l.scope->FindVar(l.considerValue);
+			else if (l.topLevel->vars.find(l.considerValue) != l.topLevel->vars.end()) { 
+				val = &l.topLevel->vars.find(l.considerValue)->second; 
+			}
 			if (val) {
 				if (val->type == 2)
 					result = new ValueNode(*val->value);

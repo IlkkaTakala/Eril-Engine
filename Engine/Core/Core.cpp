@@ -1,6 +1,18 @@
 #include <iostream>
 #include "GameLoop.h"
 #include "Core.h"
+#ifdef USE_SCRIPTCORE
+#include <ScriptCore.h>
+namespace ScriptFunctions {
+	int64 CreateObject(String* name, int id = 0) {
+		if (ObjectManager::TypeList().find(*name) == ObjectManager::TypeList().end()) return 0;
+		Console::Log("Spawning Object: " + *name);
+		return ObjectManager::TypeList()[*name]("", id, Constants::Record::CONSOLE, false, 0)->GetRecord();
+	}
+	REGISTER_FUNCTION(CreateObject, global, 2);
+}
+#endif // SCRIPTCORE
+
 
 
 GameLoop* Loop = nullptr;
