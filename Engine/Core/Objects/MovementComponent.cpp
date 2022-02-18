@@ -18,6 +18,7 @@ MovementComponent::MovementComponent()
 	brake = 2000.f;
 	air_control = 0.05f;
 	Physics::AddMovable(this);
+	stepHeight = 0.5f;
 	//rigid = nullptr;
 }
 

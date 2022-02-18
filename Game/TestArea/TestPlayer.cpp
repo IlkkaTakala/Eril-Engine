@@ -77,7 +77,7 @@ TestPlayer::TestPlayer() : Player()
 
 	PlayerCol = SpawnObject<ColliderComponent>();
 	AddComponent(PlayerCol);
-	PlayerCol->SetLocation(Vector(0, 0, 1.f), true);
+	PlayerCol->SetLocation(Vector(0.f, 0.f, 1.f), true);
 	PlayerCol->SetType(2);
 	PlayerCol->SetSize(Mesh->GetModel()->GetAABB());
 	PlayerCol->SetMovementTarget(Movement);

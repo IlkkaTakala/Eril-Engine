@@ -5,6 +5,7 @@
 class Actor;
 class MovementComponent;
 class ErilMotion;
+class btPairCachingGhostObject;
 
 class ColliderComponent : public SceneComponent, public Tickable
 {
@@ -13,6 +14,8 @@ public:
     ColliderComponent();
     virtual void OnDestroyed() override;
     virtual void LoadWithParameters(const String& args) override;
+    virtual void Tick(float delta) override;
+    virtual void BeginPlay() override {}
     void SetType(int t);
     void SetSize(AABB s);
     void SetMass(float m);

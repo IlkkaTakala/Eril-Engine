@@ -65,7 +65,7 @@ public:
 		case 2: {
 			if (!m_userPointer->moveObject) return;
 			m_userPointer->GetMovementTarget()->DesiredState.location = { loc[0], loc[2], loc[1] };
-			m_userPointer->GetMovementTarget()->DesiredState.rotation = rot;
+			//m_userPointer->GetMovementTarget()->DesiredState.rotation = rot;
 		} break;
 
 		default: 
@@ -95,6 +95,13 @@ void ColliderComponent::LoadWithParameters(const String& args)
 	Physics::AddCollider(this);
 }
 
+void ColliderComponent::Tick(float delta)
+{
+	if (type != 2 || !moveObject) return;
+	Vector temp = moveObject->DesiredState.velocity * 10;
+	body->applyCentralImpulse({ temp.X, temp.Z, temp.Y });
+}
+
 void ColliderComponent::SetType(int t)
 {
 	type = t;
@@ -108,9 +115,8 @@ void ColliderComponent::SetType(int t)
 		body->setAngularFactor(1.f);
 		break;
 	case 2:
-		body = Physics::addBox(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 100, new ErilMotion(this));
+		body = Physics::addBox(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1000, new ErilMotion(this));
 		body->setActivationState(DISABLE_DEACTIVATION);
-		body->setCollisionFlags(btCollisionObject::CF_KINEMATIC_OBJECT);
 		body->setAngularFactor(0.f);
 		break;
 	}

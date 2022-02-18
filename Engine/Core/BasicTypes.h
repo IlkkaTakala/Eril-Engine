@@ -126,9 +126,11 @@ struct Vector
 {
 	float X, Y, Z;
 
-	Vector() { X = 0.f, Y = 0.f, Z = 0.f; }
-	Vector(float a) { X = a, Y = a, Z = a; }
+	Vector() : X(0.f), Y(0.f), Z(0.f) { }
+	Vector(float a) : X(a), Y(a), Z(a) { }
 	Vector(float X, float Y, float Z) : X(X), Y(Y), Z(Z) {};
+	Vector(double X, double Y, double Z) : X((float)X), Y((float)Y), Z((float)Z) {};
+	Vector(int X, int Y, int Z) : X((float)X), Y((float)Y), Z((float)Z) {};
 	Vector(String in) { 
 		size_t off = 0;
 		size_t o_off = 0;
@@ -182,6 +184,8 @@ struct Vector
 	static Vector RotateByAxis(const Vector& in, const Vector& axis, float angle) {
 		return in * cos(angle) + Cross(axis, in) * sin(angle) + axis * Dot(axis, in) * (1 - cos(angle));
 	}
+
+	Vector Project(const Vector& other) const;
 
 	static Vector Cross(const Vector& x, const Vector& y) {
 		return Vector(

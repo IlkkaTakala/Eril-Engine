@@ -55,6 +55,7 @@ public:
 	State OldState;
 
 private:
+	friend class ColliderComponent;
 	Ref<SceneComponent> Object;
 	RefWeak<Terrain> Terra;
 
@@ -69,6 +70,7 @@ private:
 	float drag;
 	float brake;
 	float air_control;
+	float stepHeight;
 
 	Force forces[16];
 	Vector directions[16];
