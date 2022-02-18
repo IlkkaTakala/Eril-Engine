@@ -27,9 +27,9 @@ int greaterCalls;
 int isEqualFloat(float i, float c, float maxRelDiff = FLT_EPSILON) {
 	floatCalls++;
 	// Calculate the difference.
-	float diff = fabs(i - c);
-	i = fabs(i);
-	c = fabs(c);
+	float diff = abs(i - c);
+	i = abs(i);
+	c = abs(c);
 	// Find the largest
 	float largest = (c > i) ? c : i;
 
