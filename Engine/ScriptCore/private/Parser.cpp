@@ -517,7 +517,7 @@ Node* ParseArea(Context& c, const char* const begin, const char* const end)
 					if (l.ptr == begin || *(l.ptr - 1) == '(' || *(l.ptr - 1) == ')' || *(l.ptr - 1) == '{' || *(l.ptr - 1) == '}' || std::isalnum(*(l.ptr - 1)) || std::isspace(*(l.ptr - 1))) {
 						const char* p = l.ptr;
 						if (p != begin) while (isspace(*(--p)));
-						if (isalnum(*p) || *p == ')') {
+						if (isalnum(*p) || *p == ')' || *p == '"') {
 							result = func(l);
 							if (result) break;
 						}

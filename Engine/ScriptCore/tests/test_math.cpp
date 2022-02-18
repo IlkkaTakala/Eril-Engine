@@ -10,13 +10,12 @@ isEqual(2 * -2, -4);
 isEqual(6 / 2, 3);
 isEqual(6 - 2, 4);
 isEqual(-6 + 2, -4);
-#isEqualStr("hello " + "world", "hello world");
-#isEqualStr("hello bro" - "hello ", "bro");
+isEqualStr("hello " + "world", "hello world");
+isEqualStr("hello bro" - "hello ", "bro");
 isEqualFloat(5.5 + 3.4, 8.9 );
 isEqualFloat(-5.5 - 3.4, -8.9 );
 isEqualFloat(5.5 * 3.45, 18.975 );
 isEqualFloat(5.6 / 3.45, 1.6231884 );
-
 
 }
 )~~~";
@@ -76,9 +75,9 @@ int main() {
 		if (intCalls != 4) {
 			throw std::runtime_error("Int calls failed");
 		}
-		/*if (stringCalls != 2) {
+		if (stringCalls != 2) {
 			throw std::runtime_error("String calls failed");
-		}*/
+		}
 	}
 	catch (std::runtime_error e) {
 		std::cout << e.what();
