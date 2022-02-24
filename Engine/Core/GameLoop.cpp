@@ -13,6 +13,8 @@
 #include <Interface/IECS.h>
 #include <Interface/AudioManager.h>
 
+#include <ScriptCore.h>
+
 using namespace std;
 
 std::list<Tickable*> GameLoop::TickList;

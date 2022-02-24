@@ -33,15 +33,16 @@ Final Responsibilities
 ## Features
 
 These are the features we will add on top of the existing features:
-* Input system rework
-* Scripting
-* SSAO
-* Reflections
-* Shadows
-* Animations
-* Editors
-* UI Framework improvements
-* Collisions
+- [x] Input system rework
+- [x] Scripting
+- [ ] SSAO
+- [ ] Reflections
+- [ ] Shadows
+- [ ] Animations
+- [ ] Editors
+- [ ] UI Framework improvements
+- [ ] Particles
+- [x] Collisions
 
 
 Addidional features if required features are finished:
@@ -73,7 +74,9 @@ dateFormat  DD-MM
 title Personal timelines
 
 section Ilkka
-Scripting               :active,    ides1, 13-01, 5d
+Scripting               :done,      ides1, 13-01, 18-02
+Animations              :active,    ides2, after ides1, 03-03
+Particles               :           ides5, after ides2, 03-04
 Git control             :           ides3, 13-01, 18w
 Lead dev/assistance     :           ides4, 13-01, 18w
 ```
@@ -82,9 +85,10 @@ gantt
 dateFormat  DD-MM
 
 section Matti
-Input Rework           :active,    mdes3, 13-01, 1w
-Collisions             :active,    mdes1, after mdes3, 3w
-UI Improvements        :           mdes2, after mdes1, 3w
+Input Rework           :done,       mdes3, 13-01, 1w
+Collisions             :done,       mdes1, after mdes3, 4w
+Script integrations    :active,     mdes4, after mdes1, 4w
+UI Improvements        :            mdes2, after mdes1, 3w
 ```
 
 
