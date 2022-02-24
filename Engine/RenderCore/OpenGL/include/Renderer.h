@@ -120,6 +120,9 @@ public:
 	virtual RenderMesh* CreateProcedural(VisibleObject* parent, String name, std::vector<Vector>& positions, std::vector<Vector> UV, std::vector<Vector>& normal, std::vector<Vector>& tangent, std::vector<uint32>& indices) override;
 	virtual void StartLoading() override;
 
+	virtual void MarkUnused() override;
+	virtual void ClearUnused() override;
+
 private:
 	//std::map<std::string, std::ifstream*> ModelStreams;
 	std::map<String, String> ModelStreams;

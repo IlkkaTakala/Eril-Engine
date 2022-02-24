@@ -51,19 +51,19 @@ void SceneComponent::SetRotation(const Vector& NewRotation, bool force)
 	Rotation = NewRotation;
 	desired.Rotation = NewRotation;
 	transformForce = force;
-	for (auto& c : Children) c->Refresh();
+	if (force) for (auto& c : Children) c->Refresh();
 }
 
 void SceneComponent::SetWorldLocation(const Vector& NewLocation, bool force)
 {
 	Location = NewLocation - Parent->GetWorldLocation();
-	for (auto& c : Children) c->Refresh();
+	if (force) for (auto& c : Children) c->Refresh();
 }
 
 void SceneComponent::SetWorldRotation(const Vector& NewRotation, bool force)
 {
 	Rotation = NewRotation - Parent->GetWorldRotation();
-	for (auto& c : Children) c->Refresh();
+	if (force) for (auto& c : Children) c->Refresh();
 }
 
 void SceneComponent::SetScale(const Vector& NewScale, bool force)
@@ -71,13 +71,13 @@ void SceneComponent::SetScale(const Vector& NewScale, bool force)
 	Scale = NewScale;
 	desired.Scale = NewScale;
 	transformForce = force;
-	for (auto& c : Children) c->Refresh();
+	if (force) for (auto& c : Children) c->Refresh();
 }
 
 void SceneComponent::SetWorldScale(const Vector& NewScale, bool force)
 {
 	Scale = NewScale / Parent->GetWorldScale();
-	for (auto& c : Children) c->Refresh();
+	if (force) for (auto& c : Children) c->Refresh();
 }
 
 void SceneComponent::SetWorldTransform(const Transform& world)

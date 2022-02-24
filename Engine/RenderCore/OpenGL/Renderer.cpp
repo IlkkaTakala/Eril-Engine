@@ -1496,3 +1496,24 @@ void GLMesh::StartLoading()
 		}
 	}
 }
+
+void GLMesh::MarkUnused()
+{
+	for (auto& m : LoadedMeshes) {
+		if (m.second->Users == 0)
+			m.second->Time++;
+	}
+}
+
+void GLMesh::ClearUnused()
+{
+	auto it = LoadedMeshes.begin();
+	while (it != LoadedMeshes.end() ) {
+		if (it->second->Time > 5) {
+			it = LoadedMeshes.erase(it);
+		}
+		else {
+			++it;
+		}
+	}
+}

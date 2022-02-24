@@ -244,7 +244,7 @@ struct Vector
 		};
 	}
 
-	float Q_rsqrt(float number) const
+	static float Q_rsqrt(float number)
 	{
 		long i;
 		float x2, y;

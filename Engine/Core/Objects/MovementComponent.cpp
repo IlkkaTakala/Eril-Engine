@@ -5,8 +5,9 @@
 
 MovementComponent::MovementComponent()
 {
+	air_time = 0.f;
 	mass = 1.f;
-	in_acceleration = 600.f;
+	in_acceleration = 60.f;
 	max_speed = 5.f;
 	isPhysics = false;
 	isGravity = true;
@@ -73,7 +74,10 @@ void MovementComponent::Tick(float time)
 	{
 		Vector delta_a;
 		Vector velocity;
-		Vector brake_a;
+		Vector brake_a = 0.f;
+		inAir = !(DesiredState.velocity.Z < 0.1f && DesiredState.velocity.Z > -0.1f);
+		if (inAir) air_time += time;
+		else air_time = 0.f;
 		if (direction_count > 0) {
 			for (int i = 0; i < direction_count; i++) {
 				delta_a += directions[i];
@@ -84,18 +88,20 @@ void MovementComponent::Tick(float time)
 		else {
 			brake_a = -DesiredState.velocity.Normalize() * brake * time;
 			brake_a = brake_a.LengthSquared() > DesiredState.velocity.LengthSquared() ? -DesiredState.velocity : brake_a;
+			brake_a.Z = 0.f;
 		}
 		for (int i = 0; i < force_count; i++) {
 			delta_a += forces[i].Direction;
 		}
 
-		velocity = OldState.velocity + delta_a * time + brake_a;
+		velocity = OldState.velocity + delta_a * time + (inAir ? Vector(0.f) : brake_a);
 
-		float drag = velocity.LengthSquared() * (0.5f / max_speed);
+		//float drag = velocity.LengthSquared() * (0.5f / max_speed);
 
-		velocity -= velocity.Normalize() * drag;
+		//velocity -= velocity.Normalize() * drag;
 
-		if (velocity.LengthSquared() > max_speed * max_speed) velocity = velocity.Normalize() * max_speed;
+		if (!inAir && velocity.LengthSquared() > max_speed * max_speed) velocity = velocity.Normalize() * max_speed;
+		//velocity += DesiredState.gravity * time * air_time;
 		
 		if (velocity.LengthSquared() < 0.01f) velocity = 0.f;
 
@@ -105,8 +111,7 @@ void MovementComponent::Tick(float time)
 			DesiredState.location.Z = Terra->GetHeight(DesiredState.location.X, DesiredState.location.Y);
 		}
 		DesiredState.velocity = velocity;
-
-		/*rigid->body->setLinearVelocity(btVector3(velocity.X, velocity.Z, velocity.Y));*/
+		Console::Log(velocity.ToString());
 	}
 	break;
 	}

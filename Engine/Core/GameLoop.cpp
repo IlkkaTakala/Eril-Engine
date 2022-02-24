@@ -121,6 +121,7 @@ int GameLoop::MainLoop()
 		RI->Render(duration.count());
 
 		ObjectManager::DeleteListed();
+		MI->ClearUnused();
 
 		std::unique_lock<std::mutex> lock(TickListMutex);
 		for (Tickable* t : TickListRemoval) {

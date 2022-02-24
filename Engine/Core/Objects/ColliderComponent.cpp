@@ -59,12 +59,17 @@ public:
 		rot.X = degrees(rot.X);
 		rot.Y = degrees(rot.Y);
 		rot.Z = degrees(rot.Z);
+		btVector3 vel = m_userPointer->body->getLinearVelocity();
+		btVector3 gravity = m_userPointer->body->getGravity();
 
 		switch (m_userPointer->GetType())
 		{
 		case 2: {
 			if (!m_userPointer->moveObject) return;
 			m_userPointer->GetMovementTarget()->DesiredState.location = { loc[0], loc[2], loc[1] };
+			m_userPointer->GetMovementTarget()->DesiredState.velocity = { vel[0], vel[2], vel[1] };
+			m_userPointer->GetMovementTarget()->DesiredState.gravity = { gravity[0], gravity[2], gravity[1] };
+
 			//m_userPointer->GetMovementTarget()->DesiredState.rotation = rot;
 		} break;
 
@@ -98,8 +103,8 @@ void ColliderComponent::LoadWithParameters(const String& args)
 void ColliderComponent::Tick(float delta)
 {
 	if (type != 2 || !moveObject) return;
-	Vector temp = moveObject->DesiredState.velocity * 10;
-	body->applyCentralImpulse({ temp.X, temp.Z, temp.Y });
+	Vector temp = moveObject->DesiredState.velocity;
+	body->setLinearVelocity({ temp.X, temp.Z, temp.Y });
 }
 
 void ColliderComponent::SetType(int t)
@@ -118,6 +123,7 @@ void ColliderComponent::SetType(int t)
 		body = Physics::addBox(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1000, new ErilMotion(this));
 		body->setActivationState(DISABLE_DEACTIVATION);
 		body->setAngularFactor(0.f);
+		body->setFriction(0.f);
 		break;
 	}
 	Refresh();
@@ -168,10 +174,7 @@ void ColliderComponent::Refresh()
 	body->getMotionState()->getWorldTransform(temp);
 	temp.setOrigin(btVector3(loc.X, loc.Z, loc.Y));
 	temp.setRotation(btQuaternion(radians(rot.Y), radians(rot.Z), radians(rot.X)));
-	if (type == 0) {
-		body->setWorldTransform(temp);
-		Physics::ForceUpdate(body);
-	}
-	else body->getMotionState()->setWorldTransform(temp);
+	body->setWorldTransform(temp);
+	Physics::ForceUpdate(body);
 }
 

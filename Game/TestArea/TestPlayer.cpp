@@ -198,7 +198,7 @@ void TestPlayer::RunInputS(float delta, bool KeyDown)
 void TestPlayer::RunInputSpace(bool KeyDown)
 {
 	if (!Movement->IsInAir() && KeyDown)
-		Movement->AddImpulse(Vector(0.f, 0.f, 300.f));
+		Movement->AddImpulse(Vector(0.f, 0.f, 600.f));
 }
 
 void TestPlayer::InputOne(bool KeyDown)

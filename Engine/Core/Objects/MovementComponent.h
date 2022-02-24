@@ -20,6 +20,7 @@ struct State
 	Vector angular_v;
 	Vector acceleration;
 	Vector angular_a;
+	Vector gravity;
 };
 
 class MovementComponent : public BaseObject, public Tickable
@@ -71,6 +72,7 @@ private:
 	float brake;
 	float air_control;
 	float stepHeight;
+	float air_time;
 
 	Force forces[16];
 	Vector directions[16];
