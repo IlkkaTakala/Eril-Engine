@@ -270,6 +270,7 @@
     <ClCompile Include="Game\UIEditor\EditorPlayer.cpp" />
     <ClCompile Include="Game\UITest\TestPlayerLoad.cpp" />
     <ClCompile Include="Game\UITest\TestUILoad.cpp" />
+    <ClCompile Include="ParticleComponent.cpp" />
     <ClInclude Include="Engine\Assets\Resources\resource.h" />
     <ClInclude Include="Engine\Core\Objects\InputComponent.h" />
     <ClInclude Include="Game\ForestGame\EndScreen.h" />
@@ -352,6 +353,7 @@
     <ClInclude Include="Game\UIEditor\EditorPlayer.h" />
     <ClInclude Include="Game\UITest\TestPlayerLoad.h" />
     <ClInclude Include="Game\UITest\TestUILoad.h" />
+    <ClInclude Include="ParticleComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Engine\Assets\Resources\Eril.rc" />

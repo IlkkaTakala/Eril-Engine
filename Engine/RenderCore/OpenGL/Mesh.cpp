@@ -35,31 +35,38 @@ void Section::Render()
 
 void Section::MakeInstanced(int count, const glm::mat4* modelM)
 {
-	if (InstanceDisp != 0) glDeleteBuffers(1, &InstanceDisp);
-	InstanceCount = count;
-	Instanced = true;
+	if (InstanceDisp != 0)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, InstanceDisp);
+		glm::mat4* mapped = reinterpret_cast<glm::mat4*>(glMapBufferRange(GL_ARRAY_BUFFER, 0, InstanceCount * sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
+		int useCount = count < InstanceCount ? count : InstanceCount;
+		memcpy(mapped, modelM, useCount);
+	}
+	else {
+		InstanceCount = count;
+		Instanced = true;
 
-	glBindVertexArray(Holder->VAO);
+		glBindVertexArray(Holder->VAO);
 
-	glGenBuffers(1, &InstanceDisp);
-	glBindBuffer(GL_ARRAY_BUFFER, InstanceDisp);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * count, modelM, GL_STATIC_DRAW);
+		glGenBuffers(1, &InstanceDisp);
+		glBindBuffer(GL_ARRAY_BUFFER, InstanceDisp);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * count, modelM, GL_STATIC_DRAW);
 
-	glEnableVertexAttribArray(4);
-	glEnableVertexAttribArray(5);
-	glEnableVertexAttribArray(6);
-	glEnableVertexAttribArray(7);
-	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(0));
-	glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 4));
-	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 8));
-	glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 12));
-	glVertexAttribDivisor(4, 1);
-	glVertexAttribDivisor(5, 1);
-	glVertexAttribDivisor(6, 1);
-	glVertexAttribDivisor(7, 1);
-	
-	glBindVertexArray(0);
+		glEnableVertexAttribArray(4);
+		glEnableVertexAttribArray(5);
+		glEnableVertexAttribArray(6);
+		glEnableVertexAttribArray(7);
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(0));
+		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 4));
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 8));
+		glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 12));
+		glVertexAttribDivisor(4, 1);
+		glVertexAttribDivisor(5, 1);
+		glVertexAttribDivisor(6, 1);
+		glVertexAttribDivisor(7, 1);
 
+		glBindVertexArray(0);
+	}
 }
 
 RenderObject::RenderObject(LoadedMesh* mesh)
