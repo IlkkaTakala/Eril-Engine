@@ -5,8 +5,9 @@
 
 MovementComponent::MovementComponent()
 {
+	air_time = 0.f;
 	mass = 1.f;
-	in_acceleration = 600.f;
+	in_acceleration = 60.f;
 	max_speed = 5.f;
 	isPhysics = false;
 	isGravity = true;
@@ -18,7 +19,8 @@ MovementComponent::MovementComponent()
 	brake = 2000.f;
 	air_control = 0.05f;
 	Physics::AddMovable(this);
-	rigid = nullptr;
+	stepHeight = 0.5f;
+	//rigid = nullptr;
 }
 
 void MovementComponent::LoadWithParameters(const String& args)
@@ -41,7 +43,14 @@ void MovementComponent::Tick(float time)
 {
 	if (!allowMovement || Object == nullptr) return;
 	DesiredState.location = Object->GetLocation();
+	DesiredState.rotation = Object->GetRotation();
+	//getrotation
 	
+	//btTransform colliderloc;
+	//colliderloc.setIdentity();
+	//colliderloc.setOrigin(btVector3(DesiredState.location.X, DesiredState.location.Z, DesiredState.location.Y));
+	//rigid->body->setWorldTransform(colliderloc);
+
 	OldState = DesiredState;
 	if (Object == nullptr) return;
 	switch (isPhysics)
@@ -65,7 +74,10 @@ void MovementComponent::Tick(float time)
 	{
 		Vector delta_a;
 		Vector velocity;
-		Vector brake_a;
+		Vector brake_a = 0.f;
+		inAir = !(DesiredState.velocity.Z < 0.1f && DesiredState.velocity.Z > -0.1f);
+		if (inAir) air_time += time;
+		else air_time = 0.f;
 		if (direction_count > 0) {
 			for (int i = 0; i < direction_count; i++) {
 				delta_a += directions[i];
@@ -76,18 +88,20 @@ void MovementComponent::Tick(float time)
 		else {
 			brake_a = -DesiredState.velocity.Normalize() * brake * time;
 			brake_a = brake_a.LengthSquared() > DesiredState.velocity.LengthSquared() ? -DesiredState.velocity : brake_a;
+			brake_a.Z = 0.f;
 		}
 		for (int i = 0; i < force_count; i++) {
 			delta_a += forces[i].Direction;
 		}
 
-		velocity = OldState.velocity + delta_a * time + brake_a;
+		velocity = OldState.velocity + delta_a * time + (inAir ? Vector(0.f) : brake_a);
 
 		//float drag = velocity.LengthSquared() * (0.5f / max_speed);
 
 		//velocity -= velocity.Normalize() * drag;
 
-		if (velocity.LengthSquared() > max_speed * max_speed) velocity = velocity.Normalize() * max_speed;
+		if (!inAir && velocity.LengthSquared() > max_speed * max_speed) velocity = velocity.Normalize() * max_speed;
+		//velocity += DesiredState.gravity * time * air_time;
 		
 		if (velocity.LengthSquared() < 0.01f) velocity = 0.f;
 
@@ -96,12 +110,8 @@ void MovementComponent::Tick(float time)
 			velocity.Z = 0.f;
 			DesiredState.location.Z = Terra->GetHeight(DesiredState.location.X, DesiredState.location.Y);
 		}
-		btVector3 colliderloc;
-		colliderloc.setValue(DesiredState.location.X, DesiredState.location.Z, DesiredState.location.Y);
-		rigid->body->getWorldTransform().setOrigin(colliderloc);
-
 		DesiredState.velocity = velocity;
-		rigid->body->setLinearVelocity(btVector3(velocity.X, velocity.Z, velocity.Y));
+		Console::Log(velocity.ToString());
 	}
 	break;
 	}
@@ -114,7 +124,7 @@ void MovementComponent::Tick(float time)
 void MovementComponent::SetTarget(SceneComponent* t, const AABB bound)
 {
 	Object = t;
-	rigid = Physics::MakeRigidBoby(bound, t->GetLocation());
+	//rigid = Physics::MakeRigidBoby(bound, t->GetLocation(), mass, type);
 	//OldState.location = t->GetLocation();
 	//DesiredState.location = t->GetLocation();
 	//Physics::RemoveStatic(t);
@@ -131,11 +141,15 @@ void MovementComponent::ApplyMovement()
 
 	if (Object->transformForce) {
 		Object->Location = Object->desired.Location;
+		Object->Rotation = Object->desired.Rotation;
 		Object->transformForce = false;
+
 	}
 	else {
-		auto l = rigid->body->getWorldTransform().getOrigin();
-		Object->Location = Vector(l[0], l[2], l[1]);
+		/*auto l = rigid->body->getWorldTransform().getOrigin();*/
+		Object->Location = DesiredState.location;//Vector(l[0], l[2], l[1]);
+		Object->Rotation = DesiredState.rotation;
+		//rotation
 	}
 }
 

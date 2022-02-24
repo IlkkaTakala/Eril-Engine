@@ -1124,7 +1124,7 @@ void Renderer::LightCulling(int width, int height)
 	LightCullingShader->Bind();
 
 	LightCullingShader->SetUniform("depthMap", 4);
-	int lightCount = Lights->size();
+	int lightCount = (int)Lights->size();
 	LightCullingShader->SetUniform("lightCount", lightCount);
 
 	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, LightBuffer);
@@ -1493,6 +1493,27 @@ void GLMesh::StartLoading()
 	for (const auto& f : fs::recursive_directory_iterator(ActiveDir)) {
 		if (f.path().extension() == ".obj") {
 			ModelStreams[f.path().filename().replace_extension("").string()] = f.path().string();
+		}
+	}
+}
+
+void GLMesh::MarkUnused()
+{
+	for (auto& m : LoadedMeshes) {
+		if (m.second->Users == 0)
+			m.second->Time++;
+	}
+}
+
+void GLMesh::ClearUnused()
+{
+	auto it = LoadedMeshes.begin();
+	while (it != LoadedMeshes.end() ) {
+		if (it->second->Time > 5) {
+			it = LoadedMeshes.erase(it);
+		}
+		else {
+			++it;
 		}
 	}
 }

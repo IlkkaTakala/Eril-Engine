@@ -43,6 +43,7 @@ public:
 	std::vector<MeshDataHolder*> Holders;
 	uint32 HolderCount;
 	uint32 Users;
+	uint Time;
 };
 
 class Section

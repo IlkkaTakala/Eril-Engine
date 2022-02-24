@@ -65,6 +65,7 @@ void Section::MakeInstanced(int count, const glm::mat4* modelM)
 RenderObject::RenderObject(LoadedMesh* mesh)
 {
 	mesh->Users++;
+	mesh->Time = 0;
 	Mesh = mesh;
 	float extent = 0.f;
 
@@ -219,6 +220,7 @@ LoadedMesh::LoadedMesh()
 {
 	Users = 0;
 	HolderCount = 0;
+	Time = 0;
 }
 
 LoadedMesh::~LoadedMesh()

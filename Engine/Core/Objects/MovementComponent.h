@@ -20,6 +20,7 @@ struct State
 	Vector angular_v;
 	Vector acceleration;
 	Vector angular_a;
+	Vector gravity;
 };
 
 class MovementComponent : public BaseObject, public Tickable
@@ -55,6 +56,7 @@ public:
 	State OldState;
 
 private:
+	friend class ColliderComponent;
 	Ref<SceneComponent> Object;
 	RefWeak<Terrain> Terra;
 
@@ -69,12 +71,14 @@ private:
 	float drag;
 	float brake;
 	float air_control;
+	float stepHeight;
+	float air_time;
 
 	Force forces[16];
 	Vector directions[16];
 	int direction_count;
 	int force_count;
 
-	bulletObject* rigid;
+	//bulletObject* rigid;
 };
 

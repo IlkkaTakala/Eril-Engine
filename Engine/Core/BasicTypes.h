@@ -118,13 +118,19 @@ inline float radians(const float& v) {
 	return v * PI / 180.f;
 }
 
+inline float degrees(const float& v) {
+	return v / PI * 180.f;
+}
+
 struct Vector
 {
 	float X, Y, Z;
 
-	Vector() { X = 0.f, Y = 0.f, Z = 0.f; }
-	Vector(float a) { X = a, Y = a, Z = a; }
+	Vector() : X(0.f), Y(0.f), Z(0.f) { }
+	Vector(float a) : X(a), Y(a), Z(a) { }
 	Vector(float X, float Y, float Z) : X(X), Y(Y), Z(Z) {};
+	Vector(double X, double Y, double Z) : X((float)X), Y((float)Y), Z((float)Z) {};
+	Vector(int X, int Y, int Z) : X((float)X), Y((float)Y), Z((float)Z) {};
 	Vector(String in) { 
 		size_t off = 0;
 		size_t o_off = 0;
@@ -178,6 +184,8 @@ struct Vector
 	static Vector RotateByAxis(const Vector& in, const Vector& axis, float angle) {
 		return in * cos(angle) + Cross(axis, in) * sin(angle) + axis * Dot(axis, in) * (1 - cos(angle));
 	}
+
+	Vector Project(const Vector& other) const;
 
 	static Vector Cross(const Vector& x, const Vector& y) {
 		return Vector(
@@ -236,7 +244,7 @@ struct Vector
 		};
 	}
 
-	float Q_rsqrt(float number) const
+	static float Q_rsqrt(float number)
 	{
 		long i;
 		float x2, y;
@@ -304,7 +312,7 @@ struct Vector2D
 	friend bool operator==(const Vector2D& obj, const Vector2D& obj2) { return obj2.X == obj.X && obj2.Y == obj.Y; }
 };
 
-struct Transformation 
+typedef struct Transformation 
 {
 	Transformation() {
 		Location = Vector(0.f);
@@ -332,4 +340,4 @@ struct Transformation
 		lhs.Rotation += rhs.Rotation;
 		lhs.Scale *= rhs.Scale;
 	}
-};
+} Transform;

@@ -5,5 +5,5 @@
 
 void EngineInterface::CreateDefaults()
 {
-    Scene::OpenLevel("Game/MainMenu/menu");
+    Scene::OpenLevel("Assets/Maps/test");
 }
