@@ -1,13 +1,13 @@
 #pragma once
 #include <Objects/SceneComponent.h>
-
-class ParticleSystem;
+#include <RenderCore/ParticleSystem.h>
 
 class ParticleComponent : public SceneComponent, public Tickable
 {
 public:
 	ParticleComponent();
 	virtual ~ParticleComponent();
+	virtual void BeginPlay() override;
 	void SetSystem(ParticleSystem* s);
 	ParticleSystem* GetSystem() const;
 	virtual void Tick(float delta) override;

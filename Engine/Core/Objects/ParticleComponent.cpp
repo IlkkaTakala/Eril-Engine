@@ -3,17 +3,25 @@
 
 ParticleComponent::ParticleComponent()
 {
-	system = SpawnObject<ParticleSystem>();
-	system->Create(this);
+	system = nullptr;
 }
 
 ParticleComponent::~ParticleComponent()
 {
 }
 
+void ParticleComponent::BeginPlay()
+{
+	SceneComponent::BeginPlay();
+
+	if (system) system->Reset();
+}
+
 void ParticleComponent::SetSystem(ParticleSystem* s)
 {
 	system = s;
+	system->Initialize(this);
+	system->Reset();
 }
 
 ParticleSystem* ParticleComponent::GetSystem() const
@@ -23,5 +31,5 @@ ParticleSystem* ParticleComponent::GetSystem() const
 
 void ParticleComponent::Tick(float delta)
 {
-	system->Update(delta);
+	if (system) system->Update(delta);
 }

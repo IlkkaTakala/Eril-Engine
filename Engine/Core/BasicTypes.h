@@ -122,6 +122,9 @@ inline float degrees(const float& v) {
 	return v / PI * 180.f;
 }
 
+float RandomFloat();
+float RandomFloatInRange(float min, float max);
+
 struct Vector
 {
 	float X, Y, Z;
@@ -184,6 +187,8 @@ struct Vector
 	static Vector RotateByAxis(const Vector& in, const Vector& axis, float angle) {
 		return in * cos(angle) + Cross(axis, in) * sin(angle) + axis * Dot(axis, in) * (1 - cos(angle));
 	}
+
+	static Vector RandomUnitVectorInCone(Vector direction, float coneAngle, Vector up = { 0, 0, 1 });
 
 	Vector Project(const Vector& other) const;
 

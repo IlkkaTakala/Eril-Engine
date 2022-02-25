@@ -206,6 +206,7 @@ void RenderObject::SetInstances(int count, Transformation* dispArray)
 	for (uint i = 0; i < SectionCount; i++) {
 		Sections[i].MakeInstanced(count, arr);
 	}
+	delete[] arr;
 }
 
 void RenderObject::SetInstanceCount(int count)

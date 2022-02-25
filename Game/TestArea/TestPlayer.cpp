@@ -13,6 +13,7 @@
 #include "Objects/InputComponent.h"
 #include "Objects/ColliderComponent.h"
 #include <Objects/ParticleComponent.h>
+#include <RenderCore/ParticleSystem.h>
 
 //ECS
 #include <Interface/IECS.h>
@@ -90,8 +91,8 @@ TestPlayer::TestPlayer() : Player()
 	Sky->SetScale(Sky->GetScale() * 2.0f);
 
 	//Testing UI
-	auto ui = UI::LoadFromFile("Game/TestArea/testingui2.ui");
-	UI::AddToScreen(ui, this);
+	/*auto ui = UI::LoadFromFile("Game/TestArea/testingui2.ui");
+	UI::AddToScreen(ui, this);*/
 
 	pause = nullptr;
 
@@ -152,7 +153,8 @@ TestPlayer::TestPlayer() : Player()
 	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
 
 	auto part = SpawnObject<ParticleComponent>();
-	part->SetLocation({10, 5, 10});
+	part->SetSystem(ParticleSystem::MakeSystem<ParticleSystem>());
+	part->SetLocation({10, 5, 2});
 
 }
 
