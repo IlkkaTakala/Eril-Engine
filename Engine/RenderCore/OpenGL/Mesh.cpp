@@ -11,6 +11,7 @@ Section::Section()
 	Holder = nullptr;
 	Instanced = false;
 	InstanceCount = 1;
+	InstanceCountMax = 1;
 	InstanceDisp = 0;
 }
 
@@ -37,20 +38,50 @@ void Section::MakeInstanced(int count, const glm::mat4* modelM)
 {
 	if (InstanceDisp != 0)
 	{
-		glBindBuffer(GL_ARRAY_BUFFER, InstanceDisp);
-		glm::mat4* mapped = reinterpret_cast<glm::mat4*>(glMapBufferRange(GL_ARRAY_BUFFER, 0, InstanceCount * sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
-		int useCount = count < InstanceCount ? count : InstanceCount;
-		memcpy(mapped, modelM, useCount);
+		if (count < InstanceCountMax) {
+			InstanceCount = count;
+			glBindBuffer(GL_ARRAY_BUFFER, InstanceDisp);
+			glBufferData(GL_ARRAY_BUFFER, count * sizeof(glm::mat4), modelM, GL_DYNAMIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		}
+		else {
+			glDeleteBuffers(0, &InstanceDisp);
+			InstanceCount = count;
+			InstanceCountMax = count;
+			Instanced = true;
+
+			glBindVertexArray(Holder->VAO);
+
+			glGenBuffers(1, &InstanceDisp);
+			glBindBuffer(GL_ARRAY_BUFFER, InstanceDisp);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * count, modelM, GL_DYNAMIC_DRAW);
+
+			glEnableVertexAttribArray(4);
+			glEnableVertexAttribArray(5);
+			glEnableVertexAttribArray(6);
+			glEnableVertexAttribArray(7);
+			glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(0));
+			glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 4));
+			glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 8));
+			glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 12));
+			glVertexAttribDivisor(4, 1);
+			glVertexAttribDivisor(5, 1);
+			glVertexAttribDivisor(6, 1);
+			glVertexAttribDivisor(7, 1);
+
+			glBindVertexArray(0);
+		}
 	}
 	else {
 		InstanceCount = count;
+		InstanceCountMax = count;
 		Instanced = true;
 
 		glBindVertexArray(Holder->VAO);
 
 		glGenBuffers(1, &InstanceDisp);
 		glBindBuffer(GL_ARRAY_BUFFER, InstanceDisp);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * count, modelM, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * count, modelM, GL_DYNAMIC_DRAW);
 
 		glEnableVertexAttribArray(4);
 		glEnableVertexAttribArray(5);
@@ -133,7 +164,7 @@ const glm::mat4& RenderObject::GetModelMatrix()
 	return ModelMatrix;
 }
 
-void RenderObject::SetParent(VisibleObject* parent)
+void RenderObject::SetParent(SceneComponent* parent)
 {
 	Parent = parent;
 }
@@ -142,7 +173,7 @@ void RenderObject::ApplyTransform()
 {
 	Transformation finalT;
 	SceneComponent* parent = Parent;
-	while (true)
+	while (parent)
 	{
 		finalT += parent->GetTransformation();
 
@@ -174,6 +205,13 @@ void RenderObject::SetInstances(int count, Transformation* dispArray)
 	}
 	for (uint i = 0; i < SectionCount; i++) {
 		Sections[i].MakeInstanced(count, arr);
+	}
+}
+
+void RenderObject::SetInstanceCount(int count)
+{
+	for (uint i = 0; i < SectionCount; i++) {
+		Sections[i].InstanceCount = count;
 	}
 }
 

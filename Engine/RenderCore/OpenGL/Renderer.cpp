@@ -391,9 +391,10 @@ void Renderer::CleanRenderer()
 	WindowManager::Terminate();
 }
 
-Camera* Renderer::CreateCamera(VisibleObject* parent)
+Camera* Renderer::CreateCamera(SceneComponent* parent)
 {
-	GLCamera* cam = new GLCamera(parent == nullptr ? nullptr : dynamic_cast<RenderObject*>(parent->GetModel()));
+	GLCamera* cam = new GLCamera();
+	cam->SetParent(parent);
 	return cam;
 }
 
@@ -1356,7 +1357,7 @@ LoadedMesh* loadMeshes(const std::string& path)
 	return mesh;
 }
 
-RenderMesh* GLMesh::LoadData(VisibleObject* parent, String name)
+RenderMesh* GLMesh::LoadData(SceneComponent* parent, String name)
 {
 	auto result = LoadedMeshes.find(name);
 	if (result == LoadedMeshes.end()) {
@@ -1451,7 +1452,7 @@ RenderMesh* GLMesh::LoadData(VisibleObject* parent, String name)
 	}
 }
 
-RenderMesh* GLMesh::CreateProcedural(VisibleObject* parent, String name, std::vector<Vector>& positions, std::vector<Vector> UV, std::vector<Vector>& normal, std::vector<Vector>& tangent, std::vector<uint32>& indices)
+RenderMesh* GLMesh::CreateProcedural(SceneComponent* parent, String name, std::vector<Vector>& positions, std::vector<Vector> UV, std::vector<Vector>& normal, std::vector<Vector>& tangent, std::vector<uint32>& indices)
 {
 	LoadedMesh* mesh = new LoadedMesh();
 

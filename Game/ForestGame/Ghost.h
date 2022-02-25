@@ -3,6 +3,7 @@
 #include <Objects/Actor.h>
 
 class MovementComponent;
+class VisibleObject;
 
 class Ghost : public Actor
 {

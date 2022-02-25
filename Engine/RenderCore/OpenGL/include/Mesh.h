@@ -55,6 +55,7 @@ public:
 	RenderObject* Parent;
 	bool Instanced;
 	int InstanceCount;
+	int InstanceCountMax;
 	uint InstanceDisp;
 
 	void Render();
@@ -81,13 +82,14 @@ public:
 	virtual Material* GetMaterial(uint section) const override { if (section < SectionCount) return Sections[section].Instance; else return nullptr; }
 	const glm::mat4& GetModelMatrix();
 	virtual void ApplyTransform() override;
-	virtual void SetInstances(int count, Transformation* dispArray);
+	virtual void SetInstances(int count, Transformation* dispArray) override;
+	virtual void SetInstanceCount(int count) override;
 
-	void SetParent(VisibleObject* parent);
+	void SetParent(SceneComponent* parent);
 
 private:
 	friend class Renderer;
-	VisibleObject* Parent;
+	SceneComponent* Parent;
 	Section* Sections;
 	LoadedMesh* Mesh;
 	uint SectionCount;

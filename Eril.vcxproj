@@ -100,7 +100,7 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>ErilScript.lib;LinearMath_Debug.lib;Bullet3OpenCL_clew_Debug.lib;Bullet2FileLoader_Debug.lib;BulletSoftBody_Debug.lib;BulletDynamics_Debug.lib;BulletCollision_Debug.lib;BulletInverseDynamics_Debug.lib;Bullet3Common_Debug.lib;Bullet3Geometry_Debug.lib;Bullet3Collision_Debug.lib;Bullet3Dynamics_Debug.lib;OpenAL32.lib;dwrite.lib;d2d1.lib;assimp-vc140-mt.lib;zlibstaticd.lib;IrrXML.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>ScriptCore.lib;LinearMath_Debug.lib;BulletDynamics_Debug.lib;BulletCollision_Debug.lib;BulletInverseDynamics_Debug.lib;Bullet3Common_Debug.lib;Bullet3Geometry_Debug.lib;Bullet3Collision_Debug.lib;Bullet3Dynamics_Debug.lib;OpenAL32.lib;dwrite.lib;d2d1.lib;assimp-vc140-mt.lib;zlibstaticd.lib;IrrXML.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\Engine\external\openal-soft\build\Debug;$(SolutionDir)\build\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -203,6 +203,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Engine\Core\Objects\InputComponent.cpp" />
+    <ClCompile Include="Engine\Core\Objects\ParticleComponent.cpp" />
+    <ClCompile Include="Engine\RenderCore\ParticleSystem.cpp" />
     <ClCompile Include="Game\ForestGame\EndScreen.cpp" />
     <ClCompile Include="Engine\Core\BasicTypes.cpp" />
     <ClCompile Include="Engine\Core\Core.cpp" />
@@ -270,9 +272,10 @@
     <ClCompile Include="Game\UIEditor\EditorPlayer.cpp" />
     <ClCompile Include="Game\UITest\TestPlayerLoad.cpp" />
     <ClCompile Include="Game\UITest\TestUILoad.cpp" />
-    <ClCompile Include="ParticleComponent.cpp" />
     <ClInclude Include="Engine\Assets\Resources\resource.h" />
     <ClInclude Include="Engine\Core\Objects\InputComponent.h" />
+    <ClInclude Include="Engine\Core\Objects\ParticleComponent.h" />
+    <ClInclude Include="Engine\RenderCore\ParticleSystem.h" />
     <ClInclude Include="Game\ForestGame\EndScreen.h" />
     <ClInclude Include="Engine\Core\BasicTypes.h" />
     <ClInclude Include="Engine\Core\Core.h" />
@@ -353,7 +356,6 @@
     <ClInclude Include="Game\UIEditor\EditorPlayer.h" />
     <ClInclude Include="Game\UITest\TestPlayerLoad.h" />
     <ClInclude Include="Game\UITest\TestUILoad.h" />
-    <ClInclude Include="ParticleComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Engine\Assets\Resources\Eril.rc" />

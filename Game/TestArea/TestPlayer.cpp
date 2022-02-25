@@ -12,6 +12,7 @@
 #include <GamePlay/Scene.h>
 #include "Objects/InputComponent.h"
 #include "Objects/ColliderComponent.h"
+#include <Objects/ParticleComponent.h>
 
 //ECS
 #include <Interface/IECS.h>
@@ -149,6 +150,9 @@ TestPlayer::TestPlayer() : Player()
 	//BoxCol2->SetTarget(BoxModelMove);
 
 	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
+
+	auto part = SpawnObject<ParticleComponent>();
+	part->SetLocation({10, 5, 10});
 
 }
 

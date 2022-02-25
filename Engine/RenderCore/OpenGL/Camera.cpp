@@ -7,11 +7,10 @@
 #include "Settings.h"
 #include "Renderer.h"
 
-GLCamera::GLCamera(RenderObject* parent)
+GLCamera::GLCamera()
 {
 	Fov = 45.f;
 	Perspective = true;
-	Parent = parent;
 	Location = Vector(0.f, 0.f, 0.f);
 	Rotation = Vector(0.f, 0.f, 0.f);
 	Orientation = glm::mat4(1.0f);

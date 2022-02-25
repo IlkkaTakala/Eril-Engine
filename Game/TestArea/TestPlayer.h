@@ -10,6 +10,7 @@ class MovementComponent;
 class Terrain;
 class Hunter;
 class PauseUI;
+class VisibleObject;
 
 //ECS TEST
 class ECSExample;
