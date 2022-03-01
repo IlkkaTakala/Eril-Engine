@@ -23,11 +23,11 @@ Section::~Section()
 void Section::Render()
 {
 	glBindVertexArray(Holder->VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, InstanceDisp);
-	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(0));
-	glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 4));
-	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 8));
-	glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 12));
+	//glBindBuffer(GL_ARRAY_BUFFER, InstanceDisp);
+	//glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(0));
+	//glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 4));
+	//glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 8));
+	//glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 12));
 
 	if (Instanced) glDrawElementsInstanced(GL_TRIANGLES, Holder->IndexCount, GL_UNSIGNED_INT, 0, InstanceCount);
 	else glDrawElements(GL_TRIANGLES, Holder->IndexCount, GL_UNSIGNED_INT, 0);
@@ -65,6 +65,7 @@ void Section::MakeInstanced(int count, const glm::mat4* modelM)
 RenderObject::RenderObject(LoadedMesh* mesh)
 {
 	mesh->Users++;
+	mesh->Time = 0;
 	Mesh = mesh;
 	float extent = 0.f;
 
@@ -219,6 +220,7 @@ LoadedMesh::LoadedMesh()
 {
 	Users = 0;
 	HolderCount = 0;
+	Time = 0;
 }
 
 LoadedMesh::~LoadedMesh()

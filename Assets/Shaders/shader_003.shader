@@ -193,7 +193,7 @@ void main()
 	
 	vec3 Lo = vec3(0.0);
 
-	vec3 N = normalize(fs_in.TBN * normal); 
+	vec3 N = normalize(fs_in.TBN[2]); 
     vec3 V = normalize(viewPos - fs_in.FragPos).xyz;
 
 	uint offset = index * 1024;

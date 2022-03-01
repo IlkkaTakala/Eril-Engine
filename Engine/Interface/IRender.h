@@ -61,6 +61,7 @@ public:
 	virtual void GameStart() = 0;
 	virtual void DestroyWindow() = 0;
 	virtual UISpace* GetUIManager(int screen = 0) const = 0;
+
 };
 
 class IInput
@@ -111,11 +112,13 @@ public:
 	virtual RenderMesh* LoadData(VisibleObject* parent, String name) = 0;
 	virtual RenderMesh* CreateProcedural(VisibleObject* parent, String name, std::vector<Vector>& positions, std::vector<Vector> UV, std::vector<Vector>& normal, std::vector<Vector>& tangent, std::vector<uint32>& indices) = 0;
 	virtual void StartLoading() = 0;
+	virtual void MarkUnused() = 0;
+	virtual void ClearUnused() = 0;
 
 protected:
 	friend class GC;
 
-	std::map<String, LoadedMesh*> LoadedMeshes;
+	std::unordered_map<String, LoadedMesh*> LoadedMeshes;
 
 };
 

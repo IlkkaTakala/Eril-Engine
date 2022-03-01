@@ -928,7 +928,7 @@ void Renderer::Forward(int width, int height)
 	glDrawBuffers(2, attachments);
 
 	glDepthMask(GL_TRUE);
-	glDepthFunc(GL_LESS);
+	glDepthFunc(GL_LEQUAL);
 	glDisable(GL_BLEND);
 	glClearColor(0.f, 0.f, 0.f, 0.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -971,20 +971,7 @@ void Renderer::Forward(int width, int height)
 			for (Section* o : m->GetObjects())
 			{
 				glm::mat4 mm = o->Parent->GetModelMatrix();
-				Vector direction = ActiveCamera->GetForwardVector();
-				Vector location = ActiveCamera->GetLocation();
-				glm::vec3 pos = mm[3];
-				glm::vec3 rad = glm::vec3((o->Parent->GetAABB().maxs - o->Parent->GetAABB().mins).Length()) * glm::mat3(mm);
-				float radii = glm::max(rad.x, glm::max(rad.y, rad.z));
-				glm::vec3 loc = glm::vec3(location.X, location.Z, location.Y);
-				glm::vec3 dir = glm::vec3(direction.X, direction.Z, direction.Y);
-				if ((loc - pos).length() > 2.f && (loc - pos).length() > radii)
-				{
-					if (glm::dot(dir, glm::normalize(loc - pos)) < 0.5f)
-					{
-						continue;
-					}
-				}
+				if (CullCheck(o)) continue;
 				s->SetUniform("Model", mm);
 				o->Render();
 				
@@ -1041,23 +1028,9 @@ void Renderer::Forward(int width, int height)
 			for (Section* o : m->GetObjects())
 			{
 				glm::mat4 mm = o->Parent->GetModelMatrix();
-				Vector direction = ActiveCamera->GetForwardVector();
-				Vector location = ActiveCamera->GetLocation();
-				glm::vec3 pos = mm[3];
-				glm::vec3 rad = glm::vec3(o->GetRadius()) * glm::mat3(mm);
-				float radii = glm::max(rad.x, glm::max(rad.y, rad.z));
-				glm::vec3 loc = glm::vec3(location.X, location.Z, location.Y);
-				glm::vec3 dir = glm::vec3(direction.X, direction.Z, direction.Y);
-				if ((loc - pos).length() > 2.f && (loc - pos).length() > radii)
-				{
-					if (glm::dot(dir, glm::normalize(loc - pos)) < 0.5f)
-					{
-						continue;
-					}
-				}
+				if (CullCheck(o)) continue;
 				s->SetUniform("Model", mm);
 				o->Render();
-
 			}
 		}
 	}
@@ -1102,20 +1075,7 @@ void Renderer::PreDepth(int width, int height)
 			for (Section* o : m->GetObjects())
 			{
 				glm::mat4 mm = o->Parent->GetModelMatrix();
-				Vector direction = ActiveCamera->GetForwardVector();
-				Vector location = ActiveCamera->GetLocation();
-				glm::vec3 pos = mm[3];
-				glm::vec3 rad = glm::vec3(o->GetRadius()) * glm::mat3(mm);
-				float radii = glm::max(rad.x, glm::max(rad.y, rad.z));
-				glm::vec3 loc = glm::vec3(location.X, location.Z, location.Y);
-				glm::vec3 dir = glm::vec3(direction.X, direction.Z, direction.Y);
-				if ((loc - pos).length() > 2.f && (loc - pos).length() > radii)
-				{
-					if (glm::dot(dir, glm::normalize(loc - pos)) < 0.65f)
-					{
-						continue;
-					}
-				}
+				if (CullCheck(o)) continue;
 				PreDepthShader->SetUniform("Model", mm);
 				o->Render();
 
@@ -1129,7 +1089,7 @@ void Renderer::LightCulling(int width, int height)
 	LightCullingShader->Bind();
 
 	LightCullingShader->SetUniform("depthMap", 4);
-	int lightCount = Lights->size();
+	int lightCount = (int)Lights->size();
 	LightCullingShader->SetUniform("lightCount", lightCount);
 
 	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, LightBuffer);
@@ -1153,6 +1113,28 @@ void Renderer::UpdateTransforms() {
 			}
 		}
 	}
+}
+
+inline bool Renderer::CullCheck(Section* s)
+{
+	glm::mat4 mm = s->Parent->GetModelMatrix();
+	Vector direction = ActiveCamera->GetForwardVector();
+	Vector location = ActiveCamera->GetLocation();
+	glm::vec3 pos = mm[3];
+	Vector aabb = s->Parent->GetAABB().maxs - s->Parent->GetAABB().mins;
+	glm::vec3 rad = glm::vec3(aabb.X, aabb.Z, aabb.Y) * glm::mat3(mm);
+	float radii = glm::max(rad.x, glm::max(rad.y, rad.z));
+	glm::vec3 loc = glm::vec3(location.X, location.Z, location.Y);
+	glm::vec3 dir = glm::vec3(direction.X, direction.Z, direction.Y);
+	glm::vec3 d = loc - pos;
+	if (glm::length(d) > 2.f && glm::length(d) > radii)
+	{
+		if (glm::dot(dir, glm::normalize(loc - pos)) < 0.55f) // TODO: Calculate from FOV
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 void Renderer::Render(float delta)
@@ -1498,6 +1480,27 @@ void GLMesh::StartLoading()
 	for (const auto& f : fs::recursive_directory_iterator(ActiveDir)) {
 		if (f.path().extension() == ".obj") {
 			ModelStreams[f.path().filename().replace_extension("").string()] = f.path().string();
+		}
+	}
+}
+
+void GLMesh::MarkUnused()
+{
+	for (auto& m : LoadedMeshes) {
+		if (m.second->Users == 0)
+			m.second->Time++;
+	}
+}
+
+void GLMesh::ClearUnused()
+{
+	auto it = LoadedMeshes.begin();
+	while (it != LoadedMeshes.end() ) {
+		if (it->second->Time > 5) {
+			it = LoadedMeshes.erase(it);
+		}
+		else {
+			++it;
 		}
 	}
 }

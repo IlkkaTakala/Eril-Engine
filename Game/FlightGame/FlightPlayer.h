@@ -5,7 +5,6 @@
 
 class Actor;
 class InstancedObject;
-class Light;
 class MovementComponent;
 class Terrain;
 class Hunter;

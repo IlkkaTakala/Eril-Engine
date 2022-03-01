@@ -14,6 +14,7 @@
 #include "StartScreen.h"
 #include "Objects/InputComponent.h"
 #include "Material.h"
+#include "Objects/ColliderComponent.h"
 
 //ECS
 #include <Interface/IECS.h>
@@ -61,7 +62,7 @@ void FlightPlayer::Winner()
 FlightPlayer::FlightPlayer() : Player()
 {
 	mouseSens = 0.1f;
-	Speed = 2.5f;
+	Speed = 10.f;
 	time = 0.f;
 	InputMode = true;
 	cursorState = true;
@@ -74,8 +75,46 @@ FlightPlayer::FlightPlayer() : Player()
 	Movement->SetGravity(false);
 	Movement->SetPhysics(false);
 	Movement->SetMaxSpeed(Speed);
+	Movement->SetFlightMaxSpeed(Speed);
+	Movement->SetAirBrake(2000.f);
+	Movement->SetAcceleration(500.f);
+	Movement->SetAirControl(1.f);
+
+	auto pc = SpawnObject<ColliderComponent>();
+	pc->SetType(2);
+	pc->SetTarget(this);
+	pc->SetMovementTarget(Movement);
+	pc->SetSize(AABB({-0.5f, -0.5f, 0.f}, { 0.5f, 0.5f, 1.f }));
+	pc->SetLocation({ 0.f, 0.f, 0.5f });
 
 	//GetCamera()->SetPostProcess("PostProcessForest");
+
+	for (int i = 0; i < 500; i++) {
+		auto m = SpawnObject<VisibleObject>();
+		m->SetModel("Island");
+		m->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/Island"));
+		m->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Assets/Materials/grass"));
+
+		float rad = 1.0f;
+		float s = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f * PI;
+		float t = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f * PI;
+
+
+		float x = rad * cos(s) * sin(t);
+		float y = rad * sin(s) * sin(t);
+		float z = rad * cos(t);
+		Vector loc(x, y, z * 0.3f);
+		loc *= i * 5;
+
+		auto c = SpawnObject<ColliderComponent>();
+		c->SetType(0);
+		c->SetTarget(c);
+		c->SetSize(m->GetModel()->GetAABB());
+		c->SetLocation({ 0, 0, 0 });
+		m->AddComponent(c);
+		m->SetLocation(loc);
+		m->SetRotation({ 0.f, 0.f, static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 360.f });
+	}
 }
 
 void FlightPlayer::RegisterInputs(InputComponent* com) 
@@ -99,9 +138,7 @@ void FlightPlayer::RegisterInputs(InputComponent* com)
 
 void FlightPlayer::RunInputW(float delta, bool KeyDown)
 {
-	Vector dir = -GetCamera()->GetForwardVector();
-	dir.Z = 0.f;
-	Movement->AddInput(dir.Normalize());
+	Movement->AddInput(-GetCamera()->GetForwardVector());
 }
 
 void FlightPlayer::RunInputA(float delta, bool KeyDown)
@@ -116,16 +153,14 @@ void FlightPlayer::RunInputD(float delta, bool KeyDown)
 
 void FlightPlayer::RunInputS(float delta, bool KeyDown)
 {
-	Vector dir = GetCamera()->GetForwardVector();
-	dir.Z = 0.f;
-	Movement->AddInput(dir.Normalize());
+	Movement->AddInput(GetCamera()->GetForwardVector());
 }
 
 void FlightPlayer::RunInputSpace(bool KeyDown)
 {
-	if (!Movement->IsInAir() && KeyDown) {
+	/*if (!Movement->IsInAir() && KeyDown) {
 		Movement->AddImpulse(Vector(0.f, 0.f, 200.f));
-	}
+	}*/
 }
 
 void FlightPlayer::InputOne(bool KeyDown)
@@ -141,10 +176,12 @@ void FlightPlayer::InputTwo(bool KeyDown)
 void FlightPlayer::RunInputShift(bool KeyDown)
 {
 	if (KeyDown) {
-		Movement->SetMaxSpeed(4.f);
+		Movement->SetMaxSpeed(20.f);
+		Movement->SetFlightMaxSpeed(20.f);
 	}
 	else {
 		Movement->SetMaxSpeed(Speed);
+		Movement->SetFlightMaxSpeed(Speed);
 	}
 }
 
@@ -208,6 +245,15 @@ void FlightPlayer::Tick(float delta)
 		time += delta;
 		Sky->SetLocation(Location);
 		Sky->GetModel()->GetMaterial(0)->SetParameter("time", time);
+
+		std::vector<LightComponent>* dirLight = IECS::GetComponentManager()->GetComponentVector<LightComponent>(IECS::GetComponentManager()->GetTypeIdByName("LightComponent"));
+
+		if (dirLight->size() > 0) {
+			LightComponent& l = dirLight->at(0);
+			l.Rotation = Vector::RotateByAxis(l.Rotation, {1, 0, 0}, delta * 0.1);
+
+			Sky->GetModel()->GetMaterial(0)->SetParameter("sunDirection", -l.Rotation);
+		}
 	}
 }
 
@@ -223,6 +269,26 @@ void FlightPlayer::BeginPlay()
 	WindowManager::SetShowCursor(0, true);
 	cursorState = false;
 	Movement->SetAllowMovement(false);
+
+
+	//Lights Testing
+	SystemsManager* WorldSystemsManager = IECS::GetSystemsManager();
+	ComponentManager* WorldComponentManager = IECS::GetComponentManager();
+	EntityManager* WorldEntityManager = IECS::GetEntityManager();
+
+
+	IComponentArrayQuerySystem<LightComponent>* lightSystem = static_cast<IComponentArrayQuerySystem<LightComponent>*> (WorldSystemsManager->GetSystemByName("LightControllerSystem"));
+
+	if (lightSystem != nullptr)
+	{
+		LightComponent* light = lightSystem->AddComponentToSystem();
+		light->Location = Vector();
+		light->LightType = LIGHT_DIRECTIONAL;
+		light->Size = 5.f;
+		light->Intensity = 6.0f;
+		light->Color = Vector(1.f);
+		light->Rotation = Vector(0, 0, -1);
+	}
 }
 
 void FlightPlayer::OnDestroyed()

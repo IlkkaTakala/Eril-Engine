@@ -20,6 +20,7 @@ struct State
 	Vector angular_v;
 	Vector acceleration;
 	Vector angular_a;
+	Vector gravity;
 };
 
 class MovementComponent : public BaseObject, public Tickable
@@ -38,8 +39,12 @@ public:
 	void SetGround(Terrain* t);
 	SceneComponent* GetTarget() const { return Object; }
 	void SetMass(float m) { mass = m; }
+	void SetAcceleration(float a) { in_acceleration = a; }
+	void SetAirControl(float c) { air_control = c; }
 	void SetBrake(float b) { brake = b; }
+	void SetAirBrake(float b) { airbrake = b; }
 	void SetMaxSpeed(float speed) { max_speed = speed; }
+	void SetFlightMaxSpeed(float speed) { flight_max_speed = speed; }
 	void SetPhysics(bool p) { isPhysics = p; }
 	void SetGravity(bool g) { isGravity = g; }
 	void SetAllowMovement(bool value) { allowMovement = value; }
@@ -55,6 +60,7 @@ public:
 	State OldState;
 
 private:
+	friend class ColliderComponent;
 	Ref<SceneComponent> Object;
 	RefWeak<Terrain> Terra;
 
@@ -66,15 +72,19 @@ private:
 	float mass;
 	float in_acceleration;
 	float max_speed;
+	float flight_max_speed;
 	float drag;
 	float brake;
+	float airbrake;
 	float air_control;
+	float stepHeight;
+	float air_time;
 
 	Force forces[16];
 	Vector directions[16];
 	int direction_count;
 	int force_count;
 
-	bulletObject* rigid;
+	//bulletObject* rigid;
 };
 

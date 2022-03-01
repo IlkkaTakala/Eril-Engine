@@ -5,7 +5,6 @@
 
 class Actor;
 class InstancedObject;
-class Light;
 class MovementComponent;
 class Terrain;
 class PauseUI;
@@ -52,8 +51,6 @@ private:
 
 	bool cursorState;
 	bool InputMode;
-	Ref<Light> DirLight;
-	Ref<Light> Lights[100];
 	Ref<InstancedObject> Trees;
 	Ref<InstancedObject> Trees2;
 	Ref<InstancedObject> Grass;

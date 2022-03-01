@@ -18,3 +18,8 @@ std::vector<String> split(const String& s, char delim) {
 	split(s, delim, std::back_inserter(elems));
 	return elems;
 }
+
+Vector Vector::Project(const Vector& other) const
+{
+	return (Dot(*this, other) / other.LengthSquared()) * other;
+}

@@ -48,6 +48,8 @@ void GC::CleanRunner()
 			Console::Log("Record " + d.ToString() + " is pending destroy");
 		}
 
+		MI->MarkUnused();
+
 		duration = std::chrono::steady_clock::now() - start;
 	}
 }

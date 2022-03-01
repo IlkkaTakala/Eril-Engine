@@ -11,6 +11,7 @@
 #include <Interface/AudioManager.h>
 #include <GamePlay/Scene.h>
 #include "Objects/InputComponent.h"
+#include "Objects/ColliderComponent.h"
 
 //ECS
 #include <Interface/IECS.h>
@@ -60,21 +61,24 @@ TestPlayer::TestPlayer() : Player()
 	InputMode = true;
 	cursorState = true;
 	spawnCounter = 0;
-
-	//Reqister used Inputs
 	
-
 	//Player Model
 	Mesh = SpawnObject<VisibleObject>();
 	Mesh->SetModel("Cube");
-	Mesh->GetModel()->SetAABB(AABB(Vector(-1.f), Vector(1.f)));
-	
+	Mesh->GetModel()->SetAABB(AABB(Vector(-1.f, -1.f, 0.f), Vector(1.f, 1.f, 2.f)));
 	SetLocation(Vector(0, 0, 2));
 
 	//Player Movement
 	Movement = SpawnObject<MovementComponent>();
 	Movement->SetTarget(dynamic_cast<Actor*>(this), Mesh->GetModel()->GetAABB());
-	Movement->SetGravity(true);
+	Movement->SetGravity(false);
+
+	PlayerCol = SpawnObject<ColliderComponent>();
+	AddComponent(PlayerCol);
+	PlayerCol->SetLocation(Vector(0.f, 0.f, 1.f), true);
+	PlayerCol->SetType(2);
+	PlayerCol->SetSize(Mesh->GetModel()->GetAABB());
+	PlayerCol->SetMovementTarget(Movement);
 
 	//Skybox
 	Sky = SpawnObject<VisibleObject>();
@@ -88,21 +92,59 @@ TestPlayer::TestPlayer() : Player()
 
 	pause = nullptr;
 
+	Plane = SpawnObject<VisibleObject>();
+	Plane->SetModel("Cube");
+	Plane->GetModel()->SetAABB(AABB(Vector(-20.f, -20.f, -0.5f), Vector(20.f, 20.f, 0.5f)));
+	Plane->SetScale(Vector(20.f, 20.f, 0.5f));
+	Plane->SetLocation(Vector(10.f, 10.f, 0.f));
 
-		
-	Collider = SpawnObject<Actor>();
+	PlaneCol = SpawnObject<ColliderComponent>();
+	PlaneCol->SetType(0);
+	PlaneCol->SetSize(Plane->GetModel()->GetAABB());
+	Plane->AddComponent(PlaneCol);
+
+	Box = SpawnObject<Actor>();
 
 	//Moment Model -> ColliderModel
-	ColliderModel = SpawnObject<VisibleObject>();
-	ColliderModel->SetModel("Cube");
-	ColliderModel->GetModel()->SetAABB(AABB(Vector(-0.5f), Vector(0.5f)));
+	BoxModel = SpawnObject<VisibleObject>();
+	BoxModel->SetModel("Cube");
+	BoxModel->GetModel()->SetAABB(AABB(Vector(-1.0f), Vector(1.0f)));
 
-	Collider->AddComponent(ColliderModel);
-	Collider->SetLocation(Vector(20, 2, 1));
+	Box->AddComponent(BoxModel);
+	Box->SetLocation(Vector(10.f, 10.f, 2.f));
+
+	BoxCol = SpawnObject<ColliderComponent>();
+	//BoxCol->SetLocation(Box->GetLocation(), true);
+	Box->AddComponent(BoxCol);
+	BoxCol->SetType(0);
+	BoxCol->SetSize(BoxModel->GetModel()->GetAABB());
 	
+	/*BoxModelMove = SpawnObject<MovementComponent>();
+	BoxModelMove->SetTarget(Box, BoxModel->GetModel()->GetAABB());
+	BoxModelMove->SetGravity(true);*/
+	//BoxModelMove->SetPhysics(true);
+	//BoxCol->SetTarget(Box);
 
-	ColliderModelMove = SpawnObject<MovementComponent>();
-	ColliderModelMove->SetTarget(Collider, ColliderModel->GetModel()->GetAABB());
+	Box2 = SpawnObject<Actor>();
+
+	BoxModel2 = SpawnObject<VisibleObject>();
+	BoxModel2->SetModel("Cube");
+	BoxModel2->GetModel()->SetAABB(AABB(Vector(-1.0f), Vector(1.0f)));
+
+	Box2->AddComponent(BoxModel2);
+	Box2->SetLocation(Vector(10.f, 10.f, 12.f));
+
+	BoxCol2 = SpawnObject<ColliderComponent>();
+	Box2->AddComponent(BoxCol2);
+	//BoxCol->SetLocation(Box->GetLocation(), true);
+	BoxCol2->SetType(1);
+	BoxCol2->SetSize(BoxModel2->GetModel()->GetAABB());
+
+	//BoxModelMove = SpawnObject<MovementComponent>();
+	//BoxModelMove->SetTarget(Box2, BoxModel2->GetModel()->GetAABB());
+	//BoxModelMove->SetGravity(true);
+	////BoxModelMove->SetPhysics(true);
+	//BoxCol2->SetTarget(BoxModelMove);
 
 	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
 
@@ -110,8 +152,8 @@ TestPlayer::TestPlayer() : Player()
 
 void TestPlayer::TestTimer(float d)
 {
-	Console::Log("Location changed");
-	Collider->SetLocation(Vector(30, 0, 1), true);
+	//Console::Log("Location changed");
+	//Collider->SetLocation(Vector(30, 0, 1), true);
 }
 
 
@@ -154,7 +196,7 @@ void TestPlayer::RunInputS(float delta, bool KeyDown)
 void TestPlayer::RunInputSpace(bool KeyDown)
 {
 	if (!Movement->IsInAir() && KeyDown)
-		Movement->AddImpulse(Vector(0.f, 0.f, 300.f));
+		Movement->AddImpulse(Vector(0.f, 0.f, 600.f));
 }
 
 void TestPlayer::InputOne(bool KeyDown)
@@ -216,8 +258,12 @@ void TimeFunction (float d)
 
 void TestPlayer::Tick(float deltaTime)
 {
-	
-	Vector loc = Collider->GetLocation();
+	//Console::Log((BoxCol->GetWorldLocation()).ToString() + " BoxCol");
+	//Console::Log((Box->GetWorldLocation()).ToString() + " Box");
+	//Console::Log((GetWorldLocation()).ToString() + " Player");
+	//Console::Log((PlayerCol->GetWorldLocation()).ToString() + " PlayerCol");
+
+	Vector loc = Box->GetLocation();
 	GetCamera()->SetLocation(Location + Vector(0.f, 0.f, 1.5f));
 	GetCamera()->SetRotation(Rotation);
 	Sky->SetLocation(Location);
