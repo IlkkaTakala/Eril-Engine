@@ -1,10 +1,10 @@
 #include "Interface/IRender.h"
-#include "ForestPlayer.h"
+#include "FlightPlayer.h"
 #include "Objects/MovementComponent.h"
 #include "Objects/Terrain.h"
 #include "Timer.h"
 #include "Objects/InstancedObject.h"
-#include "Ghost.h"
+#include "Enemy.h"
 #include "Objects/Actor.h"
 #include "TestArea/TestUI.h"
 #include "PauseUI.h"
@@ -13,6 +13,7 @@
 #include "EndScreen.h"
 #include "StartScreen.h"
 #include "Objects/InputComponent.h"
+#include "Material.h"
 
 //ECS
 #include <Interface/IECS.h>
@@ -22,13 +23,13 @@
 #include <ECS/Components/AudioComponent.h>
 #include <ECS/Systems/AudioControllerSystem.h>
 
-class Ghost;
+class Enemy;
 
-void ForestPlayer::OpenConsole(bool) {
+void FlightPlayer::OpenConsole(bool) {
 	Console::Create();
 }
 
-void ForestPlayer::UseCursor(bool keydown)
+void FlightPlayer::UseCursor(bool keydown)
 {
 	if (keydown && pause == nullptr) {
 		WindowManager::SetShowCursor(0, cursorState);
@@ -36,7 +37,7 @@ void ForestPlayer::UseCursor(bool keydown)
 	}
 }
 
-void ForestPlayer::Caught()
+void FlightPlayer::Caught()
 {
 	end = SpawnObject<EndScreen>();
 	UI::AddToScreen(end, this);
@@ -46,7 +47,7 @@ void ForestPlayer::Caught()
 	Movement->SetAllowMovement(false);
 }
 
-void ForestPlayer::Winner()
+void FlightPlayer::Winner()
 {
 	end = SpawnObject<EndScreen>();
 	UI::AddToScreen(end, this);
@@ -54,94 +55,90 @@ void ForestPlayer::Winner()
 	WindowManager::SetShowCursor(0, true);
 	cursorState = false;
 	Movement->SetAllowMovement(false);
-	ObjectManager::GetByRecord<Ghost>(0x10)->stopMoving();
+	ObjectManager::GetByRecord<Enemy>(0x10)->stopMoving();
 }
 
-ForestPlayer::ForestPlayer() : Player()
+FlightPlayer::FlightPlayer() : Player()
 {
 	mouseSens = 0.1f;
 	Speed = 2.5f;
-
+	time = 0.f;
 	InputMode = true;
 	cursorState = true;
 	pause = nullptr;
 	end = nullptr;
 	start = nullptr;
-	spawnCounter = 0;
-
-	//Reqister used Inputs
-	
 
 	Movement = SpawnObject<MovementComponent>();
 	Movement->SetTarget(dynamic_cast<Actor*>(this));
-	Movement->SetGravity(true);
+	Movement->SetGravity(false);
 	Movement->SetPhysics(false);
 	Movement->SetMaxSpeed(Speed);
 
-	GetCamera()->SetPostProcess("PostProcessForest");
+	//GetCamera()->SetPostProcess("PostProcessForest");
 }
 
-void ForestPlayer::RegisterInputs(InputComponent* com) 
+void FlightPlayer::RegisterInputs(InputComponent* com) 
 {
-	com->RegisterKeyContinuousInput(87, &ForestPlayer::RunInputW, this);
-	com->RegisterKeyContinuousInput(65, &ForestPlayer::RunInputA, this);
-	com->RegisterKeyContinuousInput(83, &ForestPlayer::RunInputS, this);
-	com->RegisterKeyContinuousInput(68, &ForestPlayer::RunInputD, this);
-	com->RegisterKeyInput(32, &ForestPlayer::RunInputSpace, this);
-	com->RegisterKeyInput(340, &ForestPlayer::RunInputShift, this);
-	com->RegisterKeyInput(0, &ForestPlayer::LeftMouseDown, this);
-	com->RegisterKeyInput(1, &ForestPlayer::RightMouseDown, this);
-	com->RegisterKeyInput(49, &ForestPlayer::InputOne, this);
-	com->RegisterKeyInput(50, &ForestPlayer::InputTwo, this);
-	com->RegisterKeyInput(256, &ForestPlayer::InputExit, this);
-	com->RegisterKeyInput(257, &ForestPlayer::OpenConsole, this);
-	com->RegisterMouseInput(0, &ForestPlayer::MouseMoved, this);
-	com->RegisterKeyInput(69, &ForestPlayer::ItemPickE, this);
-	com->RegisterKeyInput(81, &ForestPlayer::InputQ, this);
+	com->RegisterKeyContinuousInput(87, &FlightPlayer::RunInputW, this);
+	com->RegisterKeyContinuousInput(65, &FlightPlayer::RunInputA, this);
+	com->RegisterKeyContinuousInput(83, &FlightPlayer::RunInputS, this);
+	com->RegisterKeyContinuousInput(68, &FlightPlayer::RunInputD, this);
+	com->RegisterKeyInput(32, &FlightPlayer::RunInputSpace, this);
+	com->RegisterKeyInput(340, &FlightPlayer::RunInputShift, this);
+	com->RegisterKeyInput(0, &FlightPlayer::LeftMouseDown, this);
+	com->RegisterKeyInput(1, &FlightPlayer::RightMouseDown, this);
+	com->RegisterKeyInput(49, &FlightPlayer::InputOne, this);
+	com->RegisterKeyInput(50, &FlightPlayer::InputTwo, this);
+	com->RegisterKeyInput(256, &FlightPlayer::InputExit, this);
+	com->RegisterKeyInput(257, &FlightPlayer::OpenConsole, this);
+	com->RegisterMouseInput(0, &FlightPlayer::MouseMoved, this);
+	com->RegisterKeyInput(69, &FlightPlayer::ItemPickE, this);
+	com->RegisterKeyInput(81, &FlightPlayer::InputQ, this);
 }
 
-void ForestPlayer::RunInputW(float delta, bool KeyDown)
+void FlightPlayer::RunInputW(float delta, bool KeyDown)
 {
 	Vector dir = -GetCamera()->GetForwardVector();
 	dir.Z = 0.f;
 	Movement->AddInput(dir.Normalize());
 }
 
-void ForestPlayer::RunInputA(float delta, bool KeyDown)
+void FlightPlayer::RunInputA(float delta, bool KeyDown)
 {
 	Movement->AddInput(-GetCamera()->GetRightVector());
 }
 
-void ForestPlayer::RunInputD(float delta, bool KeyDown)
+void FlightPlayer::RunInputD(float delta, bool KeyDown)
 {
 	Movement->AddInput(GetCamera()->GetRightVector());
 }
 
-void ForestPlayer::RunInputS(float delta, bool KeyDown)
+void FlightPlayer::RunInputS(float delta, bool KeyDown)
 {
 	Vector dir = GetCamera()->GetForwardVector();
 	dir.Z = 0.f;
 	Movement->AddInput(dir.Normalize());
 }
 
-void ForestPlayer::RunInputSpace(bool KeyDown)
+void FlightPlayer::RunInputSpace(bool KeyDown)
 {
 	if (!Movement->IsInAir() && KeyDown) {
 		Movement->AddImpulse(Vector(0.f, 0.f, 200.f));
 	}
 }
 
-void ForestPlayer::InputOne(bool KeyDown)
+void FlightPlayer::InputOne(bool KeyDown)
 {
 	
 }
 
-void ForestPlayer::InputTwo(bool KeyDown)
+void FlightPlayer::InputTwo(bool KeyDown)
 {
 	
 }
 
-void ForestPlayer::RunInputShift(bool KeyDown)
+void FlightPlayer::RunInputShift(bool KeyDown)
 {
 	if (KeyDown) {
 		Movement->SetMaxSpeed(4.f);
@@ -151,18 +148,18 @@ void ForestPlayer::RunInputShift(bool KeyDown)
 	}
 }
 
-void ForestPlayer::LeftMouseDown(bool KeyDown)
+void FlightPlayer::LeftMouseDown(bool KeyDown)
 {
 	//DisableInput();
 }
 
-void ForestPlayer::RightMouseDown(bool KeyDown)
+void FlightPlayer::RightMouseDown(bool KeyDown)
 {
 	/*if (KeyDown == true)
 	Console::Log((GetCamera()->GetLocation() + Vector(0.f, 0.f, -2.2f)).ToString());*/
 }
 
-void ForestPlayer::InputQ(bool KeyDown)
+void FlightPlayer::InputQ(bool KeyDown)
 {
 	if (start != nullptr && end == nullptr) {
 		start->UI::RemoveFromScreen();
@@ -170,41 +167,22 @@ void ForestPlayer::InputQ(bool KeyDown)
 		WindowManager::SetShowCursor(0, false);
 		cursorState = true;
 		Movement->SetAllowMovement(true);
-		ObjectManager::GetByRecord<Ghost>(0x10)->startMoving();
+		//ObjectManager::GetByRecord<Enemy>(0x10)->startMoving();
 	}
 }
 
-void ForestPlayer::ItemPickE(bool KeyDown)
+void FlightPlayer::ItemPickE(bool KeyDown)
 {
-	if (!KeyDown) {
-
-		float distance = 10000.f;
-		auto index = Candys.end();
-		for (auto i = Candys.begin(); i != Candys.end(); i++) {
-			float d = ((*i)->GetLocation() - GetLocation()).Length();
-			distance = d;
-			index = i;
-			if (distance < 2.0f) {
-				(*index)->DestroyObject();
-				Candys.erase(index);
-				Items.push_back(SpawnObject<Item>());
-				Console::Log("Items: " + std::to_string(Items.size()));
-				if (Items.size() == 5) {
-					Winner();
-				}
-				break;
-			}
-		}
-	}
+	
 }
 
-void ForestPlayer::MouseMoved(float X, float Y)
+void FlightPlayer::MouseMoved(float X, float Y)
 {
 	const Vector& rot = Rotation;
 	if (cursorState) SetRotation(Vector(rot.X + X * mouseSens, rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, rot.Z));
 }
 
-void ForestPlayer::InputExit(bool down)
+void FlightPlayer::InputExit(bool down)
 {
 	if (!down) return;
 	if (pause == nullptr) {
@@ -221,24 +199,24 @@ void ForestPlayer::InputExit(bool down)
 	}
 }
 
-void ForestPlayer::Tick(float)
+void FlightPlayer::Tick(float delta)
 {
 	GetCamera()->SetLocation(Location + Vector(0.f, 0.f, 2.2f));
 	GetCamera()->SetRotation(Rotation);
+
+	if (Sky) {
+		time += delta;
+		Sky->SetLocation(Location);
+		Sky->GetModel()->GetMaterial(0)->SetParameter("time", time);
+	}
 }
 
-void ForestPlayer::BeginPlay()
+void FlightPlayer::BeginPlay()
 {
-	Movement->SetGround(ObjectManager::GetByRecord<Terrain>(0xA0001111));
-	ObjectManager::GetByRecord<Ghost>(0x10)->stopMoving();
+	//ObjectManager::GetByRecord<Enemy>(0x10)->stopMoving();
+	Sky = ObjectManager::GetByRecord<VisibleObject>(0x5AA);
 
 	Console::Log("Hello beautiful world");
-
-	Candys.push_back(ObjectManager::GetByRecord<VisibleObject>(0xC1));
-	Candys.push_back(ObjectManager::GetByRecord<VisibleObject>(0xC2));
-	Candys.push_back(ObjectManager::GetByRecord<VisibleObject>(0xC3));
-	Candys.push_back(ObjectManager::GetByRecord<VisibleObject>(0xC4));
-	Candys.push_back(ObjectManager::GetByRecord<VisibleObject>(0xC5));
 
 	start = SpawnObject<StartScreen>();
 	UI::AddToScreen(start, this);
@@ -247,9 +225,9 @@ void ForestPlayer::BeginPlay()
 	Movement->SetAllowMovement(false);
 }
 
-void ForestPlayer::OnDestroyed()
+void FlightPlayer::OnDestroyed()
 {
-
+	Player::OnDestroyed();
 }
 
 Item::Item() : BaseObject()

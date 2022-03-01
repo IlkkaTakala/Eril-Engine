@@ -16,6 +16,7 @@ class UISpace;
 class Camera
 {
 public:
+	virtual ~Camera() {}
 	virtual void SetRotation(const Vector& rotation) = 0;
 	virtual void SetLocation(const Vector& location) = 0;
 
@@ -44,6 +45,7 @@ public:
 
 	virtual Camera* CreateCamera(VisibleObject* parent = nullptr) = 0;
 	virtual void SetActiveCamera(Camera*) = 0;
+	virtual Camera* GetActiveCamera() const = 0;
 	
 	//virtual void CreateLight(const LightData*) = 0; //Lights have been moved to be handled by the ECS-system.
 	//virtual void RemoveLight(const LightData*) = 0; //Lights have been moved to be handled by the ECS-system.

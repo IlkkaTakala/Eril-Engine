@@ -1,29 +1,27 @@
-#include "StartScreen.h"
+#include "EndScreen.h"
 #include <UI/Panel.h>
 #include <UI/Image.h>
 #include <UI/Text.h>
 #include <UI/Button.h>
 #include <Gameplay/Scene.h>
-#include "ForestPlayer.h"
+#include "FlightPlayer.h"
 
-void StartScreen::Construct()
+void EndScreen::Construct()
 {
+	endText = Create<Text>()->SetText("", 150);
+	endText->SetTransform(0.f, 0.f, 0.f, 0.f, Vector(0.15f), Vector(0.25f));
+
 	AddComponent(
 		Create<Panel>()->AddChild(
 			Create<Image>()->SetStyle(UIStyle(Vector(0.2f), 0.9f))
 			->SetTransform(0.f, 0.f, 0.f, 0.f, Vector(0.f, 1.f, 0.f), Vector(0.f, 1.f, 0.f))
 		)->AddChild(
-			Create<Text>()->SetText("Welcome to Ghost Woods.", 30)
-			->SetTransform(0.f, 0.f, 0.f, 0.f, Vector(0.1f), Vector(0.36f))
+			endText
 		)->AddChild(
-			Create<Text>()->SetText("Your objective is to collect 5 candy canes before ghost catches you.", 30)
-			->SetTransform(0.f, 0.f, 0.f, 0.f, Vector(0.15f), Vector(0.13f))
-		)->AddChild(
-			Create<Text>()->SetText("Controls: WASD to move. E to pickup. SHIFT to sprint. MOUSE to look.", 30)
-			->SetTransform(0.f, 0.f, 0.f, 0.f, Vector(0.2f), Vector(0.11f))
-		)->AddChild(
-			Create<Text>()->SetText("Press Q to start playing.", 30)
-			->SetTransform(0.f, 0.f, 0.f, 0.f, Vector(0.39f), Vector(0.37f))
+			Create<Button>()->AddChild(
+				Create<Text>()->SetText("Play again", 20)->SetStyle(Vector(0.f))
+			)->SetEventCallback(Constants::UI::UI_ON_MOUSE_DOWN, []() { Scene::OpenLevel("Game/FlightGame/skyflight"); })
+			->SetTransform(-50.f, 100.f, -70.f, 25.f, Vector(0.5f), Vector(0.5f))
 		)->AddChild(
 			Create<Button>()->AddChild(
 				Create<Text>()->SetText("Main menu", 20)->SetStyle(Vector(0.f))
@@ -39,3 +37,7 @@ void StartScreen::Construct()
 	);
 }
 
+void EndScreen::SetText(const String& s)
+{
+	endText->SetText(s);
+}

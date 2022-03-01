@@ -30,12 +30,12 @@ public:
 //ECS TEST
 class ECSExample;
 
-class ForestPlayer : public Player
+class FlightPlayer : public Player
 {
-	REGISTER(ForestPlayer);
+	REGISTER(FlightPlayer);
 public:
-	ForestPlayer();
-	virtual ~ForestPlayer() { /*INI->SetValue("Player", "Start", CameraPoint.ToString()); INI->SetValue("Player", "Direction", CameraDirection.ToString());*/ }
+	FlightPlayer();
+	virtual ~FlightPlayer() { }
 	virtual void Tick(float Delta) override;
 	virtual void BeginPlay() override;
 	virtual void OnDestroyed() override;
@@ -70,26 +70,12 @@ private:
 
 	bool cursorState;
 	bool InputMode;
-	Ref<Light> DirLight;
-	Ref<Light> Lights[100];
-	Ref<InstancedObject> Trees;
-	Ref<InstancedObject> Trees2;
-	Ref<InstancedObject> Grass;
-	Ref<InstancedObject> Flowers;
-	Ref<InstancedObject> Rocks;
-	Ref<InstancedObject> Shacks;
-	Ref<InstancedObject> Candy;
+	Ref<InstancedObject> Clouds;
 
 	Ref<VisibleObject> Sky;
-	Ref<Terrain> terra[4];
-	Ref<Hunter> hunt;
 	PauseUI* pause;
 	EndScreen* end;
 	StartScreen* start;
-	std::vector<RefWeak<VisibleObject>> Candys;
-	std::vector<Ref<Item>> Items;
 
-	//ECS TEST
-	Ref<ECSExample> ecsExample;
-	int spawnCounter;
+	float time;
 };

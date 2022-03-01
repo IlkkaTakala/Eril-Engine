@@ -4,11 +4,11 @@
 
 class MovementComponent;
 
-class Ghost : public Actor
+class Enemy : public Actor
 {
-	REGISTER(Ghost)
+	REGISTER(Enemy)
 public:
-	Ghost();
+	Enemy();
 	Ref<MovementComponent> move;
 
 	virtual void Tick(float) override;

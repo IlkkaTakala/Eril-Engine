@@ -22,5 +22,6 @@ void Player::LoadWithParameters(const String& args)
 
 void Player::OnDestroyed()
 {
+	Actor::OnDestroyed();
 	delete PlayerCamera;
 }

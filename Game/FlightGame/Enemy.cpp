@@ -1,4 +1,4 @@
-#include "Ghost.h"
+#include "Enemy.h"
 #include "Material.h"
 #include <Objects/Terrain.h>
 #include <Objects/MovementComponent.h>
@@ -6,9 +6,9 @@
 #include <Gameplay/GameState.h>
 #include <Gameplay/PlayerController.h>
 #include <Objects/VisibleObject.h>
-#include "ForestPlayer.h"
+#include "FlightPlayer.h"
 
-Ghost::Ghost() : Actor()
+Enemy::Enemy() : Actor()
 {
 	Mesh = SpawnObject<VisibleObject>();
 	AddComponent(Mesh);
@@ -20,16 +20,15 @@ Ghost::Ghost() : Actor()
 	move = SpawnObject<MovementComponent>();
 	move->SetTarget(this);
 	move->SetGravity(true);
-	move->SetGround(ObjectManager::GetByRecord<Terrain>(0xA0001111));
 	move->SetMaxSpeed(3.0f);
 	caught = false;
 	
 	time = 0.f;
 
-	Timer::CreateTimer(1.f, &Ghost::SetNewTarget, this, true);
+	Timer::CreateTimer(1.f, &Enemy::SetNewTarget, this, true);
 }
 
-void Ghost::Tick(float delta)
+void Enemy::Tick(float delta)
 {
 	time += delta;
 	Mesh->GetModel()->GetMaterial(0)->SetParameter("delta", time);
@@ -45,7 +44,7 @@ void Ghost::Tick(float delta)
 		if ((playerLoc - Location).Length() < 2.f) {
 			caught = true;
 			Console::Log("Player caught, game over!");
-			dynamic_cast<ForestPlayer*>(GetGameState()->CurrentPlayer.GetPointer())->Caught();
+			dynamic_cast<FlightPlayer*>(GetGameState()->CurrentPlayer.GetPointer())->Caught();
 			move->SetAllowMovement(false);
 		}
 	}
@@ -54,17 +53,17 @@ void Ghost::Tick(float delta)
 	}
 }
 
-void Ghost::stopMoving()
+void Enemy::stopMoving()
 {
 	move->SetAllowMovement(false);
 }
 
-void Ghost::startMoving()
+void Enemy::startMoving()
 {
 	move->SetAllowMovement(true);
 }
 
-void Ghost::SetNewTarget(float delta)
+void Enemy::SetNewTarget(float delta)
 {
 	if (GetGameState()->CurrentPlayer != nullptr)
 		targetLoc = GetGameState()->CurrentPlayer->GetLocation();
