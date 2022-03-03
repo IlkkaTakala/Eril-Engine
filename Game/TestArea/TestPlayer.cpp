@@ -11,7 +11,7 @@
 #include <Interface/AudioManager.h>
 #include <GamePlay/Scene.h>
 #include "Objects/InputComponent.h"
-#include "Objects/ColliderComponent.h"
+#include "Objects/CollisionShape.h"
 
 //ECS
 #include <Interface/IECS.h>
@@ -75,11 +75,11 @@ TestPlayer::TestPlayer() : Player()
 	Movement->SetTarget(dynamic_cast<Actor*>(this), Mesh->GetModel()->GetAABB());
 	Movement->SetGravity(false);
 
-	PlayerCol = SpawnObject<ColliderComponent>();
+	PlayerCol = SpawnObject<CapsuleCollisionShape>();
 	AddComponent(PlayerCol);
 	PlayerCol->SetLocation(Vector(0.f, 0.f, 1.f), true);
 	PlayerCol->SetType(2);
-	PlayerCol->SetSize(Mesh->GetModel()->GetAABB());
+	PlayerCol->SetSize(Mesh->GetModel()->GetAABB().maxs.X, Mesh->GetModel()->GetAABB().maxs.Z);
 	PlayerCol->SetMovementTarget(Movement);
 
 	//Skybox
@@ -100,7 +100,7 @@ TestPlayer::TestPlayer() : Player()
 	Plane->SetScale(Vector(20.f, 20.f, 0.5f));
 	Plane->SetLocation(Vector(10.f, 10.f, 0.f));
 
-	PlaneCol = SpawnObject<ColliderComponent>();
+	PlaneCol = SpawnObject<BoxCollisionShape>();
 	PlaneCol->SetType(0);
 	PlaneCol->SetSize(Plane->GetModel()->GetAABB());
 	Plane->AddComponent(PlaneCol);
@@ -115,8 +115,7 @@ TestPlayer::TestPlayer() : Player()
 	Box->AddComponent(BoxModel);
 	Box->SetLocation(Vector(10.f, 10.f, 2.f));
 
-	BoxCol = SpawnObject<ColliderComponent>();
-	//BoxCol->SetLocation(Box->GetLocation(), true);
+	BoxCol = SpawnObject<BoxCollisionShape>();
 	Box->AddComponent(BoxCol);
 	BoxCol->SetType(0);
 	BoxCol->SetSize(BoxModel->GetModel()->GetAABB());
@@ -130,17 +129,19 @@ TestPlayer::TestPlayer() : Player()
 	Box2 = SpawnObject<Actor>();
 
 	BoxModel2 = SpawnObject<VisibleObject>();
-	BoxModel2->SetModel("Cube");
-	BoxModel2->GetModel()->SetAABB(AABB(Vector(-1.0f), Vector(1.0f)));
+	BoxModel2->SetModel("cylinder");
+	//BoxModel2->SetScale(0.5f);
+	//BoxModel2->GetModel()->SetAABB(AABB(Vector(-1.0f), Vector(1.0f)));
 
 	Box2->AddComponent(BoxModel2);
-	Box2->SetLocation(Vector(10.f, 10.f, 12.f));
+	Box2->SetLocation(Vector(10.f, 10.f, 5.f));
 
-	BoxCol2 = SpawnObject<ColliderComponent>();
-	Box2->AddComponent(BoxCol2);
-	//BoxCol->SetLocation(Box->GetLocation(), true);
+	BoxCol2 = SpawnObject<CapsuleCollisionShape>();
 	BoxCol2->SetType(1);
-	BoxCol2->SetSize(BoxModel2->GetModel()->GetAABB());
+	Box2->AddComponent(BoxCol2);
+	BoxCol2->SetSize(BoxModel2->GetModel()->GetAABB().maxs.X, BoxModel2->GetModel()->GetAABB().maxs.Z);
+	BoxCol2->SetLocation(Vector(0.f, 0.f, 0.f));
+
 
 	//BoxModelMove = SpawnObject<MovementComponent>();
 	//BoxModelMove->SetTarget(Box2, BoxModel2->GetModel()->GetAABB());
@@ -198,7 +199,7 @@ void TestPlayer::RunInputS(float delta, bool KeyDown)
 void TestPlayer::RunInputSpace(bool KeyDown)
 {
 	if (!Movement->IsInAir() && KeyDown)
-		Movement->AddImpulse(Vector(0.f, 0.f, 600.f));
+		Movement->AddImpulse(Vector(0.f, 0.f, 6000.f));
 }
 
 void TestPlayer::InputOne(bool KeyDown)
@@ -260,7 +261,8 @@ void TimeFunction (float d)
 
 void TestPlayer::Tick(float deltaTime)
 {
-	//Console::Log((BoxCol->GetWorldLocation()).ToString() + " BoxCol");
+	//Console::Log((BoxCol2->GetWorldLocation()).ToString() + " BoxCol2");
+	//Console::Log((BoxCol->GetWorldLocation()).ToString() + " BoxCol2");
 	//Console::Log((Box->GetWorldLocation()).ToString() + " Box");
 	//Console::Log((GetWorldLocation()).ToString() + " Player");
 	//Console::Log((PlayerCol->GetWorldLocation()).ToString() + " PlayerCol");

@@ -111,7 +111,7 @@ void MovementComponent::Tick(float time)
 			DesiredState.location.Z = Terra->GetHeight(DesiredState.location.X, DesiredState.location.Y);
 		}
 		DesiredState.velocity = velocity;
-		Console::Log(velocity.ToString());
+		//Console::Log(velocity.ToString());
 	}
 	break;
 	}
