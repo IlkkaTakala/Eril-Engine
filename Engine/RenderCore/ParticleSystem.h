@@ -6,6 +6,8 @@ struct Particle;
 class RenderMesh;
 class ParticleSystemConstruction;
 class ParticleSystem;
+class CurveData;
+class VectorCurveData;
 
 class ParticleSystemConstruction
 {
@@ -17,12 +19,13 @@ public:
 	};
 
 	struct Updator {
-		Updator(ParticleSystem* s, float delta) : system(s), delta(delta) {}
+		Updator(ParticleSystem* s) : system(s) {}
 		ParticleSystem* system;
-		float delta;
 
-		inline void UpdateVelocities() const;
-		inline void UpdateLifetime() const;
+		inline void UpdateVelocities(float delta) const;
+		inline void UpdateLifetime(float delta) const;
+		inline void Color(float delta, const VectorCurveData& curve) const;
+		inline void Alpha(float delta, const CurveData& curve) const;
 	};
 
 private:
@@ -59,8 +62,11 @@ private:
 	friend class ParticleSystemConstruction;
 	ParticleSystem();
 
+	void SetMaterial();
+
 	bool Active;
 	bool FaceCamera;
+	bool Type;
 	uint32 ParticleCount;
 	uint32 MaxParticleCount;
 	bool Autoplay;
@@ -77,6 +83,8 @@ private:
 	DefaultUpdate updator;
 
 	RenderMesh* sprite;
+
+	uint MaterialBuffer;
 
 public:
 	void SetSpawner(ParticleSystemConstruction::Spawner* func) { if (spawner) delete spawner; spawner = func; }

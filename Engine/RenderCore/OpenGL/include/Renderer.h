@@ -29,7 +29,8 @@ public:
 
 	virtual Camera* CreateCamera(SceneComponent* parent = nullptr) override;
 	virtual void SetActiveCamera(Camera*) override;
-	
+	virtual Camera* GetActiveCamera() const override;
+
 	//virtual void CreateLight(const LightData*) override; //Lights have been moved to be handled by the ECS-system.
 	//virtual void RemoveLight(const LightData*) override; //Lights have been moved to be handled by the ECS-system.
 	

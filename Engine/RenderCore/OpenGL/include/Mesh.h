@@ -86,6 +86,10 @@ public:
 	virtual void SetInstanceCount(int count) override;
 
 	void SetParent(SceneComponent* parent);
+	virtual SceneComponent* GetParent() const { return Parent; }
+
+	virtual void SetBinds(std::function<void(void)> bind) override;
+	virtual std::function<void(void)>& GetBinds() override;
 
 private:
 	friend class Renderer;
@@ -95,4 +99,6 @@ private:
 	uint SectionCount;
 	glm::mat4 ModelMatrix;
 	bool requireUpdate;
+
+	std::function<void(void)> binds;
 };

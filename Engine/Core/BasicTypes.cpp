@@ -74,3 +74,45 @@ Vector Vector::Project(const Vector& other) const
 {
 	return (Dot(*this, other) / other.LengthSquared()) * other;
 }
+
+Vector Vector::toEuler(const Vector& in, double angle)
+{
+	Vector out;
+	Vector edit = in;
+	edit.Z = in.Y;
+	edit.Y = in.Z;
+	double s = sin(angle);
+	double c = cos(angle);
+	double t = 1 - c;
+	//  if axis is not already normalised then uncomment this
+	// double magnitude = Math.sqrt(in.X*in.X + in.Y*in.Y + in.Z*in.Z);
+	// if (magnitude==0) throw error;
+	// in.X /= magnitude;
+	// in.Y /= magnitude;
+	// in.Z /= magnitude;
+	if ((edit.X * edit.Y * t + edit.Z * s) > 0.998) {
+		out.Y = 2 * (float)atan2(edit.X * sin(angle / 2), cos(angle / 2));
+		out.Z = PI / 2;
+		out.X = 0;
+		out.X = degrees(out.X);
+		out.Y = degrees(out.Y);
+		out.Z = degrees(out.Z);
+		return out;
+	}
+	if ((edit.X * edit.Y * t + edit.Z * s) < -0.998) {
+		out.Y = -2 * (float)atan2(edit.X * sin(angle / 2), cos(angle / 2));
+		out.Z = -PI / 2;
+		out.X = 0;
+		out.X = degrees(out.X);
+		out.Y = degrees(out.Y);
+		out.Z = degrees(out.Z);
+		return out;
+	}
+	out.Y = (float)atan2(edit.Y * s - edit.X * edit.Z * t, 1 - (edit.Y * edit.Y + edit.Z * edit.Z) * t);
+	out.Z = (float)asin(edit.X * edit.Y * t + edit.Z * s);
+	out.X = (float)atan2(edit.X * s - edit.Y * edit.Z * t, 1 - (edit.X * edit.X + edit.Z * edit.Z) * t);
+	out.X = degrees(out.X);
+	out.Y = degrees(out.Y);
+	out.Z = degrees(out.Z);
+	return out;
+}

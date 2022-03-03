@@ -403,6 +403,11 @@ void Renderer::SetActiveCamera(Camera* cam)
 	ActiveCamera = dynamic_cast<GLCamera*>(cam);
 }
 
+Camera* Renderer::GetActiveCamera() const
+{
+	return ActiveCamera;
+}
+
 /* //Lights have been moved to be handled by the ECS-system.
 void Renderer::CreateLight(const LightData* light)
 {
@@ -936,7 +941,7 @@ void Renderer::Forward(int width, int height)
 	{
 		if (s == nullptr) continue;
 
-		if (s->Pass != 0) continue;
+		if (s->Pass != 0 || s->GetUsers().size() == 0) continue;
 
 		if (s->FaceCulling == 1) glDisable(GL_CULL_FACE);
 		else glEnable(GL_CULL_FACE);
@@ -1006,7 +1011,7 @@ void Renderer::Forward(int width, int height)
 	{
 		if (s == nullptr) continue;
 
-		if (s->Pass != 1) continue;
+		if (s->Pass != 1 || s->GetUsers().size() == 0) continue;
 
 		if (s->FaceCulling == 1) glDisable(GL_CULL_FACE);
 		else glEnable(GL_CULL_FACE);

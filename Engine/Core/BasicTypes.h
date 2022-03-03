@@ -266,35 +266,8 @@ struct Vector
 		return y;
 	}
 
-	static Vector toEuler(const Vector& in, double angle) {
-		Vector out;
-		double s = sin(angle);
-		double c = cos(angle);
-		double t = 1 - c;
-		//  if ain.Xis is not alreadin.Y normalised then uncomment this
-		// double magnitude = Math.sqrt(in.X*in.X + in.Y*in.Y + in.Z*in.Z);
-		// if (magnitude==0) throw error;
-		// in.X /= magnitude;
-		// in.Y /= magnitude;
-		// in.Z /= magnitude;
-		if ((in.X * in.Y * t + in.Z * s) > 0.998) { // north pole singularitin.Y detected
-			out.Y = 2 * (float)atan2(in.X * sin(angle / 2), cos(angle / 2));
-			out.Z = PI / 2;
-			out.X = 0;
-			return 0.f;
-		}
-		if ((in.X * in.Y * t + in.Z * s) < -0.998) { // south pole singularitin.Y detected
-			out.Y = -2 * (float)atan2(in.X * sin(angle / 2), cos(angle / 2));
-			out.Z = -PI / 2;
-			out.X = 0;
-			return 0.f;
-		}
-		out.Y = (float)atan2(in.Y * s - in.X * in.Z * t, 1 - (in.Y * in.Y + in.Z * in.Z) * t);
-		out.Z = (float)asin(in.X * in.Y * t + in.Z * s);
-		out.X = (float)atan2(in.X * s - in.Y * in.Z * t, 1 - (in.X * in.X + in.Z * in.Z) * t);
-
-		return out;
-	}
+	// Make Euler rotator from vector
+	static Vector toEuler(const Vector& in, double angle);
 };
 
 struct Vector2D

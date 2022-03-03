@@ -44,6 +44,7 @@ public:
 
 	virtual Camera* CreateCamera(SceneComponent* parent = nullptr) = 0;
 	virtual void SetActiveCamera(Camera*) = 0;
+	virtual Camera* GetActiveCamera() const = 0;
 	
 	//virtual void CreateLight(const LightData*) = 0; //Lights have been moved to be handled by the ECS-system.
 	//virtual void RemoveLight(const LightData*) = 0; //Lights have been moved to be handled by the ECS-system.
@@ -98,9 +99,13 @@ public:
 	virtual Material* GetMaterial(uint section) const = 0;
 	virtual void SetInstances(int count, Transformation* dispArray) = 0;
 	virtual void SetInstanceCount(int count) = 0;
+	virtual SceneComponent* GetParent() const = 0;
 
 	AABB GetAABB() const { return bounds; }
 	void SetAABB(AABB bounds) { this->bounds = bounds; }
+
+	virtual void SetBinds(std::function<void(void)> bind) = 0;
+	virtual std::function<void(void)>& GetBinds() = 0;
 protected:
 	AABB bounds; // low level " collision " --> tänne collision
 };

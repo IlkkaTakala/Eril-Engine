@@ -1,4 +1,9 @@
 #include "ParticleSystem.h"
+#include "Objects/SceneComponent.h"
+#include "CurveData.h"
+
+#include <glad/gl.h>
+#include <glm/glm.hpp>
 
 struct Particle
 {
@@ -9,6 +14,14 @@ struct Particle
 	float lifetime;
 	float max_lifetime;
 	bool enabled;
+	Vector colour;
+	float alpha;
+};
+
+struct MaterialParams
+{
+	glm::vec4 color;
+	glm::vec4 ages;
 };
 
 ParticleSystem::ParticleSystem()
@@ -19,6 +32,7 @@ ParticleSystem::ParticleSystem()
 	dirty = false;
 	FaceCamera = true;
 	sprite = nullptr;
+	Type = 0;
 
 	Active = false;
 
@@ -27,6 +41,11 @@ ParticleSystem::ParticleSystem()
 	updator = nullptr;
 
 	Autoplay = false;
+}
+
+void ParticleSystem::SetMaterial()
+{
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 10, MaterialBuffer);
 }
 
 ParticleSystem::~ParticleSystem()
@@ -46,44 +65,44 @@ void ParticleSystem::Initialize(SceneComponent* attach)
 	Transforms.resize(MaxParticleCount);
 	Particles.resize(MaxParticleCount);
 
-	sprite = MI->LoadData(attach, "Cube");
+	sprite = MI->LoadData(attach, "sprite");
 	if (!sprite) return;
-	sprite->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/default"));
+	sprite->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/sprite"));
 	sprite->SetInstances(MaxParticleCount, Transforms.data());
 	sprite->SetInstanceCount(ParticleCount);
+	sprite->SetBinds(std::bind(&ParticleSystem::SetMaterial, this));
+
+	glGenBuffers(1, &MaterialBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, MaterialBuffer);
+	glBufferData(GL_ARRAY_BUFFER, MaxParticleCount * sizeof(MaterialParams), nullptr, GL_DYNAMIC_DRAW);
+
 
 	constructor = [](Particle& p) {
 		p.scale = { 0.1, 0.1, 0.1 };
-		p.velocity = Vector::RandomUnitVectorInCone({ 0, 0, 1 }, 45.f, {0, 1, 0}).Normalize();
+		p.velocity = Vector::RandomUnitVectorInCone({ 0, 0, 1 }, 90.f, {0, 1, 0}).Normalize();
 		p.max_lifetime = 3.f;
 		p.enabled = false;
 		p.lifetime = 0.f;
 		p.location = 0.f;
+		p.alpha = 1.f;
+		p.colour = Vector(1.f);
 	};
 
 	updator = [](ParticleSystem* system, float delta) {
-		ParticleSystemConstruction::Updator u(system, delta);
-		u.UpdateLifetime();
-		u.UpdateVelocities();
+		ParticleSystemConstruction::Updator u(system);
+		u.UpdateLifetime(delta);
+		u.UpdateVelocities(delta);
+		u.Alpha(delta, std::vector<std::pair<float, float>>{ {0.f, 1.f}, {1.f, 0.f} });
 	};
 
-	spawner = ParticleSystemConstruction::MakeSpawnRate(this, 0.4f);
+	spawner = ParticleSystemConstruction::MakeSpawnRate(this, 6.f);
 }
 
 void ParticleSystem::Update(float delta)
 {
 	if (!Active || !spawner || !constructor) return;
 	if (spawner->Check(delta)) {
-		int idx = 0;
-		if (freeIdx.empty())
-			idx = ++ParticleCount;
-		else {
-			idx = freeIdx.front();
-			freeIdx.pop_front();
-		}
-		constructor(Particles[idx]);
-		Particles[idx].enabled = true;
-		ParticleCount = ParticleCount > idx ? ParticleCount : idx;
+		
 	}
 
 	int t_idx = 0;
@@ -91,6 +110,8 @@ void ParticleSystem::Update(float delta)
 
 	if (updator) updator(this, delta);
 
+	std::vector<MaterialParams> params;
+	params.reserve(ParticleCount);
 	for (uint i = 0; i <= ParticleCount; i++) {
 		if (!Particles[i].enabled) continue;
 
@@ -98,12 +119,26 @@ void ParticleSystem::Update(float delta)
 
 		Transforms[t_idx].Scale = p.scale;
 		Transforms[t_idx].Location = p.location;
-		Transforms[t_idx].Rotation = p.rotation;
+		if (FaceCamera) {
+			Vector cam = RI->GetActiveCamera()->GetRotation();
+			Transforms[t_idx].Rotation = cam;
+			Transforms[t_idx].Rotation.X = p.rotation.X;
+			Transforms[t_idx].Rotation.Y = cam.Y + 90.f;
+			//Transforms[t_idx].Rotation.Y = cam.X;
+		}
+		else Transforms[t_idx].Rotation = p.rotation;
+
+		params.push_back({ glm::vec4(p.colour.X, p.colour.Y, p.colour.Z, p.alpha), {p.lifetime, p.lifetime / p.max_lifetime, 0.f, 0.f} });
 
 		t_idx++;
 		last_active = i;
 	}
 	sprite->SetInstances(t_idx, Transforms.data());
+
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, MaterialBuffer);
+	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, t_idx * sizeof(MaterialParams), params.data());
+
+
 	ParticleCount = last_active;
 }
 
@@ -112,10 +147,20 @@ bool ParticleSystemConstruction::RateSpawner::Check(float delta)
 	SpawnLast += delta;
 	if (SpawnLast < SpawnInterval) return false;
 	SpawnLast = 0.f;
+	int idx = 0;
+	if (system->freeIdx.empty())
+		idx = ++system->ParticleCount;
+	else {
+		idx = system->freeIdx.front();
+		system->freeIdx.pop_front();
+	}
+	system->constructor(system->Particles[idx]);
+	system->Particles[idx].enabled = true;
+	system->ParticleCount = system->ParticleCount > idx ? system->ParticleCount : idx;
 	return true;
 }
 
-void ParticleSystemConstruction::Updator::UpdateVelocities() const
+void ParticleSystemConstruction::Updator::UpdateVelocities(float delta) const
 {
 	for (uint i = 0; i <= system->ParticleCount; i++) {
 		Particle& p = system->Particles[i];
@@ -127,7 +172,7 @@ void ParticleSystemConstruction::Updator::UpdateVelocities() const
 	}
 }
 
-inline void ParticleSystemConstruction::Updator::UpdateLifetime() const
+inline void ParticleSystemConstruction::Updator::UpdateLifetime(float delta) const
 {
 	uint last_active = 0;
 	for (uint i = 0; i <= system->ParticleCount; i++) {
@@ -146,4 +191,20 @@ inline void ParticleSystemConstruction::Updator::UpdateLifetime() const
 		last_active = i;
 	}
 	system->ParticleCount = last_active;
+}
+
+inline void ParticleSystemConstruction::Updator::Alpha(float delta, const CurveData& curve) const
+{
+	for (uint i = 0; i <= system->ParticleCount; i++) {
+		Particle& p = system->Particles[i];
+		if (!p.enabled) continue;
+
+		p.alpha = curve.EvaluateCurve(p.lifetime / p.max_lifetime);
+	
+	}
+}
+
+inline void ParticleSystemConstruction::Updator::Color(float delta, const VectorCurveData& curve) const
+{
+
 }

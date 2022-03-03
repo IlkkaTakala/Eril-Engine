@@ -101,8 +101,7 @@ void GLCamera::SetPostProcess(const String& name)
 void GLCamera::ApplyTransformation()
 {
 	View = glm::translate(glm::mat4(1.0f), glm::vec3(Location.X, Location.Z, Location.Y))
-		//* Orientation
-		* glm::eulerAngleYXZ(glm::radians(Rotation.X), glm::radians(Rotation.Y), glm::radians(Rotation.Z));
+		* glm::toMat4(glm::quat(glm::vec3(glm::radians(Rotation.Y), glm::radians(Rotation.Z), glm::radians(Rotation.X))));
 	if (glm::all(glm::isnan(View[0]))) {
 		View = glm::mat4(1.f);
 	}

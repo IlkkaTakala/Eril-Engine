@@ -30,6 +30,8 @@ void Section::Render()
 	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 8));
 	glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 12));
 
+	if (Parent->GetBinds()) Parent->GetBinds()();
+
 	if (Instanced) glDrawElementsInstanced(GL_TRIANGLES, Holder->IndexCount, GL_UNSIGNED_INT, 0, InstanceCount);
 	else glDrawElements(GL_TRIANGLES, Holder->IndexCount, GL_UNSIGNED_INT, 0);
 }
@@ -169,6 +171,16 @@ void RenderObject::SetParent(SceneComponent* parent)
 	Parent = parent;
 }
 
+void RenderObject::SetBinds(std::function<void(void)> bind)
+{
+	binds = bind;
+}
+
+std::function<void(void)>& RenderObject::GetBinds()
+{
+	return binds;
+}
+
 void RenderObject::ApplyTransform()
 {
 	Transformation finalT;
@@ -186,7 +198,7 @@ void RenderObject::ApplyTransform()
 	Vector rot = finalT.Rotation;
 	Vector sca = finalT.Scale;
 	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Z, loc.Y))
-		* glm::toMat4(glm::quat(glm::vec3(glm::radians(rot.X), glm::radians(rot.Z), glm::radians(rot.Y))))
+		* glm::toMat4(glm::quat(glm::vec3(glm::radians(rot.Y), glm::radians(rot.Z), glm::radians(rot.X))))
 		* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Z, sca.Y));
 
 	requireUpdate = false;
@@ -200,7 +212,7 @@ void RenderObject::SetInstances(int count, Transformation* dispArray)
 		Vector rot = dispArray[i].Rotation;
 		Vector sca = dispArray[i].Scale;
 		arr[i] = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Z, loc.Y))
-			* glm::toMat4(glm::quat(glm::vec3(glm::radians(rot.X), glm::radians(rot.Z), glm::radians(rot.Y))))
+			* glm::toMat4(glm::quat(glm::vec3(glm::radians(rot.Y), glm::radians(rot.Z), glm::radians(rot.X))))
 			* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Z, sca.Y));
 	}
 	for (uint i = 0; i < SectionCount; i++) {

@@ -214,6 +214,9 @@
     <ClCompile Include="Engine\RenderCore\ParticleSystem.cpp">
       <Filter>Engine\OpenGL</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Core\CurveData.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -523,6 +526,9 @@
     </ClInclude>
     <ClInclude Include="Engine\RenderCore\ParticleSystem.h">
       <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\CurveData.h">
+      <Filter>Engine\Public</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

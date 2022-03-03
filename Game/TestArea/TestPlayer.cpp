@@ -239,7 +239,10 @@ void TestPlayer::RightMouseDown(bool KeyDown)
 void TestPlayer::MouseMoved(float X, float Y)
 {
 	const Vector& rot = Rotation;
-	if (cursorState) SetRotation(Vector(rot.X + X * mouseSens, rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, rot.Z));
+	if (cursorState) SetRotation(Vector(
+		rot.X, 
+		rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, 
+		rot.Z + X * mouseSens));
 }
 
 void TestPlayer::InputExit(bool down)
