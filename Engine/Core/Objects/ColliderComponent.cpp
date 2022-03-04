@@ -13,7 +13,7 @@ void ErilMotion::getWorldTransform(btTransform& centerOfMassWorldTrans) const
 	{
 		if (!m_userPointer->moveObject) return;
 		Vector loc = m_userPointer->GetMovementTarget()->DesiredState.location;
-		Vector rot = m_userPointer->GetMovementTarget()->DesiredState.location;
+		Vector rot = m_userPointer->GetMovementTarget()->DesiredState.rotation;
 		btTransform local;
 		local.setIdentity();
 		local.setOrigin(btVector3(loc.X, loc.Z, loc.Y));

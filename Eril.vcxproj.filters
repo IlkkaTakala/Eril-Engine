@@ -211,6 +211,9 @@
     <ClCompile Include="Engine\Core\Objects\CollisionShape.cpp">
       <Filter>Engine\Objects\Physics</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Core\Objects\TerrainCollider.cpp">
+      <Filter>Engine\Objects\Physics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -516,6 +519,9 @@
       <Filter>Engine\Objects</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\Objects\CollisionShape.h">
+      <Filter>Engine\Objects\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Objects\TerrainCollider.h">
       <Filter>Engine\Objects\Physics</Filter>
     </ClInclude>
   </ItemGroup>

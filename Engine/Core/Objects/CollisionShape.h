@@ -31,7 +31,6 @@ class ConeCollisionShape : public ColliderComponent
 public:
 	virtual void SetType(int t) override;
 	void SetSize(float radius, float height);
-	//void SetLocation(float x, float y, float z);
 };
 
 class CapsuleCollisionShape : public ColliderComponent

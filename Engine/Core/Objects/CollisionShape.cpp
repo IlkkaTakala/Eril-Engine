@@ -122,14 +122,6 @@ void ConeCollisionShape::SetSize(float radius, float height)
 	body->setCollisionShape(cone);
 }
 
-//void ConeCollisionShape::SetLocation(float x, float y, float z)
-//{
-//	btTransform t;
-//	t.setIdentity();
-//	t.setOrigin(btVector3(x, y, z));
-//	body->setWorldTransform(t);
-//}
-
 void CapsuleCollisionShape::SetType(int t)
 {
 	type = t;

@@ -129,18 +129,20 @@ TestPlayer::TestPlayer() : Player()
 	Box2 = SpawnObject<Actor>();
 
 	BoxModel2 = SpawnObject<VisibleObject>();
-	BoxModel2->SetModel("cylinder");
+	BoxModel2->SetModel("capsule");
+	//BoxModel2->SetRotation(Vector(0.f, 90.f, 0.f));
 	//BoxModel2->SetScale(0.5f);
 	//BoxModel2->GetModel()->SetAABB(AABB(Vector(-1.0f), Vector(1.0f)));
 
 	Box2->AddComponent(BoxModel2);
-	Box2->SetLocation(Vector(10.f, 10.f, 5.f));
+	Box2->SetLocation(Vector(10.f, 10.f, 6.f));
 
 	BoxCol2 = SpawnObject<CapsuleCollisionShape>();
 	BoxCol2->SetType(1);
 	Box2->AddComponent(BoxCol2);
-	BoxCol2->SetSize(BoxModel2->GetModel()->GetAABB().maxs.X, BoxModel2->GetModel()->GetAABB().maxs.Z);
-	BoxCol2->SetLocation(Vector(0.f, 0.f, 0.f));
+	BoxCol2->SetSize(1.f, 2.0f);
+	//BoxCol2->SetLocation(Vector(0.f, 0.f, 0.f));
+	//BoxCol2->SetRotation(Vector(0.f, 90.f, 0.f));
 
 
 	//BoxModelMove = SpawnObject<MovementComponent>();
