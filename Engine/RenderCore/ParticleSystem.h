@@ -22,10 +22,12 @@ public:
 		Updator(ParticleSystem* s) : system(s) {}
 		ParticleSystem* system;
 
-		inline void UpdateVelocities(float delta) const;
-		inline void UpdateLifetime(float delta) const;
-		inline void Color(float delta, const VectorCurveData& curve) const;
-		inline void Alpha(float delta, const CurveData& curve) const;
+		void UpdateVelocities(float delta) const;
+		void UpdateLifetime(float delta) const;
+		void Color(float delta, const VectorCurveData& curve) const;
+		void Alpha(float delta, const CurveData& curve) const;
+		void SpriteSize(float delta, const CurveData & curve) const;
+		void SpriteRotationRate(float delta, const CurveData & curve) const;
 	};
 
 private:
@@ -57,10 +59,11 @@ public:
 		if (auto t = dynamic_cast<ParticleSystem*>(next); !t) delete t;
 		return next;
 	}
+protected:
+	ParticleSystem();
 
 private:
 	friend class ParticleSystemConstruction;
-	ParticleSystem();
 
 	void SetMaterial();
 
@@ -90,5 +93,4 @@ public:
 	void SetSpawner(ParticleSystemConstruction::Spawner* func) { if (spawner) delete spawner; spawner = func; }
 	void SetConstructor(DefaultParticle func) { constructor = func; }
 	void SetUpdator(DefaultUpdate func) { updator = func; }
-
 };

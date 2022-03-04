@@ -1,22 +1,10 @@
 #include "ParticleSystem.h"
 #include "Objects/SceneComponent.h"
 #include "CurveData.h"
+#include "Particle.h"
 
 #include <glad/gl.h>
 #include <glm/glm.hpp>
-
-struct Particle
-{
-	Vector location;
-	Vector scale;
-	Vector rotation;
-	Vector velocity;
-	float lifetime;
-	float max_lifetime;
-	bool enabled;
-	Vector colour;
-	float alpha;
-};
 
 struct MaterialParams
 {
@@ -28,6 +16,7 @@ ParticleSystem::ParticleSystem()
 {
 	MaxParticleCount = 100;
 	ParticleCount = 0;
+	MaterialBuffer = 0;
 
 	dirty = false;
 	FaceCamera = true;
@@ -75,27 +64,6 @@ void ParticleSystem::Initialize(SceneComponent* attach)
 	glGenBuffers(1, &MaterialBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, MaterialBuffer);
 	glBufferData(GL_ARRAY_BUFFER, MaxParticleCount * sizeof(MaterialParams), nullptr, GL_DYNAMIC_DRAW);
-
-
-	constructor = [](Particle& p) {
-		p.scale = { 0.1, 0.1, 0.1 };
-		p.velocity = Vector::RandomUnitVectorInCone({ 0, 0, 1 }, 90.f, {0, 1, 0}).Normalize();
-		p.max_lifetime = 3.f;
-		p.enabled = false;
-		p.lifetime = 0.f;
-		p.location = 0.f;
-		p.alpha = 1.f;
-		p.colour = Vector(1.f);
-	};
-
-	updator = [](ParticleSystem* system, float delta) {
-		ParticleSystemConstruction::Updator u(system);
-		u.UpdateLifetime(delta);
-		u.UpdateVelocities(delta);
-		u.Alpha(delta, std::vector<std::pair<float, float>>{ {0.f, 1.f}, {1.f, 0.f} });
-	};
-
-	spawner = ParticleSystemConstruction::MakeSpawnRate(this, 6.f);
 }
 
 void ParticleSystem::Update(float delta)
@@ -172,7 +140,7 @@ void ParticleSystemConstruction::Updator::UpdateVelocities(float delta) const
 	}
 }
 
-inline void ParticleSystemConstruction::Updator::UpdateLifetime(float delta) const
+void ParticleSystemConstruction::Updator::UpdateLifetime(float delta) const
 {
 	uint last_active = 0;
 	for (uint i = 0; i <= system->ParticleCount; i++) {
@@ -193,7 +161,7 @@ inline void ParticleSystemConstruction::Updator::UpdateLifetime(float delta) con
 	system->ParticleCount = last_active;
 }
 
-inline void ParticleSystemConstruction::Updator::Alpha(float delta, const CurveData& curve) const
+void ParticleSystemConstruction::Updator::Alpha(float delta, const CurveData& curve) const
 {
 	for (uint i = 0; i <= system->ParticleCount; i++) {
 		Particle& p = system->Particles[i];
@@ -204,7 +172,15 @@ inline void ParticleSystemConstruction::Updator::Alpha(float delta, const CurveD
 	}
 }
 
-inline void ParticleSystemConstruction::Updator::Color(float delta, const VectorCurveData& curve) const
+void ParticleSystemConstruction::Updator::SpriteSize(float delta, const CurveData& curve) const
+{
+}
+
+void ParticleSystemConstruction::Updator::SpriteRotationRate(float delta, const CurveData& curve) const
+{
+}
+
+void ParticleSystemConstruction::Updator::Color(float delta, const VectorCurveData& curve) const
 {
 
 }

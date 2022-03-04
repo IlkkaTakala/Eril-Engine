@@ -217,6 +217,7 @@
     <ClCompile Include="Engine\Core\CurveData.cpp">
       <Filter>Engine\Private</Filter>
     </ClCompile>
+    <ClCompile Include="Game\TestArea\CloudParticle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -529,6 +530,10 @@
     </ClInclude>
     <ClInclude Include="Engine\Core\CurveData.h">
       <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\TestArea\CloudParticle.h" />
+    <ClInclude Include="Engine\RenderCore\Particle.h">
+      <Filter>Engine\OpenGL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -73,6 +73,8 @@ layout(std430, binding = 10) readonly buffer Particles {
 layout (location = 0) out vec4 accum;
 layout (location = 1) out float reveal;
 
+uniform sampler2D Albedo;
+
 in VS_OUT{
 	vec2 TexCoords;
 	vec4 FragPos;
@@ -85,8 +87,8 @@ flat in int InstanceID;
 
 void main()
 {
-	//vec4 color = ParticlesData.data[InstanceID].color;
-	vec4 color = vec4(ParticlesData.data[InstanceID].color.a);
+	vec4 color = texture(Albedo, fs_in.TexCoords) * ParticlesData.data[InstanceID].color;
+	//vec4 color = vec4(ParticlesData.data[InstanceID].color.a);
 
 	//const float gamma = 2.2;
 	const float exposure = 1.0;

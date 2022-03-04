@@ -925,6 +925,12 @@ constexpr glm::vec4 clearClrOne(1.f);
 void Renderer::Forward(int width, int height)
 {
 	PostProcess->Bind();
+	unsigned int attachments2[] = { GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+	glDrawBuffers(2, attachments2);
+
+	glClearBufferfv(GL_COLOR, 0, &clearClrZero[0]);
+	glClearBufferfv(GL_COLOR, 1, &clearClrOne[0]);
+
 	unsigned int attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 	glDrawBuffers(2, attachments);
 
@@ -993,18 +999,14 @@ void Renderer::Forward(int width, int height)
 		}
 
 	}
+
+	glDrawBuffers(2, attachments2);
 	
 	glDepthMask(GL_FALSE);
 	glEnable(GL_BLEND);
 	glBlendFunci(0, GL_ONE, GL_ONE);
 	glBlendFunci(1, GL_ZERO, GL_ONE_MINUS_SRC_COLOR);
 	glBlendEquation(GL_FUNC_ADD);
-
-	unsigned int attachments2[] = { GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-	glDrawBuffers(2, attachments2);
-
-	glClearBufferfv(GL_COLOR, 0, &clearClrZero[0]);
-	glClearBufferfv(GL_COLOR, 1, &clearClrOne[0]);
 
 	// Translucent pass
 	for (auto const& [name, s] : Shaders)
@@ -1095,6 +1097,7 @@ void Renderer::PreDepth(int width, int height)
 	PreDepthShader->Bind();
 	for (auto const& [name, s] : Shaders)
 	{
+		if (s->Pass == 1) continue;
 		if (s->FaceCulling == 1) glDisable(GL_CULL_FACE);
 		else glEnable(GL_CULL_FACE);
 

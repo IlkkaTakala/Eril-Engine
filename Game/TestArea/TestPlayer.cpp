@@ -13,7 +13,7 @@
 #include "Objects/InputComponent.h"
 #include "Objects/ColliderComponent.h"
 #include <Objects/ParticleComponent.h>
-#include <RenderCore/ParticleSystem.h>
+#include "CloudParticle.h"
 
 //ECS
 #include <Interface/IECS.h>
@@ -153,7 +153,7 @@ TestPlayer::TestPlayer() : Player()
 	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
 
 	auto part = SpawnObject<ParticleComponent>();
-	part->SetSystem(ParticleSystem::MakeSystem<ParticleSystem>());
+	part->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
 	part->SetLocation({10, 5, 2});
 
 }
