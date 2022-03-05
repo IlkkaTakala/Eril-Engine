@@ -8,7 +8,7 @@ class Shader;
 class GLCamera : public Camera
 {
 public:
-	GLCamera(RenderObject*);
+	GLCamera();
 	virtual ~GLCamera() {};
 
 	virtual void SetFov(float) override;
@@ -42,6 +42,4 @@ private:
 
 	float Fov;
 	bool Perspective;
-
-	RenderObject* Parent;
 };

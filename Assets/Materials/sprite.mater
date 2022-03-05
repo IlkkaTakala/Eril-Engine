@@ -1,0 +1,4 @@
+[Shader]
+name=shader_sprite
+[Textures]
+Albedo=Assets/Textures/default/default_d.png

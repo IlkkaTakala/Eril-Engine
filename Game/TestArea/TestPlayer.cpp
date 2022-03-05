@@ -12,6 +12,8 @@
 #include <GamePlay/Scene.h>
 #include "Objects/InputComponent.h"
 #include "Objects/ColliderComponent.h"
+#include <Objects/ParticleComponent.h>
+#include "CloudParticle.h"
 
 //ECS
 #include <Interface/IECS.h>
@@ -89,8 +91,8 @@ TestPlayer::TestPlayer() : Player()
 	Sky->SetScale(Sky->GetScale() * 2.0f);
 
 	//Testing UI
-	auto ui = UI::LoadFromFile("Game/TestArea/testingui2.ui");
-	UI::AddToScreen(ui, this);
+	/*auto ui = UI::LoadFromFile("Game/TestArea/testingui2.ui");
+	UI::AddToScreen(ui, this);*/
 
 	pause = nullptr;
 
@@ -149,6 +151,10 @@ TestPlayer::TestPlayer() : Player()
 	//BoxCol2->SetTarget(BoxModelMove);
 
 	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
+
+	auto part = SpawnObject<ParticleComponent>();
+	part->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
+	part->SetLocation({10.f, 5.f, 0.5f});
 
 }
 
@@ -233,7 +239,10 @@ void TestPlayer::RightMouseDown(bool KeyDown)
 void TestPlayer::MouseMoved(float X, float Y)
 {
 	const Vector& rot = Rotation;
-	if (cursorState) SetRotation(Vector(rot.X + X * mouseSens, rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, rot.Z));
+	if (cursorState) SetRotation(Vector(
+		rot.X, 
+		rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, 
+		rot.Z + X * mouseSens));
 }
 
 void TestPlayer::InputExit(bool down)

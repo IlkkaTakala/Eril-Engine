@@ -38,6 +38,7 @@ public:
 	void Unbind();
 	uint GetBuffer() const { return FrameBuffer; }
 	uint GetBloom() const { return BloomBuffer; }
+	uint GetColor() const { return ColorBuffer; }
 
 	void BindTextures();
 
