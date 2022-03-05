@@ -3,13 +3,18 @@
 
 struct Particle
 {
+	bool enabled;
+
 	Vector location;
 	Vector scale;
 	Vector rotation;
+	Vector rotationRate;
 	Vector velocity;
-	float lifetime;
-	float max_lifetime;
-	bool enabled;
 	Vector colour;
 	float alpha;
+	float lifetime;
+
+	float max_lifetime;
+	Vector initialScale;
+	Vector initialColour;
 };

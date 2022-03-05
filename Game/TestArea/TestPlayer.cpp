@@ -154,7 +154,7 @@ TestPlayer::TestPlayer() : Player()
 
 	auto part = SpawnObject<ParticleComponent>();
 	part->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
-	part->SetLocation({10, 5, 2});
+	part->SetLocation({10.f, 5.f, 0.5f});
 
 }
 

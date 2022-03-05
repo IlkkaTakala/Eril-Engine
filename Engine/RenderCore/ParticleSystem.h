@@ -61,11 +61,14 @@ public:
 	}
 protected:
 	ParticleSystem();
+	void SetMaterial(Material* mat) { Material = mat; }
+	void SetModel(RenderMesh* object) { Sprite = object; }
+	void SetMaxCount(int count) { MaxParticleCount = count; }
 
 private:
 	friend class ParticleSystemConstruction;
 
-	void SetMaterial();
+	void ApplyMaterial();
 
 	bool Active;
 	bool FaceCamera;
@@ -74,23 +77,25 @@ private:
 	uint32 MaxParticleCount;
 	bool Autoplay;
 
-	bool dirty;
-	std::deque<int> freeIdx;
+	bool Dirty;
+	std::deque<int> FreeIdx;
 	std::vector<Particle> Particles;
 	std::vector<Transform> Transforms;
 
 	typedef void(*DefaultParticle)(Particle&);
 	typedef void(*DefaultUpdate)(ParticleSystem*, float delta);
-	ParticleSystemConstruction::Spawner* spawner;
-	DefaultParticle constructor;
-	DefaultUpdate updator;
+	ParticleSystemConstruction::Spawner* Spawner;
+	DefaultParticle Constructor;
+	DefaultUpdate Updator;
 
-	RenderMesh* sprite;
+	RenderMesh* Sprite;
+	Material* Material;
+	RefWeak<SceneComponent> Parent;
 
 	uint MaterialBuffer;
 
 public:
-	void SetSpawner(ParticleSystemConstruction::Spawner* func) { if (spawner) delete spawner; spawner = func; }
-	void SetConstructor(DefaultParticle func) { constructor = func; }
-	void SetUpdator(DefaultUpdate func) { updator = func; }
+	void SetSpawner(ParticleSystemConstruction::Spawner* func) { if (Spawner) delete Spawner; Spawner = func; }
+	void SetConstructor(DefaultParticle func) { Constructor = func; }
+	void SetUpdator(DefaultUpdate func) { Updator = func; }
 };

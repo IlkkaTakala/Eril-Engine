@@ -102,7 +102,7 @@ public:
 	virtual SceneComponent* GetParent() const = 0;
 
 	AABB GetAABB() const { return bounds; }
-	void SetAABB(AABB bounds) { this->bounds = bounds; }
+	virtual void SetAABB(AABB bounds) { this->bounds = bounds; }
 
 	virtual void SetBinds(std::function<void(void)> bind) = 0;
 	virtual std::function<void(void)>& GetBinds() = 0;

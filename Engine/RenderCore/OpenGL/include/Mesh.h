@@ -57,10 +57,11 @@ public:
 	int InstanceCount;
 	int InstanceCountMax;
 	uint InstanceDisp;
+	float Radius;
 
 	void Render();
 	void MakeInstanced(int count, const glm::mat4* modelM);
-	float GetRadius() const { return Holder->Radius; }
+	float GetRadius() const { return Radius; }
 
 	const uint32 GetVertexCount() const { return Holder->VertexCount; }
 	const uint32 GetFaceCount() const { return Holder->IndexCount / 3; }
@@ -90,6 +91,8 @@ public:
 
 	virtual void SetBinds(std::function<void(void)> bind) override;
 	virtual std::function<void(void)>& GetBinds() override;
+
+	virtual void SetAABB(AABB bounds) override;
 
 private:
 	friend class Renderer;

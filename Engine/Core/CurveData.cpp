@@ -9,7 +9,7 @@ float CurveData::EvaluateCurve(float delta) const
 	for (int i = 0; i < points.size(); i++) {
 		if (points[i].first <= delta) {
 			if (i + 1 < points.size()) {
-				if (points[i].second >= delta) {
+				if (points[i + 1].first >= delta) {
 					float dist = points[i + 1].first - points[i].first;
 					float change = points[i + 1].second - points[i].second;
 					float p = (delta - points[i].first) / dist;

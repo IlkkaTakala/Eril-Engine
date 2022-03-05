@@ -1,4 +1,4 @@
 [Shader]
 name=shader_sprite
 [Textures]
-Albedo=Assets/Textures/particles/P_Smoke_d.png
+Albedo=Assets/Textures/default/default_d.png

@@ -31,7 +31,7 @@ uniform mat4 Model;
 void main()
 {
 	InstanceID = gl_InstanceID;
-	vec4 pos = Model * in_disp * vec4(in_position, 1.0);
+	vec4 pos = in_disp * vec4(in_position, 1.0);
 	gl_Position = projection * view * pos;
 	vs_out.FragPos = pos;
 	vs_out.TexCoords = in_texCoord;
@@ -69,9 +69,9 @@ layout(std430, binding = 10) readonly buffer Particles {
 } ParticlesData;
 
 //layout (location = 0) out vec4 ColorBuffer;
-//layout (location = 1) out vec4 BloomBuffer;
-layout (location = 0) out vec4 accum;
-layout (location = 1) out float reveal;
+layout (location = 1) out vec4 BloomBuffer;
+layout (location = 2) out vec4 accum;
+layout (location = 3) out float reveal;
 
 uniform sampler2D Albedo;
 
@@ -88,12 +88,13 @@ flat in int InstanceID;
 void main()
 {
 	vec4 color = texture(Albedo, fs_in.TexCoords) * ParticlesData.data[InstanceID].color;
-	//vec4 color = vec4(ParticlesData.data[InstanceID].color.a);
+	//vec4 color = vec4(1.0);
 
 	//const float gamma = 2.2;
 	const float exposure = 1.0;
 	
-	//ColorBuffer = color;
+	//ColorBuffer = vec4(0.0);
+	BloomBuffer = vec4(0.0, 0.0, 0.0, color.a);
 	
 	float weight = clamp(pow(min(1.0, color.a * 10.0) + 0.01, 3.0) * 1e8 * 
                          pow(1.0 - gl_FragCoord.z * 0.9, 3.0), 1e-2, 3e3);
@@ -104,6 +105,5 @@ void main()
     // store pixel revealage threshold
     reveal = color.a;
 
-	//BloomBuffer = clamp(color - exposure, 0.0, 100.0);
 }
 ###END_FRAGMENT###
