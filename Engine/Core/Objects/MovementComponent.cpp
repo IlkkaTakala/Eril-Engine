@@ -127,10 +127,6 @@ void MovementComponent::Tick(float time)
 void MovementComponent::SetTarget(SceneComponent* t, const AABB bound)
 {
 	Object = t;
-	//rigid = Physics::MakeRigidBoby(bound, t->GetLocation(), mass, type);
-	//OldState.location = t->GetLocation();
-	//DesiredState.location = t->GetLocation();
-	//Physics::RemoveStatic(t);
 }
 
 void MovementComponent::SetGround(Terrain* t)

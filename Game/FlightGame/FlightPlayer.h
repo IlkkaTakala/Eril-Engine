@@ -11,6 +11,7 @@ class Hunter;
 class PauseUI;
 class EndScreen;
 class StartScreen;
+class VisibleObject;
 
 class Item : public BaseObject
 {

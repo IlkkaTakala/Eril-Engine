@@ -8,6 +8,7 @@ class InstancedObject;
 class MovementComponent;
 class Terrain;
 class PauseUI;
+class VisibleObject;
 
 //ECS TEST
 class ECSExample;

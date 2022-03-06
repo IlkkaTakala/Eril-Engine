@@ -1,6 +1,6 @@
 # Project plan - Eril
 
-### __[See branch docs for faster updates](../../tree/docs/docs/ProjectPlan.md)__
+### __[See branch "docs" for faster updates](../../tree/docs/docs/ProjectPlan.md)__
 
 ## Goals
 Our goal is to advance the Eril Project and create version 0.3.
@@ -37,11 +37,12 @@ These are the features we will add on top of the existing features:
 - [x] Scripting
 - [ ] SSAO
 - [ ] Reflections
+- [ ] Global illumination, IBL
 - [ ] Shadows
 - [ ] Animations
 - [ ] Editors
 - [ ] UI Framework improvements
-- [ ] Particles
+- [x] Particles
 - [x] Collisions
 
 
@@ -75,8 +76,8 @@ title Personal timelines
 
 section Ilkka
 Scripting               :done,      ides1, 13-01, 18-02
-Animations              :active,    ides2, after ides1, 03-03
-Particles               :           ides5, after ides2, 03-04
+Animations              :           ides2, after ides5, 4w
+Particles               :active,    ides5, after ides1, 11-03
 Git control             :           ides3, 13-01, 18w
 Lead dev/assistance     :           ides4, 13-01, 18w
 ```
@@ -87,6 +88,7 @@ dateFormat  DD-MM
 section Matti
 Input Rework           :done,       mdes3, 13-01, 1w
 Collisions             :done,       mdes1, after mdes3, 4w
+Collision improvements :active,     mdes5, after mdes1, 4w
 Script integrations    :active,     mdes4, after mdes1, 4w
 UI Improvements        :            mdes2, after mdes1, 3w
 ```

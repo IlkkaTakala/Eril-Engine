@@ -207,6 +207,18 @@
     </ClCompile>
     <ClCompile Include="Game\FlightGame\StartScreen.cpp">
       <Filter>Game\FlightGame</Filter>
+	</ClCompile>
+    <ClCompile Include="Engine\Core\Objects\ParticleComponent.cpp">
+      <Filter>Engine\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\RenderCore\ParticleSystem.cpp">
+      <Filter>Engine\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\CurveData.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\TestArea\CloudParticle.cpp">
+      <Filter>Game\TestArea</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -523,6 +535,21 @@
     </ClInclude>
     <ClInclude Include="Game\FlightGame\StartScreen.h">
       <Filter>Game\FlightGame</Filter>
+	</ClInclude>
+    <ClInclude Include="Engine\Core\Objects\ParticleComponent.h">
+      <Filter>Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\ParticleSystem.h">
+      <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\CurveData.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\Particle.h">
+      <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\TestArea\CloudParticle.h">
+      <Filter>Game\TestArea</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

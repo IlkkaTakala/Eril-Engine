@@ -5,6 +5,7 @@
 
 class MovementComponent;
 class PauseUI;
+class VisibleObject;
 
 //ECS TEST
 class ECSExample;

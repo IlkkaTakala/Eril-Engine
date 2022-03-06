@@ -7,11 +7,10 @@
 #include "Settings.h"
 #include "Renderer.h"
 
-GLCamera::GLCamera(RenderObject* parent)
+GLCamera::GLCamera()
 {
 	Fov = 45.f;
 	Perspective = true;
-	Parent = parent;
 	Location = Vector(0.f, 0.f, 0.f);
 	Rotation = Vector(0.f, 0.f, 0.f);
 	Orientation = glm::mat4(1.0f);
@@ -107,8 +106,7 @@ void GLCamera::SetPostProcess(const String& name)
 void GLCamera::ApplyTransformation()
 {
 	View = glm::translate(glm::mat4(1.0f), glm::vec3(Location.X, Location.Z, Location.Y))
-		//* Orientation
-		* glm::eulerAngleYXZ(glm::radians(Rotation.X), glm::radians(Rotation.Y), glm::radians(Rotation.Z));
+		* glm::eulerAngleYXZ(glm::radians(Rotation.Z), glm::radians(Rotation.Y), glm::radians(Rotation.X));
 	if (glm::all(glm::isnan(View[0]))) {
 		View = glm::mat4(1.f);
 	}

@@ -7,7 +7,7 @@
 class Material;
 class Texture;
 class RenderObject;
-class VisibleObject;
+class SceneComponent;
 class LoadedMesh;
 //struct LightData; //Lights have been moved to be handled by the ECS-system.
 struct Vertex;
@@ -31,9 +31,9 @@ public:
 
 	virtual void SetFov(float) = 0;
 	virtual void SetPerspective(bool perspective) = 0;
-	void SetParent(VisibleObject* p) { Parent = p; }
+	void SetParent(SceneComponent* p) { Parent = p; }
 protected:
-	VisibleObject* Parent;
+	SceneComponent* Parent;
 };
 
 class IRender
@@ -43,7 +43,7 @@ public:
 	virtual int SetupWindow(int width, int height) = 0;
 	virtual void CleanRenderer() = 0;
 
-	virtual Camera* CreateCamera(VisibleObject* parent = nullptr) = 0;
+	virtual Camera* CreateCamera(SceneComponent* parent = nullptr) = 0;
 	virtual void SetActiveCamera(Camera*) = 0;
 	virtual Camera* GetActiveCamera() const = 0;
 	
@@ -99,8 +99,14 @@ public:
 	virtual void SetMaterial(uint section, Material* nextMat) = 0;
 	virtual Material* GetMaterial(uint section) const = 0;
 	virtual void SetInstances(int count, Transformation* dispArray) = 0;
+	virtual void SetInstanceCount(int count) = 0;
+	virtual SceneComponent* GetParent() const = 0;
+
 	AABB GetAABB() const { return bounds; }
-	void SetAABB(AABB bounds) { this->bounds = bounds; }
+	virtual void SetAABB(AABB bounds) { this->bounds = bounds; }
+
+	virtual void SetBinds(std::function<void(void)> bind) = 0;
+	virtual std::function<void(void)>& GetBinds() = 0;
 protected:
 	AABB bounds; // low level " collision " --> tänne collision
 };
@@ -109,8 +115,8 @@ class IMesh
 {
 public:
 	virtual ~IMesh() {}
-	virtual RenderMesh* LoadData(VisibleObject* parent, String name) = 0;
-	virtual RenderMesh* CreateProcedural(VisibleObject* parent, String name, std::vector<Vector>& positions, std::vector<Vector> UV, std::vector<Vector>& normal, std::vector<Vector>& tangent, std::vector<uint32>& indices) = 0;
+	virtual RenderMesh* LoadData(SceneComponent* parent, String name) = 0;
+	virtual RenderMesh* CreateProcedural(SceneComponent* parent, String name, std::vector<Vector>& positions, std::vector<Vector> UV, std::vector<Vector>& normal, std::vector<Vector>& tangent, std::vector<uint32>& indices) = 0;
 	virtual void StartLoading() = 0;
 	virtual void MarkUnused() = 0;
 	virtual void ClearUnused() = 0;

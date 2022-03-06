@@ -3,6 +3,7 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include "Objects/VisibleObject.h"
+#include <glm/gtx/euler_angles.hpp>
 
 Section::Section()
 {
@@ -11,6 +12,7 @@ Section::Section()
 	Holder = nullptr;
 	Instanced = false;
 	InstanceCount = 1;
+	InstanceCountMax = 1;
 	InstanceDisp = 0;
 }
 
@@ -29,37 +31,76 @@ void Section::Render()
 	//glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 8));
 	//glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 12));
 
+	if (Parent->GetBinds()) Parent->GetBinds()();
+
 	if (Instanced) glDrawElementsInstanced(GL_TRIANGLES, Holder->IndexCount, GL_UNSIGNED_INT, 0, InstanceCount);
 	else glDrawElements(GL_TRIANGLES, Holder->IndexCount, GL_UNSIGNED_INT, 0);
 }
 
 void Section::MakeInstanced(int count, const glm::mat4* modelM)
 {
-	if (InstanceDisp != 0) glDeleteBuffers(1, &InstanceDisp);
-	InstanceCount = count;
-	Instanced = true;
+	if (InstanceDisp != 0)
+	{
+		if (count < InstanceCountMax) {
+			InstanceCount = count;
+			glBindBuffer(GL_ARRAY_BUFFER, InstanceDisp);
+			glBufferData(GL_ARRAY_BUFFER, count * sizeof(glm::mat4), modelM, GL_DYNAMIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		}
+		else {
+			glDeleteBuffers(0, &InstanceDisp);
+			InstanceCount = count;
+			InstanceCountMax = count;
+			Instanced = true;
 
-	glBindVertexArray(Holder->VAO);
+			glBindVertexArray(Holder->VAO);
 
-	glGenBuffers(1, &InstanceDisp);
-	glBindBuffer(GL_ARRAY_BUFFER, InstanceDisp);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * count, modelM, GL_STATIC_DRAW);
+			glGenBuffers(1, &InstanceDisp);
+			glBindBuffer(GL_ARRAY_BUFFER, InstanceDisp);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * count, modelM, GL_DYNAMIC_DRAW);
 
-	glEnableVertexAttribArray(4);
-	glEnableVertexAttribArray(5);
-	glEnableVertexAttribArray(6);
-	glEnableVertexAttribArray(7);
-	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(0));
-	glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 4));
-	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 8));
-	glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 12));
-	glVertexAttribDivisor(4, 1);
-	glVertexAttribDivisor(5, 1);
-	glVertexAttribDivisor(6, 1);
-	glVertexAttribDivisor(7, 1);
-	
-	glBindVertexArray(0);
+			glEnableVertexAttribArray(4);
+			glEnableVertexAttribArray(5);
+			glEnableVertexAttribArray(6);
+			glEnableVertexAttribArray(7);
+			glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(0));
+			glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 4));
+			glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 8));
+			glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 12));
+			glVertexAttribDivisor(4, 1);
+			glVertexAttribDivisor(5, 1);
+			glVertexAttribDivisor(6, 1);
+			glVertexAttribDivisor(7, 1);
 
+			glBindVertexArray(0);
+		}
+	}
+	else {
+		InstanceCount = count;
+		InstanceCountMax = count;
+		Instanced = true;
+
+		glBindVertexArray(Holder->VAO);
+
+		glGenBuffers(1, &InstanceDisp);
+		glBindBuffer(GL_ARRAY_BUFFER, InstanceDisp);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * count, modelM, GL_DYNAMIC_DRAW);
+
+		glEnableVertexAttribArray(4);
+		glEnableVertexAttribArray(5);
+		glEnableVertexAttribArray(6);
+		glEnableVertexAttribArray(7);
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(0));
+		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 4));
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 8));
+		glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 12));
+		glVertexAttribDivisor(4, 1);
+		glVertexAttribDivisor(5, 1);
+		glVertexAttribDivisor(6, 1);
+		glVertexAttribDivisor(7, 1);
+
+		glBindVertexArray(0);
+	}
 }
 
 RenderObject::RenderObject(LoadedMesh* mesh)
@@ -73,6 +114,7 @@ RenderObject::RenderObject(LoadedMesh* mesh)
 	Sections = new Section[SectionCount]();
 	for (uint32 i = 0; i < mesh->HolderCount; i++) {
 		Sections[i].Holder = mesh->Holders[i];
+		Sections[i].Radius = mesh->Holders[i]->Radius;
 
 		glm::mat4 trans(1.f);
 
@@ -126,16 +168,36 @@ const glm::mat4& RenderObject::GetModelMatrix()
 	return ModelMatrix;
 }
 
-void RenderObject::SetParent(VisibleObject* parent)
+void RenderObject::SetParent(SceneComponent* parent)
 {
 	Parent = parent;
+}
+
+void RenderObject::SetBinds(std::function<void(void)> bind)
+{
+	binds = bind;
+}
+
+std::function<void(void)>& RenderObject::GetBinds()
+{
+	return binds;
+}
+
+void RenderObject::SetAABB(AABB bounds)
+{
+	RenderMesh::SetAABB(bounds);
+
+	float rad = glm::max(glm::max(bounds.maxs.X, bounds.maxs.Y), bounds.maxs.Z);
+	for (int i = 0; i < SectionCount; i++) {
+		Sections[i].Radius = rad;
+	}
 }
 
 void RenderObject::ApplyTransform()
 {
 	Transformation finalT;
 	SceneComponent* parent = Parent;
-	while (true)
+	while (parent)
 	{
 		finalT += parent->GetTransformation();
 
@@ -148,7 +210,7 @@ void RenderObject::ApplyTransform()
 	Vector rot = finalT.Rotation;
 	Vector sca = finalT.Scale;
 	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Z, loc.Y))
-		* glm::toMat4(glm::quat(glm::vec3(glm::radians(rot.X), glm::radians(rot.Z), glm::radians(rot.Y))))
+		* glm::eulerAngleYXZ(glm::radians(rot.Z), glm::radians(rot.Y), glm::radians(rot.X))
 		* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Z, sca.Y));
 
 	requireUpdate = false;
@@ -162,11 +224,19 @@ void RenderObject::SetInstances(int count, Transformation* dispArray)
 		Vector rot = dispArray[i].Rotation;
 		Vector sca = dispArray[i].Scale;
 		arr[i] = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Z, loc.Y))
-			* glm::toMat4(glm::quat(glm::vec3(glm::radians(rot.X), glm::radians(rot.Z), glm::radians(rot.Y))))
+			* glm::eulerAngleYXZ(glm::radians(rot.Z), glm::radians(rot.Y), glm::radians(rot.X))
 			* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Z, sca.Y));
 	}
 	for (uint i = 0; i < SectionCount; i++) {
 		Sections[i].MakeInstanced(count, arr);
+	}
+	delete[] arr;
+}
+
+void RenderObject::SetInstanceCount(int count)
+{
+	for (uint i = 0; i < SectionCount; i++) {
+		Sections[i].InstanceCount = count;
 	}
 }
 
