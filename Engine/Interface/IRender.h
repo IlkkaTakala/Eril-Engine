@@ -101,6 +101,7 @@ public:
 	virtual void SetInstances(int count, Transformation* dispArray) = 0;
 	virtual void SetInstanceCount(int count) = 0;
 	virtual SceneComponent* GetParent() const = 0;
+	virtual void SetParent(SceneComponent* p) = 0;
 
 	AABB GetAABB() const { return bounds; }
 	virtual void SetAABB(AABB bounds) { this->bounds = bounds; }

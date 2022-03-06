@@ -15,6 +15,8 @@
 #include "Objects/InputComponent.h"
 #include "Material.h"
 #include "Objects/ColliderComponent.h"
+#include "Objects/ParticleComponent.h"
+#include "TestArea/CloudParticle.h"
 
 //ECS
 #include <Interface/IECS.h>
@@ -86,8 +88,10 @@ FlightPlayer::FlightPlayer() : Player()
 	pc->SetMovementTarget(Movement);
 	pc->SetSize(AABB({-0.5f, -0.5f, 0.f}, { 0.5f, 0.5f, 1.f }));
 	pc->SetLocation({ 0.f, 0.f, 0.5f });
+	SetRotation(0.f);
 
 	//GetCamera()->SetPostProcess("PostProcessForest");
+	int AreaSize = 700;
 
 	for (int i = 0; i < 500; i++) {
 		auto m = SpawnObject<VisibleObject>();
@@ -100,11 +104,10 @@ FlightPlayer::FlightPlayer() : Player()
 		float t = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f * PI;
 
 
-		float x = rad * cos(s) * sin(t);
-		float y = rad * sin(s) * sin(t);
-		float z = rad * cos(t);
+		float x = RandomFloatInRange(-AreaSize, AreaSize);
+		float y = RandomFloatInRange(-AreaSize, AreaSize);
+		float z = RandomFloatInRange(-AreaSize, AreaSize);
 		Vector loc(x, y, z * 0.3f);
-		loc *= i * 5;
 
 		auto c = SpawnObject<ColliderComponent>();
 		c->SetType(0);
@@ -114,6 +117,23 @@ FlightPlayer::FlightPlayer() : Player()
 		m->AddComponent(c);
 		m->SetLocation(loc);
 		m->SetRotation({ 0.f, 0.f, static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 360.f });
+	}
+
+	for (int i = 0; i < 100; i++) {
+
+		float rad = 1.0f;
+		float s = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f * PI;
+		float t = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f * PI;
+
+
+		float x = RandomFloatInRange(-AreaSize, AreaSize);
+		float y = RandomFloatInRange(-AreaSize, AreaSize);
+		float z = RandomFloatInRange(-AreaSize, AreaSize);
+		Vector loc(x, y, z * 0.3f);
+
+		auto psys = SpawnObject<ParticleComponent>();
+		psys->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
+		psys->SetLocation(loc);
 	}
 }
 
@@ -216,7 +236,10 @@ void FlightPlayer::ItemPickE(bool KeyDown)
 void FlightPlayer::MouseMoved(float X, float Y)
 {
 	const Vector& rot = Rotation;
-	if (cursorState) SetRotation(Vector(rot.X + X * mouseSens, rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, rot.Z));
+	if (cursorState) SetRotation(Vector(
+		rot.X, 
+		rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y,
+		rot.Z + X * mouseSens));
 }
 
 void FlightPlayer::InputExit(bool down)

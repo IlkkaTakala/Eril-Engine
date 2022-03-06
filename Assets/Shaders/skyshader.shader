@@ -168,11 +168,10 @@ void main()
     );
 	
 	float mu = dot(normalize(pos), normalize(fsun));
-	color = mix(color, color + vec3(80,64,40), step(0.9998, mu);
+	color = mix(color, color + vec3(80,64,40), step(0.9998, mu));
 	
 	if (pos.y < 0.0) {
-		float noise = earthNoise(pos.xz);
-		color += vec3(noise);
+		color = vec3(0.6);
 	}
 	
 	const float exposure = 1.0;

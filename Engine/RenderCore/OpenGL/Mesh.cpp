@@ -25,15 +25,17 @@ Section::~Section()
 void Section::Render()
 {
 	glBindVertexArray(Holder->VAO);
-	//glBindBuffer(GL_ARRAY_BUFFER, InstanceDisp);
-	//glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(0));
-	//glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 4));
-	//glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 8));
-	//glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 12));
 
 	if (Parent->GetBinds()) Parent->GetBinds()();
 
-	if (Instanced) glDrawElementsInstanced(GL_TRIANGLES, Holder->IndexCount, GL_UNSIGNED_INT, 0, InstanceCount);
+	if (Instanced) {
+		glBindBuffer(GL_ARRAY_BUFFER, InstanceDisp);
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(0));
+		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 4));
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 8));
+		glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 12));
+		glDrawElementsInstanced(GL_TRIANGLES, Holder->IndexCount, GL_UNSIGNED_INT, 0, InstanceCount);
+	}
 	else glDrawElements(GL_TRIANGLES, Holder->IndexCount, GL_UNSIGNED_INT, 0);
 }
 
@@ -166,11 +168,6 @@ const glm::mat4& RenderObject::GetModelMatrix()
 {
 	requireUpdate = true;
 	return ModelMatrix;
-}
-
-void RenderObject::SetParent(SceneComponent* parent)
-{
-	Parent = parent;
 }
 
 void RenderObject::SetBinds(std::function<void(void)> bind)
