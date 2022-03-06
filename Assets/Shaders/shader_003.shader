@@ -211,14 +211,14 @@ void main()
 		{
 			case 0:
 			{
-				L = normalize(-light.rotation.xyz);
+				L = normalize(light.rotation.xyz);
 				H = normalize(V + L);
 
 				float distance 	= 1.0;
 				float radius 	= 10000000.0;
 				float b 		= 1.0 / (radius * radius * 0.01);
 				float attenuation = 1.0 / (1.0 + 0.1 * distance + b * distance * distance);//1.0 / (distance * distance);
-				radiance = light.color.rgb;// * attenuation;
+				radiance = clamp(light.color.rgb * L.y, 0.0, 100.0);// * attenuation;
 				//shadow = ShadowCalculation(light.transform * vec4(fs_in.FragPos, 1.0), L, N);
 			} break;
 			

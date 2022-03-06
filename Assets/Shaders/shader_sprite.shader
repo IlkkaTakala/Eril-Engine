@@ -1,4 +1,4 @@
-2;1;0;
+2;2;0;
 ###VERTEX###
 #version 430 core
 layout (location = 0) in vec3 in_position;
@@ -68,7 +68,7 @@ layout(std430, binding = 10) readonly buffer Particles {
 	Particle data[];
 } ParticlesData;
 
-//layout (location = 0) out vec4 ColorBuffer;
+layout (location = 0) out vec4 ColorBuffer;
 layout (location = 1) out vec4 BloomBuffer;
 layout (location = 2) out vec4 accum;
 layout (location = 3) out float reveal;
@@ -93,17 +93,18 @@ void main()
 	//const float gamma = 2.2;
 	const float exposure = 1.0;
 	
-	//ColorBuffer = vec4(0.0);
+	ColorBuffer.rgb = color.rgb * color.a;
+	ColorBuffer.a = color.a;
 	BloomBuffer = vec4(0.0, 0.0, 0.0, color.a);
 	
 	float weight = clamp(pow(min(1.0, color.a * 10.0) + 0.01, 3.0) * 1e8 * 
                          pow(1.0 - gl_FragCoord.z * 0.9, 3.0), 1e-2, 3e3);
 
     // store pixel color accumulation
-    accum = vec4(color.rgb * color.a, color.a) * weight;
+    //accum = vec4(color.rgb * color.a, color.a) * weight;
 
     // store pixel revealage threshold
-    reveal = color.a;
+    //reveal = color.a;
 
 }
 ###END_FRAGMENT###

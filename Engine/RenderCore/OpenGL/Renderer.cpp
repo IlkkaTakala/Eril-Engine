@@ -438,8 +438,8 @@ void Renderer::UpdateLights()
 		{
 			GLM_Light light;
 			light.locationAndSize = glm::vec4(Lights->at(i).Location.X, Lights->at(i).Location.Z, Lights->at(i).Location.Y, Lights->at(i).Size);
-			glm::mat4 rot = glm::mat4(1.0) * glm::toMat4(glm::quat(glm::vec3(glm::radians(Lights->at(i).Rotation.X), glm::radians(Lights->at(i).Rotation.Y), glm::radians(Lights->at(i).Rotation.Z))));
-			light.rotation = rot * glm::vec4(0.0, -1.0, 0.0, 0.0);
+			Vector& rot = Lights->at(i).Rotation;
+			light.rotation = glm::vec4(rot.X, rot.Z, rot.Y, 1.0);
 			light.color = glm::vec4(Lights->at(i).Color.X, Lights->at(i).Color.Y, Lights->at(i).Color.Z, 1.0) * Lights->at(i).Intensity;
 			light.type.x = Lights->at(i).LightType;
 			mapped[i] = light;
@@ -1054,9 +1054,10 @@ void Renderer::Forward(int width, int height)
 	glBindVertexArray(ScreenVao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glDepthFunc(GL_LEQUAL);
+	glBlendFunc(GL_ONE, GL_ONE);
 
-	// Additive pass
+	// Multiplicative pass
 	for (auto const& [name, s] : Shaders)
 	{
 		if (s == nullptr) continue;

@@ -64,7 +64,7 @@ void FlightPlayer::Winner()
 FlightPlayer::FlightPlayer() : Player()
 {
 	mouseSens = 0.1f;
-	Speed = 10.f;
+	Speed = 20.f;
 	time = 0.f;
 	InputMode = true;
 	cursorState = true;
@@ -196,8 +196,8 @@ void FlightPlayer::InputTwo(bool KeyDown)
 void FlightPlayer::RunInputShift(bool KeyDown)
 {
 	if (KeyDown) {
-		Movement->SetMaxSpeed(20.f);
-		Movement->SetFlightMaxSpeed(20.f);
+		Movement->SetMaxSpeed(40.f);
+		Movement->SetFlightMaxSpeed(40.f);
 	}
 	else {
 		Movement->SetMaxSpeed(Speed);
@@ -265,7 +265,7 @@ void FlightPlayer::Tick(float delta)
 	GetCamera()->SetRotation(Rotation);
 
 	if (Sky) {
-		time += delta;
+		time += delta * 0.1;
 		Sky->SetLocation(Location);
 		Sky->GetModel()->GetMaterial(0)->SetParameter("time", time);
 
@@ -275,7 +275,7 @@ void FlightPlayer::Tick(float delta)
 			LightComponent& l = dirLight->at(0);
 			l.Rotation = Vector::RotateByAxis(l.Rotation, {1, 0, 0}, delta * 0.1);
 
-			Sky->GetModel()->GetMaterial(0)->SetParameter("sunDirection", -l.Rotation);
+			Sky->GetModel()->GetMaterial(0)->SetParameter("sunDirection", { l.Rotation.X, l.Rotation.Z, l.Rotation.Y });
 		}
 	}
 }
@@ -284,7 +284,7 @@ void FlightPlayer::BeginPlay()
 {
 	//ObjectManager::GetByRecord<Enemy>(0x10)->stopMoving();
 	Sky = ObjectManager::GetByRecord<VisibleObject>(0x5AA);
-
+	Sky->GetModel()->SetAABB(AABB({ -10 }, { 10 } ));
 	Console::Log("Hello beautiful world");
 
 	start = SpawnObject<StartScreen>();
