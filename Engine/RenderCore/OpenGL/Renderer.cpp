@@ -438,8 +438,8 @@ void Renderer::UpdateLights()
 		{
 			GLM_Light light;
 			light.locationAndSize = glm::vec4(Lights->at(i).Location.X, Lights->at(i).Location.Z, Lights->at(i).Location.Y, Lights->at(i).Size);
-			glm::mat4 rot = glm::mat4(1.0) * glm::toMat4(glm::quat(glm::vec3(glm::radians(Lights->at(i).Rotation.X), glm::radians(Lights->at(i).Rotation.Y), glm::radians(Lights->at(i).Rotation.Z))));
-			light.rotation = rot * glm::vec4(0.0, -1.0, 0.0, 0.0);
+			Vector& rot = Lights->at(i).Rotation;
+			light.rotation = glm::vec4(rot.X, rot.Z, rot.Y, 1.0);
 			light.color = glm::vec4(Lights->at(i).Color.X, Lights->at(i).Color.Y, Lights->at(i).Color.Z, 1.0) * Lights->at(i).Intensity;
 			light.type.x = Lights->at(i).LightType;
 			mapped[i] = light;
@@ -935,7 +935,7 @@ void Renderer::Forward(int width, int height)
 	glDrawBuffers(4, attachments);
 
 	glDepthMask(GL_TRUE);
-	glDepthFunc(GL_LESS);
+	glDepthFunc(GL_LEQUAL);
 	glDisable(GL_BLEND);
 	glClearColor(0.f, 0.f, 0.f, 0.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -978,20 +978,7 @@ void Renderer::Forward(int width, int height)
 			for (Section* o : m->GetObjects())
 			{
 				glm::mat4 mm = o->Parent->GetModelMatrix();
-				Vector direction = ActiveCamera->GetForwardVector();
-				Vector location = ActiveCamera->GetLocation();
-				glm::vec3 pos = mm[3];
-				glm::vec3 rad = glm::vec3((o->Parent->GetAABB().maxs - o->Parent->GetAABB().mins).Length()) * glm::mat3(mm);
-				float radii = glm::max(rad.x, glm::max(rad.y, rad.z));
-				glm::vec3 loc = glm::vec3(location.X, location.Z, location.Y);
-				glm::vec3 dir = glm::vec3(direction.X, direction.Z, direction.Y);
-				if ((loc - pos).length() > 2.f && (loc - pos).length() > radii)
-				{
-					if (glm::dot(dir, glm::normalize(loc - pos)) < 0.5f)
-					{
-						continue;
-					}
-				}
+				if (CullCheck(o)) continue;
 				s->SetUniform("Model", mm);
 				o->Render();
 				
@@ -1044,23 +1031,9 @@ void Renderer::Forward(int width, int height)
 			for (Section* o : m->GetObjects())
 			{
 				glm::mat4 mm = o->Parent->GetModelMatrix();
-				Vector direction = ActiveCamera->GetForwardVector();
-				Vector location = ActiveCamera->GetLocation();
-				glm::vec3 pos = mm[3];
-				glm::vec3 rad = glm::vec3(o->GetRadius()) * glm::mat3(mm);
-				float radii = glm::max(rad.x, glm::max(rad.y, rad.z));
-				glm::vec3 loc = glm::vec3(location.X, location.Z, location.Y);
-				glm::vec3 dir = glm::vec3(direction.X, direction.Z, direction.Y);
-				if ((loc - pos).length() > 2.f && (loc - pos).length() > radii)
-				{
-					if (glm::dot(dir, glm::normalize(loc - pos)) < 0.5f)
-					{
-						continue;
-					}
-				}
+				if (CullCheck(o)) continue;
 				s->SetUniform("Model", mm);
 				o->Render();
-
 			}
 		}
 	}
@@ -1081,9 +1054,10 @@ void Renderer::Forward(int width, int height)
 	glBindVertexArray(ScreenVao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glDepthFunc(GL_LEQUAL);
+	glBlendFunc(GL_ONE, GL_ONE);
 
-	// Additive pass
+	// Multiplicative pass
 	for (auto const& [name, s] : Shaders)
 	{
 		if (s == nullptr) continue;
@@ -1166,20 +1140,7 @@ void Renderer::PreDepth(int width, int height)
 			for (Section* o : m->GetObjects())
 			{
 				glm::mat4 mm = o->Parent->GetModelMatrix();
-				Vector direction = ActiveCamera->GetForwardVector();
-				Vector location = ActiveCamera->GetLocation();
-				glm::vec3 pos = mm[3];
-				glm::vec3 rad = glm::vec3(o->GetRadius()) * glm::mat3(mm);
-				float radii = glm::max(rad.x, glm::max(rad.y, rad.z));
-				glm::vec3 loc = glm::vec3(location.X, location.Z, location.Y);
-				glm::vec3 dir = glm::vec3(direction.X, direction.Z, direction.Y);
-				if ((loc - pos).length() > 2.f && (loc - pos).length() > radii)
-				{
-					if (glm::dot(dir, glm::normalize(loc - pos)) < 0.65f)
-					{
-						continue;
-					}
-				}
+				if (CullCheck(o)) continue;
 				PreDepthShader->SetUniform("Model", mm);
 				o->Render();
 
@@ -1217,6 +1178,31 @@ void Renderer::UpdateTransforms() {
 			}
 		}
 	}
+}
+
+inline bool Renderer::CullCheck(Section* s)
+{
+	glm::mat4 mm = s->Parent->GetModelMatrix();
+	Vector direction = ActiveCamera->GetForwardVector();
+	Vector location = ActiveCamera->GetLocation();
+	glm::vec3 pos = mm[3];
+	Vector aabb = s->Parent->GetAABB().maxs - s->Parent->GetAABB().mins;
+	glm::vec3 rad = glm::vec3(aabb.X, aabb.Z, aabb.Y) * glm::mat3(mm);
+	float radii = glm::max(rad.x, glm::max(rad.y, rad.z));
+	glm::vec3 loc = glm::vec3(location.X, location.Z, location.Y);
+	glm::vec3 dir = glm::vec3(direction.X, direction.Z, direction.Y);
+	glm::vec3 d = loc - pos;
+	if (glm::length(d) > s->RenderDistance) {
+		return true;
+	}
+	else if (glm::length(d) > 2.f && glm::length(d) > radii)
+	{
+		if (glm::dot(dir, glm::normalize(loc - pos)) < 0.55f) // TODO: Calculate from FOV
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 void Renderer::Render(float delta)

@@ -19,6 +19,7 @@ float CurveData::EvaluateCurve(float delta) const
 			else return points[i].second;
 		}
 	}
+	return 0.f;
 }
 
 Vector VectorCurveData::EvaluateCurve(float delta) const
@@ -36,4 +37,5 @@ Vector VectorCurveData::EvaluateCurve(float delta) const
 			else return points[i].second;
 		}
 	}
+	return 0.f;
 }

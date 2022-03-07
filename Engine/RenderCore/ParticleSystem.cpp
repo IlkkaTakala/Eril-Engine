@@ -57,7 +57,11 @@ void ParticleSystem::Initialize(SceneComponent* attach)
 	Particles.resize(MaxParticleCount);
 	Parent = attach;
 
-	if (!Sprite) Sprite = MI->LoadData(attach, "sprite");
+	if (!Sprite) {
+		Sprite = MI->LoadData(attach, "sprite");
+		Sprite->SetAABB(AABB({ -10 }, { 10 }));
+	}
+	else Sprite->SetParent(attach);
 	if (!Sprite) return;
 	if (!Material) {
 		Material = RI->LoadMaterialByName("Assets/Materials/sprite");
@@ -71,7 +75,6 @@ void ParticleSystem::Initialize(SceneComponent* attach)
 	glBindBuffer(GL_ARRAY_BUFFER, MaterialBuffer);
 	glBufferData(GL_ARRAY_BUFFER, MaxParticleCount * sizeof(MaterialParams), nullptr, GL_DYNAMIC_DRAW);
 
-	Sprite->SetAABB(AABB({-10}, {10}));
 }
 
 void ParticleSystem::Update(float delta)
@@ -134,6 +137,7 @@ bool ParticleSystemConstruction::RateSpawner::Check(float delta)
 	system->Particles[idx].location += system->Parent->GetWorldLocation();
 	system->Particles[idx].rotation += system->Parent->GetWorldRotation();
 	system->Particles[idx].enabled = true;
+	system->Particles[idx].lifetime = 0.f;
 	system->ParticleCount = system->ParticleCount > idx ? system->ParticleCount : idx;
 	return true;
 }

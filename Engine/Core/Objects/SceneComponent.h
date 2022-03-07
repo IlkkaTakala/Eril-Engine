@@ -33,7 +33,7 @@ public:
 
 	SceneComponent* GetParent() const { return Parent; }
 	virtual void SetParent(SceneComponent* parent) { Parent = parent; }
-	const std::list<RefWeak<SceneComponent>> GetChildren() const { return Children; }
+	const std::list<Ref<SceneComponent>>& GetChildren() const { return Children; }
 	//void SetParent(SceneComponent* obj) { Parent = obj; }
 
 	virtual void Refresh() {}
@@ -45,7 +45,7 @@ protected:
 	friend class MovementComponent;
 
 	Ref<SceneComponent> Parent;
-	std::list<RefWeak<SceneComponent>> Children;
+	std::list<Ref<SceneComponent>> Children;
 
 	Vector Location;
 	Vector Rotation;

@@ -27,6 +27,7 @@ public:
     virtual void SetParent(SceneComponent* parent) override;
     virtual void Refresh() override;
 
+    void OnCollide();
 private:
     friend class ErilMotion;
     btRigidBody* body;

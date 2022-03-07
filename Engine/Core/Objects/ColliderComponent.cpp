@@ -68,7 +68,7 @@ public:
 			if (!m_userPointer->moveObject) return;
 			m_userPointer->GetMovementTarget()->DesiredState.location = { loc[0], loc[2], loc[1] };
 			m_userPointer->GetMovementTarget()->DesiredState.velocity = { vel[0], vel[2], vel[1] };
-			m_userPointer->GetMovementTarget()->DesiredState.gravity = { gravity[0], gravity[2], gravity[1] };
+			//m_userPointer->GetMovementTarget()->DesiredState.gravity = { gravity[0], gravity[2], gravity[1] };
 
 			//m_userPointer->GetMovementTarget()->DesiredState.rotation = rot;
 		} break;
@@ -105,6 +105,8 @@ void ColliderComponent::Tick(float delta)
 	if (type != 2 || !moveObject) return;
 	Vector temp = moveObject->DesiredState.velocity;
 	body->setLinearVelocity({ temp.X, temp.Z, temp.Y });
+	Vector gra = moveObject->DesiredState.gravity;
+	body->setGravity(btVector3(gra.X, gra.Z, gra.Y));
 }
 
 void ColliderComponent::SetType(int t)
@@ -126,6 +128,7 @@ void ColliderComponent::SetType(int t)
 		body->setFriction(0.f);
 		break;
 	}
+	body->setUserPointer(this);
 	Refresh();
 }
 
@@ -176,5 +179,10 @@ void ColliderComponent::Refresh()
 	temp.setRotation(btQuaternion(radians(rot.Y), radians(rot.Z), radians(rot.X)));
 	body->setWorldTransform(temp);
 	Physics::ForceUpdate(body);
+}
+
+void ColliderComponent::OnCollide()
+{
+	Console::Log("collision detected");
 }
 

@@ -16,6 +16,7 @@ class UISpace;
 class Camera
 {
 public:
+	virtual ~Camera() {}
 	virtual void SetRotation(const Vector& rotation) = 0;
 	virtual void SetLocation(const Vector& location) = 0;
 
@@ -100,6 +101,8 @@ public:
 	virtual void SetInstances(int count, Transformation* dispArray) = 0;
 	virtual void SetInstanceCount(int count) = 0;
 	virtual SceneComponent* GetParent() const = 0;
+	virtual void SetParent(SceneComponent* p) = 0;
+	virtual void SetSectionRenderDistance(uint section, float distance) = 0;
 
 	AABB GetAABB() const { return bounds; }
 	virtual void SetAABB(AABB bounds) { this->bounds = bounds; }

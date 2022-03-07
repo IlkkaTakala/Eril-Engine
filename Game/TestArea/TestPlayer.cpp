@@ -75,7 +75,13 @@ TestPlayer::TestPlayer() : Player()
 	//Player Movement
 	Movement = SpawnObject<MovementComponent>();
 	Movement->SetTarget(dynamic_cast<Actor*>(this), Mesh->GetModel()->GetAABB());
-	Movement->SetGravity(false);
+	Movement->SetGravity(true);
+	Movement->SetPhysics(false);
+	Movement->SetMaxSpeed(Speed);
+	Movement->SetFlightMaxSpeed(Speed);
+	Movement->SetAirBrake(10.f);
+	Movement->SetAcceleration(500.f);
+	Movement->SetAirControl(0.9f);
 
 	PlayerCol = SpawnObject<ColliderComponent>();
 	AddComponent(PlayerCol);

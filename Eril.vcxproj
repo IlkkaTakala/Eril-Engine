@@ -116,7 +116,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>Game;Engine\external\bullet3\src;Engine\external\assimp\include;Engine\external\tinyfiledialogs;Engine\external\openal-soft\include;Game;Engine\external\assimp\include;Engine\external\RapidXML;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Engine\ScriptCore\include;Game;Engine\external\bullet3\src;Engine\external\assimp\include;Engine\external\tinyfiledialogs;Engine\external\openal-soft\include;Game;Engine\external\assimp\include;Engine\external\RapidXML;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ExceptionHandling>Sync</ExceptionHandling>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -160,7 +160,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>Game;Engine\external\bullet3\src;Engine\external\assimp\include;Engine\external\tinyfiledialogs;Engine\external\openal-soft\include;Game;Engine\external\assimp\include;Engine\external\RapidXML;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Engine\ScriptCore\include;Game;Engine\external\bullet3\src;Engine\external\assimp\include;Engine\external\tinyfiledialogs;Engine\external\openal-soft\include;Game;Engine\external\assimp\include;Engine\external\RapidXML;Engine\external\stb-image;Engine\RenderCore\OpenGL\include;Engine;Engine\Core;Engine\external\glfw\include;Engine\external\glfw\deps;Engine\external\glm\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -206,7 +206,6 @@
     <ClCompile Include="Engine\Core\Objects\InputComponent.cpp" />
     <ClCompile Include="Engine\Core\Objects\ParticleComponent.cpp" />
     <ClCompile Include="Engine\RenderCore\ParticleSystem.cpp" />
-    <ClCompile Include="Game\ForestGame\EndScreen.cpp" />
     <ClCompile Include="Engine\Core\BasicTypes.cpp" />
     <ClCompile Include="Engine\Core\Core.cpp" />
     <ClCompile Include="Engine\Core\ECS\EntityManager.cpp" />
@@ -258,6 +257,7 @@
     <ClCompile Include="Game\Disco\DiscoPlayer.cpp" />
     <ClCompile Include="Game\ECS_Examples\ECSExample.cpp" />
     <ClCompile Include="Game\EngineInterface.cpp" />
+    <ClCompile Include="Game\ForestGame\EndScreen.cpp" />
     <ClCompile Include="Game\ForestGame\ForestPlayer.cpp" />
     <ClCompile Include="Game\ForestGame\Ghost.cpp" />
     <ClCompile Include="Game\ForestGame\StartScreen.cpp" />
@@ -280,7 +280,6 @@
     <ClInclude Include="Engine\Core\Objects\ParticleComponent.h" />
     <ClInclude Include="Engine\RenderCore\Particle.h" />
     <ClInclude Include="Engine\RenderCore\ParticleSystem.h" />
-    <ClInclude Include="Game\ForestGame\EndScreen.h" />
     <ClInclude Include="Engine\Core\BasicTypes.h" />
     <ClInclude Include="Engine\Core\Core.h" />
     <ClInclude Include="Engine\Core\ECS\Component.h" />
@@ -345,6 +344,7 @@
     <ClInclude Include="Game\ECS_Examples\ECSExample.h" />
     <ClInclude Include="Game\ECS_Examples\Systems\MovementSystem.h" />
     <ClInclude Include="Game\EngineInterface.h" />
+    <ClInclude Include="Game\ForestGame\EndScreen.h" />
     <ClInclude Include="Game\ForestGame\ForestPlayer.h" />
     <ClInclude Include="Game\ForestGame\Ghost.h" />
     <ClInclude Include="Game\ForestGame\StartScreen.h" />
@@ -367,6 +367,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Engine\Assets\Icons\icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Game\ForestGame\forest.map" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

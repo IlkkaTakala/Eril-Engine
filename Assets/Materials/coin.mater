@@ -1,0 +1,7 @@
+[Shader]
+name=shader_005
+[Vectors]
+Albedo=1.0,0.333,0.0
+[Scalars]
+Roughness=0.4
+Metallic=0.8

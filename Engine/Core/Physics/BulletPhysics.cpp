@@ -2,6 +2,7 @@
 #include <glad/gl.h>
 #include <Physics/BulletPhysics.h>
 #include "BulletObject.h"
+#include <Objects/ColliderComponent.h>
 
 btDynamicsWorld* world;
 btDispatcher* dispatcher;
@@ -145,6 +146,7 @@ void Physics::init()
 	solver = new btSequentialImpulseConstraintSolver();
 	world = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfig);
 	world->setGravity(btVector3(0, -10, 0));
+	gContactAddedCallback = Physics::callbackFunc;
 }
 
 btDynamicsWorld* Physics::GetWorld()
@@ -152,10 +154,65 @@ btDynamicsWorld* Physics::GetWorld()
 	return world;
 }
 
-bool Physics::callbackFunc(btManifoldPoint& cp, const btCollisionObject* obj1, int id1, int index1, const btCollisionObject* obj2, int id2, int index2)
+bool Physics::callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int id1, int index1, const btCollisionObjectWrapper* obj2, int id2, int index2)
 {
-	((bulletObject*)obj1->getUserPointer())->hit = true;
+	((ColliderComponent*)obj1->getCollisionObject()->getUserPointer())->OnCollide();
 
-	((bulletObject*)obj2->getUserPointer())->hit = true;
+	((ColliderComponent*)obj2->getCollisionObject()->getUserPointer())->OnCollide();
+
+	return false;
+}
+
+bool Physics::LineTraceSingle(const Vector& start, const Vector& end, Vector& hitLocation, Vector& hitNormal)
+{
+	btVector3 rayFrom(start.X, start.Z, start.Y);
+	btVector3 rayTo(end.X, end.Z, end.Y);
+	struct	AllRayResultCallback : public btCollisionWorld::RayResultCallback
+	{
+		AllRayResultCallback(const btVector3& rayFromWorld, const btVector3& rayToWorld)
+			:m_rayFromWorld(rayFromWorld),
+			m_rayToWorld(rayToWorld)
+		{
+		}
+
+		btVector3	m_rayFromWorld;//used to calculate hitPointWorld from hitFraction
+		btVector3	m_rayToWorld;
+
+		btVector3	m_hitNormalWorld;
+		btVector3	m_hitPointWorld;
+
+		virtual	btScalar	addSingleResult(btCollisionWorld::LocalRayResult& rayResult, bool normalInWorldSpace)
+		{
+
+			//caller already does the filter on the m_closestHitFraction
+			btAssert(rayResult.m_hitFraction <= m_closestHitFraction);
+
+			m_closestHitFraction = rayResult.m_hitFraction;
+
+			m_collisionObject = rayResult.m_collisionObject;
+			if (normalInWorldSpace)
+			{
+				m_hitNormalWorld = rayResult.m_hitNormalLocal;
+			}
+			else
+			{
+				///need to transform normal into worldspace
+				m_hitNormalWorld = m_collisionObject->getWorldTransform().getBasis() * rayResult.m_hitNormalLocal;
+			}
+			m_hitPointWorld.setInterpolate3(m_rayFromWorld, m_rayToWorld, rayResult.m_hitFraction);
+			return 1.f;
+		}
+	};
+
+
+	AllRayResultCallback	resultCallback(rayFrom, rayTo);
+	//	btCollisionWorld::ClosestRayResultCallback resultCallback(rayFrom,rayTo);
+	world->rayTest(rayFrom, rayTo, resultCallback);
+	if (resultCallback.hasHit())
+	{
+		hitNormal = Vector(resultCallback.m_hitNormalWorld[0], resultCallback.m_hitNormalWorld[2], resultCallback.m_hitNormalWorld[1]);
+		hitLocation = Vector(resultCallback.m_hitPointWorld[0], resultCallback.m_hitPointWorld[2], resultCallback.m_hitPointWorld[1]);
+		return true;
+	}
 	return false;
 }

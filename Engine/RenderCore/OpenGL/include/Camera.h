@@ -9,7 +9,7 @@ class GLCamera : public Camera
 {
 public:
 	GLCamera();
-	virtual ~GLCamera() {};
+	virtual ~GLCamera();
 
 	virtual void SetFov(float) override;
 	virtual void SetPerspective(bool perspective) override;
