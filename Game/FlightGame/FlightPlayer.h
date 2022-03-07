@@ -12,6 +12,7 @@ class PauseUI;
 class EndScreen;
 class StartScreen;
 class VisibleObject;
+class ScoreUI;
 
 class Item : public BaseObject
 {
@@ -42,11 +43,13 @@ public:
 	void Caught();
 	void Winner();
 
+	void AddScore();
+	void InputQ(bool KeyDown);
+
 private:
 	float mouseSens;
 	float Speed;
 
-	void InputQ(bool KeyDown);
 	void ItemPickE(bool KeyDown);
 	void RunInputW(float delta, bool KeyDown);
 	void RunInputA(float delta, bool KeyDown);
@@ -72,6 +75,9 @@ private:
 	bool InputMode;
 	Ref<InstancedObject> Clouds;
 
+	int score;
+
+	Ref<ScoreUI> Scoreui;
 	Ref<VisibleObject> Sky;
 	PauseUI* pause;
 	EndScreen* end;

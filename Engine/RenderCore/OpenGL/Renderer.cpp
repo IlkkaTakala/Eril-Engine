@@ -1192,7 +1192,10 @@ inline bool Renderer::CullCheck(Section* s)
 	glm::vec3 loc = glm::vec3(location.X, location.Z, location.Y);
 	glm::vec3 dir = glm::vec3(direction.X, direction.Z, direction.Y);
 	glm::vec3 d = loc - pos;
-	if (glm::length(d) > 2.f && glm::length(d) > radii)
+	if (glm::length(d) > s->RenderDistance) {
+		return true;
+	}
+	else if (glm::length(d) > 2.f && glm::length(d) > radii)
 	{
 		if (glm::dot(dir, glm::normalize(loc - pos)) < 0.55f) // TODO: Calculate from FOV
 		{

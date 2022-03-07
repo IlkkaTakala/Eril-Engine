@@ -41,156 +41,8 @@ void main()
 	vs_out.Normals = N;
 	vs_out.BiTangents = B;
 	vs_out.Tangents = T;
-	//vs_out.normal = normalize(mat3(Model * in_disp) * in_normal).xyz;
-
-	/*
-	//vec3 T = (Model * in_disp * vec4(in_tangent, 1.0f)).xyz;
-	//vec3 N = (Model * in_disp * vec4(in_normal, 1.0f)).xyz;
-	vec3 T = (Model * in_disp * vec4(in_tangent, 0.0f)).xyz;
-	vec3 N = (Model * in_disp * vec4(in_normal, 0.0f)).xyz;
-	T = normalize(T);
-	N = normalize(N);
-	
-	*/
 }
 ###END_VERTEX###
-
-###GEOMETRY###
-#version 430 core
-
-layout(triangles) in;
-
-// Three lines will be generated: 6 vertices
-layout(line_strip, max_vertices = 12) out;
-
-// Shader storage buffer objects
-layout(std140, binding = 0) uniform Globals
-{
-	mat4 projection;
-	mat4 view;
-	vec4 viewPos;
-	ivec2 screenSize;
-	int sceneLightCount;
-};
-
-//uniform float normal_length;
-//uniform mat4 gxl3d_ModelViewProjectionMatrix;
-
-
-in VS_OUT{
-	vec2 TexCoords;
-	vec4 FragPos;
-	vec3 Normals;
-	vec3 BiTangents;
-	vec3 Tangents;
-} gs_in[];
-
-out GS_OUT
-{
-	vec2 TexCoords;
-	vec4 FragPos;
-	vec3 Normals;
-	vec3 BiTangents;
-	vec3 Tangents;
-} gs_out;
-
-
-void main()							 
-{			
-	
-
-	//Make Normal Triangle
-	float normal_length = 0.5;
-	int i;
-	for (i = 0; i < gs_in.length(); i++)
-	{
-		gs_out.TexCoords = gs_in[i].TexCoords;
-		gs_out.FragPos = gs_in[i].FragPos;
-		gs_out.Normals = gs_in[i].Normals;
-		gs_out.BiTangents = gs_in[i].BiTangents;
-		gs_out.Tangents = gs_in[i].Tangents;
-
-		
-	}	 
-
-	vec4 P = gl_in[0].gl_Position;
-	vec4 N = vec4(gs_in[0].Normals, 1.0);
-
-	//WireFrame
-	/*
-	P = gl_in[0].gl_Position;
-	gl_Position = P;
-	EmitVertex();
-
-	P = gl_in[1].gl_Position;
-	gl_Position = P;
-	EmitVertex();
-	EndPrimitive();
-
-	P = gl_in[1].gl_Position;
-	gl_Position = P;
-	EmitVertex();
-
-	P = gl_in[2].gl_Position;
-	gl_Position = P;
-	EmitVertex();
-	EndPrimitive();
-
-	P = gl_in[2].gl_Position;
-	gl_Position = P;
-	EmitVertex();
-
-	P = gl_in[0].gl_Position;
-	gl_Position = P;
-	EmitVertex();
-	EndPrimitive();
-	*/
-
-	//Normals
-	P = gl_in[0].gl_Position;
-	N = projection * view * vec4(gs_in[0].Normals, 0.0) * normal_length;
-	gl_Position = P;
-	EmitVertex();
-
-	gl_Position = P + N;
-	EmitVertex();
-	EndPrimitive();
-
-	//Tangents
-	P = gl_in[0].gl_Position;
-	vec4 T = projection * view * vec4(gs_in[0].Tangents, 0.0) * normal_length;
-	gl_Position = P;
-	EmitVertex();
-
-	gl_Position = P + T;
-	EmitVertex();
-	EndPrimitive();
-
-	//BiTangents
-	
-	P = gl_in[0].gl_Position;
-	vec4 B = projection * view * vec4(gs_in[0].BiTangents, 0.0) * normal_length;
-	gl_Position = P;
-	EmitVertex();
-
-	gl_Position = P + B;
-	EmitVertex();
-	EndPrimitive();
-	
-	
-
-
-	
-
-
-
-
-}
-
-
-
-###END_GEOMETRY###
-
 ###FRAGMENT###
 #version 430 core
 
@@ -235,10 +87,9 @@ in VS_OUT{
 	vec3 Tangents;
 } fs_in;
 
-uniform sampler2D Albedo;
-uniform sampler2D Normal;
-uniform sampler2D Roughness;
-uniform sampler2D AO;
+uniform vec3 Albedo;
+uniform float Roughness;
+uniform float Metallic;
 
 uniform int numberOfTilesX;
 
@@ -326,30 +177,19 @@ void main()
 	ivec2 tileID = location / ivec2(16, 16);
 	uint index = tileID.y * numberOfTilesX + tileID.x;
 
-	// Get color and normal components from texture maps
-	//vec3 FragPos = texture(gPosition, TexCoords).xyz;
-	//vec4 data = texture(gData, TexCoords);
 	float gamma = 2.2;	
-	vec3 albedo = pow(texture(Albedo, fs_in.TexCoords).rgb, vec3(gamma));
-	float metallic = 0.0;//texture(Metallic, fs_in.TexCoords).r;
-	float AOt = texture(AO, fs_in.TexCoords).r;
-	float roughness = 1.0 - texture(Roughness, fs_in.TexCoords).r;
-	vec3 normal = texture(Normal, fs_in.TexCoords).rgb;
-	//normal.r = 1.0 - normal.r;
-	//normal.g = 1.0 - normal.g;
-	normal = normalize(normal * 2.0 - 1.0);
+	const vec3 albedo = Albedo;
+	const float metallic = Metallic;
+	const float AOt = 1.0;
+	const float roughness = Roughness;
 	
 	float shadow = 0;
-	//float SSAO = texture(gSSAO, TexCoords).r;
 	
-	vec3 ambient = vec3(0.01, 0.02, 0.06) * albedo * AOt;// * SSAO;
+	vec3 ambient = vec3(0.01, 0.02, 0.06) * albedo * AOt;
 	
 	vec3 Lo = vec3(0.0);
 	
-	mat3 TBN = mat3(fs_in.Tangents, fs_in.BiTangents, fs_in.Normals);
-
-
-	vec3 N = normalize(TBN * normal);
+	vec3 N = normalize(fs_in.Normals);
     vec3 V = normalize(viewPos - fs_in.FragPos).xyz;
 
 	uint offset = index * 1024;
@@ -370,8 +210,7 @@ void main()
 				L = normalize(light.rotation.xyz);
 				H = normalize(V + L);
 
-				radiance = light.color.rgb;
-				//shadow = ShadowCalculation(light.transform * vec4(fs_in.FragPos, 1.0), L, N);
+				radiance = clamp(light.color.rgb * L.y, 0.0, 100.0);
 			} break;
 			
 			case 1:
@@ -427,11 +266,6 @@ void main()
 	
 	vec4 color = vec4(ambient + Lo, 1.0);
 	
-	// Height fog
-	//float depth = LinearizeDepth(fs_in.FragPos.z) / 100.0;
-	//color += clamp(depth - 0.5, 0.0, 8.0);
-	
-	//const float gamma = 2.2;
 	const float exposure = 1.0;
 	
 	ColorBuffer = color;

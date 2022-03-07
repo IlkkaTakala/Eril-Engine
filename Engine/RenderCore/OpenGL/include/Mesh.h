@@ -58,6 +58,7 @@ public:
 	int InstanceCountMax;
 	uint InstanceDisp;
 	float Radius;
+	float RenderDistance;
 
 	void Render();
 	void MakeInstanced(int count, const glm::mat4* modelM);
@@ -85,6 +86,8 @@ public:
 	virtual void ApplyTransform() override;
 	virtual void SetInstances(int count, Transformation* dispArray) override;
 	virtual void SetInstanceCount(int count) override;
+
+	virtual void SetSectionRenderDistance(uint section, float distance) override;
 
 	virtual SceneComponent* GetParent() const { return Parent; }
 	virtual void SetParent(SceneComponent* p) override { Parent = p; }

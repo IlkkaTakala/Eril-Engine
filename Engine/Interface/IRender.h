@@ -102,6 +102,7 @@ public:
 	virtual void SetInstanceCount(int count) = 0;
 	virtual SceneComponent* GetParent() const = 0;
 	virtual void SetParent(SceneComponent* p) = 0;
+	virtual void SetSectionRenderDistance(uint section, float distance) = 0;
 
 	AABB GetAABB() const { return bounds; }
 	virtual void SetAABB(AABB bounds) { this->bounds = bounds; }

@@ -207,7 +207,7 @@
     </ClCompile>
     <ClCompile Include="Game\FlightGame\StartScreen.cpp">
       <Filter>Game\FlightGame</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="Engine\Core\Objects\ParticleComponent.cpp">
       <Filter>Engine\Objects</Filter>
     </ClCompile>
@@ -219,6 +219,12 @@
     </ClCompile>
     <ClCompile Include="Game\TestArea\CloudParticle.cpp">
       <Filter>Game\TestArea</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\FlightGame\CoinActor.cpp">
+      <Filter>Game\FlightGame</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\FlightGame\ScoreUI.cpp">
+      <Filter>Game\FlightGame</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -535,7 +541,7 @@
     </ClInclude>
     <ClInclude Include="Game\FlightGame\StartScreen.h">
       <Filter>Game\FlightGame</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="Engine\Core\Objects\ParticleComponent.h">
       <Filter>Engine\Objects</Filter>
     </ClInclude>
@@ -550,6 +556,12 @@
     </ClInclude>
     <ClInclude Include="Game\TestArea\CloudParticle.h">
       <Filter>Game\TestArea</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\FlightGame\CoinActor.h">
+      <Filter>Game\FlightGame</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\FlightGame\ScoreUI.h">
+      <Filter>Game\FlightGame</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -128,6 +128,7 @@ void ColliderComponent::SetType(int t)
 		body->setFriction(0.f);
 		break;
 	}
+	body->setUserPointer(this);
 	Refresh();
 }
 
@@ -178,5 +179,10 @@ void ColliderComponent::Refresh()
 	temp.setRotation(btQuaternion(radians(rot.Y), radians(rot.Z), radians(rot.X)));
 	body->setWorldTransform(temp);
 	Physics::ForceUpdate(body);
+}
+
+void ColliderComponent::OnCollide()
+{
+	Console::Log("collision detected");
 }
 

@@ -17,6 +17,8 @@
 #include "Objects/ColliderComponent.h"
 #include "Objects/ParticleComponent.h"
 #include "TestArea/CloudParticle.h"
+#include "CoinActor.h"
+#include "ScoreUI.h"
 
 //ECS
 #include <Interface/IECS.h>
@@ -61,26 +63,33 @@ void FlightPlayer::Winner()
 	ObjectManager::GetByRecord<Enemy>(0x10)->stopMoving();
 }
 
+void FlightPlayer::AddScore()
+{
+	score++;
+	Scoreui->SetScore(score);
+}
+
 FlightPlayer::FlightPlayer() : Player()
 {
 	mouseSens = 0.1f;
-	Speed = 20.f;
+	Speed = 40.f;
 	time = 0.f;
 	InputMode = true;
 	cursorState = true;
 	pause = nullptr;
 	end = nullptr;
 	start = nullptr;
+	score = 0; 
 
 	Movement = SpawnObject<MovementComponent>();
 	Movement->SetTarget(dynamic_cast<Actor*>(this));
-	Movement->SetGravity(false);
+	Movement->SetGravity(true);
 	Movement->SetPhysics(false);
 	Movement->SetMaxSpeed(Speed);
 	Movement->SetFlightMaxSpeed(Speed);
-	Movement->SetAirBrake(2000.f);
+	Movement->SetAirBrake(10.f);
 	Movement->SetAcceleration(500.f);
-	Movement->SetAirControl(1.f);
+	Movement->SetAirControl(0.9f);
 
 	auto pc = SpawnObject<ColliderComponent>();
 	pc->SetType(2);
@@ -93,11 +102,27 @@ FlightPlayer::FlightPlayer() : Player()
 	//GetCamera()->SetPostProcess("PostProcessForest");
 	int AreaSize = 700;
 
-	for (int i = 0; i < 500; i++) {
+	auto isla = SpawnObject<VisibleObject>();
+	isla->SetModel("Island");
+	RenderMesh* model = isla->GetModel();
+	model->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/Island"));
+	model->SetMaterial(1, RI->LoadMaterialByName("Assets/Materials/grass"));
+	model->SetSectionRenderDistance(1, 300.f);
+
+	auto islaCol = SpawnObject<ColliderComponent>();
+	islaCol->SetType(0);
+	islaCol->SetSize(isla->GetModel()->GetAABB());
+	islaCol->SetLocation({ 0, 0, 0 });
+	isla->AddComponent(islaCol);
+	isla->SetLocation({0,0,-5});
+
+	for (int i = 0; i < 250; i++) {
 		auto m = SpawnObject<VisibleObject>();
 		m->SetModel("Island");
-		m->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/Island"));
-		m->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Assets/Materials/grass"));
+		RenderMesh* model = m->GetModel();
+		model->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/Island"));
+		model->SetMaterial(1, RI->LoadMaterialByName("Assets/Materials/grass"));
+		model->SetSectionRenderDistance(1, 300.f);
 
 		float rad = 1.0f;
 		float s = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f * PI;
@@ -117,9 +142,12 @@ FlightPlayer::FlightPlayer() : Player()
 		m->AddComponent(c);
 		m->SetLocation(loc);
 		m->SetRotation({ 0.f, 0.f, static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 360.f });
+
+		auto coin = SpawnObject<CoinActor>();
+		coin->SetLocation(m->GetLocation() + Vector(0,0, 6));
 	}
 
-	for (int i = 0; i < 100; i++) {
+	for (int i = 0; i < 70; i++) {
 
 		float rad = 1.0f;
 		float s = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 2.0f * PI;
@@ -135,16 +163,19 @@ FlightPlayer::FlightPlayer() : Player()
 		psys->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
 		psys->SetLocation(loc);
 	}
+
+	Scoreui = SpawnObject<ScoreUI>();
+	UI::AddToScreen(Scoreui, this);
 }
 
 void FlightPlayer::RegisterInputs(InputComponent* com) 
 {
 	com->RegisterKeyContinuousInput(87, &FlightPlayer::RunInputW, this);
-	com->RegisterKeyContinuousInput(65, &FlightPlayer::RunInputA, this);
+	/*com->RegisterKeyContinuousInput(65, &FlightPlayer::RunInputA, this);
 	com->RegisterKeyContinuousInput(83, &FlightPlayer::RunInputS, this);
-	com->RegisterKeyContinuousInput(68, &FlightPlayer::RunInputD, this);
+	com->RegisterKeyContinuousInput(68, &FlightPlayer::RunInputD, this);*/
 	com->RegisterKeyInput(32, &FlightPlayer::RunInputSpace, this);
-	com->RegisterKeyInput(340, &FlightPlayer::RunInputShift, this);
+	//com->RegisterKeyInput(340, &FlightPlayer::RunInputShift, this);
 	com->RegisterKeyInput(0, &FlightPlayer::LeftMouseDown, this);
 	com->RegisterKeyInput(1, &FlightPlayer::RightMouseDown, this);
 	com->RegisterKeyInput(49, &FlightPlayer::InputOne, this);
@@ -153,12 +184,13 @@ void FlightPlayer::RegisterInputs(InputComponent* com)
 	com->RegisterKeyInput(257, &FlightPlayer::OpenConsole, this);
 	com->RegisterMouseInput(0, &FlightPlayer::MouseMoved, this);
 	com->RegisterKeyInput(69, &FlightPlayer::ItemPickE, this);
-	com->RegisterKeyInput(81, &FlightPlayer::InputQ, this);
 }
 
 void FlightPlayer::RunInputW(float delta, bool KeyDown)
 {
-	Movement->AddInput(-GetCamera()->GetForwardVector());
+	Vector dir = -GetCamera()->GetForwardVector();
+	if (dir.Z > 0.f) dir.Z *= 0.4f;
+	Movement->AddInput(dir.Normalize());
 }
 
 void FlightPlayer::RunInputA(float delta, bool KeyDown)

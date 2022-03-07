@@ -204,9 +204,11 @@
   <ItemGroup>
     <ClCompile Include="Engine\Core\CurveData.cpp" />
     <ClCompile Include="Engine\Core\Objects\InputComponent.cpp" />
+    <ClCompile Include="Game\FlightGame\CoinActor.cpp" />
     <ClCompile Include="Game\FlightGame\EndScreen.cpp" />
     <ClCompile Include="Game\FlightGame\FlightPlayer.cpp" />
     <ClCompile Include="Game\FlightGame\Enemy.cpp" />
+    <ClCompile Include="Game\FlightGame\ScoreUI.cpp" />
     <ClCompile Include="Game\FlightGame\StartScreen.cpp" />
     <ClCompile Include="Engine\Core\Objects\ParticleComponent.cpp" />
     <ClCompile Include="Engine\RenderCore\ParticleSystem.cpp" />
@@ -277,9 +279,11 @@
     <ClInclude Include="Engine\Assets\Resources\resource.h" />
     <ClInclude Include="Engine\Core\CurveData.h" />
     <ClInclude Include="Engine\Core\Objects\InputComponent.h" />
+    <ClInclude Include="Game\FlightGame\CoinActor.h" />
     <ClInclude Include="Game\FlightGame\EndScreen.h" />
     <ClInclude Include="Game\FlightGame\FlightPlayer.h" />
     <ClInclude Include="Game\FlightGame\Enemy.h" />
+    <ClInclude Include="Game\FlightGame\ScoreUI.h" />
     <ClInclude Include="Game\FlightGame\StartScreen.h" />
     <ClInclude Include="Engine\Core\Objects\ParticleComponent.h" />
     <ClInclude Include="Engine\RenderCore\Particle.h" />

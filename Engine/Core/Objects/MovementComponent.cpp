@@ -77,7 +77,9 @@ void MovementComponent::Tick(float time)
 		Vector delta_a;
 		Vector velocity;
 		Vector brake_a = 0.f;
-		inAir = !(DesiredState.velocity.Z < 0.1f && DesiredState.velocity.Z > -0.1f);
+		Vector ground;
+		Vector groundNormal;
+		inAir = !Physics::LineTraceSingle(DesiredState.location + Vector(0.f,0.f,0.0f), DesiredState.location + Vector(0.f, 0.f, -0.5f), ground, groundNormal);
 		if (inAir) air_time += time;
 		else air_time = 0.f;
 		if (direction_count > 0) {
@@ -90,7 +92,7 @@ void MovementComponent::Tick(float time)
 		else {
 			brake_a = -DesiredState.velocity.Normalize() * (inAir ? airbrake : brake) * time;
 			brake_a = brake_a.LengthSquared() > DesiredState.velocity.LengthSquared() ? -DesiredState.velocity : brake_a;
-			if (!inAir) brake_a.Z = 0.f;
+			if (inAir) brake_a.Z = 0.f;
 		}
 		for (int i = 0; i < force_count; i++) {
 			delta_a += forces[i].Direction;

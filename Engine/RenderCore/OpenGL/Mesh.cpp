@@ -14,6 +14,7 @@ Section::Section()
 	InstanceCount = 1;
 	InstanceCountMax = 1;
 	InstanceDisp = 0;
+	RenderDistance = 100000.f;
 }
 
 Section::~Section()
@@ -234,6 +235,13 @@ void RenderObject::SetInstanceCount(int count)
 {
 	for (uint i = 0; i < SectionCount; i++) {
 		Sections[i].InstanceCount = count;
+	}
+}
+
+void RenderObject::SetSectionRenderDistance(uint section, float distance)
+{
+	if (section < SectionCount) {
+		Sections[section].RenderDistance = distance;
 	}
 }
 
