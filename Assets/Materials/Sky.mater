@@ -1,6 +1,4 @@
 [Shader]
 name=skyshader
-[Scalars]
-time=0
-[Vectors]
-sunDirection=0,1,0
+[Textures]
+Albedo=Assets/Textures/hdri_sphere2.hdr

@@ -5,6 +5,7 @@
 
 class Actor;
 class InstancedObject;
+class Light;
 class MovementComponent;
 class Terrain;
 class Hunter;
@@ -53,6 +54,7 @@ private:
 
 	bool cursorState;
 	bool InputMode;
+	Ref<Light> DirLight;
 	Ref<VisibleObject> Sky;
 	Ref<Actor> Box;
 	Ref<Actor> Box2;

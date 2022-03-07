@@ -1,3 +1,0 @@
-<header version='1.0' />
-<FlightPlayer id="4" args= "Location:0,0,0; Rotation:0,0,0;" />
-<VisibleObject id="5AA" args="Mesh:plane; Material1:Assets/Materials/Sky; Scale:1,1,1" />

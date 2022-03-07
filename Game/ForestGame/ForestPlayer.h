@@ -5,6 +5,7 @@
 
 class Actor;
 class InstancedObject;
+class Light;
 class MovementComponent;
 class Terrain;
 class Hunter;
@@ -12,7 +13,6 @@ class PauseUI;
 class EndScreen;
 class StartScreen;
 class VisibleObject;
-class ScoreUI;
 
 class Item : public BaseObject
 {
@@ -31,25 +31,23 @@ public:
 //ECS TEST
 class ECSExample;
 
-class FlightPlayer : public Player
+class ForestPlayer : public Player
 {
-	REGISTER(FlightPlayer);
+	REGISTER(ForestPlayer);
 public:
-	FlightPlayer();
-	virtual ~FlightPlayer() { }
+	ForestPlayer();
+	virtual ~ForestPlayer() { /*INI->SetValue("Player", "Start", CameraPoint.ToString()); INI->SetValue("Player", "Direction", CameraDirection.ToString());*/ }
 	virtual void Tick(float Delta) override;
 	virtual void BeginPlay() override;
 	virtual void OnDestroyed() override;
 	void Caught();
 	void Winner();
 
-	void AddScore();
-	void InputQ(bool KeyDown);
-
 private:
 	float mouseSens;
 	float Speed;
 
+	void InputQ(bool KeyDown);
 	void ItemPickE(bool KeyDown);
 	void RunInputW(float delta, bool KeyDown);
 	void RunInputA(float delta, bool KeyDown);
@@ -73,15 +71,26 @@ private:
 
 	bool cursorState;
 	bool InputMode;
-	Ref<InstancedObject> Clouds;
+	Ref<Light> DirLight;
+	Ref<Light> Lights[100];
+	Ref<InstancedObject> Trees;
+	Ref<InstancedObject> Trees2;
+	Ref<InstancedObject> Grass;
+	Ref<InstancedObject> Flowers;
+	Ref<InstancedObject> Rocks;
+	Ref<InstancedObject> Shacks;
+	Ref<InstancedObject> Candy;
 
-	int score;
-
-	Ref<ScoreUI> Scoreui;
 	Ref<VisibleObject> Sky;
+	Ref<Terrain> terra[4];
+	Ref<Hunter> hunt;
 	PauseUI* pause;
 	EndScreen* end;
 	StartScreen* start;
+	std::vector<RefWeak<VisibleObject>> Candys;
+	std::vector<Ref<Item>> Items;
 
-	float time;
+	//ECS TEST
+	Ref<ECSExample> ecsExample;
+	int spawnCounter;
 };

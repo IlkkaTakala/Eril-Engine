@@ -4,7 +4,7 @@
 #include <UI/Text.h>
 #include <UI/Button.h>
 #include <Gameplay/Scene.h>
-#include "FlightPlayer.h"
+#include "ForestPlayer.h"
 
 void EndScreen::Construct()
 {
@@ -19,8 +19,8 @@ void EndScreen::Construct()
 			endText
 		)->AddChild(
 			Create<Button>()->AddChild(
-				Create<Text>()->SetText("Restart", 20)->SetStyle(Vector(0.f))
-			)->SetEventCallback(Constants::UI::UI_ON_MOUSE_DOWN, []() { Scene::OpenLevel("Game/FlightGame/skyflight"); })
+				Create<Text>()->SetText("Play again", 20)->SetStyle(Vector(0.f))
+			)->SetEventCallback(Constants::UI::UI_ON_MOUSE_DOWN, []() { Scene::OpenLevel("Game/ForestGame/forest"); })
 			->SetTransform(-50.f, 100.f, -70.f, 25.f, Vector(0.5f), Vector(0.5f))
 		)->AddChild(
 			Create<Button>()->AddChild(

@@ -3,6 +3,7 @@
 #include "Settings.h"
 #include "Gameplay/PlayerController.h"
 
+class Light;
 class MovementComponent;
 class PauseUI;
 class VisibleObject;

@@ -5,11 +5,11 @@
 class MovementComponent;
 class VisibleObject;
 
-class Enemy : public Actor
+class Ghost : public Actor
 {
-	REGISTER(Enemy)
+	REGISTER(Ghost)
 public:
-	Enemy();
+	Ghost();
 	Ref<MovementComponent> move;
 
 	virtual void Tick(float) override;
