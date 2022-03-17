@@ -175,12 +175,6 @@
     <ClCompile Include="Game\Disco\DiscoPlayer.cpp">
       <Filter>Game\Disco</Filter>
     </ClCompile>
-    <ClCompile Include="Game\ForestGame\ForestPlayer.cpp">
-      <Filter>Game\ForestGame</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\ForestGame\Ghost.cpp">
-      <Filter>Game\ForestGame</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Interface\AudioManager.cpp">
       <Filter>Engine\Interface</Filter>
     </ClCompile>
@@ -193,12 +187,6 @@
     <ClCompile Include="Engine\Core\Objects\ColliderComponent.cpp">
       <Filter>Engine\Objects\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="Game\ForestGame\EndScreen.cpp">
-      <Filter>Game\ForestGame</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\ForestGame\StartScreen.cpp">
-      <Filter>Game\ForestGame</Filter>
-    </ClCompile>
     <ClCompile Include="Game\UITest\TestPlayerLoad.cpp">
       <Filter>Game\UITesting</Filter>
     </ClCompile>
@@ -207,6 +195,30 @@
     </ClCompile>
     <ClCompile Include="Engine\Core\Objects\InputComponent.cpp">
       <Filter>Engine\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Objects\ParticleComponent.cpp">
+      <Filter>Engine\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\RenderCore\ParticleSystem.cpp">
+      <Filter>Engine\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\CurveData.cpp">
+      <Filter>Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\TestArea\CloudParticle.cpp">
+      <Filter>Game\TestArea</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\ForestGame\EndScreen.cpp">
+      <Filter>Game\ForestGame</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\ForestGame\ForestPlayer.cpp">
+      <Filter>Game\ForestGame</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\ForestGame\Ghost.cpp">
+      <Filter>Game\ForestGame</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\ForestGame\StartScreen.cpp">
+      <Filter>Game\ForestGame</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Core\Objects\CollisionShape.cpp">
       <Filter>Engine\Objects\Physics</Filter>
@@ -279,11 +291,11 @@
     <Filter Include="Game\Disco">
       <UniqueIdentifier>{c1638df8-5fae-4cd8-9d38-56e874a765f3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\ForestGame">
-      <UniqueIdentifier>{734f2662-5704-48ce-8f67-7c7c45fe62c9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\UITesting">
       <UniqueIdentifier>{7ceb856b-ccf9-40a6-98dc-2a4226f8f168}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\ForestGame">
+      <UniqueIdentifier>{734f2662-5704-48ce-8f67-7c7c45fe62c9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -520,6 +532,35 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Core\Objects\ParticleComponent.h">
+      <Filter>Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\ParticleSystem.h">
+      <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\CurveData.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\Particle.h">
+      <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\TestArea\CloudParticle.h">
+      <Filter>Game\TestArea</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\ForestGame\EndScreen.h">
+      <Filter>Game\ForestGame</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\ForestGame\ForestPlayer.h">
+      <Filter>Game\ForestGame</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\ForestGame\Ghost.h">
+      <Filter>Game\ForestGame</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\ForestGame\StartScreen.h">
+      <Filter>Game\ForestGame</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="Game\Disco\DiscoPlayer.h">
       <Filter>Game\Disco</Filter>
     </ClInclude>
@@ -529,18 +570,6 @@
     <ClInclude Include="Game\Disco\DiscoLightSystem.h">
       <Filter>Game\Disco</Filter>
     </ClInclude>
-    <ClInclude Include="Game\ForestGame\ForestPlayer.h">
-      <Filter>Game\ForestGame</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\ForestGame\Ghost.h">
-      <Filter>Game\ForestGame</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\ForestGame\EndScreen.h">
-      <Filter>Game\ForestGame</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\ForestGame\StartScreen.h">
-      <Filter>Game\ForestGame</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Engine\Assets\Resources\Eril.rc">
@@ -548,6 +577,13 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Engine\Assets\Icons\icon.ico" />
+    <Image Include="Engine\Assets\Icons\icon.ico">
+      <Filter>Resources</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Game\ForestGame\forest.map">
+      <Filter>Game\ForestGame</Filter>
+    </None>
   </ItemGroup>
 </Project>

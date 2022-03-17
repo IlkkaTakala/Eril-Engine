@@ -225,8 +225,6 @@ layout(std430, binding = 2) readonly buffer VisibleLightIndicesBuffer {
 
 layout (location = 0) out vec4 ColorBuffer;
 layout (location = 1) out vec4 BloomBuffer;
-layout (location = 2) out vec4 accum;
-layout (location = 3) out float reveal;
 
 in VS_OUT{
 	vec2 TexCoords;
@@ -369,7 +367,7 @@ void main()
 		{
 			case 0:
 			{
-				L = normalize(-light.rotation.xyz);
+				L = normalize(light.rotation.xyz);
 				H = normalize(V + L);
 
 				radiance = light.color.rgb;

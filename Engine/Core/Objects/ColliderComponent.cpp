@@ -38,10 +38,10 @@ void ErilMotion::setWorldTransform(const btTransform& centerOfMassWorldTrans)
 	if (!m_userPointer->body) return;
 	btTransform temp = centerOfMassWorldTrans * m_centerOfMassOffset;
 	btVector3 loc = temp.getOrigin();
-	Vector wLoc = Vector( loc[0], loc[2], loc[1] ) - m_userPointer->GetLocation();
+	Vector wLoc = Vector(loc[0], loc[2], loc[1]) - m_userPointer->GetLocation();
 	btQuaternion rot2 = temp.getRotation();
 	Vector rot;
-	rot2.getEulerZYX(rot.Y, rot.Z, rot.X);
+	rot2.getEulerZYX(rot.Y, rot.X, rot.Z);
 	rot.X = degrees(rot.X);
 	rot.Y = degrees(rot.Y);
 	rot.Z = degrees(rot.Z);
@@ -59,9 +59,9 @@ void ErilMotion::setWorldTransform(const btTransform& centerOfMassWorldTrans)
 		//m_userPointer->GetMovementTarget()->DesiredState.rotation = rot;
 	} break;
 
-	default: 
+	default:
 	{
-		Transformation local(wLoc, rot, m_userPointer->GetTarget()->GetScale());
+		Transformation local({ loc[0], loc[2], loc[1] }, rot, m_userPointer->GetTarget()->GetScale());
 		m_userPointer->GetTarget()->SetTransform(local);
 	} break;
 	}
@@ -90,6 +90,8 @@ void ColliderComponent::Tick(float delta)
 	if (type != 2 || !moveObject) return;
 	Vector temp = moveObject->DesiredState.velocity;
 	body->setLinearVelocity({ temp.X, temp.Z, temp.Y });
+	Vector gra = moveObject->DesiredState.gravity;
+	body->setGravity(btVector3(gra.X, gra.Z, gra.Y));
 }
 
 void ColliderComponent::SetType(int t)
@@ -134,5 +136,10 @@ void ColliderComponent::Refresh()
 	temp.setRotation(btQuaternion(radians(rot.Y), radians(rot.Z), radians(rot.X)));
 	body->setWorldTransform(temp);
 	Physics::ForceUpdate(body);
+}
+
+void ColliderComponent::OnCollide()
+{
+	Console::Log("collision detected");
 }
 

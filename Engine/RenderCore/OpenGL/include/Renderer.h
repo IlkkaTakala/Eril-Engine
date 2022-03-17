@@ -13,6 +13,7 @@ class ReflectionBuffer;
 //struct LightData; //Lights have been moved to be handled by the ECS-system.
 class LightComponent;
 class UISpace;
+class Section;
 
 struct GLFWwindow;
 
@@ -27,11 +28,9 @@ public:
 	virtual int SetupWindow(int width, int height) override;
 	virtual void CleanRenderer() override;
 
-	virtual Camera* CreateCamera(VisibleObject* parent = nullptr) override;
+	virtual Camera* CreateCamera(SceneComponent* parent = nullptr) override;
 	virtual void SetActiveCamera(Camera*) override;
-	
-	//virtual void CreateLight(const LightData*) override; //Lights have been moved to be handled by the ECS-system.
-	//virtual void RemoveLight(const LightData*) override; //Lights have been moved to be handled by the ECS-system.
+	virtual Camera* GetActiveCamera() const override;
 	
 	void UpdateLights();
 
@@ -59,6 +58,7 @@ private:
 	void PreDepth(int width, int height);
 	void LightCulling(int width, int height);
 	void UpdateTransforms();
+	inline bool CullCheck(Section* s);
 
 	std::map<String, Shader*> Shaders;
 	std::map<String, Material*> BaseMaterials;
@@ -116,8 +116,8 @@ class GLMesh : public IMesh
 public:
 	GLMesh();
 	virtual ~GLMesh();
-	virtual	RenderMesh* LoadData(VisibleObject* parent, String name) override;
-	virtual RenderMesh* CreateProcedural(VisibleObject* parent, String name, std::vector<Vector>& positions, std::vector<Vector> UV, std::vector<Vector>& normal, std::vector<Vector>& tangent, std::vector<uint32>& indices) override;
+	virtual	RenderMesh* LoadData(SceneComponent* parent, String name) override;
+	virtual RenderMesh* CreateProcedural(SceneComponent* parent, String name, std::vector<Vector>& positions, std::vector<Vector> UV, std::vector<Vector>& normal, std::vector<Vector>& tangent, std::vector<uint32>& indices) override;
 	virtual void StartLoading() override;
 
 	virtual void MarkUnused() override;

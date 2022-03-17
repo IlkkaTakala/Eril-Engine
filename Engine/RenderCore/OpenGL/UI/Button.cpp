@@ -43,7 +43,7 @@ Button::Button()
 	glBindBuffer(GL_UNIFORM_BUFFER, hoverBuffer);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(UIStyleGLM), &h, GL_DYNAMIC_DRAW);
 
-	pressed = UIStyle(Vector(0.8f), 1.f, RI->LoadTextureByName("Assets/Textures/buttonPressed.png"));
+	pressed = UIStyle(Vector(0.6f), 1.f, RI->LoadTextureByName("Assets/Textures/buttonPressed.png"));
 	UIStyleGLM p(pressed);
 	glGenBuffers(1, &pressBuffer);
 	glBindBuffer(GL_UNIFORM_BUFFER, pressBuffer);

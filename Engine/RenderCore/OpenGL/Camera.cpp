@@ -7,11 +7,10 @@
 #include "Settings.h"
 #include "Renderer.h"
 
-GLCamera::GLCamera(RenderObject* parent)
+GLCamera::GLCamera()
 {
 	Fov = 45.f;
 	Perspective = true;
-	Parent = parent;
 	Location = Vector(0.f, 0.f, 0.f);
 	Rotation = Vector(0.f, 0.f, 0.f);
 	Orientation = glm::mat4(1.0f);
@@ -24,6 +23,11 @@ GLCamera::GLCamera(RenderObject* parent)
 	int y = std::atoi(INI->GetValue("Render", "ResolutionY").c_str());
 
 	Projection = glm::perspectiveFov(glm::radians(Fov), (float)x, (float)y, 0.1f, 1000.f);
+}
+
+GLCamera::~GLCamera()
+{
+	if (RI->GetActiveCamera() == this) RI->SetActiveCamera(nullptr);
 }
 
 void GLCamera::SetFov(float fov)
@@ -102,8 +106,7 @@ void GLCamera::SetPostProcess(const String& name)
 void GLCamera::ApplyTransformation()
 {
 	View = glm::translate(glm::mat4(1.0f), glm::vec3(Location.X, Location.Z, Location.Y))
-		//* Orientation
-		* glm::eulerAngleYXZ(glm::radians(Rotation.X), glm::radians(Rotation.Y), glm::radians(Rotation.Z));
+		* glm::eulerAngleYXZ(glm::radians(Rotation.Z), glm::radians(Rotation.Y), glm::radians(Rotation.X));
 	if (glm::all(glm::isnan(View[0]))) {
 		View = glm::mat4(1.f);
 	}

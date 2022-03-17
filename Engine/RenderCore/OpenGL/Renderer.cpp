@@ -391,15 +391,21 @@ void Renderer::CleanRenderer()
 	WindowManager::Terminate();
 }
 
-Camera* Renderer::CreateCamera(VisibleObject* parent)
+Camera* Renderer::CreateCamera(SceneComponent* parent)
 {
-	GLCamera* cam = new GLCamera(parent == nullptr ? nullptr : dynamic_cast<RenderObject*>(parent->GetModel()));
+	GLCamera* cam = new GLCamera();
+	cam->SetParent(parent);
 	return cam;
 }
 
 void Renderer::SetActiveCamera(Camera* cam)
 {
 	ActiveCamera = dynamic_cast<GLCamera*>(cam);
+}
+
+Camera* Renderer::GetActiveCamera() const
+{
+	return ActiveCamera;
 }
 
 /* //Lights have been moved to be handled by the ECS-system.
@@ -432,8 +438,8 @@ void Renderer::UpdateLights()
 		{
 			GLM_Light light;
 			light.locationAndSize = glm::vec4(Lights->at(i).Location.X, Lights->at(i).Location.Z, Lights->at(i).Location.Y, Lights->at(i).Size);
-			glm::mat4 rot = glm::mat4(1.0) * glm::toMat4(glm::quat(glm::vec3(glm::radians(Lights->at(i).Rotation.X), glm::radians(Lights->at(i).Rotation.Y), glm::radians(Lights->at(i).Rotation.Z))));
-			light.rotation = rot * glm::vec4(0.0, -1.0, 0.0, 0.0);
+			Vector& rot = Lights->at(i).Rotation;
+			light.rotation = glm::vec4(rot.X, rot.Z, rot.Y, 1.0);
 			light.color = glm::vec4(Lights->at(i).Color.X, Lights->at(i).Color.Y, Lights->at(i).Color.Z, 1.0) * Lights->at(i).Intensity;
 			light.type.x = Lights->at(i).LightType;
 			mapped[i] = light;
@@ -919,11 +925,17 @@ constexpr glm::vec4 clearClrOne(1.f);
 void Renderer::Forward(int width, int height)
 {
 	PostProcess->Bind();
-	unsigned int attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-	glDrawBuffers(2, attachments);
+	unsigned int attachments2[] = { GL_NONE, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+	glDrawBuffers(4, attachments2);
+
+	glClearBufferfv(GL_COLOR, 2, &clearClrZero[0]);
+	glClearBufferfv(GL_COLOR, 3, &clearClrOne[0]);
+
+	unsigned int attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_NONE, GL_NONE };
+	glDrawBuffers(4, attachments);
 
 	glDepthMask(GL_TRUE);
-	glDepthFunc(GL_LESS);
+	glDepthFunc(GL_LEQUAL);
 	glDisable(GL_BLEND);
 	glClearColor(0.f, 0.f, 0.f, 0.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -935,7 +947,122 @@ void Renderer::Forward(int width, int height)
 	{
 		if (s == nullptr) continue;
 
-		if (s->Pass != 0) continue;
+		if (s->Pass != 0 || s->GetUsers().size() == 0) continue;
+
+		if (s->FaceCulling == 1) glDisable(GL_CULL_FACE);
+		else glEnable(GL_CULL_FACE);
+
+		s->Bind();
+
+		for (Material* m : s->GetUsers())
+		{
+			if (m->GetObjects().size() < 1) continue;
+			for (auto const& param : m->GetVectorParameters()) {
+				s->SetUniform(param.first, param.second);
+			}
+
+			for (auto const& param : m->GetScalarParameters()) {
+				s->SetUniform(param.first, param.second);
+			}
+
+			int round = 0;
+			for (auto const& param : m->GetTextures()) {
+				if (param.second > 0) {
+					s->SetUniform(param.first, round);
+					glActiveTexture(GL_TEXTURE0 + round);
+					glBindTexture(GL_TEXTURE_2D, param.second->GetTextureID());
+					round++;
+				}
+			}
+
+			for (Section* o : m->GetObjects())
+			{
+				glm::mat4 mm = o->Parent->GetModelMatrix();
+				if (CullCheck(o)) continue;
+				s->SetUniform("Model", mm);
+				o->Render();
+				
+			}
+		}
+
+	}
+
+	glDrawBuffers(4, attachments2);
+	
+	glDepthMask(GL_FALSE);
+	glEnable(GL_BLEND);
+	glBlendFunci(2, GL_ONE, GL_ONE);
+	glBlendFunci(3, GL_ZERO, GL_ONE_MINUS_SRC_COLOR);
+	glBlendEquation(GL_FUNC_ADD);
+
+	// Translucent pass
+	for (auto const& [name, s] : Shaders)
+	{
+		if (s == nullptr) continue;
+
+		if (s->Pass != 1 || s->GetUsers().size() == 0) continue;
+
+		if (s->FaceCulling == 1) glDisable(GL_CULL_FACE);
+		else glEnable(GL_CULL_FACE);
+
+		s->Bind();
+
+		for (Material* m : s->GetUsers())
+		{
+			if (m->GetObjects().size() < 1) continue;
+			for (auto const& param : m->GetVectorParameters()) {
+				s->SetUniform(param.first, param.second);
+			}
+
+			for (auto const& param : m->GetScalarParameters()) {
+				s->SetUniform(param.first, param.second);
+			}
+
+			int round = 0;
+			for (auto const& param : m->GetTextures()) {
+				if (param.second > 0) {
+					s->SetUniform(param.first, round);
+					glActiveTexture(GL_TEXTURE0 + round);
+					glBindTexture(GL_TEXTURE_2D, param.second->GetTextureID());
+					round++;
+				}
+			}
+
+			for (Section* o : m->GetObjects())
+			{
+				glm::mat4 mm = o->Parent->GetModelMatrix();
+				if (CullCheck(o)) continue;
+				s->SetUniform("Model", mm);
+				o->Render();
+			}
+		}
+	}
+
+	glDrawBuffers(4, attachments);
+
+	glDepthFunc(GL_ALWAYS);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	//PostProcess->Bind();
+
+	// use composite shader
+	CompositeShader->Bind();
+
+	// draw screen quad
+	PostProcess->BindTextures();
+	glBindVertexArray(ScreenVao);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glDepthFunc(GL_LEQUAL);
+	glBlendFunc(GL_ONE, GL_ONE);
+
+	// Multiplicative pass
+	for (auto const& [name, s] : Shaders)
+	{
+		if (s == nullptr) continue;
+
+		if (s->Pass != 2 || s->GetUsers().size() == 0) continue;
 
 		if (s->FaceCulling == 1) glDisable(GL_CULL_FACE);
 		else glEnable(GL_CULL_FACE);
@@ -982,96 +1109,11 @@ void Renderer::Forward(int width, int height)
 				}
 				s->SetUniform("Model", mm);
 				o->Render();
-				
-			}
-		}
-
-	}
-	
-	glDepthMask(GL_FALSE);
-	glEnable(GL_BLEND);
-	glBlendFunci(0, GL_ONE, GL_ONE);
-	glBlendFunci(1, GL_ZERO, GL_ONE_MINUS_SRC_COLOR);
-	glBlendEquation(GL_FUNC_ADD);
-
-	unsigned int attachments2[] = { GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-	glDrawBuffers(2, attachments2);
-
-	glClearBufferfv(GL_COLOR, 0, &clearClrZero[0]);
-	glClearBufferfv(GL_COLOR, 1, &clearClrOne[0]);
-
-	// Translucent pass
-	for (auto const& [name, s] : Shaders)
-	{
-		if (s == nullptr) continue;
-
-		if (s->Pass != 1) continue;
-
-		if (s->FaceCulling == 1) glDisable(GL_CULL_FACE);
-		else glEnable(GL_CULL_FACE);
-
-		s->Bind();
-
-		for (Material* m : s->GetUsers())
-		{
-			if (m->GetObjects().size() < 1) continue;
-			for (auto const& param : m->GetVectorParameters()) {
-				s->SetUniform(param.first, param.second);
-			}
-
-			for (auto const& param : m->GetScalarParameters()) {
-				s->SetUniform(param.first, param.second);
-			}
-
-			int round = 0;
-			for (auto const& param : m->GetTextures()) {
-				if (param.second > 0) {
-					s->SetUniform(param.first, round);
-					glActiveTexture(GL_TEXTURE0 + round);
-					glBindTexture(GL_TEXTURE_2D, param.second->GetTextureID());
-					round++;
-				}
-			}
-
-			for (Section* o : m->GetObjects())
-			{
-				glm::mat4 mm = o->Parent->GetModelMatrix();
-				Vector direction = ActiveCamera->GetForwardVector();
-				Vector location = ActiveCamera->GetLocation();
-				glm::vec3 pos = mm[3];
-				glm::vec3 rad = glm::vec3(o->GetRadius()) * glm::mat3(mm);
-				float radii = glm::max(rad.x, glm::max(rad.y, rad.z));
-				glm::vec3 loc = glm::vec3(location.X, location.Z, location.Y);
-				glm::vec3 dir = glm::vec3(direction.X, direction.Z, direction.Y);
-				if ((loc - pos).length() > 2.f && (loc - pos).length() > radii)
-				{
-					if (glm::dot(dir, glm::normalize(loc - pos)) < 0.5f)
-					{
-						continue;
-					}
-				}
-				s->SetUniform("Model", mm);
-				o->Render();
 
 			}
 		}
 	}
-
-	glDrawBuffers(2, attachments);
-
-	glDepthFunc(GL_ALWAYS);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	//PostProcess->Bind();
-
-	// use composite shader
-	CompositeShader->Bind();
-
-	// draw screen quad
-	PostProcess->BindTextures();
-	glBindVertexArray(ScreenVao);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glDisable(GL_BLEND);
 
 	PostProcess->Unbind();
 }
@@ -1089,6 +1131,7 @@ void Renderer::PreDepth(int width, int height)
 	PreDepthShader->Bind();
 	for (auto const& [name, s] : Shaders)
 	{
+		if (s->Pass == 1) continue;
 		if (s->FaceCulling == 1) glDisable(GL_CULL_FACE);
 		else glEnable(GL_CULL_FACE);
 
@@ -1097,20 +1140,7 @@ void Renderer::PreDepth(int width, int height)
 			for (Section* o : m->GetObjects())
 			{
 				glm::mat4 mm = o->Parent->GetModelMatrix();
-				Vector direction = ActiveCamera->GetForwardVector();
-				Vector location = ActiveCamera->GetLocation();
-				glm::vec3 pos = mm[3];
-				glm::vec3 rad = glm::vec3(o->GetRadius()) * glm::mat3(mm);
-				float radii = glm::max(rad.x, glm::max(rad.y, rad.z));
-				glm::vec3 loc = glm::vec3(location.X, location.Z, location.Y);
-				glm::vec3 dir = glm::vec3(direction.X, direction.Z, direction.Y);
-				if ((loc - pos).length() > 2.f && (loc - pos).length() > radii)
-				{
-					if (glm::dot(dir, glm::normalize(loc - pos)) < 0.65f)
-					{
-						continue;
-					}
-				}
+				if (CullCheck(o)) continue;
 				PreDepthShader->SetUniform("Model", mm);
 				o->Render();
 
@@ -1148,6 +1178,31 @@ void Renderer::UpdateTransforms() {
 			}
 		}
 	}
+}
+
+inline bool Renderer::CullCheck(Section* s)
+{
+	glm::mat4 mm = s->Parent->GetModelMatrix();
+	Vector direction = ActiveCamera->GetForwardVector();
+	Vector location = ActiveCamera->GetLocation();
+	glm::vec3 pos = mm[3];
+	Vector aabb = s->Parent->GetAABB().maxs - s->Parent->GetAABB().mins;
+	glm::vec3 rad = glm::vec3(aabb.X, aabb.Z, aabb.Y) * glm::mat3(mm);
+	float radii = glm::max(rad.x, glm::max(rad.y, rad.z));
+	glm::vec3 loc = glm::vec3(location.X, location.Z, location.Y);
+	glm::vec3 dir = glm::vec3(direction.X, direction.Z, direction.Y);
+	glm::vec3 d = loc - pos;
+	if (glm::length(d) > s->RenderDistance) {
+		return true;
+	}
+	else if (glm::length(d) > 2.f && glm::length(d) > radii)
+	{
+		if (glm::dot(dir, glm::normalize(loc - pos)) < 0.55f) // TODO: Calculate from FOV
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 void Renderer::Render(float delta)
@@ -1356,7 +1411,7 @@ LoadedMesh* loadMeshes(const std::string& path)
 	return mesh;
 }
 
-RenderMesh* GLMesh::LoadData(VisibleObject* parent, String name)
+RenderMesh* GLMesh::LoadData(SceneComponent* parent, String name)
 {
 	auto result = LoadedMeshes.find(name);
 	if (result == LoadedMeshes.end()) {
@@ -1451,7 +1506,7 @@ RenderMesh* GLMesh::LoadData(VisibleObject* parent, String name)
 	}
 }
 
-RenderMesh* GLMesh::CreateProcedural(VisibleObject* parent, String name, std::vector<Vector>& positions, std::vector<Vector> UV, std::vector<Vector>& normal, std::vector<Vector>& tangent, std::vector<uint32>& indices)
+RenderMesh* GLMesh::CreateProcedural(SceneComponent* parent, String name, std::vector<Vector>& positions, std::vector<Vector> UV, std::vector<Vector>& normal, std::vector<Vector>& tangent, std::vector<uint32>& indices)
 {
 	LoadedMesh* mesh = new LoadedMesh();
 

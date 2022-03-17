@@ -15,6 +15,7 @@ class SphereCollisionShape;
 class CylinderCollisionShape;
 class ConeCollisionShape;
 class CapsuleCollisionShape;
+class VisibleObject;
 
 //ECS TEST
 class ECSExample;

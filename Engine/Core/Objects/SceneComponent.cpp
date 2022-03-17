@@ -19,9 +19,11 @@ void SceneComponent::OnDestroyed()
 	if (Parent != nullptr) Parent->RemoveComponent(this);
 	else if (GetScene()) GetScene()->RemoveSceneRoot(this);
 	for (const auto& c : Children) {
+		if (!c) continue;
 		c->Parent = nullptr;
 		c->DestroyObject();
 	}
+	Children.clear();
 }
 
 void SceneComponent::LoadWithParameters(const String& args)
