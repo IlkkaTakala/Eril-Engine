@@ -70,7 +70,7 @@ TestPlayer::TestPlayer() : Player()
 	Mesh = SpawnObject<VisibleObject>();
 	Mesh->SetModel("Cube");
 	Mesh->GetModel()->SetAABB(AABB(Vector(-1.f, -1.f, 0.f), Vector(1.f, 1.f, 2.f)));
-	SetLocation(Vector(15, 15, 70));
+	SetLocation(Vector(15, 15, 7));
 
 	//Player Movement
 	Movement = SpawnObject<MovementComponent>();

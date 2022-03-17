@@ -41,7 +41,7 @@ void ErilMotion::setWorldTransform(const btTransform& centerOfMassWorldTrans)
 	Vector wLoc = Vector(loc[0], loc[2], loc[1]) - m_userPointer->GetLocation();
 	btQuaternion rot2 = temp.getRotation();
 	Vector rot;
-	rot2.getEulerZYX(rot.Y, rot.X, rot.Z);
+	rot2.getEulerZYX(rot.Y, rot.Z, rot.X);
 	rot.X = degrees(rot.X);
 	rot.Y = degrees(rot.Y);
 	rot.Z = degrees(rot.Z);
