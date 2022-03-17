@@ -204,7 +204,6 @@
   <ItemGroup>
     <ClCompile Include="Engine\Core\Objects\CollisionShape.cpp" />
     <ClCompile Include="Engine\Core\Objects\InputComponent.cpp" />
-    <ClCompile Include="Engine\Core\Objects\TerrainCollider.cpp" />
     <ClCompile Include="Game\ForestGame\EndScreen.cpp" />
     <ClCompile Include="Engine\Core\BasicTypes.cpp" />
     <ClCompile Include="Engine\Core\Core.cpp" />
@@ -275,7 +274,6 @@
     <ClInclude Include="Engine\Assets\Resources\resource.h" />
     <ClInclude Include="Engine\Core\Objects\CollisionShape.h" />
     <ClInclude Include="Engine\Core\Objects\InputComponent.h" />
-    <ClInclude Include="Engine\Core\Objects\TerrainCollider.h" />
     <ClInclude Include="Game\ForestGame\EndScreen.h" />
     <ClInclude Include="Engine\Core\BasicTypes.h" />
     <ClInclude Include="Engine\Core\Core.h" />

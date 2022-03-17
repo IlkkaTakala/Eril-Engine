@@ -2,12 +2,14 @@
 #include <Core.h>
 #include <Objects/VisibleObject.h>
 
+class btRigidBody;
+
 class Terrain : public SceneComponent
 {
 	REGISTER(Terrain);
 public:
 	Terrain();
-
+	virtual void OnDestroyed() override;
 	virtual void BeginPlay() override {}
 	virtual void LoadWithParameters(const String& args) override;
 
@@ -28,5 +30,8 @@ private:
 	Texture* Heightmap;
 
 	Ref<VisibleObject> Mesh;
+
+	btRigidBody* terrain;
+	float* m_rawHeightfieldData;
 };
 

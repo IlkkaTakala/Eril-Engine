@@ -56,6 +56,7 @@ public:
 	virtual void BeginPlay() = 0;
 	virtual void OnDestroyed() {};
 	Scene* GetScene() const { return World; }
+	void SetScene(Scene* scene) { World = scene; }
 	virtual void LoadWithParameters(const String& args) {}
 
 protected:

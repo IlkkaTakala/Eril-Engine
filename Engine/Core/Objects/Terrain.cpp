@@ -1,5 +1,8 @@
 #include "Terrain.h"
 #include "Mesh.h"
+#include <btBulletDynamicsCommon.h>
+#include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
+#include "Physics/BulletPhysics.h"
 
 namespace Noise {
 	/* coherent noise function over 1, 2 or 3 dimensions */
@@ -211,12 +214,19 @@ Terrain::Terrain()
 {
 	isTexture = false;
 	Heightmap = nullptr;
+	m_rawHeightfieldData = nullptr;
 
 	resolution = 0;
 	noise_scale = 0.010f;
 	amplitude = 10.0f;
 	Mesh = SpawnObject<VisibleObject>();
 	AddComponent(Mesh);
+}
+
+void Terrain::OnDestroyed()
+{
+	Physics::RemoveBody(terrain);
+	delete[] m_rawHeightfieldData;
 }
 
 void Terrain::LoadWithParameters(const String& args)
@@ -282,8 +292,27 @@ void Terrain::InitTerrain(int r, Vector scale, String material)
 	normals.resize(pos.size());
 	tangents.resize(pos.size());
 
+	delete[] m_rawHeightfieldData;
+	m_rawHeightfieldData = new float[pos.size()]();
+	for (size_t i = 0; i < pos.size(); i++)
+	{
+		m_rawHeightfieldData[i] = pos[i].Z;
+	}
+
 	Mesh->SetModel(MI->CreateProcedural(Mesh, "Terrain_" + std::to_string(GetRecord()), pos, uvs, normals, tangents, inds));
 	Mesh->GetModel()->SetMaterial(0, RI->LoadMaterialByName(material == "" ? "Assets/Materials/ground" : material));
+
+	btHeightfieldTerrainShape* heightFieldShape = new btHeightfieldTerrainShape(r + 1, r + 1, m_rawHeightfieldData, 1, -128, 128, 1, PHY_FLOAT, false);
+	btTransform tr;
+	tr.setIdentity();
+	tr.setOrigin(btVector3(scale.X / 2 + Location.X, Location.Z, scale.Y / 2 + Location.Y));
+	
+	//heightFieldShape->setLocalScaling(btVector3(scale.X, 1.0, scale.Y));
+	terrain = new btRigidBody(0, 0, heightFieldShape, btVector3(0, 0, 0));
+
+	terrain->setWorldTransform(tr);
+	terrain->setUserIndex(-1);
+	Physics::GetWorld()->addRigidBody(terrain);
 }
 
 float Terrain::GetHeight(float x, float y)
