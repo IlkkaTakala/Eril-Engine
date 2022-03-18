@@ -13,9 +13,9 @@ public:
 	virtual void LoadWithParameters(const String& args) override;
 
 	void SetModel(std::string Name);
-	void SetModel(RenderMesh* mesh);
+	void SetModel(RenderMeshStatic* mesh);
 	std::string GetModelName() const { return std::string(); }
-	RenderMesh* GetModel() const { return RenderData; }
+	RenderMeshStatic* GetModel() const { return RenderData; }
 
 	const std::string GetName() const { return std::string(""); }
 
@@ -23,6 +23,6 @@ public:
 protected:
 	friend class GC;
 
-	RenderMesh* RenderData;
+	RenderMeshStatic* RenderData;
 	
 };

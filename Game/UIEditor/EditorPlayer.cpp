@@ -18,7 +18,7 @@ void EditorPlayer::LoadWithParameters(const String& args)
 	auto ui = SpawnObject<Editor>();
 	UI::AddToScreen(ui, this);
 
-	WindowManager::SetShowCursor(0, true);
+	SetShowCursor(true);
 }
 
 void EditorPlayer::InputExit(bool down)

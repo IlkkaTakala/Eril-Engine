@@ -1,4 +1,5 @@
 #pragma once
+#include <Interface/IRender.h>
 #include <glad/gl.h>
 #include <glm/glm.hpp>
 #include <vector>
@@ -7,7 +8,7 @@
 class LoadedMesh;
 class MeshDataHolder;
 class Section;
-class RenderObject;
+class RenderMeshStaticGL;
 
 struct Vertex
 {
@@ -17,17 +18,30 @@ struct Vertex
 	glm::vec3 tangent;
 };
 
+class GLMesh : public IMesh
+{
+public:
+	GLMesh() {}
+	virtual ~GLMesh() {}
+	virtual RenderMeshStatic* CreateProcedural(SceneComponent* parent, String name, std::vector<Vector>& positions, std::vector<Vector> UV, std::vector<Vector>& normal, std::vector<Vector>& tangent, std::vector<uint32>& indices) override;
+	virtual RenderMeshStatic* GetStatic(SceneComponent* parent, const String& name) override;
+	virtual RenderMeshStatic* MakeEmptyStatic() override;
+};
+
 class MeshDataHolder
 {
 public:
 	MeshDataHolder(Vertex* verts, uint32 vertCount, uint32* indices, uint32 indexCount);
 	~MeshDataHolder();
+	void MakeBuffers();
 
 	uint VAO;
 	uint VBO;
 	uint EBO;
 
-	Material* Instance;
+	std::vector<Vertex> temp_vertices;
+	std::vector<uint32> temp_indices;
+	Material* DefaultMaterial;
 	uint32 VertexCount;
 	uint32 IndexCount;
 	float Radius;
@@ -52,10 +66,13 @@ public:
 	Section();
 	~Section();
 	Material* Instance;
-	RenderObject* Parent;
+	RenderMeshStaticGL* Parent;
 	bool Instanced;
 	int InstanceCount;
 	int InstanceCountMax;
+	glm::mat4* Instances;
+	bool InstancesDirty;
+
 	uint InstanceDisp;
 	float Radius;
 	float RenderDistance;
@@ -68,17 +85,19 @@ public:
 	const uint32 GetFaceCount() const { return Holder->IndexCount / 3; }
 
 private:
-	friend class RenderObject;
+	friend class RenderMeshStaticGL;
 
 	MeshDataHolder* Holder;
 };
 
 
-class RenderObject : public RenderMesh
+class RenderMeshStaticGL : public RenderMeshStatic
 {
 public:
-	RenderObject(LoadedMesh* mesh);
-	virtual ~RenderObject();
+	RenderMeshStaticGL();
+	virtual ~RenderMeshStaticGL();
+
+	void SetMesh(LoadedMesh* mesh);
 
 	virtual void SetMaterial(uint section, Material* nextMat) override;
 	virtual Material* GetMaterial(uint section) const override { if (section < SectionCount) return Sections[section].Instance; else return nullptr; }

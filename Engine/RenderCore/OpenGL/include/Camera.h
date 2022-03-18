@@ -2,8 +2,8 @@
 #include "Interface/IRender.h"
 #include "glm/glm.hpp"
 
-class RenderObject;
-class Shader;
+class RenderMeshStaticGL;
+class Material;
 
 class GLCamera : public Camera
 {
@@ -28,7 +28,7 @@ public:
 	const glm::mat4& GetViewMatrix() const { return View; }
 
 	virtual void SetPostProcess(const String& name) override;
-	Shader* GetPostProcess() const { return postProcess; }
+	Material* GetPostProcess() const { return postProcess; }
 
 private:
 	glm::mat4 Projection;
@@ -36,7 +36,7 @@ private:
 	glm::mat4 Orientation;
 	Vector Location;
 	Vector Rotation;
-	Shader* postProcess;
+	Material* postProcess;
 
 	inline void ApplyTransformation();
 

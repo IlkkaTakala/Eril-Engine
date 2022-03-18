@@ -2,7 +2,10 @@
 #include "Gameplay/GameState.h"
 #include "EngineInterface.h"
 #include "Settings.h"
-#include "Interface/IRender.h"
+#include <Interface/IRender.h>
+#include <Interface/AssetManager.h>
+#include <Interface/AudioManager.h>
+#include <Interface/IECS.h>
 #include "GameLoop.h"
 #include "WinConsole.h"
 #include "GarbageCollector.h"
@@ -10,8 +13,6 @@
 #include "Physics/BulletPhysics.h"
 #include "Timer.h"
 #include <GamePlay/Scene.h>
-#include <Interface/IECS.h>
-#include <Interface/AudioManager.h>
 
 #include <ScriptCore.h>
 
@@ -37,7 +38,6 @@ GameLoop::~GameLoop()
 	delete INI;
 	delete II;
 	delete MI;
-	delete RI;
 	delete Collector;
 	IECS::Destroy();
 	AudioManager::Destroy();
@@ -55,28 +55,26 @@ int GameLoop::Start()
 
 	try
 	{
-		if (INI->GetValue("Engine", "Console") == "true") 
+		if (INI->GetValue("Engine", "Console") == "true")
 			Console::Create();
-		MI->StartLoading();
+		AssetManager::StartLoader();
 		int x = std::atoi(INI->GetValue("Render", "ResolutionX").c_str());
 		int y = std::atoi(INI->GetValue("Render", "ResolutionY").c_str());
-		RI->SetupWindow(x, y);
+		IRender::SetupWindow(x, y);
 		II->SetInputHandler();
 	}
 	catch (const std::exception& e)
 	{
 		Console::Log(e.what());
-		RI->DestroyWindow();
+		IRender::DestroyWindow();
 		return 11;
 	}
-
 	AudioManager::Init();
-	
+
 	Console::Log("Creating defaults...\n");
 	//Physics::init();
 	EngineInterface::CreateDefaults();
 	Collector = new GC();
-
 	Console::Log("Loading finished");
 	return MainLoop();
 }
@@ -85,7 +83,6 @@ void GameLoop::Quit()
 {
 	bQuitStarted = true;
 	bQuit = true;
-	Collector->Quit();
 }
 
 int GameLoop::MainLoop()
@@ -93,11 +90,11 @@ int GameLoop::MainLoop()
 	std::chrono::duration<float> duration = std::chrono::milliseconds(0);
 	auto begin = std::chrono::steady_clock::now();
 	auto time = std::chrono::milliseconds(10);
-	RI->GameStart();
+	IRender::GameStart();
 	while (!bQuit) {
 		auto start = std::chrono::steady_clock::now();
 
-		RI->Update();
+		IRender::Update();
 
 		II->ProcessInputs(duration.count());
 
@@ -120,10 +117,10 @@ int GameLoop::MainLoop()
 			Physics::CheckCollisions(duration.count());
 		}
 
-		RI->Render(duration.count());
+		IRender::Render(duration.count());
 
 		ObjectManager::DeleteListed();
-		MI->ClearUnused();
+		//MI->ClearUnused(); // TODO
 
 		std::unique_lock<std::mutex> lock(TickListMutex);
 		for (Tickable* t : TickListRemoval) {
@@ -136,10 +133,11 @@ int GameLoop::MainLoop()
 
 		Scene::CheckShouldLoad();
 	}
+	Collector->Quit();
 
 	TickList.clear();
 	
-	RI->CleanRenderer();
+	IRender::CleanRenderer();
 
 	return 0;
 }

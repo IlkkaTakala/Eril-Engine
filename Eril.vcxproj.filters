@@ -220,6 +220,9 @@
     <ClCompile Include="Game\ForestGame\StartScreen.cpp">
       <Filter>Game\ForestGame</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Interface\AssetManager.cpp">
+      <Filter>Engine\Interface</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -293,6 +296,9 @@
     </Filter>
     <Filter Include="Game\ForestGame">
       <UniqueIdentifier>{734f2662-5704-48ce-8f67-7c7c45fe62c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Basic">
+      <UniqueIdentifier>{496e8a96-ea8b-458f-9cc1-45d3a7bb71c2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -550,6 +556,15 @@
     </ClInclude>
     <ClInclude Include="Game\ForestGame\StartScreen.h">
       <Filter>Game\ForestGame</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Basic\QueueSafe.h">
+      <Filter>Engine\Basic</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\RenderCommands.h">
+      <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Interface\AssetManager.h">
+      <Filter>Engine\Interface</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

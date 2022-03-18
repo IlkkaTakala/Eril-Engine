@@ -13,6 +13,7 @@ UISpace::UISpace()
 {
 	Combiner = nullptr;
 
+	UInputComp = nullptr;
 	UIBuffer = 0;
 	Color = 0;
 	Depth = 0;

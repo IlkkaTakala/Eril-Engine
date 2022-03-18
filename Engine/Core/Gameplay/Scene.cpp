@@ -93,7 +93,6 @@ void Scene::RemoveSceneRoot(SceneComponent* obj)
 
 void Scene::LoadLevel()
 {
-	WindowManager::SetShowCursor(0, false);
 	if (Loop->World != nullptr) {
 		ObjectManager::CleanObjects();
 		II->ClearInputs();
@@ -132,7 +131,7 @@ void Scene::LoadLevel()
 		LoopSceneChildren(base);
 	}
 
-	RI->GetUIManager()->RegisterInputs();
+	if (IRender::GetUIManager()) IRender::GetUIManager()->RegisterInputs();
 
 	newLevel = "";
 	Loop->World->bLoading = false;

@@ -164,7 +164,7 @@ Font loadFont(String name)
 	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(Glyph) * 256, f.glyphs, GL_STATIC_DRAW);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
-	f.tex = RI->LoadTextureByName("Assets/Fonts/" + file);
+	f.tex = IRender::LoadTextureByName("Assets/Fonts/" + file);
 
 	auto end = std::chrono::steady_clock::now();
 	duration = end - start;
@@ -358,9 +358,9 @@ void Text::Render()
 	solid_shader->SetUniform("weight", weight);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, RI->GetUIManager()->GetDepth());
+	glBindTexture(GL_TEXTURE_2D, IRender::GetUIManager()->GetDepth());
 
-	glBindImageTexture(0, RI->GetUIManager()->GetColor(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16F);
+	glBindImageTexture(0, IRender::GetUIManager()->GetColor(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16F);
 	glBindImageTexture(4, fonts[font].tex->GetTextureID(), 0, GL_FALSE, 0, GL_READ_ONLY, GL_R8);
 
 	glDispatchCompute(1, 1, 1);

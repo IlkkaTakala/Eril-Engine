@@ -283,7 +283,7 @@ void Terrain::InitTerrain(int r, Vector scale, String material)
 	tangents.resize(pos.size());
 
 	Mesh->SetModel(MI->CreateProcedural(Mesh, "Terrain_" + std::to_string(GetRecord()), pos, uvs, normals, tangents, inds));
-	Mesh->GetModel()->SetMaterial(0, RI->LoadMaterialByName(material == "" ? "Assets/Materials/ground" : material));
+	if (Mesh->GetModel()) Mesh->GetModel()->SetMaterial(0, IRender::LoadMaterialByName(material == "" ? "Assets/Materials/ground" : material));
 }
 
 float Terrain::GetHeight(float x, float y)

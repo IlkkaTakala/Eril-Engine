@@ -205,6 +205,7 @@
     <ClCompile Include="Engine\Core\CurveData.cpp" />
     <ClCompile Include="Engine\Core\Objects\InputComponent.cpp" />
     <ClCompile Include="Engine\Core\Objects\ParticleComponent.cpp" />
+    <ClCompile Include="Engine\Interface\AssetManager.cpp" />
     <ClCompile Include="Engine\RenderCore\ParticleSystem.cpp" />
     <ClCompile Include="Engine\Core\BasicTypes.cpp" />
     <ClCompile Include="Engine\Core\Core.cpp" />
@@ -275,9 +276,11 @@
     <ClCompile Include="Game\UITest\TestPlayerLoad.cpp" />
     <ClCompile Include="Game\UITest\TestUILoad.cpp" />
     <ClInclude Include="Engine\Assets\Resources\resource.h" />
+    <ClInclude Include="Engine\Core\Basic\QueueSafe.h" />
     <ClInclude Include="Engine\Core\CurveData.h" />
     <ClInclude Include="Engine\Core\Objects\InputComponent.h" />
     <ClInclude Include="Engine\Core\Objects\ParticleComponent.h" />
+    <ClInclude Include="Engine\Interface\AssetManager.h" />
     <ClInclude Include="Engine\RenderCore\Particle.h" />
     <ClInclude Include="Engine\RenderCore\ParticleSystem.h" />
     <ClInclude Include="Engine\Core\BasicTypes.h" />
@@ -337,6 +340,7 @@
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\VerticalPanel.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\UI\UIComponent.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\UI\UISpace.h" />
+    <ClInclude Include="Engine\RenderCore\RenderCommands.h" />
     <ClInclude Include="Game\Disco\DiscoLightComponent.h" />
     <ClInclude Include="Game\Disco\DiscoLightSystem.h" />
     <ClInclude Include="Game\Disco\DiscoPlayer.h" />

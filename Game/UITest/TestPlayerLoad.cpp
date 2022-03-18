@@ -44,8 +44,8 @@ TestPlayerLoad::TestPlayerLoad() : Player()
 
 	//Skybox
 	Sky = SpawnObject<VisibleObject>();
-	Sky->SetModel(MI->LoadData(Sky, "SkySphere"));
-	Sky->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/Sky"));
+	Sky->SetModel(MI->GetStatic(Sky, "SkySphere"));
+	Sky->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/Sky"));
 	Sky->SetScale(Sky->GetScale() * 2.0f);
 
 	//Testing UI

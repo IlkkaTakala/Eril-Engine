@@ -32,7 +32,7 @@ void ForestPlayer::OpenConsole(bool) {
 void ForestPlayer::UseCursor(bool keydown)
 {
 	if (keydown && pause == nullptr) {
-		WindowManager::SetShowCursor(0, cursorState);
+		SetShowCursor(cursorState);
 		cursorState = !cursorState;
 	}
 }
@@ -42,7 +42,7 @@ void ForestPlayer::Caught()
 	end = SpawnObject<EndScreen>();
 	UI::AddToScreen(end, this);
 	end->SetText("You lost!");
-	WindowManager::SetShowCursor(0, true);
+	SetShowCursor(true);
 	cursorState = false;
 	Movement->SetAllowMovement(false);
 }
@@ -52,7 +52,7 @@ void ForestPlayer::Winner()
 	end = SpawnObject<EndScreen>();
 	UI::AddToScreen(end, this);
 	end->SetText("You won!");
-	WindowManager::SetShowCursor(0, true);
+	SetShowCursor(true);
 	cursorState = false;
 	Movement->SetAllowMovement(false);
 	ObjectManager::GetByRecord<Ghost>(0x10)->stopMoving();
@@ -168,7 +168,7 @@ void ForestPlayer::InputQ(bool KeyDown)
 	if (start != nullptr && end == nullptr) {
 		start->UI::RemoveFromScreen();
 		start = nullptr;
-		WindowManager::SetShowCursor(0, false);
+		SetShowCursor(false);
 		cursorState = true;
 		Movement->SetAllowMovement(true);
 		ObjectManager::GetByRecord<Ghost>(0x10)->startMoving();
@@ -211,13 +211,13 @@ void ForestPlayer::InputExit(bool down)
 	if (pause == nullptr) {
 		pause = SpawnObject<PauseUI>();
 		UI::AddToScreen(pause, this);
-		WindowManager::SetShowCursor(0, true);
+		SetShowCursor(true);
 		cursorState = false;
 	}
 	else {
 		pause->DestroyObject();
 		pause = nullptr;
-		WindowManager::SetShowCursor(0, false);
+		SetShowCursor(false);
 		cursorState = true;
 	}
 }
@@ -243,7 +243,7 @@ void ForestPlayer::BeginPlay()
 
 	start = SpawnObject<StartScreen>();
 	UI::AddToScreen(start, this);
-	WindowManager::SetShowCursor(0, true);
+	SetShowCursor(true);
 	cursorState = false;
 	Movement->SetAllowMovement(false);
 }

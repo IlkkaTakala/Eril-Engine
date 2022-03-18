@@ -85,7 +85,7 @@ void GLInput::ProcessInputs(float delta)
 	
 	float x = 0.0, y = 0.0;
 	//glfwGetCursorPos(dynamic_cast<Renderer*>(RI)->Window, &x, &y);
-	WindowManager::GetCursorPosition(dynamic_cast<Renderer*>(RI)->Window, x, y);
+	//WindowManager::GetCursorPosition(dynamic_cast<Renderer*>(RI)->Window, x, y); // TODO
 	for (const auto& m : ICs) {
 		if (!m->GetInputDisabled())
 		m->HandleMouse(x, y, delta);
@@ -95,7 +95,7 @@ void GLInput::ProcessInputs(float delta)
 void GLInput::SetInputHandler(void(*Callback) (int, int, int, int))
 {
 	//KeyInput = Callback == nullptr ? &InputCallback : Callback;
-	glfwSetKeyCallback((GLFWwindow*)WindowManager::GetHandle(dynamic_cast<Renderer*>(RI)->Window), [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+	/*glfwSetKeyCallback((GLFWwindow*)WindowManager::GetHandle(dynamic_cast<Renderer*>(RI)->Window), [](GLFWwindow* window, int key, int scancode, int action, int mods) {
 		InputCallback(key, scancode, action, mods);
 	});
 
@@ -105,5 +105,6 @@ void GLInput::SetInputHandler(void(*Callback) (int, int, int, int))
 
 	glfwSetCharCallback((GLFWwindow*)WindowManager::GetHandle(dynamic_cast<Renderer*>(RI)->Window), [](GLFWwindow* window, uint key) {
 		TextInputCallback(key);
-	});
+	});*/
+	// TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
 }
