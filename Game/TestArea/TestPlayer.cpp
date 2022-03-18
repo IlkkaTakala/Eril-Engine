@@ -70,7 +70,7 @@ TestPlayer::TestPlayer() : Player()
 	Mesh = SpawnObject<VisibleObject>();
 	Mesh->SetModel("Cube");
 	Mesh->GetModel()->SetAABB(AABB(Vector(-1.f, -1.f, 0.f), Vector(1.f, 1.f, 2.f)));
-	SetLocation(Vector(15, 15, 7));
+	SetLocation(Vector(15, 15, 1));
 
 	//Player Movement
 	Movement = SpawnObject<MovementComponent>();
@@ -137,7 +137,7 @@ TestPlayer::TestPlayer() : Player()
 	Box2 = SpawnObject<Actor>();
 
 	BoxModel2 = SpawnObject<VisibleObject>();
-	BoxModel2->SetModel("capsule");
+	BoxModel2->SetModel("cylinder");
 	//BoxModel2->SetRotation(Vector(0.f, 90.f, 0.f));
 	//BoxModel2->SetScale(0.5f);
 	//BoxModel2->GetModel()->SetAABB(AABB(Vector(-1.0f), Vector(1.0f)));
@@ -145,10 +145,10 @@ TestPlayer::TestPlayer() : Player()
 	Box2->AddComponent(BoxModel2);
 	Box2->SetLocation(Vector(10.f, 10.f, 6.f));
 
-	BoxCol2 = SpawnObject<CapsuleCollisionShape>();
+	BoxCol2 = SpawnObject<CylinderCollisionShape>();
 	BoxCol2->SetType(1);
 	Box2->AddComponent(BoxCol2);
-	BoxCol2->SetSize(1.f, 2.0f);
+	BoxCol2->SetSize(BoxModel2->GetModel()->GetAABB());
 	//BoxCol2->SetLocation(Vector(0.f, 0.f, 0.f));
 	//BoxCol2->SetRotation(Vector(0.f, 90.f, 0.f));
 

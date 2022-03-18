@@ -67,7 +67,7 @@ private:
 	Ref<VisibleObject> BoxModel;
 	Ref<BoxCollisionShape> BoxCol;
 	Ref<VisibleObject> BoxModel2;
-	Ref<CapsuleCollisionShape> BoxCol2;
+	Ref<CylinderCollisionShape> BoxCol2;
 	Ref<CapsuleCollisionShape> PlayerCol;
 
 	Ref<VisibleObject> Plane;

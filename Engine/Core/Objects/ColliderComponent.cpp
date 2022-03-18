@@ -3,6 +3,10 @@
 #include <Physics.h>
 #include "MovementComponent.h"
 #include <btBulletDynamicsCommon.h>
+#include <glm/glm.hpp>
+#include <glm/gtx/euler_angles.hpp>
+#include <glm/gtx/quaternion.hpp>
+
 
 void ErilMotion::getWorldTransform(btTransform& centerOfMassWorldTrans) const
 {
@@ -40,11 +44,10 @@ void ErilMotion::setWorldTransform(const btTransform& centerOfMassWorldTrans)
 	btVector3 loc = temp.getOrigin();
 	Vector wLoc = Vector(loc[0], loc[2], loc[1]) - m_userPointer->GetLocation();
 	btQuaternion rot2 = temp.getRotation();
-	Vector rot;
-	rot2.getEulerZYX(rot.Y, rot.Z, rot.X);
-	rot.X = degrees(rot.X);
-	rot.Y = degrees(rot.Y);
-	rot.Z = degrees(rot.Z);
+
+	glm::vec3 euler = glm::eulerAngles(glm::qua{ rot2[0], rot2[1], rot2[2], rot2[3] });
+	Vector rot(degrees(euler.x), degrees(euler.y), degrees(euler.z));
+
 	btVector3 vel = m_userPointer->body->getLinearVelocity();
 	btVector3 gravity = m_userPointer->body->getGravity();
 
