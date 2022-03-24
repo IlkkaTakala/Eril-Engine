@@ -15,7 +15,7 @@ struct Force
 struct State
 {
 	Vector location;
-	Vector rotation;
+	Rotator rotation;
 	Vector velocity;
 	Vector angular_v;
 	Vector acceleration;

@@ -2,6 +2,7 @@
 #include <math.h>
 #include <string>
 #include <vector>
+
 constexpr auto PI = 3.14159265359f;
 
 typedef unsigned int uint;
@@ -289,33 +290,3 @@ struct Vector2D
 
 	friend bool operator==(const Vector2D& obj, const Vector2D& obj2) { return obj2.X == obj.X && obj2.Y == obj.Y; }
 };
-
-typedef struct Transformation 
-{
-	Transformation() {
-		Location = Vector(0.f);
-		Rotation = Vector(0.f);
-		Scale = Vector(1.f);
-	}
-
-	Transformation(const Vector& Loc, const Vector& Rot, const Vector& Sca) {
-		Location = Loc;
-		Rotation = Rot;
-		Scale = Sca;
-	}
-
-	Vector Location;
-	Vector Rotation;
-	Vector Scale;
-
-	friend Transformation operator+(Transformation lhs, const Transformation& rhs) {
-		lhs += rhs;
-		return lhs;
-	}
-
-	friend void operator+=(Transformation& lhs, const Transformation& rhs) {
-		lhs.Location += rhs.Location;
-		lhs.Rotation += rhs.Rotation;
-		lhs.Scale *= rhs.Scale;
-	}
-} Transform;

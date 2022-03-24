@@ -6,6 +6,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtx/quaternion.hpp>
+#define BT_EULER_DEFAULT_ZYX
+
 
 
 void ErilMotion::getWorldTransform(btTransform& centerOfMassWorldTrans) const
@@ -17,7 +19,7 @@ void ErilMotion::getWorldTransform(btTransform& centerOfMassWorldTrans) const
 	{
 		if (!m_userPointer->moveObject) return;
 		Vector loc = m_userPointer->GetMovementTarget()->DesiredState.location;
-		Vector rot = m_userPointer->GetMovementTarget()->DesiredState.rotation;
+		Rotator rot = m_userPointer->GetMovementTarget()->DesiredState.rotation;
 		btTransform local;
 		local.setIdentity();
 		local.setOrigin(btVector3(loc.X, loc.Z, loc.Y));
@@ -41,12 +43,12 @@ void ErilMotion::setWorldTransform(const btTransform& centerOfMassWorldTrans)
 {
 	if (!m_userPointer->body) return;
 	btTransform temp = centerOfMassWorldTrans * m_centerOfMassOffset;
+
 	btVector3 loc = temp.getOrigin();
 	Vector wLoc = Vector(loc[0], loc[2], loc[1]) - m_userPointer->GetLocation();
 	btQuaternion rot2 = temp.getRotation();
 
-	glm::vec3 euler = glm::eulerAngles(glm::qua{ rot2[0], rot2[1], rot2[2], rot2[3] });
-	Vector rot(degrees(euler.x), degrees(euler.y), degrees(euler.z));
+	Rotator rot(rot2[0], rot2[1], rot2[2], rot2[3]);
 
 	btVector3 vel = m_userPointer->body->getLinearVelocity();
 	btVector3 gravity = m_userPointer->body->getGravity();
@@ -132,7 +134,7 @@ void ColliderComponent::Refresh()
 {
 	if (!body) return;
 	Vector loc = GetWorldLocation();
-	Vector rot = GetWorldRotation();
+	Rotator rot = GetWorldRotation();
 	btTransform temp;
 	body->getMotionState()->getWorldTransform(temp);
 	temp.setOrigin(btVector3(loc.X, loc.Z, loc.Y));

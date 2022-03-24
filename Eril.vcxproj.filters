@@ -297,6 +297,9 @@
     <Filter Include="Game\ForestGame">
       <UniqueIdentifier>{734f2662-5704-48ce-8f67-7c7c45fe62c9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Public\Basic">
+      <UniqueIdentifier>{d569de2a-930e-4331-ac70-fe7d1f065f86}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Core\Objects\Actor.h">
@@ -529,6 +532,12 @@
     </ClInclude>
     <ClInclude Include="Engine\Core\Objects\CollisionShape.h">
       <Filter>Engine\Objects\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Basic\Rotation.h">
+      <Filter>Engine\Public\Basic</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Basic\Transformation.h">
+      <Filter>Engine\Public\Basic</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

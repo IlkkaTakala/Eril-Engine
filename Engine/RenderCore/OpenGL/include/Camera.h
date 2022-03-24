@@ -14,12 +14,12 @@ public:
 	virtual void SetFov(float) override;
 	virtual void SetPerspective(bool perspective) override;
 
-	virtual void SetRotation(const Vector& rotation) override;
+	virtual void SetRotation(const Rotator& rotation) override;
 	virtual void SetLocation(const Vector& location) override;
 	virtual const Vector GetUpVector() const override;
 	virtual const Vector GetForwardVector() const override;
 	virtual const Vector GetRightVector() const override;
-	virtual const Vector& GetRotation() const override;
+	virtual const Rotator& GetRotation() const override;
 	virtual const Vector& GetLocation() const override;
 
 	virtual void SetLookAt(const Vector& to, const Vector& up = Vector(0.0f, 0.0f, 1.0f)) override;
@@ -35,7 +35,7 @@ private:
 	glm::mat4 View;
 	glm::mat4 Orientation;
 	Vector Location;
-	Vector Rotation;
+	Rotator Rotation;
 	Shader* postProcess;
 
 	inline void ApplyTransformation();

@@ -138,7 +138,7 @@ TestPlayer::TestPlayer() : Player()
 
 	BoxModel2 = SpawnObject<VisibleObject>();
 	BoxModel2->SetModel("cylinder");
-	//BoxModel2->SetRotation(Vector(0.f, 90.f, 0.f));
+	//BoxModel2->SetRotation(Vector(0.f, 0.f, -90.f));
 	//BoxModel2->SetScale(0.5f);
 	//BoxModel2->GetModel()->SetAABB(AABB(Vector(-1.0f), Vector(1.0f)));
 
@@ -247,7 +247,7 @@ void TestPlayer::RightMouseDown(bool KeyDown)
 
 void TestPlayer::MouseMoved(float X, float Y)
 {
-	const Vector& rot = Rotation;
+	const Rotator& rot = Rotation;
 	if (cursorState) SetRotation(Vector(
 		rot.X, 
 		rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, 

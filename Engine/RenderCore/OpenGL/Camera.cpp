@@ -12,7 +12,7 @@ GLCamera::GLCamera()
 	Fov = 45.f;
 	Perspective = true;
 	Location = Vector(0.f, 0.f, 0.f);
-	Rotation = Vector(0.f, 0.f, 0.f);
+	Rotation = Rotator(0.f, 0.f, 0.f, 0.f);
 	Orientation = glm::mat4(1.0f);
 
 	ApplyTransformation();
@@ -52,7 +52,7 @@ void GLCamera::SetPerspective(bool perspective)
 	}
 }
 
-void GLCamera::SetRotation(const Vector& rotation)
+void GLCamera::SetRotation(const Rotator& rotation)
 {
 	Rotation = rotation;
 	
@@ -84,7 +84,7 @@ const Vector GLCamera::GetRightVector() const
 	return Vector(inverted[0][0], inverted[2][0], inverted[1][0]);
 }
 
-const Vector& GLCamera::GetRotation() const
+const Rotator& GLCamera::GetRotation() const
 {
 	return Rotation;
 }
@@ -106,7 +106,7 @@ void GLCamera::SetPostProcess(const String& name)
 void GLCamera::ApplyTransformation()
 {
 	View = glm::translate(glm::mat4(1.0f), glm::vec3(Location.X, Location.Z, Location.Y))
-		* glm::eulerAngleYXZ(glm::radians(Rotation.Z), glm::radians(Rotation.Y), glm::radians(Rotation.X));
+		* glm::mat4(glm::quat(Rotation.W, Rotation.X, Rotation.Y, Rotation.Z));
 	if (glm::all(glm::isnan(View[0]))) {
 		View = glm::mat4(1.f);
 	}
