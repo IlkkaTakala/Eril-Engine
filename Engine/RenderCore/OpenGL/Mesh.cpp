@@ -62,21 +62,15 @@ Section::Section()
 	Instance = nullptr;
 	Parent = nullptr;
 	Holder = nullptr;
-	Instanced = false;
-	InstanceCount = 1;
-	InstanceCountMax = 1;
-	InstanceDisp = 0;
 	RenderDistance = 100000.f;
 	Radius = 0.f;
-	InstancesDirty = false;
-	Instances = nullptr;
+	InstanceDisp = 0;
 }
 
 Section::~Section()
 {
 	if (Instance != nullptr) Instance->RemoveSection(this);
 	glDeleteBuffers(1, &InstanceDisp); // TODO
-	delete[] Instances;
 }
 
 void Section::Render()
@@ -85,65 +79,15 @@ void Section::Render()
 
 	if (Parent->GetBinds()) Parent->GetBinds()();
 
-	if (Instanced) {
-		if (InstancesDirty) {
-			glGenBuffers(1, &InstanceDisp);
-			glBindBuffer(GL_ARRAY_BUFFER, InstanceDisp);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * InstanceCount, Instances, GL_DYNAMIC_DRAW);
-
-			glEnableVertexAttribArray(4);
-			glEnableVertexAttribArray(5);
-			glEnableVertexAttribArray(6);
-			glEnableVertexAttribArray(7);
-			glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(0));
-			glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 4));
-			glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 8));
-			glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 12));
-			glVertexAttribDivisor(4, 1);
-			glVertexAttribDivisor(5, 1);
-			glVertexAttribDivisor(6, 1);
-			glVertexAttribDivisor(7, 1);
-		} 
-		else {
-			glBindBuffer(GL_ARRAY_BUFFER, InstanceDisp);
-			glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(0));
-			glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 4));
-			glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 8));
-			glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 12));
-		}
-		glDrawElementsInstanced(GL_TRIANGLES, Holder->IndexCount, GL_UNSIGNED_INT, 0, InstanceCount);
+	if (Parent->Instanced) {
+		glBindBuffer(GL_ARRAY_BUFFER, InstanceDisp);
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(0));
+		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 4));
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 8));
+		glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 12));
+		glDrawElementsInstanced(GL_TRIANGLES, Holder->IndexCount, GL_UNSIGNED_INT, 0, Parent->InstanceCount);
 	}
 	else glDrawElements(GL_TRIANGLES, Holder->IndexCount, GL_UNSIGNED_INT, 0);
-}
-
-void Section::MakeInstanced(int count, const glm::mat4* modelM)
-{
-	if (Instances != nullptr)
-	{
-		if (count < InstanceCountMax) {
-			InstanceCount = count;
-			memcpy(Instances, modelM, count);
-		}
-		else {
-			InstanceCount = count;
-			InstanceCountMax = count;
-			Instanced = true;
-
-			delete[] Instances;
-			Instances = new glm::mat4[count]();
-			memcpy(Instances, modelM, count);
-		}
-	}
-	else {
-		InstanceCount = count;
-		InstanceCountMax = count;
-		Instanced = true;
-		
-		Instances = new glm::mat4[count]();
-		memcpy(Instances, modelM, count);
-	
-	}
-	InstancesDirty = true;
 }
 
 void RenderMeshStaticGL::SetMesh(LoadedMesh* mesh)
@@ -159,29 +103,9 @@ void RenderMeshStaticGL::SetMesh(LoadedMesh* mesh)
 		Sections[i].Holder = mesh->Holders[i];
 		Sections[i].Radius = mesh->Holders[i]->Radius;
 
-		glm::mat4 trans(1.f);
-
-		glBindVertexArray(Sections[i].Holder->VAO);
-
-		glGenBuffers(1, &Sections[i].InstanceDisp);
-		glBindBuffer(GL_ARRAY_BUFFER, Sections[i].InstanceDisp);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4), &trans, GL_STATIC_DRAW);
-
-		glEnableVertexAttribArray(4);
-		glEnableVertexAttribArray(5);
-		glEnableVertexAttribArray(6);
-		glEnableVertexAttribArray(7);
-		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(0));
-		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 4));
-		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 8));
-		glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 12));
-		glVertexAttribDivisor(4, 1);
-		glVertexAttribDivisor(5, 1);
-		glVertexAttribDivisor(6, 1);
-		glVertexAttribDivisor(7, 1);
-
-		glBindVertexArray(0);
-		SetMaterial(i, mesh->Holders[i]->DefaultMaterial);
+		if (auto it = Materials.find(i); it != Materials.end()) 
+			SetMaterial(i, it->second);
+		else SetMaterial(i, mesh->Holders[i]->DefaultMaterial);
 		Sections[i].Parent = this;
 
 		if (Sections[i].GetRadius() > extent) extent = Sections[i].GetRadius();
@@ -198,16 +122,23 @@ RenderMeshStaticGL::RenderMeshStaticGL()
 	SectionCount = 0;
 	requireUpdate = true;
 	ModelMatrix = glm::mat4(1.f);
+	InstanceCount = 1;
+	InstanceCountMax = 1;
+	InstancesDirty = false;
+	Instances = nullptr;
+	Instanced = false;
 }
 
 RenderMeshStaticGL::~RenderMeshStaticGL()
 {
 	delete[] Sections;
 	Mesh->Users--;
+	delete[] Instances;
 }
 
 void RenderMeshStaticGL::SetMaterial(uint section, Material* nextMat)
 {
+	Materials[section] = nextMat;
 	if (section < SectionCount && nextMat != nullptr) {
 		if (Sections[section].Instance != nullptr) Sections[section].Instance->RemoveSection(&Sections[section]);
 		Sections[section].Instance = nextMat;
@@ -266,25 +197,69 @@ void RenderMeshStaticGL::ApplyTransform()
 
 void RenderMeshStaticGL::SetInstances(int count, Transformation* dispArray)
 {
-	glm::mat4* arr = new glm::mat4[count]();
-	for (int i = 0; i < count; i++) {
+	if (Instances != nullptr)
+	{
+		if (count < InstanceCountMax) {
+			InstanceCount = count;
+		}
+		else {
+			InstanceCount = count;
+			InstanceCountMax = count;
+			Instanced = true;
+
+			delete[] Instances;
+			Instances = new glm::mat4[count]();
+		}
+	}
+	else {
+		InstanceCount = count;
+		InstanceCountMax = count;
+		Instanced = true;
+
+		Instances = new glm::mat4[count]();
+
+	}
+	for (int i = 0; i < InstanceCount; i++) {
 		Vector loc = dispArray[i].Location;
 		Vector rot = dispArray[i].Rotation;
 		Vector sca = dispArray[i].Scale;
-		arr[i] = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Z, loc.Y))
+		Instances[i] = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Z, loc.Y))
 			* glm::eulerAngleYXZ(glm::radians(rot.Z), glm::radians(rot.Y), glm::radians(rot.X))
 			* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Z, sca.Y));
 	}
-	for (uint i = 0; i < SectionCount; i++) {
-		Sections[i].MakeInstanced(count, arr);
-	}
-	delete[] arr;
+
+	InstancesDirty = true;
 }
 
 void RenderMeshStaticGL::SetInstanceCount(int count)
 {
-	for (uint i = 0; i < SectionCount; i++) {
-		Sections[i].InstanceCount = count;
+	InstanceCount = count;
+}
+
+void RenderMeshStaticGL::ApplyInstances()
+{
+	if (InstancesDirty) {
+		for (uint i = 0; i < SectionCount; i++) {
+			if (Sections[i].InstanceDisp != 0) glDeleteBuffers(1, &Sections[i].InstanceDisp);
+			glBindVertexArray(Sections[i].Holder->VAO);
+			glGenBuffers(1, &Sections[i].InstanceDisp);
+			glBindBuffer(GL_ARRAY_BUFFER, Sections[i].InstanceDisp);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * InstanceCount, Instances, GL_DYNAMIC_DRAW);
+
+			glEnableVertexAttribArray(4);
+			glEnableVertexAttribArray(5);
+			glEnableVertexAttribArray(6);
+			glEnableVertexAttribArray(7);
+			glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(0));
+			glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 4));
+			glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 8));
+			glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 12));
+			glVertexAttribDivisor(4, 1);
+			glVertexAttribDivisor(5, 1);
+			glVertexAttribDivisor(6, 1);
+			glVertexAttribDivisor(7, 1);
+		}
+		InstancesDirty = false;
 	}
 }
 
@@ -302,20 +277,19 @@ MeshDataHolder::MeshDataHolder(Vertex* verts, uint32 vertCount, uint32* indices,
 	EBO = 0;
 	temp_vertices.resize(vertCount);
 	temp_indices.resize(indexCount);
-	memcpy(temp_vertices.data(), verts, vertCount);
-	memcpy(temp_indices.data(), indices, indexCount);
+	std::copy(verts, verts + vertCount, temp_vertices.begin());
+	std::copy(indices, indices + indexCount, temp_indices.begin());
 	DefaultMaterial = nullptr;
 	Radius = 0.f;
+	defaultInstanced = 0;
 }
 
 MeshDataHolder::~MeshDataHolder()
 {
-	IRender::SendCommand({ RC_DELETEBUFFER, VBO, 0 });
-	IRender::SendCommand({ RC_DELETEBUFFER, EBO, 0 });
-	IRender::SendCommand({ RC_DELETEARRAY, VAO, 0 });
+
 }
 
-void MeshDataHolder::MakeBuffers()
+void MeshDataHolder::CreateState()
 {
 	VertexCount = temp_vertices.size();
 	IndexCount = temp_indices.size();
@@ -349,10 +323,37 @@ void MeshDataHolder::MakeBuffers()
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tangent));
 	glEnableVertexAttribArray(3);
 
+	/*if (defaultInstanced == 0) glDeleteBuffers(1, &defaultInstanced);
+	glm::mat4 trans(1.f);
+	glGenBuffers(1, &defaultInstanced);
+	glBindBuffer(GL_ARRAY_BUFFER, defaultInstanced);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4), &trans, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(4);
+	glEnableVertexAttribArray(5);
+	glEnableVertexAttribArray(6);
+	glEnableVertexAttribArray(7);
+	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(0));
+	glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 4));
+	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 8));
+	glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 12));
+	glVertexAttribDivisor(4, 1);
+	glVertexAttribDivisor(5, 1);
+	glVertexAttribDivisor(6, 1);
+	glVertexAttribDivisor(7, 1);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);*/
 	glBindVertexArray(0);
 
 	temp_indices.clear();
 	temp_vertices.clear();
+}
+
+void MeshDataHolder::Clear()
+{
+	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
+	glDeleteVertexArrays(1, &VAO);
 }
 
 LoadedMesh::LoadedMesh()

@@ -19,6 +19,7 @@ public:
 	GLInput();
 	virtual ~GLInput();
 
+	virtual void Update() override;
 	virtual void ProcessInputs(float delta) override;
 	virtual void SetInputHandler(void(*Callback)(int, int, int, int) = 0) override;
 

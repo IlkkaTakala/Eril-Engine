@@ -1,7 +1,8 @@
 #pragma once
 #include "Core.h"
+#include "../OpenGLObject.h"
 
-class Texture
+class Texture : public OpenGLObject
 {
 public:
 	Texture();
@@ -12,7 +13,12 @@ public:
 	uint GetTextureID() const { return ID; }
 	String GetName() const { return Name; }
 	void SetName(const String& name) { if (Name == "") Name = name; }
-	void MakeBuffers();
+
+	virtual void CreateState() override;
+	virtual void Clear() override;
+
+	void LoadTexture(int width, int height, int nrChannels, const uint8* data, int type);
+	void LoadTexture(int width, int height, int nrChannels, const float* data);
 private:
 	uint ID;
 	int Type;

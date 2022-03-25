@@ -20,8 +20,8 @@ namespace AssetManager
 		std::unordered_map<String, LoadedMesh*> StaticMeshes;
 		std::map<String, Texture*> LoadedTextures;
 
-		SafeQueue<String> LoadQueue;
-		SafeQueue<String> UnloadQueue;
+		SafeQueue<std::pair<String, void*>> LoadQueue;
+		SafeQueue<std::pair<String, void*>> UnloadQueue;
 	}
 }
 
@@ -99,7 +99,7 @@ LoadedMesh* loadMeshes(const std::string& path)
 	LoadedMesh* mesh = new LoadedMesh();
 	//read file with Assimp
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals);
+	const aiScene* scene = importer.ReadFile(path + ".obj", aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals);
 	//Check for errors
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
@@ -118,36 +118,17 @@ LoadedMesh* loadMeshes(const std::string& path)
 namespace AssetManager
 {
 	namespace {
-		void Loader() {
-
-			bool exit = false;
-			while (!exit) {
-				String name = LoadQueue.dequeue();
-				AssetType type = GetAssetType(name);
-				switch (type)
-				{
-				case AssetType::MeshStatic: {
-					auto mesh = loadMeshes(name);
-					StaticMeshes.emplace(name, mesh);
-					IRender::SendCommand({ RC_MAKEMESH, (uint64)mesh, 0 });
-				} break;
-				case AssetType::Texture: {
-					TextureLoader(name);
-				} break;
-				default:
-					break;
-				}
-			}
-		}
-
-		void TextureLoader(const String& name)
+		void TextureLoader(const String& name, Texture* ptr)
 		{
-			Texture* next = nullptr;
+			Texture* next = ptr ? ptr : nullptr;
 			int width, height, nrChannels;
 			if (stbi_is_hdr(name.c_str())) {
 				float* data = stbi_loadf(name.c_str(), &width, &height, &nrChannels, 0);
 				if (data == nullptr) return;
-				next = new Texture(width, height, nrChannels, data);
+				if (ptr) {
+					ptr->LoadTexture(width, height, nrChannels, data);
+				}
+				else next = new Texture(width, height, nrChannels, data);
 				stbi_image_free(data);
 			}
 			else
@@ -157,13 +138,45 @@ namespace AssetManager
 				int type = 0;
 				if (name.rbegin()[4] == 'd' || name.rbegin()[5] == 'd') type = 0;
 				else if (name.rbegin()[4] == 'n' || name.rbegin()[5] == 'n') type = 1;
-				next = new Texture(width, height, nrChannels, data, type);
+				if (ptr) {
+					ptr->LoadTexture(width, height, nrChannels, data, type);
+				}
+				else next = new Texture(width, height, nrChannels, data, type);
 				stbi_image_free(data);
 			}
 			next->SetName(name);
 			LoadedTextures.emplace(name, next);
-			IRender::SendCommand({ RC_MAKETEXTURE, (uint64)next, 0 });
+			IRender::SendCommand({ RC_MAKEOBJECT, (uint64)static_cast<OpenGLObject*>(next), 0 });
 			Console::Log("Texture loaded: " + name);
+		}
+
+		void Loader() {
+
+			bool exit = false;
+			while (!exit) {
+				auto data = LoadQueue.dequeue();
+				String& name = data.first;
+				AssetType type = GetAssetType(name);
+				switch (type)
+				{
+				case AssetType::MeshStatic: {
+					auto mesh = loadMeshes(name);
+					if (!mesh) continue;
+					if (data.second) {
+						auto container = (RenderMeshStaticGL*)data.second;
+						container->SetMesh(mesh);
+					}
+					StaticMeshes.emplace(name, mesh);
+					for (auto& m : mesh->Holders)
+						IRender::SendCommand({ RC_MAKEOBJECT, (uint64)static_cast<OpenGLObject*>(m), 0 });
+				} break;
+				case AssetType::Texture: {
+					TextureLoader(name, (Texture*)data.second);
+				} break;
+				default:
+					break;
+				}
+			}
 		}
 	}
 }
@@ -175,20 +188,22 @@ void AssetManager::StartLoader()
 
 void AssetManager::LoadAssetAsync(const String& name)
 {
-	LoadQueue.enqueue(name);
+	LoadQueue.enqueue({ name, nullptr });
 }
 
 void AssetManager::LoadMeshAsync(const String& name, RenderMeshStatic* empty)
 {
+	LoadQueue.enqueue({ name, empty });
 }
 
 void AssetManager::LoadTextureAsync(const String& name, Texture* empty)
 {
+	LoadQueue.enqueue({ name, empty });
 }
 
 AssetType AssetManager::GetAssetType(const String& name)
 {
-	if (name.ends_with(".obj")) return AssetType::MeshStatic;
+	if (name.find("Meshes") != String::npos) return AssetType::MeshStatic;
 	return AssetType::Texture;
 }
 

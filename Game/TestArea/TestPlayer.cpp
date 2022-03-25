@@ -68,7 +68,7 @@ TestPlayer::TestPlayer() : Player()
 
 	//Player Model
 	Mesh = SpawnObject<VisibleObject>();
-	Mesh->SetModel("Cube");
+	Mesh->SetModel("Assets/Meshes/Cube");
 	Mesh->GetModel()->SetAABB(AABB(Vector(-1.f, -1.f, 0.f), Vector(1.f, 1.f, 2.f)));
 	SetLocation(Vector(0, 0, 2));
 
@@ -92,7 +92,7 @@ TestPlayer::TestPlayer() : Player()
 
 	//Skybox
 	Sky = SpawnObject<VisibleObject>();
-	Sky->SetModel(MI->GetStatic(Sky, "SkySphere"));
+	Sky->SetModel("Assets/Meshes/SkySphere");
 	Sky->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/Sky"));
 	Sky->SetScale(Sky->GetScale() * 2.0f);
 
@@ -103,7 +103,7 @@ TestPlayer::TestPlayer() : Player()
 	pause = nullptr;
 
 	Plane = SpawnObject<VisibleObject>();
-	Plane->SetModel("Cube");
+	Plane->SetModel("Assets/Meshes/Cube");
 	Plane->GetModel()->SetAABB(AABB(Vector(-20.f, -20.f, -0.5f), Vector(20.f, 20.f, 0.5f)));
 	Plane->SetScale(Vector(20.f, 20.f, 0.5f));
 	Plane->SetLocation(Vector(10.f, 10.f, 0.f));
@@ -117,7 +117,7 @@ TestPlayer::TestPlayer() : Player()
 
 	//Moment Model -> ColliderModel
 	BoxModel = SpawnObject<VisibleObject>();
-	BoxModel->SetModel("Cube");
+	BoxModel->SetModel("Assets/Meshes/Cube");
 	BoxModel->GetModel()->SetAABB(AABB(Vector(-1.0f), Vector(1.0f)));
 
 	Box->AddComponent(BoxModel);
@@ -138,7 +138,7 @@ TestPlayer::TestPlayer() : Player()
 	Box2 = SpawnObject<Actor>();
 
 	BoxModel2 = SpawnObject<VisibleObject>();
-	BoxModel2->SetModel("Cube");
+	BoxModel2->SetModel("Assets/Meshes/Cube");
 	BoxModel2->GetModel()->SetAABB(AABB(Vector(-1.0f), Vector(1.0f)));
 
 	Box2->AddComponent(BoxModel2);

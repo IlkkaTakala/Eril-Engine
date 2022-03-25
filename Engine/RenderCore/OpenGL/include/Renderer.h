@@ -47,6 +47,8 @@ public:
 
 	virtual UISpace* GetUIManager(int screen = 0) const { return UIHolder; }
 
+	virtual uint GetMainWindowHandle() const;
+
 private:
 	friend class GLInput;
 	friend class GLCamera;

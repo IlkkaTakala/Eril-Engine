@@ -14,6 +14,7 @@ struct Vertex;
 class UISpace;
 struct RenderCommand;
 struct MeshCommand;
+class RenderHandler;
 
 class Camera
 {
@@ -65,6 +66,8 @@ namespace IRender
 
 	void SetShowCursor(bool show, uint window = 0);
 	bool GetShowCursor(uint window = 0);
+
+	RenderHandler* GetRenderer();
 };
 
 class RenderHandler 
@@ -80,6 +83,8 @@ public:
 
 	virtual UISpace* GetUIManager(int screen = 0) const = 0;
 
+	virtual uint GetMainWindowHandle() const = 0;
+
 	std::condition_variable Condition;
 	std::mutex LoadMutex;
 };
@@ -87,6 +92,7 @@ public:
 class IInput
 {
 public:
+	virtual void Update() = 0;
 	virtual void SetInputHandler(void(*Callback)(int, int, int, int) = 0) = 0;
 	virtual void ProcessInputs(float delta) = 0;
 	void SetTextMode(bool mode) { isText = mode; }

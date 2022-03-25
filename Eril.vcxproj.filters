@@ -566,6 +566,9 @@
     <ClInclude Include="Engine\Interface\AssetManager.h">
       <Filter>Engine\Interface</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\OpenGLObject.h">
+      <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Disco\DiscoPlayer.h">

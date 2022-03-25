@@ -281,6 +281,7 @@
     <ClInclude Include="Engine\Core\Objects\InputComponent.h" />
     <ClInclude Include="Engine\Core\Objects\ParticleComponent.h" />
     <ClInclude Include="Engine\Interface\AssetManager.h" />
+    <ClInclude Include="Engine\RenderCore\OpenGL\OpenGLObject.h" />
     <ClInclude Include="Engine\RenderCore\Particle.h" />
     <ClInclude Include="Engine\RenderCore\ParticleSystem.h" />
     <ClInclude Include="Engine\Core\BasicTypes.h" />

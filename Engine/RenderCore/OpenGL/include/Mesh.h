@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include "Material.h"
+#include "../OpenGLObject.h"
 
 class LoadedMesh;
 class MeshDataHolder;
@@ -28,16 +29,18 @@ public:
 	virtual RenderMeshStatic* MakeEmptyStatic() override;
 };
 
-class MeshDataHolder
+class MeshDataHolder : public OpenGLObject
 {
 public:
 	MeshDataHolder(Vertex* verts, uint32 vertCount, uint32* indices, uint32 indexCount);
 	~MeshDataHolder();
-	void MakeBuffers();
+	void CreateState() override;
+	void Clear() override;
 
 	uint VAO;
 	uint VBO;
 	uint EBO;
+	uint defaultInstanced;
 
 	std::vector<Vertex> temp_vertices;
 	std::vector<uint32> temp_indices;
@@ -67,18 +70,11 @@ public:
 	~Section();
 	Material* Instance;
 	RenderMeshStaticGL* Parent;
-	bool Instanced;
-	int InstanceCount;
-	int InstanceCountMax;
-	glm::mat4* Instances;
-	bool InstancesDirty;
-
-	uint InstanceDisp;
 	float Radius;
 	float RenderDistance;
+	uint InstanceDisp;
 
 	void Render();
-	void MakeInstanced(int count, const glm::mat4* modelM);
 	float GetRadius() const { return Radius; }
 
 	const uint32 GetVertexCount() const { return Holder->VertexCount; }
@@ -106,6 +102,8 @@ public:
 	virtual void SetInstances(int count, Transformation* dispArray) override;
 	virtual void SetInstanceCount(int count) override;
 
+	void ApplyInstances();
+
 	virtual void SetSectionRenderDistance(uint section, float distance) override;
 
 	virtual SceneComponent* GetParent() const { return Parent; }
@@ -118,12 +116,22 @@ public:
 
 private:
 	friend class Renderer;
+	friend class Section;
+
 	SceneComponent* Parent;
 	Section* Sections;
 	LoadedMesh* Mesh;
 	uint SectionCount;
 	glm::mat4 ModelMatrix;
 	bool requireUpdate;
+
+	int InstanceCount;
+	int InstanceCountMax;
+	glm::mat4* Instances;
+	bool InstancesDirty;
+	bool Instanced;
+
+	std::unordered_map<uint, Material*> Materials;
 
 	std::function<void(void)> binds;
 };

@@ -42,7 +42,7 @@ uint WindowManager::CreateMainWindow(int width, int height)
 		glfwTerminate();
 		return -1;
 	}
-	uint idx = Windows.size() > 0 ? Windows.rbegin()->first + 1 : 1;
+	uint idx = Windows.size() > 0 ? Windows.rbegin()->first + 1 : 0;
 	Windows.emplace(idx, Window);
 
 	if (INI->GetValue("Render", "ResolutionY").c_str() == "false")

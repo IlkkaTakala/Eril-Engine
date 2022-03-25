@@ -757,24 +757,29 @@ void Renderer::Update(SafeQueue<RenderCommand>* commands, Renderer* RC)
 			case RC_SHOWCURSOR:
 				WindowManager::SetShowCursor(c.param2, c.param1);
 				break;
-				
-			case RC_MAKEMESH: {
-				auto mesh = (LoadedMesh*)c.param1;
-				for (auto& m : mesh->Holders) m->MakeBuffers();
-			} break;
 
-			case RC_MAKETEXTURE: {
-				auto tex = (Texture*)c.param1;
-				tex->MakeBuffers();
-			} break;
-
-			case RC_DELETEBUFFER:
-				glDeleteBuffers(1, (uint*)&c.param1);
+			case RC_GAMESTART:
+				RC->GameStart();
 				break;
 
-			case RC_DELETEARRAY:
-				glDeleteVertexArrays(1, (uint*)&c.param1);
+			case RC_REFRESH:
+				WindowManager::PollEvents();
 				break;
+
+			case RC_MAKEOBJECT: {
+				auto obj = (OpenGLObject*)c.param1;
+				obj->CreateState();
+			} break;
+
+			case RC_DELETEOBJECT: {
+				auto obj = (OpenGLObject*)c.param1;
+				obj->Clear();
+			} break;
+
+			case RC_MAKEINSTANCE: {
+				auto mesh = (RenderMeshStaticGL*)c.param1;
+				mesh->ApplyInstances();
+			} break;
 
 			default:
 				break;
@@ -1003,7 +1008,7 @@ void Renderer::Forward(int width, int height)
 				if (param.second > 0) {
 					s->SetUniform(param.first, round);
 					glActiveTexture(GL_TEXTURE0 + round);
-					glBindTexture(GL_TEXTURE_2D, param.second->GetTextureID());
+					if (param.second->GetTextureID() != 0) glBindTexture(GL_TEXTURE_2D, param.second->GetTextureID());
 					round++;
 				}
 			}
@@ -1056,7 +1061,7 @@ void Renderer::Forward(int width, int height)
 				if (param.second > 0) {
 					s->SetUniform(param.first, round);
 					glActiveTexture(GL_TEXTURE0 + round);
-					glBindTexture(GL_TEXTURE_2D, param.second->GetTextureID());
+					if (param.second->GetTextureID() != 0) glBindTexture(GL_TEXTURE_2D, param.second->GetTextureID());
 					round++;
 				}
 			}
@@ -1118,7 +1123,7 @@ void Renderer::Forward(int width, int height)
 				if (param.second > 0) {
 					s->SetUniform(param.first, round);
 					glActiveTexture(GL_TEXTURE0 + round);
-					glBindTexture(GL_TEXTURE_2D, param.second->GetTextureID());
+					if (param.second->GetTextureID() != 0) glBindTexture(GL_TEXTURE_2D, param.second->GetTextureID());
 					round++;
 				}
 			}
@@ -1338,4 +1343,9 @@ void Renderer::GameStart()
 void Renderer::DestroyWindow()
 {
 	WindowManager::CloseWindow(Window);
+}
+
+uint Renderer::GetMainWindowHandle() const
+{
+	return Window;
 }

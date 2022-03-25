@@ -100,6 +100,7 @@ void IRender::Update()
 {
 	RenderCommands.enqueue({ RC_RECALCULATE, 0, 0 });
 	RenderCommands.enqueue({ RC_RELIGHTS, 0, 0 });
+	RenderCommands.enqueue({ RC_REFRESH, 0, 0 });
 }
 
 void IRender::Render(float delta)
@@ -130,4 +131,9 @@ void IRender::SetShowCursor(bool show, uint window)
 bool IRender::GetShowCursor(uint window)
 {
 	return WindowManager::GetShowCursor(window);
+}
+
+RenderHandler* IRender::GetRenderer()
+{
+	return RH;
 }

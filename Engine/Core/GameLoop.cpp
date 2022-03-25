@@ -89,7 +89,7 @@ int GameLoop::MainLoop()
 {
 	std::chrono::duration<float> duration = std::chrono::milliseconds(0);
 	auto begin = std::chrono::steady_clock::now();
-	auto time = std::chrono::milliseconds(10);
+	auto target = std::chrono::milliseconds(10);
 	IRender::GameStart();
 	while (!bQuit) {
 		auto start = std::chrono::steady_clock::now();
@@ -128,9 +128,13 @@ int GameLoop::MainLoop()
 		}
 		TickListRemoval.clear();
 		lock.unlock();
+
+		auto time = target - std::chrono::duration<double>(std::chrono::steady_clock::now() - start);
+		std::this_thread::sleep_for(time);
+
 		duration = std::chrono::steady_clock::now() - start;
 		fps = 1.f / duration.count();
-
+		//Console::Log(std::to_string(fps));
 		Scene::CheckShouldLoad();
 	}
 	Collector->Quit();

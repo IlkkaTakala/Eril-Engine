@@ -14,8 +14,17 @@ Texture::Texture()
 	Channels = 0;
 }
 
-
 Texture::Texture(int width, int height, int nrChannels, const uint8* data, int type)
+{
+	LoadTexture(width, height, nrChannels, data, type);
+}
+
+Texture::Texture(int width, int height, int nrChannels, const float* data)
+{
+	LoadTexture(width, height, nrChannels, data);
+}
+
+void Texture::LoadTexture(int width, int height, int nrChannels, const uint8 * data, int type)
 {
 	ID = 0;
 	Type = type;
@@ -26,10 +35,10 @@ Texture::Texture(int width, int height, int nrChannels, const uint8* data, int t
 	Initialized = false;
 	Channels = nrChannels;
 	Data = new uint8[width * height * Channels]();
-	memcpy(Data, data, width * height * Channels);
+	memcpy(Data, data, width * height * Channels * sizeof(uint8));
 }
 
-Texture::Texture(int width, int height, int nrChannels, const float* data)
+void Texture::LoadTexture(int width, int height, int nrChannels, const float* data)
 {
 	ID = 0;
 	Type = 0;
@@ -40,16 +49,15 @@ Texture::Texture(int width, int height, int nrChannels, const float* data)
 	Initialized = false;
 	Channels = nrChannels;
 	Data = new float[width * height * Channels]();
-	memcpy(Data, data, width * height * Channels);
+	memcpy(Data, data, width * height * Channels * sizeof(float));
 }
 
 Texture::~Texture()
 {
 	delete[] Data;
-	glDeleteTextures(1, &ID);
 }
 
-void Texture::MakeBuffers()
+void Texture::CreateState()
 {
 	switch (DataType)
 	{
@@ -140,4 +148,9 @@ void Texture::MakeBuffers()
 	default:
 		break;
 	}
+}
+
+void Texture::Clear()
+{
+	glDeleteTextures(1, &ID);
 }
