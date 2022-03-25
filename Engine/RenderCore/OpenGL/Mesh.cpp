@@ -65,6 +65,7 @@ Section::Section()
 	RenderDistance = 100000.f;
 	Radius = 0.f;
 	InstanceDisp = 0;
+	InstancesSet = true;
 }
 
 Section::~Section()
@@ -75,6 +76,20 @@ Section::~Section()
 
 void Section::Render()
 {
+	if (Holder->VAO == 0) return;
+	if (!InstancesSet) {
+		if (Parent->Instanced)
+			Parent->ApplyInstances();
+		else {
+			glBindBuffer(GL_ARRAY_BUFFER, Holder->defaultInstanced);
+			glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(0));
+			glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 4));
+			glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 8));
+			glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 12));
+			InstancesSet = true;
+		}
+	}
+
 	glBindVertexArray(Holder->VAO);
 
 	if (Parent->GetBinds()) Parent->GetBinds()();
@@ -110,6 +125,7 @@ void RenderMeshStaticGL::SetMesh(LoadedMesh* mesh)
 
 		if (Sections[i].GetRadius() > extent) extent = Sections[i].GetRadius();
 	}
+	ApplyInstances();
 	bounds = extent;
 	requireUpdate = true;
 }
@@ -132,7 +148,7 @@ RenderMeshStaticGL::RenderMeshStaticGL()
 RenderMeshStaticGL::~RenderMeshStaticGL()
 {
 	delete[] Sections;
-	Mesh->Users--;
+	if (Mesh) Mesh->Users--;
 	delete[] Instances;
 }
 
@@ -227,8 +243,8 @@ void RenderMeshStaticGL::SetInstances(int count, Transformation* dispArray)
 			* glm::eulerAngleYXZ(glm::radians(rot.Z), glm::radians(rot.Y), glm::radians(rot.X))
 			* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Z, sca.Y));
 	}
-
 	InstancesDirty = true;
+	ApplyInstances();
 }
 
 void RenderMeshStaticGL::SetInstanceCount(int count)
@@ -240,6 +256,10 @@ void RenderMeshStaticGL::ApplyInstances()
 {
 	if (InstancesDirty) {
 		for (uint i = 0; i < SectionCount; i++) {
+			if (Sections[i].Holder->VAO == 0) {
+				Sections[i].InstancesSet = false;
+				continue;
+			}
 			if (Sections[i].InstanceDisp != 0) glDeleteBuffers(1, &Sections[i].InstanceDisp);
 			glBindVertexArray(Sections[i].Holder->VAO);
 			glGenBuffers(1, &Sections[i].InstanceDisp);
@@ -286,7 +306,7 @@ MeshDataHolder::MeshDataHolder(Vertex* verts, uint32 vertCount, uint32* indices,
 
 MeshDataHolder::~MeshDataHolder()
 {
-
+	Clear();
 }
 
 void MeshDataHolder::CreateState()
@@ -323,7 +343,7 @@ void MeshDataHolder::CreateState()
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tangent));
 	glEnableVertexAttribArray(3);
 
-	/*if (defaultInstanced == 0) glDeleteBuffers(1, &defaultInstanced);
+	if (defaultInstanced != 0) glDeleteBuffers(1, &defaultInstanced);
 	glm::mat4 trans(1.f);
 	glGenBuffers(1, &defaultInstanced);
 	glBindBuffer(GL_ARRAY_BUFFER, defaultInstanced);
@@ -342,7 +362,7 @@ void MeshDataHolder::CreateState()
 	glVertexAttribDivisor(6, 1);
 	glVertexAttribDivisor(7, 1);
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);*/
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
 	temp_indices.clear();

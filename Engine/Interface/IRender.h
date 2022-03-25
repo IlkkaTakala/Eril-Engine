@@ -48,8 +48,6 @@ namespace IRender
 	Camera* CreateCamera(SceneComponent* parent = nullptr);
 	void SetActiveCamera(Camera*);
 	Camera* GetActiveCamera();
-	
-	void Init();
 
 	int SetupWindow(int width, int height);
 
@@ -66,27 +64,6 @@ namespace IRender
 
 	void SetShowCursor(bool show, uint window = 0);
 	bool GetShowCursor(uint window = 0);
-
-	RenderHandler* GetRenderer();
-};
-
-class RenderHandler 
-{
-public:
-	virtual ~RenderHandler() {}
-
-	virtual Camera* CreateCamera(SceneComponent* parent = nullptr) = 0;
-	virtual void SetActiveCamera(Camera*) = 0;
-	virtual Camera* GetActiveCamera() const = 0;
-	virtual Material* LoadMaterialByName(const String& name) = 0;
-	virtual Material* GetMaterialByName(const String& name) const = 0;
-
-	virtual UISpace* GetUIManager(int screen = 0) const = 0;
-
-	virtual uint GetMainWindowHandle() const = 0;
-
-	std::condition_variable Condition;
-	std::mutex LoadMutex;
 };
 
 class IInput

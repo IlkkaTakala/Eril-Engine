@@ -13,10 +13,9 @@
 #endif // OPENGL
 
 
-std::thread* RI = nullptr;
 std::thread* MH = nullptr;
 
-extern RenderHandler* RH = nullptr;
+extern Renderer* RI = nullptr;
 extern IInput* II = nullptr;
 extern IMesh* MI = nullptr;
 
@@ -28,19 +27,13 @@ int InterfaceInit()
 {
 	#ifdef OPENGL
 
-	RH = new Renderer();
-	IRender::Init();
+	RI = new Renderer();
 	II = new GLInput();
 	MI = new GLMesh();
 
 	#endif // OPENGL
 
 	return 0;
-}
-
-void IRender::Init()
-{
-	RI = new std::thread(&Renderer::Update, &RenderCommands, (Renderer*)RH);
 }
 
 void IRender::SendCommand(RenderCommand c)
@@ -50,45 +43,42 @@ void IRender::SendCommand(RenderCommand c)
 
 void IRender::CleanRenderer()
 {
-	RenderCommands.enqueue({ RC_DESTROY, 0, 0 });
+	RI->CleanRenderer();
 }
 
 Camera* IRender::CreateCamera(SceneComponent* parent)
 {
-	return RH->CreateCamera(parent);
+	return RI->CreateCamera(parent);
 }
 
 void IRender::SetActiveCamera(Camera* cam)
 {
-	RH->SetActiveCamera(cam);
+	RI->SetActiveCamera(cam);
 }
 
 Camera* IRender::GetActiveCamera()
 {
-	return RH->GetActiveCamera();
+	return RI->GetActiveCamera();
 }
 
 int IRender::SetupWindow(int width, int height)
 {
-	RenderCommands.enqueue({ RC_SETUP, (uint64)width, (uint64)height });
-	std::unique_lock<std::mutex> lk(RH->LoadMutex);
-	RH->Condition.wait(lk);
-	return 0;
+	return RI->SetupWindow(width, height);
 }
 
 void IRender::LoadShaders()
 {
-	RenderCommands.enqueue({ RC_LOADSHADERS, 0, 0 });
+	RI->LoadShaders();
 }
 
 Material* IRender::GetMaterialByName(const String& name)
 {
-	return RH->GetMaterialByName(name);
+	return RI->GetMaterialByName(name);
 }
 
 Material* IRender::LoadMaterialByName(const String& name)
 {
-	return RH->LoadMaterialByName(name);;
+	return RI->LoadMaterialByName(name);;
 }
 
 Texture* IRender::LoadTextureByName(const String& name)
@@ -98,13 +88,13 @@ Texture* IRender::LoadTextureByName(const String& name)
 
 void IRender::Update()
 {
-	RenderCommands.enqueue({ RC_RECALCULATE, 0, 0 });
-	RenderCommands.enqueue({ RC_RELIGHTS, 0, 0 });
-	RenderCommands.enqueue({ RC_REFRESH, 0, 0 });
+	WindowManager::PollEvents();
+	RI->Update(&RenderCommands, RI);
 }
 
 void IRender::Render(float delta)
 {
+	RI->Render(delta);
 }
 
 void IRender::GameStart()
@@ -114,26 +104,20 @@ void IRender::GameStart()
 
 void IRender::DestroyWindow()
 {
-	RenderCommands.enqueue({ RC_DESTROY, 0, 0 });
-	RI->join();
+	RI->DestroyWindow();
 }
 
 UISpace* IRender::GetUIManager(int screen)
 {
-	return RH->GetUIManager();
+	return RI->GetUIManager();
 }
 
 void IRender::SetShowCursor(bool show, uint window)
 {
-	RenderCommands.enqueue({ RC_SHOWCURSOR, show, (uint64)window });
+	WindowManager::SetShowCursor(window, show);
 }
 
 bool IRender::GetShowCursor(uint window)
 {
 	return WindowManager::GetShowCursor(window);
-}
-
-RenderHandler* IRender::GetRenderer()
-{
-	return RH;
 }

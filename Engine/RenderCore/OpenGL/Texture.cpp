@@ -55,6 +55,7 @@ void Texture::LoadTexture(int width, int height, int nrChannels, const float* da
 Texture::~Texture()
 {
 	delete[] Data;
+	Clear();
 }
 
 void Texture::CreateState()

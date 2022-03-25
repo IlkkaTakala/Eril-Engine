@@ -101,7 +101,7 @@ void GLCamera::SetLookAt(const Vector& to, const Vector& up) {
 
 void GLCamera::SetPostProcess(const String& name)
 {
-	postProcess = IRender::GetMaterialByName(name);
+	postProcess = IRender::LoadMaterialByName(name);
 }
 
 void GLCamera::ApplyTransformation()

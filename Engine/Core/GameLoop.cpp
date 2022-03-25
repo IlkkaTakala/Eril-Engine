@@ -129,8 +129,8 @@ int GameLoop::MainLoop()
 		TickListRemoval.clear();
 		lock.unlock();
 
-		auto time = target - std::chrono::duration<double>(std::chrono::steady_clock::now() - start);
-		std::this_thread::sleep_for(time);
+		//auto time = target - std::chrono::duration<double>(std::chrono::steady_clock::now() - start);
+		//std::this_thread::sleep_for(time);
 
 		duration = std::chrono::steady_clock::now() - start;
 		fps = 1.f / duration.count();

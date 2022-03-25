@@ -68,7 +68,7 @@ void ParticleSystem::Initialize(SceneComponent* attach)
 	Parent = attach;
 
 	if (!Sprite) {
-		Sprite = MI->GetStatic(attach, "sprite");
+		Sprite = MI->GetStatic(attach, "Assets/Meshes/sprite");
 		Sprite->SetAABB(AABB({ -10 }, { 10 }));
 	}
 	else Sprite->SetParent(attach);

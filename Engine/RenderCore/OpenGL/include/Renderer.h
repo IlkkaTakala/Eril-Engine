@@ -21,7 +21,7 @@ struct GLFWwindow;
 
 struct Globals;
 
-class Renderer : public RenderHandler
+class Renderer
 {
 public:
 	Renderer();
@@ -30,14 +30,14 @@ public:
 	int SetupWindow(int width, int height);
 	void CleanRenderer();
 
-	Camera* CreateCamera(SceneComponent* parent = nullptr) override;
-	void SetActiveCamera(Camera*) override;
-	Camera* GetActiveCamera() const override;
+	Camera* CreateCamera(SceneComponent* parent = nullptr);
+	void SetActiveCamera(Camera*);
+	Camera* GetActiveCamera() const;
 	
 	void UpdateLights();
 
 	void LoadShaders();
-	Material* GetMaterialByName(const String& name) const override;
+	Material* GetMaterialByName(const String& name) const;
 	Material* LoadMaterialByName(const String& name);
 
 	static void Update(SafeQueue<RenderCommand>* commands, Renderer* RC);

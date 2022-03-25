@@ -41,7 +41,7 @@ public:
         return val;
     }
 
-    bool inEmpty(void) {
+    bool isEmpty(void) {
         std::unique_lock<std::mutex> lock(m);
         return q.empty();
     }

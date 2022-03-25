@@ -153,7 +153,6 @@ MessageCallback(GLenum source,
 
 int Renderer::SetupWindow(int width, int height)
 {
-	std::unique_lock<std::mutex> render_lock(LoadMutex);
 	if (width < 640 || width > 2048 || height < 480 || height > 2048) throw std::exception("Unsupported resolution!\n");
 
 	Window = WindowManager::CreateMainWindow(width, height);
@@ -364,7 +363,6 @@ int Renderer::SetupWindow(int width, int height)
 	Lights = static_cast<IComponentArrayQuerySystem<LightComponent>*>(IECS::GetSystemsManager()->GetSystemByName("LightControllerSystem"))->GetComponentVector();
 
 	ready = true;
-	Condition.notify_all();
 
 	return 0;
 }
@@ -716,78 +714,67 @@ Material* Renderer::LoadMaterialByName(const String& name)
 
 void Renderer::Update(SafeQueue<RenderCommand>* commands, Renderer* RC)
 {
-	std::chrono::duration<float> duration = std::chrono::milliseconds(0);
-	auto begin = std::chrono::steady_clock::now();
-	auto time = std::chrono::milliseconds(10);
-	bool exit = false;
-	while (!exit) {
-		auto start = std::chrono::steady_clock::now();
-		if (RC->Window != 0 && WindowManager::GetShouldWindowClose(RC->Window)) Exit();
+	if (RC->Window != 0 && WindowManager::GetShouldWindowClose(RC->Window)) Exit();
 
-		while (!commands->inEmpty() && !exit) {
-			auto c = commands->dequeue();
+	while (!commands->isEmpty()) {
+		auto c = commands->dequeue();
 
-			switch (c.command)
-			{
-			case RC_SETUP:
-				RC->SetupWindow((int)c.param1, (int)c.param2);
-				break;
+		switch (c.command)
+		{
+		case RC_SETUP:
+			RC->SetupWindow((int)c.param1, (int)c.param2);
+			break;
 
-			case RC_RECALCULATE:
-				RC->UpdateTransforms();
-				break;
+		case RC_RECALCULATE:
+			RC->UpdateTransforms();
+			break;
 
-			case RC_RELIGHTS:
-				if (RC->Lights->size() != 0) RC->UpdateLights();
-				break;
+		case RC_RELIGHTS:
+			if (RC->Lights->size() != 0) RC->UpdateLights();
+			break;
 
-			case RC_LOADSHADERS:
-				RC->LoadShaders();
-				break;
+		case RC_LOADSHADERS:
+			RC->LoadShaders();
+			break;
 
-			case RC_DESTROY:
-				RC->CleanRenderer();
-				exit = true;
-				break;
+		case RC_DESTROY:
+			RC->CleanRenderer();
+			break;
 
-			case RC_ACTIVECAMERA:
-				RC->ActiveCamera = dynamic_cast<GLCamera*>((Camera*)c.param1);
-				break;
+		case RC_ACTIVECAMERA:
+			RC->ActiveCamera = dynamic_cast<GLCamera*>((Camera*)c.param1);
+			break;
 
-			case RC_SHOWCURSOR:
-				WindowManager::SetShowCursor(c.param2, c.param1);
-				break;
+		case RC_SHOWCURSOR:
+			WindowManager::SetShowCursor(c.param2, c.param1);
+			break;
 
-			case RC_GAMESTART:
-				RC->GameStart();
-				break;
+		case RC_GAMESTART:
+			RC->GameStart();
+			break;
 
-			case RC_REFRESH:
-				WindowManager::PollEvents();
-				break;
+		case RC_REFRESH:
+			WindowManager::PollEvents();
+			break;
 
-			case RC_MAKEOBJECT: {
-				auto obj = (OpenGLObject*)c.param1;
-				obj->CreateState();
-			} break;
+		case RC_MAKEOBJECT: {
+			auto obj = (OpenGLObject*)c.param1;
+			obj->CreateState();
+		} break;
 
-			case RC_DELETEOBJECT: {
-				auto obj = (OpenGLObject*)c.param1;
-				obj->Clear();
-			} break;
+		case RC_DELETEOBJECT: {
+			auto obj = (OpenGLObject*)c.param1;
+			obj->Clear();
+		} break;
 
-			case RC_MAKEINSTANCE: {
-				auto mesh = (RenderMeshStaticGL*)c.param1;
-				mesh->ApplyInstances();
-			} break;
+		case RC_MAKEINSTANCE: {
+			auto mesh = (RenderMeshStaticGL*)c.param1;
+			mesh->ApplyInstances();
+		} break;
 
-			default:
-				break;
-			}
+		default:
+			break;
 		}
-
-		RC->Render(duration.count());
-		duration = std::chrono::steady_clock::now() - start;
 	}
 }
 
@@ -1264,11 +1251,13 @@ void Renderer::Render(float delta)
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, GlobalUniforms);
 
+	UpdateTransforms();
 
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, LightBuffer);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, VisibleLightIndicesBuffer);
 
 	//EnvReflection(width, height);
+	UpdateLights();
 
 	glViewport(0, 0, width, height);
 	glEnable(GL_DEPTH_TEST);

@@ -73,6 +73,7 @@ public:
 	float Radius;
 	float RenderDistance;
 	uint InstanceDisp;
+	bool InstancesSet;
 
 	void Render();
 	float GetRadius() const { return Radius; }
@@ -96,7 +97,7 @@ public:
 	void SetMesh(LoadedMesh* mesh);
 
 	virtual void SetMaterial(uint section, Material* nextMat) override;
-	virtual Material* GetMaterial(uint section) const override { if (section < SectionCount) return Sections[section].Instance; else return nullptr; }
+	virtual Material* GetMaterial(uint section) const override { if (section < SectionCount) return Sections[section].Instance; else if (auto it = Materials.find(section); it != Materials.end()) return it->second; else return nullptr; }
 	const glm::mat4& GetModelMatrix();
 	virtual void ApplyTransform() override;
 	virtual void SetInstances(int count, Transformation* dispArray) override;
