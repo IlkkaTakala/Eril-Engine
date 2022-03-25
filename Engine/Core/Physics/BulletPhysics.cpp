@@ -52,7 +52,7 @@ btRigidBody* Physics::addCylinder(float width, float height, float depth, float 
 	t.setIdentity();
 	t.setOrigin(btVector3(x, y, z));
 	t.setRotation(btQuaternion(0, 0, 0, 1));
-	btCylinderShape* cylinder = new btCylinderShape(btVector3(width / 2.0, height / 2.0, depth / 2.0));
+	btCylinderShape* cylinder = new btCylinderShape(btVector3(width / 2.f, height / 2.f, depth / 2.f));
 	btVector3 inertia(0, 0, 0);
 	if (mass != 0.0)
 		cylinder->calculateLocalInertia(mass, inertia);
@@ -70,7 +70,7 @@ btRigidBody* Physics::addCylinderStatic(float width, float height, float depth, 
 	t.setIdentity();
 	t.setOrigin(btVector3(x, y, z));
 	t.setRotation(btQuaternion(0, 0, 0, 1));
-	btCylinderShape* cylinder = new btCylinderShape(btVector3(width / 2.0, height / 2.0, depth / 2.0));
+	btCylinderShape* cylinder = new btCylinderShape(btVector3(width / 2.f, height / 2.f, depth / 2.f));
 	btVector3 inertia(0, 0, 0);
 	
 	btRigidBody::btRigidBodyConstructionInfo info(0, state, cylinder, inertia);
@@ -122,7 +122,7 @@ btRigidBody* Physics::addBox(float width, float height, float depth, float x, fl
 	t.setIdentity();
 	t.setOrigin(btVector3(x, y, z));
 	t.setRotation(btQuaternion(0, 0, 0, 1));
-	btBoxShape* box = new btBoxShape(btVector3(width / 2.0, height / 2.0, depth / 2.0));
+	btBoxShape* box = new btBoxShape(btVector3(width / 2.f, height / 2.f, depth / 2.f));
 	btVector3 inertia(0, 0, 0);
 	if (mass != 0.0)
 		box->calculateLocalInertia(mass, inertia);
@@ -140,7 +140,7 @@ btRigidBody* Physics::addBoxStatic(float width, float height, float depth, float
 	t.setIdentity();
 	t.setOrigin(btVector3(x, y, z));
 	t.setRotation(btQuaternion(0, 0, 0, 1));
-	btBoxShape* box = new btBoxShape(btVector3(width / 2.0, height / 2.0, depth / 2.0));
+	btBoxShape* box = new btBoxShape(btVector3(width / 2.f, height / 2.f, depth / 2.f));
 	btVector3 inertia(0, 0, 0);
 
 	btRigidBody::btRigidBodyConstructionInfo info(0, state, box, inertia);

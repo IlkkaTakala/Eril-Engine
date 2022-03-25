@@ -249,9 +249,9 @@ void TestPlayer::MouseMoved(float X, float Y)
 {
 	const Rotator& rot = Rotation;
 	if (cursorState) SetRotation(Vector(
-		rot.X, 
-		rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, 
-		rot.Z + X * mouseSens));
+		rot.Roll(), 
+		rot.Yaw() + Y * mouseSens < 89.f && rot.Yaw() + Y * mouseSens > -89.f ? rot.Yaw() + Y * mouseSens : rot.Yaw(),
+		rot.Pitch() + X * mouseSens));
 }
 
 void TestPlayer::InputExit(bool down)

@@ -90,7 +90,7 @@ void CylinderCollisionShape::SetSize(AABB s)
 	float height = s.maxs.Z - s.mins.Z;
 	float depth = s.maxs.Y - s.mins.Y;
 	size = s;
-	btCylinderShape* cylinder = new btCylinderShape(btVector3(width / 2.0, height / 2.0, depth / 2.0));
+	btCylinderShape* cylinder = new btCylinderShape(btVector3(width / 2.f, height / 2.f, depth / 2.f));
 	body->setCollisionShape(cylinder);
 }
 

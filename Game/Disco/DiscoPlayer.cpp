@@ -158,7 +158,10 @@ void DiscoPlayer::RightMouseDown(bool KeyDown)
 void DiscoPlayer::MouseMoved(float X, float Y)
 {
 	const Rotator& rot = Rotation;
-	if (cursorState) SetRotation(Rotator(rot.W, rot.X + X * mouseSens, rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, rot.Z));
+	if (cursorState) SetRotation(Vector(
+		rot.X,
+		rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y,
+		rot.Z + X * mouseSens));
 }
 
 void DiscoPlayer::InputExit(bool down)

@@ -6,7 +6,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtx/quaternion.hpp>
-#define BT_EULER_DEFAULT_ZYX
 
 
 
@@ -23,7 +22,7 @@ void ErilMotion::getWorldTransform(btTransform& centerOfMassWorldTrans) const
 		btTransform local;
 		local.setIdentity();
 		local.setOrigin(btVector3(loc.X, loc.Z, loc.Y));
-		local.setRotation(btQuaternion(radians(rot.Y), radians(rot.Z), radians(rot.X)));
+		local.setRotation(btQuaternion((rot.X), (rot.Z), (rot.Y), (rot.W)));
 		centerOfMassWorldTrans = local * m_centerOfMassOffset.inverse();
 	} break;
 
@@ -33,7 +32,7 @@ void ErilMotion::getWorldTransform(btTransform& centerOfMassWorldTrans) const
 		btTransform local;
 		local.setIdentity();
 		local.setOrigin(btVector3(temp.Location.X, temp.Location.Z, temp.Location.Y));
-		local.setRotation(btQuaternion(radians(temp.Rotation.Y), radians(temp.Rotation.Z), radians(temp.Rotation.X)));
+		local.setRotation(btQuaternion((temp.Rotation.X), (temp.Rotation.Z), (temp.Rotation.Y), (temp.Rotation.W)));
 		centerOfMassWorldTrans = local * m_centerOfMassOffset.inverse();
 	} break;
 	}
@@ -46,9 +45,9 @@ void ErilMotion::setWorldTransform(const btTransform& centerOfMassWorldTrans)
 
 	btVector3 loc = temp.getOrigin();
 	Vector wLoc = Vector(loc[0], loc[2], loc[1]) - m_userPointer->GetLocation();
-	btQuaternion rot2 = temp.getRotation();
 
-	Rotator rot(rot2[0], rot2[1], rot2[2], rot2[3]);
+	btQuaternion rot2 = temp.getRotation();
+	Rotator rot(rot2[3], rot2[0], rot2[1], rot2[2]);
 
 	btVector3 vel = m_userPointer->body->getLinearVelocity();
 	btVector3 gravity = m_userPointer->body->getGravity();
@@ -61,7 +60,7 @@ void ErilMotion::setWorldTransform(const btTransform& centerOfMassWorldTrans)
 		m_userPointer->GetMovementTarget()->DesiredState.velocity = { vel[0], vel[2], vel[1] };
 		m_userPointer->GetMovementTarget()->DesiredState.gravity = { gravity[0], gravity[2], gravity[1] };
 
-		//m_userPointer->GetMovementTarget()->DesiredState.rotation = rot;
+		m_userPointer->GetMovementTarget()->DesiredState.rotation = rot;
 	} break;
 
 	default:
@@ -138,7 +137,7 @@ void ColliderComponent::Refresh()
 	btTransform temp;
 	body->getMotionState()->getWorldTransform(temp);
 	temp.setOrigin(btVector3(loc.X, loc.Z, loc.Y));
-	temp.setRotation(btQuaternion(radians(rot.Y), radians(rot.Z), radians(rot.X)));
+	temp.setRotation(btQuaternion((rot.X), (rot.Z), (rot.Y), (rot.W)));
 	body->setWorldTransform(temp);
 	Physics::ForceUpdate(body);
 }

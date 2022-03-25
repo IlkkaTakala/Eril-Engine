@@ -45,7 +45,7 @@ namespace Noise {
 		r0 = t - (int)t;\
 		r1 = r0 - 1.;
 
-		double noise1(double arg)
+		float noise1(float arg)
 		{
 			int bx0, bx1;
 			float rx0, rx1, sx, t, u, v, vec[1];

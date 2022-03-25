@@ -22,7 +22,7 @@ void InstancedObject::LoadWithParameters(const String& args)
 	int instanceCount = 0;
 	std::vector<String> it;
 	Vector Scale = Vector(1, 1, 1);
-	Rotator Rotation = Rotator(0, 0, 0, 0);
+	Rotator Rotation = Rotator(0.f);
 	Terrain* Terra = nullptr;
 
 	if (ran != data.end()) randCount = atoi(ran->second.c_str());
