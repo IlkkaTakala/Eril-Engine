@@ -95,7 +95,7 @@ const Vector& GLCamera::GetLocation() const
 }
 
 void GLCamera::SetLookAt(const Vector& to, const Vector& up) {
-	Orientation = glm::inverse(glm::lookAtRH(glm::vec3(Location.X, Location.Z, Location.Y), glm::vec3(to.X, to.Z, to.Y), glm::vec3(up.X, up.Z, up.Y)));
+	Orientation = glm::inverse(glm::lookAtRH(glm::vec3(Location.X, Location.Z, -Location.Y), glm::vec3(to.X, to.Z, -to.Y), glm::vec3(up.X, up.Z, -up.Y)));
 }
 
 void GLCamera::SetPostProcess(const String& name)
@@ -105,8 +105,8 @@ void GLCamera::SetPostProcess(const String& name)
 
 void GLCamera::ApplyTransformation()
 {
-	View = glm::translate(glm::mat4(1.0f), glm::vec3(Location.X, Location.Z, Location.Y))
-		* glm::mat4(glm::quat(Rotation.W, Rotation.X, Rotation.Z, Rotation.Y));
+	View = glm::translate(glm::mat4(1.0f), glm::vec3(Location.X, Location.Z, -Location.Y))
+		* glm::toMat4(glm::quat(Rotation.W, Rotation.X, Rotation.Z, -Rotation.Y));
 	if (glm::all(glm::isnan(View[0]))) {
 		View = glm::mat4(1.f);
 	}

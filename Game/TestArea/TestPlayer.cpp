@@ -64,7 +64,7 @@ TestPlayer::TestPlayer() : Player()
 	cursorState = true;
 	spawnCounter = 0;
 	
-	
+	Rotation = Rotator(90.f);
 
 	//Player Model
 	Mesh = SpawnObject<VisibleObject>();
@@ -83,12 +83,12 @@ TestPlayer::TestPlayer() : Player()
 	Movement->SetAcceleration(500.f);
 	Movement->SetAirControl(0.9f);
 
-	PlayerCol = SpawnObject<CapsuleCollisionShape>();
+	/*PlayerCol = SpawnObject<CapsuleCollisionShape>();
 	AddComponent(PlayerCol);
 	PlayerCol->SetLocation(Vector(0.f, 0.f, 1.f), true);
 	PlayerCol->SetType(2);
 	PlayerCol->SetSize(Mesh->GetModel()->GetAABB().maxs.X, Mesh->GetModel()->GetAABB().maxs.Z);
-	PlayerCol->SetMovementTarget(Movement);
+	PlayerCol->SetMovementTarget(Movement);*/
 
 	//Skybox
 	Sky = SpawnObject<VisibleObject>();
@@ -247,11 +247,20 @@ void TestPlayer::RightMouseDown(bool KeyDown)
 
 void TestPlayer::MouseMoved(float X, float Y)
 {
-	const Rotator& rot = Rotation;
-	if (cursorState) SetRotation(Vector(
-		rot.Roll(), 
-		rot.Yaw() + Y * mouseSens < 89.f && rot.Yaw() + Y * mouseSens > -89.f ? rot.Yaw() + Y * mouseSens : rot.Yaw(),
-		rot.Pitch() + X * mouseSens));
+	Camera* cam = GetCamera();
+	Rotator rot = cam->GetRotation();
+	if (cursorState) {
+		Rotator temp = rot.RotateAroundAxis(radians(X * mouseSens), rot.GetUpVector());
+		temp = rot.RotateAroundAxis(radians(Y * mouseSens), rot.GetRightVector() * temp);
+		temp.Normalize();
+		cam->SetRotation(temp);
+
+		//Rotation.RotateAroundAxis(radians(Y * mouseSens), rot.GetRightVector());
+	}
+	/*if (cursorState) SetRotation(Vector(
+		rot.RollDegrees(),
+		rot.PitchDegrees() + X * mouseSens,
+		rot.YawDegrees() + Y * mouseSens < 89.f && rot.YawDegrees() + Y * mouseSens > -89.f ? rot.YawDegrees() + Y * mouseSens : rot.YawDegrees()));*/
 }
 
 void TestPlayer::InputExit(bool down)
@@ -286,7 +295,6 @@ void TestPlayer::Tick(float deltaTime)
 
 	Vector loc = Box->GetLocation();
 	GetCamera()->SetLocation(Location + Vector(0.f, 0.f, 1.5f));
-	GetCamera()->SetRotation(Rotation);
 	Sky->SetLocation(Location);
 	
 	Vector listenerPos = Location;

@@ -207,8 +207,8 @@ void RenderObject::ApplyTransform()
 	Vector loc = finalT.Location;
 	Rotator rot = finalT.Rotation;
 	Vector sca = finalT.Scale;
-	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Z, loc.Y))
-		* glm::mat4(glm::quat(rot.W, rot.X, rot.Z, rot.Y))
+	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Z, -loc.Y))
+		* glm::toMat4(glm::quat(rot.W, rot.X, rot.Z, -rot.Y))
 		* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Z, sca.Y));
 
 	requireUpdate = false;
@@ -221,8 +221,8 @@ void RenderObject::SetInstances(int count, Transformation* dispArray)
 		Vector loc = dispArray[i].Location;
 		Rotator rot = dispArray[i].Rotation;
 		Vector sca = dispArray[i].Scale;
-		arr[i] = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Z, loc.Y))
-			* glm::mat4(glm::quat(rot.W, rot.X, rot.Z, rot.Y))
+		arr[i] = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Z, -loc.Y))
+			* glm::toMat4(glm::quat(rot.W, rot.X, rot.Z, -rot.Y))
 			* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Z, sca.Y));
 	}
 	for (uint i = 0; i < SectionCount; i++) {

@@ -5,7 +5,7 @@
 SceneComponent::SceneComponent() : BaseObject()
 {
 	Location = Vector(0, 0, 0);
-	Rotation = Rotator(0, 0, 0, 0);
+	Rotation = Rotator(0.f);
 	Scale = Vector(1, 1, 1);
 
 	transformForce = false;
