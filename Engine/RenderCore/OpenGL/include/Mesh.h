@@ -5,6 +5,8 @@
 #include <vector>
 #include "Material.h"
 #include "../OpenGLObject.h"
+#include "AnimationController.h"
+#include "Skeleton.h"
 
 class LoadedMesh;
 class MeshDataHolder;
@@ -17,6 +19,17 @@ struct Vertex
 	glm::vec3 normal;
 	glm::vec3 uv;
 	glm::vec3 tangent;
+};
+
+struct SkeletalVertex
+{
+	glm::vec3 position;
+	glm::vec3 normal;
+	glm::vec3 uv;
+	glm::vec3 tangent;
+
+	glm::vec4 weights;
+	glm::ivec4 bones;
 };
 
 class GLMesh : public IMesh
@@ -131,6 +144,48 @@ private:
 	glm::mat4* Instances;
 	bool InstancesDirty;
 	bool Instanced;
+
+	std::unordered_map<uint, Material*> Materials;
+
+	std::function<void(void)> binds;
+};
+
+class RenderMeshSkeletalGL : public RenderMeshSkeletal
+{
+public:
+	RenderMeshSkeletalGL();
+	virtual ~RenderMeshSkeletalGL();
+
+	void SetMesh(LoadedMesh* mesh);
+
+	virtual void SetMaterial(uint section, Material* nextMat) override;
+	virtual Material* GetMaterial(uint section) const override { if (section < SectionCount) return Sections[section].Instance; else if (auto it = Materials.find(section); it != Materials.end()) return it->second; else return nullptr; }
+	const glm::mat4& GetModelMatrix();
+	virtual void ApplyTransform() override;
+
+	virtual void SetSectionRenderDistance(uint section, float distance) override;
+
+	virtual SceneComponent* GetParent() const { return Parent; }
+	virtual void SetParent(SceneComponent* p) override { Parent = p; }
+
+	virtual void SetBinds(std::function<void(void)> bind) override;
+	virtual std::function<void(void)>& GetBinds() override;
+
+	virtual void SetAABB(AABB bounds) override;
+
+private:
+	friend class Renderer;
+	friend class Section;
+
+	SceneComponent* Parent;
+	Section* Sections;
+	LoadedMesh* Mesh;
+	uint SectionCount;
+	glm::mat4 ModelMatrix;
+	bool requireUpdate;
+
+	AnimationController* animControl;
+	Skeleton* skeleton;
 
 	std::unordered_map<uint, Material*> Materials;
 

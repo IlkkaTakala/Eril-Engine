@@ -116,6 +116,26 @@ protected:
 	AABB bounds; // low level " collision " --> tänne collision
 };
 
+class RenderMeshSkeletal
+{
+public:
+	virtual ~RenderMeshSkeletal() {}
+	virtual void ApplyTransform() = 0;
+	virtual void SetMaterial(uint section, Material* nextMat) = 0;
+	virtual Material* GetMaterial(uint section) const = 0;
+	virtual SceneComponent* GetParent() const = 0;
+	virtual void SetParent(SceneComponent* p) = 0;
+	virtual void SetSectionRenderDistance(uint section, float distance) = 0;
+
+	AABB GetAABB() const { return bounds; }
+	virtual void SetAABB(AABB bounds) { this->bounds = bounds; }
+
+	virtual void SetBinds(std::function<void(void)> bind) = 0;
+	virtual std::function<void(void)>& GetBinds() = 0;
+protected:
+	AABB bounds; // low level " collision " --> tänne collision
+};
+
 class IMesh
 {
 public:

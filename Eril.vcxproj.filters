@@ -223,6 +223,15 @@
     <ClCompile Include="Engine\Interface\AssetManager.cpp">
       <Filter>Engine\Interface</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\RenderCore\OpenGL\Animation.cpp">
+      <Filter>Engine\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\RenderCore\OpenGL\AnimationController.cpp">
+      <Filter>Engine\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\RenderCore\OpenGL\Skeleton.cpp">
+      <Filter>Engine\OpenGL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -567,6 +576,15 @@
       <Filter>Engine\Interface</Filter>
     </ClInclude>
     <ClInclude Include="Engine\RenderCore\OpenGL\OpenGLObject.h">
+      <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\Animation.h">
+      <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\AnimationController.h">
+      <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\Skeleton.h">
       <Filter>Engine\OpenGL</Filter>
     </ClInclude>
   </ItemGroup>

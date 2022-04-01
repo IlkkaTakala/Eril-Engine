@@ -203,7 +203,10 @@ void AssetManager::LoadTextureAsync(const String& name, Texture* empty)
 
 AssetType AssetManager::GetAssetType(const String& name)
 {
+	// TODO
 	if (name.find("Meshes") != String::npos) return AssetType::MeshStatic;
+	if (name.find("Textures") != String::npos) return AssetType::MeshStatic;
+	if (name.find("Animations") != String::npos) return AssetType::MeshStatic;
 	return AssetType::Texture;
 }
 

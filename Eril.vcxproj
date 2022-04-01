@@ -206,6 +206,9 @@
     <ClCompile Include="Engine\Core\Objects\InputComponent.cpp" />
     <ClCompile Include="Engine\Core\Objects\ParticleComponent.cpp" />
     <ClCompile Include="Engine\Interface\AssetManager.cpp" />
+    <ClCompile Include="Engine\RenderCore\OpenGL\Animation.cpp" />
+    <ClCompile Include="Engine\RenderCore\OpenGL\AnimationController.cpp" />
+    <ClCompile Include="Engine\RenderCore\OpenGL\Skeleton.cpp" />
     <ClCompile Include="Engine\RenderCore\ParticleSystem.cpp" />
     <ClCompile Include="Engine\Core\BasicTypes.cpp" />
     <ClCompile Include="Engine\Core\Core.cpp" />
@@ -281,6 +284,9 @@
     <ClInclude Include="Engine\Core\Objects\InputComponent.h" />
     <ClInclude Include="Engine\Core\Objects\ParticleComponent.h" />
     <ClInclude Include="Engine\Interface\AssetManager.h" />
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\Animation.h" />
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\AnimationController.h" />
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\Skeleton.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\OpenGLObject.h" />
     <ClInclude Include="Engine\RenderCore\Particle.h" />
     <ClInclude Include="Engine\RenderCore\ParticleSystem.h" />

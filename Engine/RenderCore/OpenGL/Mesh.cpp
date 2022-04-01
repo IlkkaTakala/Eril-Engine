@@ -209,6 +209,9 @@ void RenderMeshStaticGL::ApplyTransform()
 		* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Z, sca.Y));
 
 	requireUpdate = false;
+
+	glm::vec3 test(1.f);
+	glm::mat4 test2(2.f);
 }
 
 void RenderMeshStaticGL::SetInstances(int count, Transformation* dispArray)
