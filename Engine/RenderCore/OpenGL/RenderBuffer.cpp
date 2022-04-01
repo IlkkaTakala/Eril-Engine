@@ -174,6 +174,14 @@ PostBuffer::PostBuffer(int width, int height)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, BloomBuffer, 0);
 
+	// - normal color buffer
+	glGenTextures(1, &NormalBuffer);
+	glBindTexture(GL_TEXTURE_2D, NormalBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, NormalBuffer, 0);
+
 	// - accumulation color buffer
 	glGenTextures(1, &AccumBuffer);
 	glBindTexture(GL_TEXTURE_2D, AccumBuffer);
@@ -217,6 +225,7 @@ PostBuffer::~PostBuffer()
 {
 	glDeleteTextures(1, &ColorBuffer);
 	glDeleteTextures(1, &BloomBuffer);
+	glDeleteTextures(1, &NormalBuffer);
 	glDeleteTextures(1, &AccumBuffer);
 	glDeleteTextures(1, &RevealageBuffer);
 	glDeleteTextures(1, &DepthBuffer);
@@ -248,6 +257,9 @@ void PostBuffer::BindTextures()
 
 	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, DepthBuffer);
+
+	glActiveTexture(GL_TEXTURE5);
+	glBindTexture(GL_TEXTURE_2D, NormalBuffer);
 }
 
 SSAOBuffer::SSAOBuffer(int width, int height)

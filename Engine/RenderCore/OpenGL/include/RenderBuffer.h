@@ -38,6 +38,7 @@ public:
 	void Unbind();
 	uint GetBuffer() const { return FrameBuffer; }
 	uint GetBloom() const { return BloomBuffer; }
+	uint GetNormal() const { return NormalBuffer; }
 	uint GetColor() const { return ColorBuffer; }
 
 	void BindTextures();
@@ -50,6 +51,7 @@ private:
 	uint AccumBuffer;
 	uint RevealageBuffer;
 	uint DepthBuffer;
+	uint NormalBuffer;
 
 	PostBuffer(const PostBuffer&);
 	PostBuffer& operator=(const PostBuffer&);

@@ -27,6 +27,7 @@ layout (std140, binding = 0) uniform Globals
 layout (binding = 0) uniform sampler2D Color;
 layout (binding = 1) uniform sampler2D Bloom;
 layout (binding = 4) uniform sampler2D Depth;
+layout (binding = 5) uniform sampler2D Normal;
 
 in vec2 TexCoords;
 out vec4 FragColor;
@@ -100,6 +101,7 @@ void main()
 	
 	//result = applyFog(result, length(pixelPos - viewPos.xyz), normalize(pixelPos - viewPos.xyz), normalize(vec3(-1.0, 1.0, -1.0)));
 	
-    FragColor = vec4(result, 1.0);
+    //FragColor = vec4(result, 1.0);
+	FragColor = vec4(vec3(texture(Color, TexCoords).r), 1.0);
 }
 ###END_FRAGMENT###
