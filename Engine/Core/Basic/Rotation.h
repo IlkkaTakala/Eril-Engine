@@ -50,22 +50,10 @@ public:
 	}
 
 	inline float Yaw() const {
-		//return (float)atan2(2.0f * (Y * Z + W * X), W * W - X * X - Y * Y + Z * Z);
-		//return (float)asin(std::clamp(-2.0f * (X * Z - W * Y), -1.f, 1.f));
 		return (float)asin(-2.0f * (X * Z - W * Y));
-
 	}
 
 	inline float Pitch() const {
-		/*return (float)asin(-2.0f * (X * Z - W * Y));
-		float const x = W * W - X *X - Y * Y + Z * Z;
-		float const y = 2.f * (Y * Z + W * X);
-
-		if (std::equal(Vector(x, y, 0.f), Vector(0.f), std::numeric_limits<float>::epsilon()))
-			return float(2.f) * (float)atan2(X, W);
-
-		return (float)atan2(y, x);*/
-
 		return (float)atan2(2.0f * (Y * Z + W * X), W * W - X * X - Y * Y + Z * Z);
 	}
 
@@ -92,11 +80,11 @@ public:
 	}
 
 	inline Vector GetForwardVector() {
-		return RotateVector({ 0, -1, 0 }).Normalize();
+		return RotateVector({ 0, 1, 0 }).Normalize();
 	}
 
 	inline Vector RotateVector(const Vector& vector) {
-		return *this * vector;
+		return *this * vector * Rotator(W, -X, -Y, -Z);
 	}
 
 	static Rotator FromAxisAngle(float angle, const Vector& axis) {
@@ -109,19 +97,13 @@ public:
 	}
 
 	inline Rotator RotateAroundAxis(float angle, const Vector& axis) const {
-		/*Rotator r;
-		r.X = axis.X * (float)sin(angle / 2.0f);
-		r.Y = axis.Y * (float)sin(angle / 2.0f);
-		r.Z = axis.Z * (float)sin(angle / 2.0f);
-		r.W = (float)cos(angle / 2.0f);
-		return (*this * r).Normalize();*/
-
-		Vector const Tmp(axis);
-
-		float const AngleRad(angle);
-		float const Sin = sinf(AngleRad * float(0.5));
-
-		return *this * Rotator(cosf(AngleRad * float(0.5)), Tmp.X * Sin, Tmp.Y * Sin, Tmp.Z * Sin);
+		Rotator r;
+		float a = sinf(angle / 2.0f);
+		r.X = axis.X * a;
+		r.Y = axis.Y * a;
+		r.Z = axis.Z * a;
+		r.W = cosf(angle / 2.0f);
+		return (*this * r).Normalize();
 	}
 
 	friend Rotator operator*(Rotator lhs, const Rotator& rhs) {
@@ -136,18 +118,8 @@ public:
 		return *this;
 	}
 
-	Vector operator*(const Vector& rhs) {
-		Vector temp;
-		/*W * 0 + W * rhs.X + W * rhs.Y + W * rhs.Z +
-		X * 0 + X * rhs.X + X * rhs.Y + X * rhs.Z +
-		Y * 0 + Y * rhs.X + Y * rhs.Y + Y * rhs.Z +
-		Z * 0 + Z * rhs.X + Z * rhs.Y + Z * rhs.Z;
-		
-		W * 0 - X * rhs.X - Y * rhs.Y - Z * rhs.Z +*/
-		/*temp.X = (W * rhs.X + X * 0 + Y * rhs.Z - Z * rhs.Y);
-		temp.Y = (W * rhs.Y - X * rhs.Z + Y * 0 + Z * rhs.X);
-		temp.Z = (W * rhs.Z + X * rhs.Y - Y * rhs.X + Z * 0);*/
-		Rotator& q = *this;
+	friend Vector operator*(const Rotator& lhs, const Vector& rhs) {
+		const Rotator& q = lhs;
 		Vector const QuatVector(q.X, q.Y, q.Z);
 		Vector const uv(Vector::Cross(QuatVector, rhs));
 		Vector const uuv(Vector::Cross(QuatVector, uv));

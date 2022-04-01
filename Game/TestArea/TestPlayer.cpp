@@ -64,7 +64,7 @@ TestPlayer::TestPlayer() : Player()
 	cursorState = true;
 	spawnCounter = 0;
 	
-	Rotation = Rotator(90.f);
+	Rotation = Rotator(0.f);
 
 	//Player Model
 	Mesh = SpawnObject<VisibleObject>();
@@ -161,9 +161,9 @@ TestPlayer::TestPlayer() : Player()
 
 	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
 
-	auto part = SpawnObject<ParticleComponent>();
+	/*auto part = SpawnObject<ParticleComponent>();
 	part->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
-	part->SetLocation({10.f, 5.f, 0.5f});
+	part->SetLocation({10.f, 5.f, 0.5f});*/
 
 }
 
@@ -250,8 +250,10 @@ void TestPlayer::MouseMoved(float X, float Y)
 	Camera* cam = GetCamera();
 	Rotator rot = cam->GetRotation();
 	if (cursorState) {
-		Rotator temp = rot.RotateAroundAxis(radians(X * mouseSens), rot.GetUpVector());
-		temp = rot.RotateAroundAxis(radians(Y * mouseSens), rot.GetRightVector() * temp);
+		Rotator temp = rot.RotateAroundAxis(radians(X * mouseSens), {0, 0, 1});
+		Vector right = temp.GetRightVector();
+		right.Z = 0.f;	
+		temp = temp.RotateAroundAxis(radians(Y * mouseSens), right.Normalize());
 		temp.Normalize();
 		cam->SetRotation(temp);
 

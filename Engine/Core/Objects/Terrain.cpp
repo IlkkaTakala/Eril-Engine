@@ -279,12 +279,12 @@ void Terrain::InitTerrain(int r, Vector scale, String material)
 
 			if (y < r && x < r) {
 				inds.emplace_back(y * (r + 1) + x);
-				inds.emplace_back((y + 1) * (r + 1) + x);
 				inds.emplace_back((y + 1) * (r + 1) + x + 1);
+				inds.emplace_back((y + 1) * (r + 1) + x);
 
 				inds.emplace_back(y * (r + 1) + x);
-				inds.emplace_back((y + 1) * (r + 1) + x + 1);
 				inds.emplace_back(y * (r + 1) + x + 1);
+				inds.emplace_back((y + 1) * (r + 1) + x + 1);
 			}
 		}
 	}
