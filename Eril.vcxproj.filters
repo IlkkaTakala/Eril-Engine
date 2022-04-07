@@ -223,7 +223,12 @@
     <ClCompile Include="Engine\Core\Objects\CollisionShape.cpp">
       <Filter>Engine\Objects\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\Basic\Rotation.cpp" />
+    <ClCompile Include="Engine\Core\Basic\Math.cpp">
+      <Filter>Engine\Public\Basic</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Basic\Rotation.cpp">
+      <Filter>Engine\Public\Basic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -538,6 +543,9 @@
       <Filter>Engine\Public\Basic</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\Basic\Transformation.h">
+      <Filter>Engine\Public\Basic</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Basic\Math.h">
       <Filter>Engine\Public\Basic</Filter>
     </ClInclude>
   </ItemGroup>

@@ -83,12 +83,12 @@ TestPlayer::TestPlayer() : Player()
 	Movement->SetAcceleration(500.f);
 	Movement->SetAirControl(0.9f);
 
-	/*PlayerCol = SpawnObject<CapsuleCollisionShape>();
+	PlayerCol = SpawnObject<CapsuleCollisionShape>();
 	AddComponent(PlayerCol);
 	PlayerCol->SetLocation(Vector(0.f, 0.f, 1.f), true);
 	PlayerCol->SetType(2);
 	PlayerCol->SetSize(Mesh->GetModel()->GetAABB().maxs.X, Mesh->GetModel()->GetAABB().maxs.Z);
-	PlayerCol->SetMovementTarget(Movement);*/
+	PlayerCol->SetMovementTarget(Movement);
 
 	//Skybox
 	Sky = SpawnObject<VisibleObject>();
@@ -188,7 +188,7 @@ void TestPlayer::RunInputZ(float delta, bool KeyDown)
 
 void TestPlayer::RunInputW(float delta, bool KeyDown)
 {
-	Vector dir = -GetCamera()->GetForwardVector();
+	Vector dir = GetCamera()->GetForwardVector();
 	dir.Z = 0.f;
 	Movement->AddInput(dir.Normalize());
 }
@@ -205,7 +205,7 @@ void TestPlayer::RunInputD(float delta, bool KeyDown)
 
 void TestPlayer::RunInputS(float delta, bool KeyDown)
 {
-	Vector dir = GetCamera()->GetForwardVector();
+	Vector dir = -GetCamera()->GetForwardVector();
 	dir.Z = 0.f;
 	Movement->AddInput(dir.Normalize());
 }
@@ -247,22 +247,17 @@ void TestPlayer::RightMouseDown(bool KeyDown)
 
 void TestPlayer::MouseMoved(float X, float Y)
 {
-	Camera* cam = GetCamera();
-	Rotator rot = cam->GetRotation();
 	if (cursorState) {
+		Camera* cam = GetCamera();
+		Rotator rot = cam->GetRotation();
 		Rotator temp = rot.RotateAroundAxis(radians(X * mouseSens), {0, 0, 1});
 		Vector right = temp.GetRightVector();
 		right.Z = 0.f;	
 		temp = temp.RotateAroundAxis(radians(Y * mouseSens), right.Normalize());
-		temp.Normalize();
+		//temp.Normalize();
 		cam->SetRotation(temp);
-
-		//Rotation.RotateAroundAxis(radians(Y * mouseSens), rot.GetRightVector());
+		Console::Log(std::to_string(temp.Roll()));
 	}
-	/*if (cursorState) SetRotation(Vector(
-		rot.RollDegrees(),
-		rot.PitchDegrees() + X * mouseSens,
-		rot.YawDegrees() + Y * mouseSens < 89.f && rot.YawDegrees() + Y * mouseSens > -89.f ? rot.YawDegrees() + Y * mouseSens : rot.YawDegrees()));*/
 }
 
 void TestPlayer::InputExit(bool down)
@@ -301,7 +296,7 @@ void TestPlayer::Tick(float deltaTime)
 	
 	Vector listenerPos = Location;
 	Vector listenerOrientation = GetCamera()->GetForwardVector();
-	AudioManager::SetListener(listenerPos, -GetCamera()->GetForwardVector(), -GetCamera()->GetUpVector());
+	AudioManager::SetListener(listenerPos, GetCamera()->GetForwardVector(), GetCamera()->GetUpVector());
 }
 
 void TestPlayer::BeginPlay()

@@ -8,14 +8,14 @@ void BoxCollisionShape::SetType(int t)
 	switch (type)
 	{
 	case 0:
-		body = Physics::addBoxStatic(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, new ErilMotion(this));
+		body = Physics::addBoxStatic(1.0, 1.0, 1.0, 0.0, 0.0, 0.0, new ErilMotion(this));
 		break;
 	case 1:
-		body = Physics::addBox(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 100, new ErilMotion(this));
+		body = Physics::addBox(1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 100, new ErilMotion(this));
 		body->setAngularFactor(1.f);
 		break;
 	case 2:
-		body = Physics::addBox(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1000, new ErilMotion(this));
+		body = Physics::addBox(1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1000, new ErilMotion(this));
 		body->setActivationState(DISABLE_DEACTIVATION);
 		body->setAngularFactor(0.f);
 		body->setFriction(0.f);
@@ -40,14 +40,14 @@ void SphereCollisionShape::SetType(int t)
 	switch (type)
 	{
 	case 0:
-		body = Physics::addSphereStatic(1.0, 1.0, 1.0, 1.0, new ErilMotion(this));
+		body = Physics::addSphereStatic(1.0, 0.0, 0.0, 0.0, new ErilMotion(this));
 		break;
 	case 1:
-		body = Physics::addSphere(1.0, 1.0, 1.0, 1.0, 100, new ErilMotion(this));
+		body = Physics::addSphere(1.0, 0.0, 0.0, 0.0, 100, new ErilMotion(this));
 		body->setAngularFactor(1.f);
 		break;
 	case 2:
-		body = Physics::addSphere(1.0, 1.0, 1.0, 1.0, 1000, new ErilMotion(this));
+		body = Physics::addSphere(1.0, 0.0, 0.0, 0.0, 1000, new ErilMotion(this));
 		body->setActivationState(DISABLE_DEACTIVATION);
 		body->setAngularFactor(0.f);
 		body->setFriction(0.f);
@@ -68,14 +68,14 @@ void CylinderCollisionShape::SetType(int t)
 	switch (type)
 	{
 	case 0:
-		body = Physics::addCylinderStatic(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, new ErilMotion(this));
+		body = Physics::addCylinderStatic(1.0, 1.0, 1.0, 0.0, 0.0, 0.0, new ErilMotion(this));
 		break;
 	case 1:
-		body = Physics::addCylinder(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 100, new ErilMotion(this));
+		body = Physics::addCylinder(1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 100, new ErilMotion(this));
 		body->setAngularFactor(1.f);
 		break;
 	case 2:
-		body = Physics::addCylinder(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1000, new ErilMotion(this));
+		body = Physics::addCylinder(1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1000, new ErilMotion(this));
 		body->setActivationState(DISABLE_DEACTIVATION);
 		body->setAngularFactor(0.f);
 		body->setFriction(0.f);
@@ -100,14 +100,14 @@ void ConeCollisionShape::SetType(int t)
 	switch (type)
 	{
 	case 0:
-		body = Physics::addConeStatic(1.0, 1.0, 1.0, 1.0, 1.0, new ErilMotion(this));
+		body = Physics::addConeStatic(1.0, 1.0, 0.0, 0.0, 0.0, new ErilMotion(this));
 		break;
 	case 1:
-		body = Physics::addCone(1.0, 1.0, 1.0, 1.0, 1.0, 100, new ErilMotion(this));
+		body = Physics::addCone(1.0, 1.0, 0.0, 0.0, 0.0, 100, new ErilMotion(this));
 		body->setAngularFactor(1.f);
 		break;
 	case 2:
-		body = Physics::addCone(1.0, 1.0, 1.0, 1.0, 1.0, 1000, new ErilMotion(this));
+		body = Physics::addCone(1.0, 1.0, 0.0, 0.0, 0.0, 1000, new ErilMotion(this));
 		body->setActivationState(DISABLE_DEACTIVATION);
 		body->setAngularFactor(0.f);
 		body->setFriction(0.f);
@@ -128,14 +128,14 @@ void CapsuleCollisionShape::SetType(int t)
 	switch (type)
 	{
 	case 0:
-		body = Physics::addCapsuleStatic(1.0, 1.0, 1.0, 1.0, 1.0, new ErilMotion(this));
+		body = Physics::addCapsuleStatic(1.0, 1.0, 0.0, 0.0, 0.0, new ErilMotion(this));
 		break;
 	case 1:
-		body = Physics::addCapsule(1.0, 1.0, 1.0, 1.0, 1.0, 100, new ErilMotion(this));
+		body = Physics::addCapsule(1.0, 1.0, 0.0, 0.0, 0.0, 100, new ErilMotion(this));
 		body->setAngularFactor(1.f);
 		break;
 	case 2:
-		body = Physics::addCapsule(1.0, 1.0, 1.0, 1.0, 1.0, 1000, new ErilMotion(this));
+		body = Physics::addCapsule(1.0, 1.0, 0.0, 0.0, 0.0, 1000, new ErilMotion(this));
 		body->setActivationState(DISABLE_DEACTIVATION);
 		body->setAngularFactor(0.f);
 		body->setFriction(0.f);

@@ -305,7 +305,7 @@ void Terrain::InitTerrain(int r, Vector scale, String material)
 	btHeightfieldTerrainShape* heightFieldShape = new btHeightfieldTerrainShape(r + 1, r + 1, m_rawHeightfieldData, 1, -128, 128, 1, PHY_FLOAT, false);
 	btTransform tr;
 	tr.setIdentity();
-	tr.setOrigin(btVector3(scale.X / 2 + Location.X, Location.Z, scale.Y / 2 + Location.Y));
+	tr.setOrigin(btVector3(scale.X / 2 + Location.X, Location.Y, scale.Z / 2 + Location.Z));
 	
 	//heightFieldShape->setLocalScaling(btVector3(scale.X, 1.0, scale.Y));
 	terrain = new btRigidBody(0, 0, heightFieldShape, btVector3(0, 0, 0));

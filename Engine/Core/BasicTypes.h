@@ -1,9 +1,7 @@
 #pragma once
-#include <math.h>
+#include <Basic/Math.h>
 #include <string>
 #include <vector>
-
-constexpr auto PI = 3.14159265359f;
 
 typedef unsigned int uint;
 
@@ -115,14 +113,6 @@ struct RecordInt {
 	}
 };
 
-inline float radians(const float& v) {
-	return v * PI / 180.f;
-}
-
-inline float degrees(const float& v) {
-	return v / PI * 180.f;
-}
-
 float RandomFloat();
 float RandomFloatInRange(float min, float max);
 
@@ -151,39 +141,39 @@ struct Vector
 
 	//float Length() { return; }
 
-	Vector Normalize() const { return *this * Q_rsqrt(X * X + Y * Y + Z * Z); }
+	Vector Normalize() const { return *this * Math::Q_rsqrt(X * X + Y * Y + Z * Z); }
 	Vector SafeNormalize() const { return Normalize(); }
 
-	Vector Rotate(const Vector& In) 
+	/*Vector Rotate(const Vector& In) 
 	{
 		Vector out;
 		out = *this;
-		float angleX = In.X * PI / 180.f;
-		float angleY = -In.Y * PI / 180.f;
-		float angleZ = In.Z * PI / 180.f;
+		double angleX = In.X * PI / 180.0;
+		double angleY = -In.Y * PI / 180.0;
+		double angleZ = In.Z * PI / 180.0;
 
-		float s = (float)sin(angleX);
-		float c = (float)cos(angleX);
+		double s = sin(angleX);
+		double c = cos(angleX);
 		Vector copy = out;
 
 		out.Y = copy.Y * c - copy.Z * s;
 		out.Z = copy.Y * s + copy.Z * c;
 
-		s = (float)sin(angleY);
-		c = (float)cos(angleY);
+		s = sin(angleY);
+		c = cos(angleY);
 		copy = out;
 
 		out.X = copy.X * c + copy.Z * s;
 		out.Z = copy.X * -s + copy.Z * c;
 
-		s = (float)sin(angleZ);
-		c = (float)cos(angleZ);
+		s = sin(angleZ);
+		c = cos(angleZ);
 		copy = out;
 
 		out.X = copy.X * c + copy.Y * -s;
 		out.Y = copy.Y * c + copy.X * s;
 		return out;
-	}
+	}*/
 
 	static Vector RotateByAxis(const Vector& in, const Vector& axis, float angle) {
 		return in * cos(angle) + Cross(axis, in) * sin(angle) + axis * Dot(axis, in) * (1 - cos(angle));
@@ -248,23 +238,6 @@ struct Vector
 		case 2: return Z;
 		default: return X;
 		};
-	}
-
-	static float Q_rsqrt(float number)
-	{
-		long i;
-		float x2, y;
-		const float threehalfs = 1.5F;
-
-		x2 = number * 0.5F;
-		y = number;
-		i = *(long*)&y;                       // evil floating point bit level hacking
-		i = 0x5f3759df - (i >> 1);               // what the fuck? 
-		y = *(float*)&i;
-		y = y * (threehalfs - (x2 * y * y));   // 1st iteration
-	//	y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed
-
-		return y;
 	}
 
 	// Make Euler rotator from vector

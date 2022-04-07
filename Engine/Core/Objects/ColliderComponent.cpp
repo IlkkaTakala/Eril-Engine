@@ -21,8 +21,8 @@ void ErilMotion::getWorldTransform(btTransform& centerOfMassWorldTrans) const
 		Rotator rot = m_userPointer->GetMovementTarget()->DesiredState.rotation;
 		btTransform local;
 		local.setIdentity();
-		local.setOrigin(btVector3(loc.X, loc.Z, -loc.Y));
-		local.setRotation(btQuaternion((rot.X), (rot.Z), (-rot.Y), (rot.W)));
+		local.setOrigin(btVector3(loc.X, loc.Y, loc.Z));
+		local.setRotation(btQuaternion((rot.X), (rot.Y), (rot.Z), (rot.W)));
 		centerOfMassWorldTrans = local * m_centerOfMassOffset.inverse();
 	} break;
 
@@ -31,8 +31,8 @@ void ErilMotion::getWorldTransform(btTransform& centerOfMassWorldTrans) const
 		Transformation temp = m_userPointer->GetWorldTransformation();
 		btTransform local;
 		local.setIdentity();
-		local.setOrigin(btVector3(temp.Location.X, temp.Location.Z, -temp.Location.Y));
-		local.setRotation(btQuaternion((temp.Rotation.X), (temp.Rotation.Z), (-temp.Rotation.Y), (temp.Rotation.W)));
+		local.setOrigin(btVector3(temp.Location.X, temp.Location.Y, temp.Location.Z));
+		local.setRotation(btQuaternion((temp.Rotation.X), (temp.Rotation.Y), (temp.Rotation.Z), (temp.Rotation.W)));
 		centerOfMassWorldTrans = local * m_centerOfMassOffset.inverse();
 	} break;
 	}
@@ -44,10 +44,10 @@ void ErilMotion::setWorldTransform(const btTransform& centerOfMassWorldTrans)
 	btTransform temp = centerOfMassWorldTrans * m_centerOfMassOffset;
 
 	btVector3 loc = temp.getOrigin();
-	Vector wLoc = Vector(loc[0], loc[2], -loc[1]) - m_userPointer->GetLocation();
+	Vector wLoc = Vector(loc[0], loc[1], loc[2]) - m_userPointer->GetLocation();
 
 	btQuaternion rot2 = temp.getRotation();
-	Rotator rot(rot2[3], rot2[0], rot2[2], -rot2[1]);
+	Rotator rot(rot2[3], rot2[0], rot2[1], rot2[2]);
 
 	btVector3 vel = m_userPointer->body->getLinearVelocity();
 	btVector3 gravity = m_userPointer->body->getGravity();
@@ -57,15 +57,15 @@ void ErilMotion::setWorldTransform(const btTransform& centerOfMassWorldTrans)
 	case 2: {
 		if (!m_userPointer->moveObject) return;
 		m_userPointer->GetMovementTarget()->DesiredState.location = wLoc;
-		m_userPointer->GetMovementTarget()->DesiredState.velocity = { vel[0], vel[2], -vel[1] };
-		m_userPointer->GetMovementTarget()->DesiredState.gravity = { gravity[0], gravity[2], -gravity[1] };
+		m_userPointer->GetMovementTarget()->DesiredState.velocity = { vel[0], vel[1], vel[2] };
+		m_userPointer->GetMovementTarget()->DesiredState.gravity = { gravity[0], gravity[1], gravity[2] };
 
 		m_userPointer->GetMovementTarget()->DesiredState.rotation = rot;
 	} break;
 
 	default:
 	{
-		Transformation local({ loc[0], loc[2], -loc[1] }, rot, m_userPointer->GetTarget()->GetScale());
+		Transformation local({ loc[0], loc[1], loc[2] }, rot, m_userPointer->GetTarget()->GetScale());
 		m_userPointer->GetTarget()->SetTransform(local);
 	} break;
 	}
@@ -93,9 +93,9 @@ void ColliderComponent::Tick(float delta)
 {
 	if (type != 2 || !moveObject) return;
 	Vector temp = moveObject->DesiredState.velocity;
-	body->setLinearVelocity({ temp.X, temp.Z, -temp.Y });
+	body->setLinearVelocity({ temp.X, temp.Y, temp.Z });
 	Vector gra = moveObject->DesiredState.gravity;
-	body->setGravity(btVector3(gra.X, gra.Z, -gra.Y));
+	body->setGravity(btVector3(gra.X, gra.Y, gra.Z));
 }
 
 void ColliderComponent::SetType(int t)
@@ -136,8 +136,8 @@ void ColliderComponent::Refresh()
 	Rotator rot = GetWorldRotation();
 	btTransform temp;
 	body->getMotionState()->getWorldTransform(temp);
-	temp.setOrigin(btVector3(loc.X, loc.Z, -loc.Y));
-	temp.setRotation(btQuaternion((rot.X), (rot.Z), (-rot.Y), (rot.W)));
+	temp.setOrigin(btVector3(loc.X, loc.Y, loc.Z));
+	temp.setRotation(btQuaternion((rot.X), (rot.Y), (rot.Z), (rot.W)));
 	body->setWorldTransform(temp);
 	Physics::ForceUpdate(body);
 }

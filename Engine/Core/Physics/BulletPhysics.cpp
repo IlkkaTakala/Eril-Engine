@@ -224,7 +224,7 @@ void Physics::init()
 	broadphase = new btDbvtBroadphase();
 	solver = new btSequentialImpulseConstraintSolver();
 	world = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfig);
-	world->setGravity(btVector3(0, -10, 0));
+	world->setGravity(btVector3(0, 0, -10));
 	gContactAddedCallback = Physics::callbackFunc;
 }
 
@@ -244,8 +244,8 @@ bool Physics::callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* 
 
 bool Physics::LineTraceSingle(const Vector& start, const Vector& end, Vector& hitLocation, Vector& hitNormal)
 {
-	btVector3 rayFrom(start.X, start.Z, start.Y);
-	btVector3 rayTo(end.X, end.Z, end.Y);
+	btVector3 rayFrom(start.X, start.Y, start.Z);
+	btVector3 rayTo(end.X, end.Y, end.Z);
 	struct	AllRayResultCallback : public btCollisionWorld::RayResultCallback
 	{
 		AllRayResultCallback(const btVector3& rayFromWorld, const btVector3& rayToWorld)
@@ -289,8 +289,8 @@ bool Physics::LineTraceSingle(const Vector& start, const Vector& end, Vector& hi
 	world->rayTest(rayFrom, rayTo, resultCallback);
 	if (resultCallback.hasHit())
 	{
-		hitNormal = Vector(resultCallback.m_hitNormalWorld[0], resultCallback.m_hitNormalWorld[2], resultCallback.m_hitNormalWorld[1]);
-		hitLocation = Vector(resultCallback.m_hitPointWorld[0], resultCallback.m_hitPointWorld[2], resultCallback.m_hitPointWorld[1]);
+		hitNormal = Vector(resultCallback.m_hitNormalWorld[0], resultCallback.m_hitNormalWorld[1], resultCallback.m_hitNormalWorld[2]);
+		hitLocation = Vector(resultCallback.m_hitPointWorld[0], resultCallback.m_hitPointWorld[1], resultCallback.m_hitPointWorld[2]);
 		return true;
 	}
 	return false;

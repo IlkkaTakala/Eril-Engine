@@ -12,7 +12,7 @@ GLCamera::GLCamera()
 	Fov = 45.f;
 	Perspective = true;
 	Location = Vector(0.f, 0.f, 0.f);
-	Rotation = Rotator(0.f);
+	Rotation = Rotator(Vector{ 0.f, 0.f, 0.f });
 	Orientation = glm::mat4(1.0f);
 
 	ApplyTransformation();
@@ -75,7 +75,7 @@ const Vector GLCamera::GetUpVector() const
 const Vector GLCamera::GetForwardVector() const
 {
 	const glm::mat4 inverted = /*glm::inverse*/(View);
-	return Vector(inverted[2][0], inverted[2][1], inverted[2][2]);
+	return -Vector(inverted[2][0], inverted[2][1], inverted[2][2]);
 }
 
 const Vector GLCamera::GetRightVector() const

@@ -1093,20 +1093,7 @@ void Renderer::Forward(int width, int height)
 			for (Section* o : m->GetObjects())
 			{
 				glm::mat4 mm = o->Parent->GetModelMatrix();
-				Vector direction = ActiveCamera->GetForwardVector();
-				Vector location = ActiveCamera->GetLocation();
-				glm::vec3 pos = mm[3];
-				glm::vec3 rad = glm::vec3((o->Parent->GetAABB().maxs - o->Parent->GetAABB().mins).Length()) * glm::mat3(mm);
-				float radii = glm::max(rad.x, glm::max(rad.y, rad.z));
-				glm::vec3 loc = glm::vec3(location.X, location.Z, -location.Y);
-				glm::vec3 dir = glm::vec3(direction.X, direction.Z, -direction.Y);
-				if ((loc - pos).length() > 2.f && (loc - pos).length() > radii)
-				{
-					if (glm::dot(dir, glm::normalize(loc - pos)) < 0.5f)
-					{
-						continue;
-					}
-				}
+				if (CullCheck(o)) continue;
 				s->SetUniform("Model", mm);
 				o->Render();
 
@@ -1197,7 +1184,7 @@ inline bool Renderer::CullCheck(Section* s)
 	}
 	else if (glm::length(d) > 2.f && glm::length(d) > radii)
 	{
-		if (glm::dot(dir, glm::normalize(loc - pos)) < 0.55f) // TODO: Calculate from FOV
+		if (glm::dot(dir, glm::normalize(pos - loc)) < 0.55f) // TODO: Calculate from FOV
 		{
 			return true;
 		}
