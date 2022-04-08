@@ -202,6 +202,9 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Core\Basic\Math.cpp" />
+    <ClCompile Include="Engine\Core\Basic\Rotation.cpp" />
+    <ClCompile Include="Engine\Core\Objects\CollisionShape.cpp" />
     <ClCompile Include="Engine\Core\CurveData.cpp" />
     <ClCompile Include="Engine\Core\Objects\InputComponent.cpp" />
     <ClCompile Include="Engine\Core\Objects\ParticleComponent.cpp" />
@@ -275,6 +278,10 @@
     <ClCompile Include="Game\UITest\TestPlayerLoad.cpp" />
     <ClCompile Include="Game\UITest\TestUILoad.cpp" />
     <ClInclude Include="Engine\Assets\Resources\resource.h" />
+    <ClInclude Include="Engine\Core\Basic\Math.h" />
+    <ClInclude Include="Engine\Core\Basic\Rotation.h" />
+    <ClInclude Include="Engine\Core\Basic\Transformation.h" />
+    <ClInclude Include="Engine\Core\Objects\CollisionShape.h" />
     <ClInclude Include="Engine\Core\CurveData.h" />
     <ClInclude Include="Engine\Core\Objects\InputComponent.h" />
     <ClInclude Include="Engine\Core\Objects\ParticleComponent.h" />

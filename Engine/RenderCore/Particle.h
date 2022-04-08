@@ -7,7 +7,7 @@ struct Particle
 
 	Vector location;
 	Vector scale;
-	Vector rotation;
+	Rotator rotation;
 	Vector rotationRate;
 	Vector velocity;
 	Vector colour;

@@ -11,65 +11,110 @@ btBroadphaseInterface* broadphase;
 btConstraintSolver* solver;
 std::vector<bulletObject*> bodies;
 
-btRigidBody* Physics::addSphere(float rad, float x, float y, float z, float mass)
+btRigidBody* Physics::addSphere(float radius, float x, float y, float z, float mass, btMotionState* state)
 {
 	btTransform t;
 	t.setIdentity();
 	t.setOrigin(btVector3(x, y, z));
-	btSphereShape* sphere = new btSphereShape(rad);
+	t.setRotation(btQuaternion(0, 0, 0, 1));
+	btSphereShape* sphere = new btSphereShape(radius);
 	btVector3 inertia(0, 0, 0);
 	if (mass != 0.0)
 		sphere->calculateLocalInertia(mass, inertia);
 
-	btMotionState* motion = new btDefaultMotionState(t);
-	btRigidBody::btRigidBodyConstructionInfo info(mass, motion, sphere, inertia);
+	btRigidBody::btRigidBodyConstructionInfo info(mass, state, sphere, inertia);
 	btRigidBody* body = new btRigidBody(info);
+	body->setCollisionFlags(btCollisionObject::CF_DYNAMIC_OBJECT);
 	world->addRigidBody(body);
-	//bodies.push_back(new bulletObject(body, 0, 1.0, 0.0, 0.0));
-	//body->setUserPointer(bodies[bodies.size() - 1]);
 	return body;
 }
 
-
-btRigidBody* Physics::addCylinder(float d, float h, float x, float y, float z, float mass)
+btRigidBody* Physics::addSphereStatic(float radius, float x, float y, float z, btMotionState* state)
 {
 	btTransform t;
 	t.setIdentity();
 	t.setOrigin(btVector3(x, y, z));
-	btCylinderShape* sphere = new btCylinderShape(btVector3(d / 2.0, h / 2.0, d / 2.0));
+	t.setRotation(btQuaternion(0, 0, 0, 1));
+	btSphereShape* sphere = new btSphereShape(radius);
 	btVector3 inertia(0, 0, 0);
-	if (mass != 0.0)
-		sphere->calculateLocalInertia(mass, inertia);
 
-	btMotionState* motion = new btDefaultMotionState(t);
-	btRigidBody::btRigidBodyConstructionInfo info(mass, motion, sphere, inertia);
+	btRigidBody::btRigidBodyConstructionInfo info(0, state, sphere, inertia);
 	btRigidBody* body = new btRigidBody(info);
+	body->setCollisionFlags(btCollisionObject::CF_STATIC_OBJECT);
+	body->setAngularFactor(0.f);
 	world->addRigidBody(body);
-	/*bodies.push_back(new bulletObject(body, 1, 0.0, 1.0, 0.0));
-	body->setUserPointer(bodies[bodies.size() - 1]);*/
 	return body;
 }
 
-
-btRigidBody* Physics::addCone(float d, float h, float x, float y, float z, float mass)
+btRigidBody* Physics::addCylinder(float width, float height, float depth, float x, float y, float z, float mass, btMotionState* state)
 {
 	btTransform t;
 	t.setIdentity();
 	t.setOrigin(btVector3(x, y, z));
-	btConeShape* sphere = new btConeShape(d, h);
+	t.setRotation(btQuaternion(0, 0, 0, 1));
+	btCylinderShape* cylinder = new btCylinderShape(btVector3(width / 2.f, height / 2.f, depth / 2.f));
 	btVector3 inertia(0, 0, 0);
 	if (mass != 0.0)
-		sphere->calculateLocalInertia(mass, inertia);
+		cylinder->calculateLocalInertia(mass, inertia);
 
-	btMotionState* motion = new btDefaultMotionState(t);
-	btRigidBody::btRigidBodyConstructionInfo info(mass, motion, sphere, inertia);
+	btRigidBody::btRigidBodyConstructionInfo info(mass, state, cylinder, inertia);
 	btRigidBody* body = new btRigidBody(info);
+	body->setCollisionFlags(btCollisionObject::CF_DYNAMIC_OBJECT);
 	world->addRigidBody(body);
-	/*bodies.push_back(new bulletObject(body));
-	body->setUserPointer(bodies[bodies.size() - 1]);*/
 	return body;
 }
 
+btRigidBody* Physics::addCylinderStatic(float width, float height, float depth, float x, float y, float z, btMotionState* state)
+{
+	btTransform t;
+	t.setIdentity();
+	t.setOrigin(btVector3(x, y, z));
+	t.setRotation(btQuaternion(0, 0, 0, 1));
+	btCylinderShape* cylinder = new btCylinderShape(btVector3(width / 2.f, height / 2.f, depth / 2.f));
+	btVector3 inertia(0, 0, 0);
+	
+	btRigidBody::btRigidBodyConstructionInfo info(0, state, cylinder, inertia);
+	btRigidBody* body = new btRigidBody(info);
+	body->setCollisionFlags(btCollisionObject::CF_STATIC_OBJECT);
+	body->setAngularFactor(0.f);
+	world->addRigidBody(body);
+	return body;
+}
+
+btRigidBody* Physics::addCone(float radius, float height, float x, float y, float z, float mass, btMotionState* state)
+{
+	btTransform t;
+	t.setIdentity();
+	t.setOrigin(btVector3(x, y, z));
+	t.setRotation(btQuaternion(0, 0, 0, 1));
+	btConeShape* cone = new btConeShape(radius, height);
+	btVector3 inertia(0, 0, 0);
+	if (mass != 0.0)
+		cone->calculateLocalInertia(mass, inertia);
+
+	btRigidBody::btRigidBodyConstructionInfo info(mass, state, cone, inertia);
+	btRigidBody* body = new btRigidBody(info);
+	body->setCollisionFlags(btCollisionObject::CF_DYNAMIC_OBJECT);
+	world->addRigidBody(body);
+	return body;
+}
+
+btRigidBody* Physics::addConeStatic(float radius, float height, float x, float y, float z, btMotionState* state)
+{
+	btTransform t;
+	t.setIdentity();
+	t.setOrigin(btVector3(x, y, z));
+	t.setRotation(btQuaternion(0, 0, 0, 1));
+	btConeShape* cone = new btConeShape(radius, height);
+	btVector3 inertia(0, 0, 0);
+	
+	btRigidBody::btRigidBodyConstructionInfo info(0, state, cone, inertia);
+	btRigidBody* body = new btRigidBody(info);
+	body->setCollisionFlags(btCollisionObject::CF_STATIC_OBJECT);
+	body->setAngularFactor(0.f);
+	world->addRigidBody(body);
+	return body;
+}
 
 btRigidBody* Physics::addBox(float width, float height, float depth, float x, float y, float z, float mass, btMotionState* state)
 {
@@ -77,7 +122,7 @@ btRigidBody* Physics::addBox(float width, float height, float depth, float x, fl
 	t.setIdentity();
 	t.setOrigin(btVector3(x, y, z));
 	t.setRotation(btQuaternion(0, 0, 0, 1));
-	btBoxShape* box = new btBoxShape(btVector3(width / 2.0, height / 2.0, depth / 2.0));
+	btBoxShape* box = new btBoxShape(btVector3(width / 2.f, height / 2.f, depth / 2.f));
 	btVector3 inertia(0, 0, 0);
 	if (mass != 0.0)
 		box->calculateLocalInertia(mass, inertia);
@@ -95,7 +140,7 @@ btRigidBody* Physics::addBoxStatic(float width, float height, float depth, float
 	t.setIdentity();
 	t.setOrigin(btVector3(x, y, z));
 	t.setRotation(btQuaternion(0, 0, 0, 1));
-	btBoxShape* box = new btBoxShape(btVector3(width / 2.0, height / 2.0, depth / 2.0));
+	btBoxShape* box = new btBoxShape(btVector3(width / 2.f, height / 2.f, depth / 2.f));
 	btVector3 inertia(0, 0, 0);
 
 	btRigidBody::btRigidBodyConstructionInfo info(0, state, box, inertia);
@@ -106,6 +151,40 @@ btRigidBody* Physics::addBoxStatic(float width, float height, float depth, float
 	return body;
 }
 
+btRigidBody* Physics::addCapsule(float radius, float height, float x, float y, float z, float mass, btMotionState* state)
+{
+	btTransform t;
+	t.setIdentity();
+	t.setOrigin(btVector3(x, y, z));
+	t.setRotation(btQuaternion(0, 0, 0, 1));
+	btCapsuleShape* capsule = new btCapsuleShape(radius, height);
+	btVector3 inertia(0, 0, 0);
+	if (mass != 0.0)
+		capsule->calculateLocalInertia(mass, inertia);
+
+	btRigidBody::btRigidBodyConstructionInfo info(mass, state, capsule, inertia);
+	btRigidBody* body = new btRigidBody(info);
+	body->setCollisionFlags(btCollisionObject::CF_DYNAMIC_OBJECT);
+	world->addRigidBody(body);
+	return body;
+}
+
+btRigidBody* Physics::addCapsuleStatic(float radius, float height, float x, float y, float z, btMotionState* state)
+{
+	btTransform t;
+	t.setIdentity();
+	t.setOrigin(btVector3(x, y, z));
+	t.setRotation(btQuaternion(0, 0, 0, 1));
+	btCapsuleShape* capsule = new btCapsuleShape(radius, height);
+	btVector3 inertia(0, 0, 0);
+
+	btRigidBody::btRigidBodyConstructionInfo info(0, state, capsule, inertia);
+	btRigidBody* body = new btRigidBody(info);
+	body->setCollisionFlags(btCollisionObject::CF_STATIC_OBJECT);
+	body->setAngularFactor(0.f);
+	world->addRigidBody(body);
+	return body;
+}
 
 void Physics::ForceUpdate(btRigidBody* body)
 {
@@ -165,8 +244,8 @@ bool Physics::callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* 
 
 bool Physics::LineTraceSingle(const Vector& start, const Vector& end, Vector& hitLocation, Vector& hitNormal)
 {
-	btVector3 rayFrom(start.X, start.Z, start.Y);
-	btVector3 rayTo(end.X, end.Z, end.Y);
+	btVector3 rayFrom(start.X, start.Y, start.Z);
+	btVector3 rayTo(end.X, end.Y, end.Z);
 	struct	AllRayResultCallback : public btCollisionWorld::RayResultCallback
 	{
 		AllRayResultCallback(const btVector3& rayFromWorld, const btVector3& rayToWorld)
@@ -210,8 +289,8 @@ bool Physics::LineTraceSingle(const Vector& start, const Vector& end, Vector& hi
 	world->rayTest(rayFrom, rayTo, resultCallback);
 	if (resultCallback.hasHit())
 	{
-		hitNormal = Vector(resultCallback.m_hitNormalWorld[0], resultCallback.m_hitNormalWorld[2], resultCallback.m_hitNormalWorld[1]);
-		hitLocation = Vector(resultCallback.m_hitPointWorld[0], resultCallback.m_hitPointWorld[2], resultCallback.m_hitPointWorld[1]);
+		hitNormal = Vector(resultCallback.m_hitNormalWorld[0], resultCallback.m_hitNormalWorld[1], resultCallback.m_hitNormalWorld[2]);
+		hitLocation = Vector(resultCallback.m_hitPointWorld[0], resultCallback.m_hitPointWorld[1], resultCallback.m_hitPointWorld[2]);
 		return true;
 	}
 	return false;

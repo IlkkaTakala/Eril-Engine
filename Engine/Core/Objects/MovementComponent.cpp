@@ -79,7 +79,7 @@ void MovementComponent::Tick(float time)
 		Vector brake_a = 0.f;
 		Vector ground;
 		Vector groundNormal;
-		inAir = !Physics::LineTraceSingle(DesiredState.location + Vector(0.f,0.f,0.0f), DesiredState.location + Vector(0.f, 0.f, -0.5f), ground, groundNormal);
+		inAir = !Physics::LineTraceSingle(DesiredState.location + Vector(0.f,0.f,0.0f), DesiredState.location + Vector(0.f, 0.f, -1.5f), ground, groundNormal);
 		if (inAir) air_time += time;
 		else air_time = 0.f;
 		if (direction_count > 0) {

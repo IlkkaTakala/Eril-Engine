@@ -205,11 +205,12 @@ void RenderObject::ApplyTransform()
 	}
 
 	Vector loc = finalT.Location;
-	Vector rot = finalT.Rotation;
+	Rotator rot = finalT.Rotation;
 	Vector sca = finalT.Scale;
-	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Z, loc.Y))
-		* glm::eulerAngleYXZ(glm::radians(rot.Z), glm::radians(rot.Y), glm::radians(rot.X))
-		* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Z, sca.Y));
+	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Y, loc.Z))
+		* glm::toMat4(glm::quat(rot.W, rot.X, rot.Y, rot.Z))
+		* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Y, sca.Z));
+
 
 	requireUpdate = false;
 }
@@ -219,11 +220,11 @@ void RenderObject::SetInstances(int count, Transformation* dispArray)
 	glm::mat4* arr = new glm::mat4[count]();
 	for (int i = 0; i < count; i++) {
 		Vector loc = dispArray[i].Location;
-		Vector rot = dispArray[i].Rotation;
+		Rotator rot = dispArray[i].Rotation;
 		Vector sca = dispArray[i].Scale;
-		arr[i] = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Z, loc.Y))
-			* glm::eulerAngleYXZ(glm::radians(rot.Z), glm::radians(rot.Y), glm::radians(rot.X))
-			* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Z, sca.Y));
+		arr[i] = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Y, loc.Z))
+			* glm::toMat4(glm::quat(-rot.W, rot.X, rot.Y, rot.Z))
+			* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Y, sca.Z));
 	}
 	for (uint i = 0; i < SectionCount; i++) {
 		Sections[i].MakeInstanced(count, arr);

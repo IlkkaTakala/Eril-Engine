@@ -1,5 +1,6 @@
 #pragma once
 #include "BasicTypes.h"
+#include <Basic/Rotation.h>
 #include "Objects/BaseObject.h"
 #include "ObjectManager.h"
 #include "Interface/IRender.h"

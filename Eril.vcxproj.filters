@@ -220,6 +220,15 @@
     <ClCompile Include="Game\ForestGame\StartScreen.cpp">
       <Filter>Game\ForestGame</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Core\Objects\CollisionShape.cpp">
+      <Filter>Engine\Objects\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Basic\Math.cpp">
+      <Filter>Engine\Public\Basic</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Basic\Rotation.cpp">
+      <Filter>Engine\Public\Basic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -293,6 +302,9 @@
     </Filter>
     <Filter Include="Game\ForestGame">
       <UniqueIdentifier>{734f2662-5704-48ce-8f67-7c7c45fe62c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Public\Basic">
+      <UniqueIdentifier>{d569de2a-930e-4331-ac70-fe7d1f065f86}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -524,6 +536,20 @@
     <ClInclude Include="Engine\Core\Objects\InputComponent.h">
       <Filter>Engine\Objects</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Core\Objects\CollisionShape.h">
+      <Filter>Engine\Objects\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Basic\Rotation.h">
+      <Filter>Engine\Public\Basic</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Basic\Transformation.h">
+      <Filter>Engine\Public\Basic</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Basic\Math.h">
+      <Filter>Engine\Public\Basic</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="Engine\Core\Objects\ParticleComponent.h">
       <Filter>Engine\Objects</Filter>
     </ClInclude>
