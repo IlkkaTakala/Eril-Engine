@@ -148,7 +148,7 @@ void AudioManager::StopAudio(uint id)
 
 void AudioManager::SetListener(const Vector& position, const Vector& orientation, const Vector& up)
 {
-	//alListener3f(AL_POSITION, position.X, position.Y, position.Z);
+	alListener3f(AL_POSITION, position.X, position.Y, position.Z);
 	float f[] = {orientation.X, orientation.Y, orientation.Z, up.X, up.Y, up.Z };
 	alListenerfv(AL_ORIENTATION, f);
 }

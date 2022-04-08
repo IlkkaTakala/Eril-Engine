@@ -23,7 +23,7 @@ public:
 	const Vector GetLocation() const { return Location; }
 	const Rotator GetRotation() const { return Rotation; }
 	const Vector GetWorldLocation() const { return (Parent ? Parent->GetWorldLocation() : Vector(0.f)) + Location; }
-	const Rotator GetWorldRotation() const { return (Parent ? Parent->GetWorldRotation() : Rotator(0.f)) + Rotation; }
+	const Rotator GetWorldRotation() const { return (Parent ? Parent->GetWorldRotation() : Rotator(0.f)) * Rotation; }
 	const Vector GetScale() const { return Scale; }
 	const Vector GetWorldScale() const { return Parent ? Parent->GetWorldScale() : Vector(0.f) * Scale; }
 	Transformation GetTransformation() const { return Transformation(Location, Rotation, Scale); }

@@ -87,7 +87,7 @@ TestPlayer::TestPlayer() : Player()
 	AddComponent(PlayerCol);
 	PlayerCol->SetLocation(Vector(0.f, 0.f, 1.f), true);
 	PlayerCol->SetType(2);
-	PlayerCol->SetSize(Mesh->GetModel()->GetAABB().maxs.X, Mesh->GetModel()->GetAABB().maxs.Z);
+	PlayerCol->SetSize(0.5, 1.f);
 	PlayerCol->SetMovementTarget(Movement);
 
 	//Skybox
@@ -144,6 +144,7 @@ TestPlayer::TestPlayer() : Player()
 
 	Box2->AddComponent(BoxModel2);
 	Box2->SetLocation(Vector(10.f, 10.f, 6.f));
+	Box2->SetRotation(Vector(90.f, 0.f, 0.f));
 
 	BoxCol2 = SpawnObject<CylinderCollisionShape>();
 	BoxCol2->SetType(1);
@@ -250,13 +251,12 @@ void TestPlayer::MouseMoved(float X, float Y)
 	if (cursorState) {
 		Camera* cam = GetCamera();
 		Rotator rot = cam->GetRotation();
-		Rotator temp = rot.RotateAroundAxis(radians(X * mouseSens), {0, 0, 1});
-		Vector right = temp.GetRightVector();
-		right.Z = 0.f;	
-		temp = temp.RotateAroundAxis(radians(Y * mouseSens), right.Normalize());
-		//temp.Normalize();
-		cam->SetRotation(temp);
-		Console::Log(std::to_string(temp.Roll()));
+		float y = rot.PitchDegrees();
+		cam->SetRotation(Vector(
+			rot.RollDegrees(),
+			y + Y * mouseSens < 89.f && y + Y * mouseSens > -89.f ? y + Y * mouseSens : y,
+			rot.YawDegrees() + X * mouseSens
+		));
 	}
 }
 

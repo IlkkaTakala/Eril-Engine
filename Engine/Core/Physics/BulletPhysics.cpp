@@ -224,7 +224,7 @@ void Physics::init()
 	broadphase = new btDbvtBroadphase();
 	solver = new btSequentialImpulseConstraintSolver();
 	world = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfig);
-	world->setGravity(btVector3(0, 0, -10));
+	world->setGravity(btVector3(0, -10, 0));
 	gContactAddedCallback = Physics::callbackFunc;
 }
 

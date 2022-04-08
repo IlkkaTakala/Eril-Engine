@@ -28,7 +28,8 @@ typedef struct Transformation
 
 	friend void operator+=(Transformation& lhs, const Transformation& rhs) {
 		lhs.Location += rhs.Location;
-		lhs.Rotation += rhs.Rotation;
+		lhs.Rotation *= rhs.Rotation;
+		lhs.Rotation.FastNormalize();
 		lhs.Scale *= rhs.Scale;
 	}
 } Transform;

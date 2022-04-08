@@ -294,20 +294,20 @@ void Terrain::InitTerrain(int r, Vector scale, String material)
 
 	delete[] m_rawHeightfieldData;
 	m_rawHeightfieldData = new float[pos.size()]();
-	for (size_t i = 0; i < pos.size(); i++)
-	{
-		m_rawHeightfieldData[i] = pos[i].Z;
+	for (int32 y = 0; y < r + 1; y++) {
+		for (int32 x = 0; x < r + 1; x++) {
+			m_rawHeightfieldData[y * (r + 1) + x] = pos[(r - y) * (r + 1) + x].Z;
+		}
 	}
-
 	Mesh->SetModel(MI->CreateProcedural(Mesh, "Terrain_" + std::to_string(GetRecord()), pos, uvs, normals, tangents, inds));
 	Mesh->GetModel()->SetMaterial(0, RI->LoadMaterialByName(material == "" ? "Assets/Materials/ground" : material));
 
 	btHeightfieldTerrainShape* heightFieldShape = new btHeightfieldTerrainShape(r + 1, r + 1, m_rawHeightfieldData, 1, -128, 128, 1, PHY_FLOAT, false);
 	btTransform tr;
 	tr.setIdentity();
-	tr.setOrigin(btVector3(scale.X / 2 + Location.X, Location.Y, scale.Z / 2 + Location.Z));
+	tr.setOrigin(btVector3(scale.X / 2 + Location.X, Location.Z, -(scale.Y / 2 + Location.Y)));
 	
-	//heightFieldShape->setLocalScaling(btVector3(scale.X, 1.0, scale.Y));
+	//heightFieldShape->setLocalScaling(btVector3(1.0, 1.0, -1.0));
 	terrain = new btRigidBody(0, 0, heightFieldShape, btVector3(0, 0, 0));
 
 	terrain->setWorldTransform(tr);

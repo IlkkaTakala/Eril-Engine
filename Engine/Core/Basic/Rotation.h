@@ -5,24 +5,23 @@
 struct Rotator
 {
 public:
-	Rotator() : W(0.f), X(0.f), Y(0.f), Z(1.f) { }
-	Rotator(float a) : W((float)cos(radians(a) * 0.5)), X(0.f), Y(0.f), Z(1.f) { float d = (float)sin(radians(a) * 0.5); X *= d; Y *= d; Z *= d; Normalize(); }
-	Rotator(float W, float X, float Y, float Z) : W(W), X(X), Y(Y), Z(Z) { Normalize(); }
+	Rotator() : W(1.f), X(0.f), Y(0.f), Z(0.f) { }
+	Rotator(float a) : W((float)cos(radians(a) * 0.5)), X(0.f), Y(0.f), Z(1.f) { float d = (float)sin(radians(a) * 0.5); X *= d; Y *= d; Z *= d; FastNormalize(); }
+	Rotator(float W, float X, float Y, float Z) : W(W), X(X), Y(Y), Z(Z) { FastNormalize(); }
 	Rotator(float real, Vector imaginary) : W(real), X(imaginary.X), Y(imaginary.Y), Z(imaginary.Z) { }
 	Rotator(const Vector& euler) {
-		double c1 = cos(radians((double)euler.Z) * 0.5);
-		double s1 = sin(radians((double)euler.Z) * 0.5);
-		double c2 = cos(radians((double)euler.Y) * 0.5);
-		double s2 = sin(radians((double)euler.Y) * 0.5);
-		double c3 = cos(radians((double)euler.X) * 0.5);
-		double s3 = sin(radians((double)euler.X) * 0.5);
-		double c1c2 = c1 * c2;
-		double s1s2 = s1 * s2;
-		W = float(c1c2 * c3 - s1s2 * s3);
-		X = float(c1c2 * s3 + s1s2 * c3);
-		Y = float(s1 * c2 * c3 + c1 * s2 * s3);
-		Z = float(c1 * s2 * c3 - s1 * c2 * s3);
-		Normalize();
+		double cy = cos(radians((double)euler.Z) * 0.5);
+		double sy = sin(radians((double)euler.Z) * 0.5);
+		double cp = cos(radians((double)euler.X) * 0.5);
+		double sp = sin(radians((double)euler.X) * 0.5);
+		double cr = cos(radians((double)euler.Y) * 0.5);
+		double sr = sin(radians((double)euler.Y) * 0.5);
+
+		W = float(cr * cp * cy + sr * sp * sy);
+		X = float(sr * cp * cy - cr * sp * sy);
+		Y = float(cr * sp * cy + sr * cp * sy);
+		Z = float(cr * cp * sy - sr * sp * cy);
+		FastNormalize();
 	};
 
 	Rotator(const String& in) {
@@ -35,7 +34,7 @@ public:
 		Y = std::stof(in.substr(o_off + 1, off = in.find(',', off + 1)));
 		o_off = off;
 		Z = std::stof(in.substr(o_off + 1, off = in.find(',', off + 1)));
-		Normalize();
+		FastNormalize();
 	}
 
 	// Roll, Pitch, Yaw
@@ -83,6 +82,23 @@ public:
 		return *this;
 	}
 
+	Rotator Conjugate() const
+	{
+		return -*this;
+	}
+
+	Rotator& FastNormalize()
+	{
+		double qmagsq = W * W + X * X + Y * Y + Z * Z;
+		if (std::abs(1.0 - qmagsq) < 2.107342e-08) {
+			*this *= float(2.0 / (1.0 + qmagsq));
+		}
+		else {
+			*this *= float(1.0 / sqrt(qmagsq));
+		}
+		return *this;
+	}
+
 	static float Dot(const Rotator& lhs, const Rotator& rhs)
 	{
 		return (lhs.X * rhs.X) + (lhs.Y * rhs.Y) + (lhs.Z * rhs.Z) + (lhs.W * rhs.W);
@@ -111,7 +127,7 @@ public:
 			return (lhs * scale) + (rhs * invscale);
 		}
 		else // linear interploation
-		return Lerp(lhs, rhs, time);
+		return Lerp(lhs, rhs, time).FastNormalize();
 	}
 
 	static Vector RotatorToEuler(const Rotator& vec) {
@@ -125,17 +141,17 @@ public:
 	}
 
 	inline double Pitch() const {
+		double sinr_cosp = 2 * (W * X + Y * Z);
+		double cosr_cosp = 1 - 2 * (X * X + Y * Y);
+		return atan2(sinr_cosp, cosr_cosp);
+	}
+
+	inline double Roll() const {
 		double sinp = 2 * (W * Y - Z * X);
 		if (std::abs(sinp) >= 1)
 			return copysign(PI / 2, sinp);
 		else
 			return asin(sinp);
-	}
-
-	inline double Roll() const {
-		double sinr_cosp = 2 * (W * X + Y * Z);
-		double cosr_cosp = 1 - 2 * (X * X + Y * Y);
-		return atan2(sinr_cosp, cosr_cosp);
 	}
 
 	inline float YawDegrees() const {
@@ -161,7 +177,7 @@ public:
 	}
 
 	inline Vector RotateVector(const Vector& vector) {
-		return *this * vector;
+		return (*this).FastNormalize() * vector;
 	}
 
 	static Rotator FromAxisAngle(float angle, const Vector& axis) {
@@ -171,11 +187,11 @@ public:
 		r.Y = axis.Y * theta;
 		r.Z = axis.Z * theta;
 		r.W = cosf(angle * 0.5f);
-		return r.Normalize();
+		return r.FastNormalize();
 	}
 
 	inline Rotator RotateAroundAxis(float angle, const Vector& axis) const {
-		return (*this * FromAxisAngle(angle, axis)).Normalize();
+		return (*this * FromAxisAngle(angle, axis)).FastNormalize();
 	}
 
 	friend Rotator operator*(Rotator lhs, const Rotator& rhs) {
@@ -195,10 +211,11 @@ public:
 	}
 	
 	Rotator& operator*=(const Rotator& rhs) {
-		W = (rhs.W * W) - (rhs.X * X) - (rhs.Y * Y) - (rhs.Z * Z);
-		X = (rhs.W * X) + (rhs.X * W) + (rhs.Y * Z) - (rhs.Z * Y);
-		Y = (rhs.W * Y) + (rhs.Y * W) + (rhs.Z * X) - (rhs.X * Z);
-		Z = (rhs.W * Z) + (rhs.Z * W) + (rhs.X * Y) - (rhs.Y * X);
+		Rotator lhs(*this);
+		W = (lhs.W * rhs.W) - (lhs.X * rhs.X) - (lhs.Y * rhs.Y) - (lhs.Z * rhs.Z);
+		X = (lhs.W * rhs.X) + (lhs.X * rhs.W) + (lhs.Y * rhs.Z) - (lhs.Z * rhs.Y);
+		Y = (lhs.W * rhs.Y) - (lhs.X * rhs.Z) + (lhs.Y * rhs.W) + (lhs.Z * rhs.X);
+		Z = (lhs.W * rhs.Z) + (lhs.X * rhs.Y) - (lhs.Y * rhs.X) + (lhs.Z * rhs.W);
 		return *this;
 	}
 
@@ -271,6 +288,12 @@ public:
 		default: return W;
 		};
 	}
+
+	friend Rotator operator-(const Rotator& lhs)
+	{
+		return { lhs.W, -lhs.X, -lhs.Y, -lhs.Z };
+	}
+
 private:
 
 public:
