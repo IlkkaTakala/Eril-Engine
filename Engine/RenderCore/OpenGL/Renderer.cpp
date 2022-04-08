@@ -904,7 +904,7 @@ void Renderer::SSAO(int width, int height)
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
 
-	SSAORender->BindBlur();
+	/*SSAORender->BindBlur();
 	glActiveTexture(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, SSAORender->GetSSAO());
 	SSAOBlurShader->Bind();
@@ -913,7 +913,7 @@ void Renderer::SSAO(int width, int height)
 	glDepthFunc(GL_ALWAYS);
 	glBindVertexArray(ScreenVao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glBindVertexArray(0);
+	glBindVertexArray(0);*/
 
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
 }

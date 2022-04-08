@@ -335,7 +335,7 @@ void main()
 	vec3 albedo = pow(texture(Albedo, fs_in.TexCoords).rgb, vec3(gamma));
 	float metallic = 0.0;//texture(Metallic, fs_in.TexCoords).r;
 	float AOt = texture(AO, fs_in.TexCoords).r;
-	float roughness = 1.0 - texture(Roughness, fs_in.TexCoords).r;
+	float roughness = 1.0;//1.0 - texture(Roughness, fs_in.TexCoords).r;
 	vec3 normal = texture(Normal, fs_in.TexCoords).rgb;
 	//normal.r = 1.0 - normal.r;
 	//normal.g = 1.0 - normal.g;

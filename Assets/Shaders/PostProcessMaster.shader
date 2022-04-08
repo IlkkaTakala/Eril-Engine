@@ -29,7 +29,7 @@ layout (binding = 1) uniform sampler2D Bloom;
 layout (binding = 4) uniform sampler2D Depth;
 layout (binding = 5) uniform sampler2D Normal;
 layout (binding = 6) uniform sampler2D Position;
-layout (binding = 8) uniform sampler2D SSAO;
+layout (binding = 7) uniform sampler2D SSAO;
 
 in vec2 TexCoords;
 out vec4 FragColor;
@@ -96,7 +96,7 @@ void main()
     vec3 hdrColor = texture(Color, TexCoords).rgb;  
 	hdrColor = hdrColor * texture(SSAO, TexCoords).r;  
     vec3 bloomColor = texture(Bloom, TexCoords).rgb;
-    hdrColor += bloomColor;
+    hdrColor += 0.3 * bloomColor;
     vec3 result = vec3(1.0) - exp(-hdrColor * exposure);  
     result = pow(result, vec3(1.0 / gamma));
 	
@@ -104,7 +104,7 @@ void main()
 	
 	//result = applyFog(result, length(pixelPos - viewPos.xyz), normalize(pixelPos - viewPos.xyz), normalize(vec3(-1.0, 1.0, -1.0)));
 	
-    FragColor = vec4(result, 1.0);
-	//FragColor = vec4(vec3(texture(SSAO, TexCoords).r), 1.0);
+    //FragColor = vec4(result, 1.0);
+	FragColor = vec4(vec3(texture(SSAO, TexCoords).r), 1.0);
 }
 ###END_FRAGMENT###

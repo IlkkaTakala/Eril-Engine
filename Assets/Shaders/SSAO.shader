@@ -57,7 +57,7 @@ void main()
 	
 	vec2 noiseScale = vec2(screenSize.x/4.0, screenSize.y/4.0);
 	vec3 fragPos   = (view * texture(gPosition, TexCoords)).xyz;
-	vec3 normal    = mat3(view) * normalize(texture(gNormal, TexCoords)).rgb;
+	vec3 normal    = mat3(view) * normalize(texture(gNormal, TexCoords)).rbg;
 	vec3 randomVec = texture(texNoise, TexCoords * noiseScale).xyz;
 	
 	vec3 tangent   = normalize(randomVec - normal * dot(randomVec, normal));
@@ -66,13 +66,13 @@ void main()
 	
 	int kernelSize = 64;
 	float radius = 0.6;
-	float bias = 0.025;
+	float bias = 1.0;
 	
 	float occlusion = 0.0;
 	for(int i = 0; i < kernelSize; ++i)
 	{
 		// get sample position
-		vec3 samplePos = TBN * samples.data[i]; // from tangent to view-space
+		vec3 samplePos = TBN * samples.data[i].xyz; // from tangent to view-space
 		samplePos = fragPos + samplePos * radius; 
 		
 		vec4 offset = vec4(samplePos, 1.0);
