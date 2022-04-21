@@ -1,11 +1,5 @@
 <header version='1.0' />
 <TestPlayer id="4" />
-<Terrain id="A0005554" args="Scale:0,0,0;Resolution:100" />
-<VisibleObject id="C01" args="Location:2,2,2; Mesh:Cube;" />
-<VisibleObject id="C02" args="Location:5,14,2; Mesh:Cube;" />
-<VisibleObject id="C03" args="Location:7,10,2; Mesh:Cube;" />
-<VisibleObject id="C04" args="Location:9,5,2; Mesh:Cube;" />
-<VisibleObject id="C05" args="Location:13,6,2; Mesh:Cube;" />
-
+<Terrain id="A0005554" args="Scale:100,100,1;Resolution:100" />
 
 

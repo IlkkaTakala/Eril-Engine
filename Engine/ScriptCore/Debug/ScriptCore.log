@@ -1,0 +1,11 @@
+﻿  dllmain.cpp
+C:\Users\mattisei\Desktop\Eril\Engine\ScriptCore\private\dllmain.cpp(20,1): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "pch.h"' to your source?
+  Error.cpp
+C:\Users\mattisei\Desktop\Eril\Engine\ScriptCore\private\Error.cpp(35,1): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "pch.h"' to your source?
+  Export.cpp
+C:\Users\mattisei\Desktop\Eril\Engine\ScriptCore\private\Export.cpp(98,1): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "pch.h"' to your source?
+  Function.cpp
+C:\Users\mattisei\Desktop\Eril\Engine\ScriptCore\private\Function.cpp(154,1): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "pch.h"' to your source?
+  Parser.cpp
+C:\Users\mattisei\Desktop\Eril\Engine\ScriptCore\private\Parser.cpp(919,1): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "pch.h"' to your source?
+  Generating Code...

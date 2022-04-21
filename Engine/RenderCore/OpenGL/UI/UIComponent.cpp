@@ -65,7 +65,7 @@ void UIComponent::UpdateMatrices(const Vector2D& size)
 	const Vector2D ScreenSize = RI->GetUIManager()->GetSize();
 	const glm::mat4 view = glm::ortho(0.f, (float)ScreenSize.X, (float)ScreenSize.Y, 0.f, 10.f, 0.1f);;
 	const Vector loc = transform.Location;
-	const Vector rot = transform.Rotation;
+	const Rotator rot = transform.Rotation;
 	const Vector sca = transform.Scale;
 
 	glm::vec3 gloc = parent == nullptr ? glm::vec3(0.f) : glm::vec3(parent->topLeft.X, parent->topLeft.Y, 0.f);

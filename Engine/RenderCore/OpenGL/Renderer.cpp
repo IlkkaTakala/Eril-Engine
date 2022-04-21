@@ -437,9 +437,9 @@ void Renderer::UpdateLights()
 		if (!Lights->at(i).GetDisabled()) //DONT USE THE LIGHT IF IT'S DISABLED!
 		{
 			GLM_Light light;
-			light.locationAndSize = glm::vec4(Lights->at(i).Location.X, Lights->at(i).Location.Z, Lights->at(i).Location.Y, Lights->at(i).Size);
+			light.locationAndSize = glm::vec4(Lights->at(i).Location.X, Lights->at(i).Location.Y, Lights->at(i).Location.Z, Lights->at(i).Size);
 			Vector& rot = Lights->at(i).Rotation;
-			light.rotation = glm::vec4(rot.X, rot.Z, rot.Y, 1.0);
+			light.rotation = glm::vec4(rot.X, rot.Y, rot.Z, 1.0);
 			light.color = glm::vec4(Lights->at(i).Color.X, Lights->at(i).Color.Y, Lights->at(i).Color.Z, 1.0) * Lights->at(i).Intensity;
 			light.type.x = Lights->at(i).LightType;
 			mapped[i] = light;
@@ -872,7 +872,7 @@ void Renderer::Shadows(int width, int height)
 
 	for (const LightComponent &l : *Lights) {
 		if (l.LightType != 0) continue;
-		glm::vec3 loc = glm::vec3(ActiveCamera->GetLocation().X, ActiveCamera->GetLocation().Z, ActiveCamera->GetLocation().Y);
+		glm::vec3 loc = glm::vec3(ActiveCamera->GetLocation().X, ActiveCamera->GetLocation().Z, -ActiveCamera->GetLocation().Y);
 		glm::vec3 dir = glm::toMat4(glm::quat(glm::vec3(glm::radians(l.Rotation.X), glm::radians(l.Rotation.Y), glm::radians(l.Rotation.Z)))) * glm::vec4(0.0, -1.0, 0.0, 0.0);
 		glm::vec3 up = glm::toMat4(glm::quat(glm::vec3(glm::radians(l.Rotation.X), glm::radians(l.Rotation.Y), glm::radians(l.Rotation.Z)))) * glm::vec4(1.0, 0.0, 0.0, 0.0);
 		glm::vec3 newLoc = loc + (-dir * 70.f);
@@ -1092,20 +1092,7 @@ void Renderer::Forward(int width, int height)
 			for (Section* o : m->GetObjects())
 			{
 				glm::mat4 mm = o->Parent->GetModelMatrix();
-				Vector direction = ActiveCamera->GetForwardVector();
-				Vector location = ActiveCamera->GetLocation();
-				glm::vec3 pos = mm[3];
-				glm::vec3 rad = glm::vec3((o->Parent->GetAABB().maxs - o->Parent->GetAABB().mins).Length()) * glm::mat3(mm);
-				float radii = glm::max(rad.x, glm::max(rad.y, rad.z));
-				glm::vec3 loc = glm::vec3(location.X, location.Z, location.Y);
-				glm::vec3 dir = glm::vec3(direction.X, direction.Z, direction.Y);
-				if ((loc - pos).length() > 2.f && (loc - pos).length() > radii)
-				{
-					if (glm::dot(dir, glm::normalize(loc - pos)) < 0.5f)
-					{
-						continue;
-					}
-				}
+				if (CullCheck(o)) continue;
 				s->SetUniform("Model", mm);
 				o->Render();
 
@@ -1186,17 +1173,17 @@ inline bool Renderer::CullCheck(Section* s)
 	Vector location = ActiveCamera->GetLocation();
 	glm::vec3 pos = mm[3];
 	Vector aabb = s->Parent->GetAABB().maxs - s->Parent->GetAABB().mins;
-	glm::vec3 rad = glm::vec3(aabb.X, aabb.Z, aabb.Y) * glm::mat3(mm);
+	glm::vec3 rad = glm::vec3(aabb.X, aabb.Y, aabb.Z) * glm::mat3(mm);
 	float radii = glm::max(rad.x, glm::max(rad.y, rad.z));
-	glm::vec3 loc = glm::vec3(location.X, location.Z, location.Y);
-	glm::vec3 dir = glm::vec3(direction.X, direction.Z, direction.Y);
+	glm::vec3 loc = glm::vec3(location.X, location.Y, location.Z);
+	glm::vec3 dir = glm::vec3(direction.X, direction.Y, direction.Z);
 	glm::vec3 d = loc - pos;
 	if (glm::length(d) > s->RenderDistance) {
 		return true;
 	}
 	else if (glm::length(d) > 2.f && glm::length(d) > radii)
 	{
-		if (glm::dot(dir, glm::normalize(loc - pos)) < 0.55f) // TODO: Calculate from FOV
+		if (glm::dot(dir, glm::normalize(pos - loc)) < 0.55f) // TODO: Calculate from FOV
 		{
 			return true;
 		}
@@ -1217,7 +1204,7 @@ void Renderer::Render(float delta)
 	GlobalVariables.Projection = ActiveCamera->GetProjectionMatrix();
 	GlobalVariables.View = glm::inverse(ActiveCamera->GetViewMatrix());
 	const Vector& loc = ActiveCamera->GetLocation();
-	GlobalVariables.ViewPoint = glm::vec4(loc.X, loc.Z, loc.Y, 1.f);
+	GlobalVariables.ViewPoint = glm::vec4(loc.X, loc.Y, loc.Z, 1.f);
 	GlobalVariables.ScreenSize = glm::ivec2(width, height);
 	GlobalVariables.SceneLightCount = (int)Lights->size();					//DOES NOT TAKE INTO ACCOUNT THAT LIGHTS CAN BE DISABLED/DELETED
 
@@ -1323,8 +1310,8 @@ void processMesh(LoadedMesh* meshHolder, aiMesh* mesh)
 	{
 		Vertex vertex;
 		vertex.position.x = mesh->mVertices[i].x;
-		vertex.position.y = mesh->mVertices[i].y;
-		vertex.position.z = mesh->mVertices[i].z;
+		vertex.position.y = -mesh->mVertices[i].z;
+		vertex.position.z = mesh->mVertices[i].y;
 		if (radius < mesh->mVertices[i].x) radius = mesh->mVertices[i].x;
 
 		vertex.normal.x = mesh->mNormals[i].x;
@@ -1359,15 +1346,6 @@ void processMesh(LoadedMesh* meshHolder, aiMesh* mesh)
 	std::vector<uint> adjacent;
 	MeshDataHolder* section = new MeshDataHolder(vertices.data(), (uint32)vertices.size(), indices.data(), (uint32)indices.size());
 	section->Radius = radius;
-	/*section->FaceCount = indices.size() / 3;
-	section->VertexCount = vertices.size();
-
-
-	section->indices = new uint32[indices.size() * sizeof(uint32)];
-	memcpy(section->indices, indices.data(), indices.size() * sizeof(uint32));
-
-	section->vertices = new Vertex[vertices.size() * sizeof(Vertex)];
-	memcpy(section->vertices, vertices.data(), vertices.size() * sizeof(Vertex));*/
 
 	section->Instance = RI->LoadMaterialByName("Assets/Materials/default");
 
@@ -1423,79 +1401,6 @@ RenderMesh* GLMesh::LoadData(SceneComponent* parent, String name)
 		LoadedMesh* mesh = loadMeshes(r->second);
 		LoadedMeshes.emplace(name, mesh);
 
-		/*mesh->HolderCount = 1;
-		mesh->Holders = new MeshDataHolder[mesh->HolderCount]();
-		std::ifstream* s = r->second;
-		s->seekg(0);
-		String in;
-		size_t v_index = 0;
-		size_t n_index = 0;
-		std::vector<float> verts;
-		std::vector<float> normals;
-		std::vector<unsigned int> normalIndices;
-		std::vector<unsigned int> faces;
-		for (uint32 i = 0; i < mesh->HolderCount; i++) {
-			MeshDataHolder* hold = &mesh->Holders[i];
-			while (std::getline(*s, in)) {
-				switch (in.front())
-				{
-				case 'v':
-				{
-					std::vector<String> vec = split(in, ' ');
-					if (vec[0] == "v") {
-						verts.push_back(std::stof(vec[1]));
-						verts.push_back(std::stof(vec[2]));
-						verts.push_back(std::stof(vec[3]));
-						v_index++;
-					}
-					else if (vec[0] == "vn") {
-						normals.push_back(std::stof(vec[1]));
-						normals.push_back(std::stof(vec[2]));
-						normals.push_back(std::stof(vec[3]));
-						n_index++;
-					}
-				}
-				break;
-
-				case 'f':
-				{
-					std::vector<String> face = split(in, ' ');
-					face.erase(face.begin(), face.begin() + 1);
-					for (String str : face) {
-						std::vector<String> data = split(str, '/');
-						faces.push_back(std::stoi(data[0]) - 1);
-						normalIndices.push_back(std::stoi(data[2]) - 1);
-					}
-				}
-				break;
-
-				default:
-					break;
-				}
-			}
-			hold->FaceCount = (uint32)faces.size() / 3;
-			hold->VertexCount = (uint32)v_index;
-			hold->vertices = new Vertex[v_index]();
-			hold->indices = new uint32[faces.size()]();
-
-			for (unsigned int i = 0; i < v_index; i++) {
-				hold->vertices[i].position.x = verts[i * 3];
-				hold->vertices[i].position.y = verts[i * 3 + 1];
-				hold->vertices[i].position.z = verts[i * 3 + 2];
-			}
-
-			for (uint i = 0; i < faces.size(); i++) {
-				hold->vertices[faces[i]].normal.x = normals[normalIndices[i] * 3 + 0];
-				hold->vertices[faces[i]].normal.y = normals[normalIndices[i] * 3 + 1];
-				hold->vertices[faces[i]].normal.z = normals[normalIndices[i] * 3 + 2];
-			}
-
-			memcpy(hold->indices, faces.data(), faces.size() * sizeof(uint32));
-
-			hold->Instance = RI->LoadMaterialByName("Shaders/test");
-		}*/
-
-
 		RenderObject* obj = new RenderObject(mesh);
 		obj->SetParent(parent);
 		return obj;
@@ -1524,10 +1429,10 @@ RenderMesh* GLMesh::CreateProcedural(SceneComponent* parent, String name, std::v
 		if		(bounds.mins.Z > positions[i].Z) bounds.mins.Z = positions[i].Z;
 		else if (bounds.maxs.Z < positions[i].Z) bounds.maxs.Z = positions[i].Z;
 
-		verts[i].position = glm::vec3(positions[i].X, positions[i].Z, positions[i].Y);
+		verts[i].position = glm::vec3(positions[i].X, positions[i].Y, positions[i].Z);
 		verts[i].uv = glm::vec3(UV[i].X, UV[i].Y, UV[i].Z);
-		verts[i].normal = glm::vec3(normal[i].X, normal[i].Z, normal[i].Y);
-		verts[i].tangent = glm::vec3(tangent[i].X, tangent[i].Z, tangent[i].Y);
+		verts[i].normal = glm::vec3(normal[i].X, normal[i].Y, normal[i].Z);
+		verts[i].tangent = glm::vec3(tangent[i].X, tangent[i].Y, tangent[i].Z);
 	}
 
 	MeshDataHolder* section = new MeshDataHolder(verts.data(), positions.size(), indices.data(), indices.size());

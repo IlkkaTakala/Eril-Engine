@@ -201,8 +201,8 @@ void ForestPlayer::ItemPickE(bool KeyDown)
 
 void ForestPlayer::MouseMoved(float X, float Y)
 {
-	const Vector& rot = Rotation;
-	if (cursorState) SetRotation(Vector(rot.X + X * mouseSens, rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, rot.Z));
+	const Rotator& rot = Rotation;
+	if (cursorState) SetRotation(Rotator(rot.W, rot.X + X * mouseSens, rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, rot.Z));
 }
 
 void ForestPlayer::InputExit(bool down)

@@ -26,13 +26,13 @@ std::mt19937 rng(dev());
 float RandomFloat()
 {
 	std::uniform_real_distribution<> dist6;
-	return dist6(rng);
+	return (float)dist6(rng);
 }
 
 float RandomFloatInRange(float min, float max)
 {
 	std::uniform_real_distribution<> dist6(min, max);
-	return dist6(rng);
+	return (float)dist6(rng);
 }
 
 Vector Vector::RandomUnitVectorInCone(Vector direction, float coneAngle, Vector up)

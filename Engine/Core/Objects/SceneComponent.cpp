@@ -5,7 +5,7 @@
 SceneComponent::SceneComponent() : BaseObject()
 {
 	Location = Vector(0, 0, 0);
-	Rotation = Vector(0, 0, 0);
+	Rotation = Rotator(0.f);
 	Scale = Vector(1, 1, 1);
 
 	transformForce = false;
@@ -17,7 +17,7 @@ SceneComponent::SceneComponent() : BaseObject()
 void SceneComponent::OnDestroyed()
 {
 	if (Parent != nullptr) Parent->RemoveComponent(this);
-	else GetScene()->RemoveSceneRoot(this);
+	else if (GetScene()) GetScene()->RemoveSceneRoot(this);
 	for (const auto& c : Children) {
 		if (!c) continue;
 		c->Parent = nullptr;
@@ -36,7 +36,7 @@ void SceneComponent::LoadWithParameters(const String& args)
 	auto scale = data.find("Scale");
 
 	if (loc != data.end()) SetLocation(Vector(loc->second), true);
-	if (rot != data.end()) SetRotation(Vector(rot->second), true);
+	if (rot != data.end()) SetRotation(Rotator(rot->second), true);
 	if (scale != data.end()) SetScale(Vector(scale->second), true);
 }
 
@@ -48,7 +48,7 @@ void SceneComponent::SetLocation(const Vector& NewLocation, bool force)
 	for (auto& c : Children) c->Refresh();
 }
 
-void SceneComponent::SetRotation(const Vector& NewRotation, bool force)
+void SceneComponent::SetRotation(const Rotator& NewRotation, bool force)
 {
 	Rotation = NewRotation;
 	desired.Rotation = NewRotation;
@@ -62,7 +62,7 @@ void SceneComponent::SetWorldLocation(const Vector& NewLocation, bool force)
 	if (force) for (auto& c : Children) c->Refresh();
 }
 
-void SceneComponent::SetWorldRotation(const Vector& NewRotation, bool force)
+void SceneComponent::SetWorldRotation(const Rotator& NewRotation, bool force)
 {
 	Rotation = NewRotation - Parent->GetWorldRotation();
 	if (force) for (auto& c : Children) c->Refresh();
