@@ -10,6 +10,11 @@ class MovementComponent;
 class Terrain;
 class Hunter;
 class PauseUI;
+class BoxCollisionShape;
+class SphereCollisionShape;
+class CylinderCollisionShape;
+class ConeCollisionShape;
+class CapsuleCollisionShape;
 class VisibleObject;
 
 //ECS TEST
@@ -60,13 +65,13 @@ private:
 	Ref<Actor> Box2;
 	Ref<MovementComponent> BoxModelMove;
 	Ref<VisibleObject> BoxModel;
-	Ref<ColliderComponent> BoxCol;
+	Ref<BoxCollisionShape> BoxCol;
 	Ref<VisibleObject> BoxModel2;
-	Ref<ColliderComponent> BoxCol2;
-	Ref<ColliderComponent> PlayerCol;
+	Ref<CylinderCollisionShape> BoxCol2;
+	Ref<CapsuleCollisionShape> PlayerCol;
 
 	Ref<VisibleObject> Plane;
-	Ref<ColliderComponent> PlaneCol;
+	Ref<BoxCollisionShape> PlaneCol;
 
 	PauseUI* pause;
 

@@ -89,6 +89,7 @@ void Scene::AddSceneRoot(SceneComponent* obj)
 void Scene::RemoveSceneRoot(SceneComponent* obj)
 {
 	SceneGraph.remove(obj);
+	obj->SetScene(nullptr);
 }
 
 void Scene::LoadLevel()

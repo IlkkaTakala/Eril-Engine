@@ -232,6 +232,15 @@
     <ClCompile Include="Engine\RenderCore\OpenGL\Skeleton.cpp">
       <Filter>Engine\OpenGL</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Core\Objects\CollisionShape.cpp">
+      <Filter>Engine\Objects\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Basic\Math.cpp">
+      <Filter>Engine\Basic</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Basic\Rotation.cpp">
+      <Filter>Engine\Basic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -539,6 +548,20 @@
     <ClInclude Include="Engine\Core\Objects\InputComponent.h">
       <Filter>Engine\Objects</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Core\Objects\CollisionShape.h">
+      <Filter>Engine\Objects\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Basic\Math.h">
+      <Filter>Engine\Basic</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Basic\Rotation.h">
+      <Filter>Engine\Basic</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Basic\Transformation.h">
+      <Filter>Engine\Basic</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="Engine\Core\Objects\ParticleComponent.h">
       <Filter>Engine\Objects</Filter>
     </ClInclude>

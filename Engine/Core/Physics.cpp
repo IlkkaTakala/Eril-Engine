@@ -109,8 +109,6 @@ namespace Physics
 		}*/
 	}
 
-
-#pragma optimize("", off)
 	void CheckCollisions(float delta)
 	{
 		{
@@ -125,7 +123,6 @@ namespace Physics
 			m->ApplyMovement();
 		}
 	}
-#pragma optimize("", on)
 
 	void AddStatic(VisibleObject* obj)
 	{

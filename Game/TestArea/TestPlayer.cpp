@@ -11,7 +11,7 @@
 #include <Interface/AudioManager.h>
 #include <GamePlay/Scene.h>
 #include "Objects/InputComponent.h"
-#include "Objects/ColliderComponent.h"
+#include "Objects/CollisionShape.h"
 #include <Objects/ParticleComponent.h>
 #include "CloudParticle.h"
 
@@ -64,13 +64,13 @@ TestPlayer::TestPlayer() : Player()
 	cursorState = true;
 	spawnCounter = 0;
 	
-	
+	Rotation = Rotator(0.f);
 
 	//Player Model
 	Mesh = SpawnObject<VisibleObject>();
 	Mesh->SetModel("Assets/Meshes/Cube");
 	Mesh->GetModel()->SetAABB(AABB(Vector(-1.f, -1.f, 0.f), Vector(1.f, 1.f, 2.f)));
-	SetLocation(Vector(0, 0, 2));
+	SetLocation(Vector(15, 15, 1));
 
 	//Player Movement
 	Movement = SpawnObject<MovementComponent>();
@@ -83,11 +83,11 @@ TestPlayer::TestPlayer() : Player()
 	Movement->SetAcceleration(500.f);
 	Movement->SetAirControl(0.9f);
 
-	PlayerCol = SpawnObject<ColliderComponent>();
+	PlayerCol = SpawnObject<CapsuleCollisionShape>();
 	AddComponent(PlayerCol);
 	PlayerCol->SetLocation(Vector(0.f, 0.f, 1.f), true);
 	PlayerCol->SetType(2);
-	PlayerCol->SetSize(Mesh->GetModel()->GetAABB());
+	PlayerCol->SetSize(0.5, 1.f);
 	PlayerCol->SetMovementTarget(Movement);
 
 	//Skybox
@@ -102,16 +102,16 @@ TestPlayer::TestPlayer() : Player()
 
 	pause = nullptr;
 
-	Plane = SpawnObject<VisibleObject>();
-	Plane->SetModel("Assets/Meshes/Cube");
+	/*Plane = SpawnObject<VisibleObject>();
+	Plane->SetModel("Cube");
 	Plane->GetModel()->SetAABB(AABB(Vector(-20.f, -20.f, -0.5f), Vector(20.f, 20.f, 0.5f)));
 	Plane->SetScale(Vector(20.f, 20.f, 0.5f));
 	Plane->SetLocation(Vector(10.f, 10.f, 0.f));
 
-	PlaneCol = SpawnObject<ColliderComponent>();
+	PlaneCol = SpawnObject<BoxCollisionShape>();
 	PlaneCol->SetType(0);
 	PlaneCol->SetSize(Plane->GetModel()->GetAABB());
-	Plane->AddComponent(PlaneCol);
+	Plane->AddComponent(PlaneCol);*/
 
 	Box = SpawnObject<Actor>();
 
@@ -123,8 +123,7 @@ TestPlayer::TestPlayer() : Player()
 	Box->AddComponent(BoxModel);
 	Box->SetLocation(Vector(10.f, 10.f, 2.f));
 
-	BoxCol = SpawnObject<ColliderComponent>();
-	//BoxCol->SetLocation(Box->GetLocation(), true);
+	BoxCol = SpawnObject<BoxCollisionShape>();
 	Box->AddComponent(BoxCol);
 	BoxCol->SetType(0);
 	BoxCol->SetSize(BoxModel->GetModel()->GetAABB());
@@ -138,17 +137,20 @@ TestPlayer::TestPlayer() : Player()
 	Box2 = SpawnObject<Actor>();
 
 	BoxModel2 = SpawnObject<VisibleObject>();
-	BoxModel2->SetModel("Assets/Meshes/Cube");
+	BoxModel2->SetModel("Assets/Meshes/cylinder");
 	BoxModel2->GetModel()->SetAABB(AABB(Vector(-1.0f), Vector(1.0f)));
 
 	Box2->AddComponent(BoxModel2);
-	Box2->SetLocation(Vector(10.f, 10.f, 12.f));
+	Box2->SetLocation(Vector(10.f, 10.f, 6.f));
+	Box2->SetRotation(Vector(90.f, 0.f, 0.f));
 
-	BoxCol2 = SpawnObject<ColliderComponent>();
-	Box2->AddComponent(BoxCol2);
-	//BoxCol->SetLocation(Box->GetLocation(), true);
+	BoxCol2 = SpawnObject<CylinderCollisionShape>();
 	BoxCol2->SetType(1);
+	Box2->AddComponent(BoxCol2);
 	BoxCol2->SetSize(BoxModel2->GetModel()->GetAABB());
+	//BoxCol2->SetLocation(Vector(0.f, 0.f, 0.f));
+	//BoxCol2->SetRotation(Vector(0.f, 90.f, 0.f));
+
 
 	//BoxModelMove = SpawnObject<MovementComponent>();
 	//BoxModelMove->SetTarget(Box2, BoxModel2->GetModel()->GetAABB());
@@ -158,9 +160,9 @@ TestPlayer::TestPlayer() : Player()
 
 	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
 
-	auto part = SpawnObject<ParticleComponent>();
+	/*auto part = SpawnObject<ParticleComponent>();
 	part->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
-	part->SetLocation({10.f, 5.f, 0.5f});
+	part->SetLocation({10.f, 5.f, 0.5f});*/
 
 }
 
@@ -185,7 +187,7 @@ void TestPlayer::RunInputZ(float delta, bool KeyDown)
 
 void TestPlayer::RunInputW(float delta, bool KeyDown)
 {
-	Vector dir = -GetCamera()->GetForwardVector();
+	Vector dir = GetCamera()->GetForwardVector();
 	dir.Z = 0.f;
 	Movement->AddInput(dir.Normalize());
 }
@@ -202,7 +204,7 @@ void TestPlayer::RunInputD(float delta, bool KeyDown)
 
 void TestPlayer::RunInputS(float delta, bool KeyDown)
 {
-	Vector dir = GetCamera()->GetForwardVector();
+	Vector dir = -GetCamera()->GetForwardVector();
 	dir.Z = 0.f;
 	Movement->AddInput(dir.Normalize());
 }
@@ -210,7 +212,7 @@ void TestPlayer::RunInputS(float delta, bool KeyDown)
 void TestPlayer::RunInputSpace(bool KeyDown)
 {
 	if (!Movement->IsInAir() && KeyDown)
-		Movement->AddImpulse(Vector(0.f, 0.f, 600.f));
+		Movement->AddImpulse(Vector(0.f, 0.f, 6000.f));
 }
 
 void TestPlayer::InputOne(bool KeyDown)
@@ -244,11 +246,16 @@ void TestPlayer::RightMouseDown(bool KeyDown)
 
 void TestPlayer::MouseMoved(float X, float Y)
 {
-	const Vector& rot = Rotation;
-	if (cursorState) SetRotation(Vector(
-		rot.X, 
-		rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, 
-		rot.Z + X * mouseSens));
+	if (cursorState) {
+		Camera* cam = GetCamera();
+		Rotator rot = cam->GetRotation();
+		float y = rot.PitchDegrees();
+		cam->SetRotation(Vector(
+			rot.RollDegrees(),
+			y + Y * mouseSens < 89.f && y + Y * mouseSens > -89.f ? y + Y * mouseSens : y,
+			rot.YawDegrees() + X * mouseSens
+		));
+	}
 }
 
 void TestPlayer::InputExit(bool down)
@@ -275,19 +282,19 @@ void TimeFunction (float d)
 
 void TestPlayer::Tick(float deltaTime)
 {
-	//Console::Log((BoxCol->GetWorldLocation()).ToString() + " BoxCol");
+	//Console::Log((BoxCol2->GetWorldLocation()).ToString() + " BoxCol2");
+	//Console::Log((BoxCol->GetWorldLocation()).ToString() + " BoxCol2");
 	//Console::Log((Box->GetWorldLocation()).ToString() + " Box");
 	//Console::Log((GetWorldLocation()).ToString() + " Player");
 	//Console::Log((PlayerCol->GetWorldLocation()).ToString() + " PlayerCol");
 
 	Vector loc = Box->GetLocation();
 	GetCamera()->SetLocation(Location + Vector(0.f, 0.f, 1.5f));
-	GetCamera()->SetRotation(Rotation);
 	Sky->SetLocation(Location);
 	
 	Vector listenerPos = Location;
 	Vector listenerOrientation = GetCamera()->GetForwardVector();
-	AudioManager::SetListener(listenerPos, -GetCamera()->GetForwardVector(), -GetCamera()->GetUpVector());
+	AudioManager::SetListener(listenerPos, GetCamera()->GetForwardVector(), GetCamera()->GetUpVector());
 }
 
 void TestPlayer::BeginPlay()
@@ -326,7 +333,7 @@ void TestPlayer::BeginPlay()
 		DirLight->Size = 3.f;
 		DirLight->Intensity = 1.f;
 		DirLight->Color = Vector(1.f);
-		DirLight->Rotation = Vector(0.5, 0.5, -0.5);
+		DirLight->Rotation = Vector(0.5, 0.5, -0.5).Normalize();
 
 		for (int i = 0; i < 50; i++)
 		{

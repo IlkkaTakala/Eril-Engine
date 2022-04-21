@@ -4,8 +4,8 @@
 
 class Actor;
 class MovementComponent;
-class ErilMotion;
 class btPairCachingGhostObject;
+class ErilMotion;
 
 class ColliderComponent : public SceneComponent, public Tickable
 {
@@ -16,8 +16,7 @@ public:
     virtual void LoadWithParameters(const String& args) override;
     virtual void Tick(float delta) override;
     virtual void BeginPlay() override {}
-    void SetType(int t);
-    void SetSize(AABB s);
+    virtual void SetType(int t);
     void SetMass(float m);
     void SetTarget(SceneComponent* m);
     void SetMovementTarget(MovementComponent* m);
@@ -28,7 +27,7 @@ public:
     virtual void Refresh() override;
 
     void OnCollide();
-private:
+protected:
     friend class ErilMotion;
     btRigidBody* body;
     int type;
@@ -36,4 +35,21 @@ private:
     float mass;
     Ref<SceneComponent> Object;
     Ref<MovementComponent> moveObject;
+};
+
+class ErilMotion : public btMotionState
+{
+    btTransform m_centerOfMassOffset;
+    RefWeak<ColliderComponent> m_userPointer;
+public:
+
+    ErilMotion(ColliderComponent* c, const btTransform& startTrans = btTransform::getIdentity(), const btTransform& centerOfMassOffset = btTransform::getIdentity()) :
+        m_centerOfMassOffset(centerOfMassOffset),
+        m_userPointer(c)
+    {
+    }
+
+    ///synchronizes world transform from user to physics
+    virtual void getWorldTransform(btTransform& centerOfMassWorldTrans) const;
+    virtual void setWorldTransform(const btTransform& centerOfMassWorldTrans);
 };

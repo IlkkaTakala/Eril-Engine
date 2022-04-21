@@ -432,9 +432,9 @@ void Renderer::UpdateLights()
 		if (!Lights->at(i).GetDisabled()) //DONT USE THE LIGHT IF IT'S DISABLED!
 		{
 			GLM_Light light;
-			light.locationAndSize = glm::vec4(Lights->at(i).Location.X, Lights->at(i).Location.Z, Lights->at(i).Location.Y, Lights->at(i).Size);
+			light.locationAndSize = glm::vec4(Lights->at(i).Location.X, Lights->at(i).Location.Y, Lights->at(i).Location.Z, Lights->at(i).Size);
 			Vector& rot = Lights->at(i).Rotation;
-			light.rotation = glm::vec4(rot.X, rot.Z, rot.Y, 1.0);
+			light.rotation = glm::vec4(rot.X, rot.Y, rot.Z, 1.0);
 			light.color = glm::vec4(Lights->at(i).Color.X, Lights->at(i).Color.Y, Lights->at(i).Color.Z, 1.0) * Lights->at(i).Intensity;
 			light.type.x = Lights->at(i).LightType;
 			mapped[i] = light;
@@ -897,7 +897,7 @@ void Renderer::Shadows(int width, int height)
 
 	for (const LightComponent &l : *Lights) {
 		if (l.LightType != 0) continue;
-		glm::vec3 loc = glm::vec3(ActiveCamera->GetLocation().X, ActiveCamera->GetLocation().Z, ActiveCamera->GetLocation().Y);
+		glm::vec3 loc = glm::vec3(ActiveCamera->GetLocation().X, ActiveCamera->GetLocation().Z, -ActiveCamera->GetLocation().Y);
 		glm::vec3 dir = glm::toMat4(glm::quat(glm::vec3(glm::radians(l.Rotation.X), glm::radians(l.Rotation.Y), glm::radians(l.Rotation.Z)))) * glm::vec4(0.0, -1.0, 0.0, 0.0);
 		glm::vec3 up = glm::toMat4(glm::quat(glm::vec3(glm::radians(l.Rotation.X), glm::radians(l.Rotation.Y), glm::radians(l.Rotation.Z)))) * glm::vec4(1.0, 0.0, 0.0, 0.0);
 		glm::vec3 newLoc = loc + (-dir * 70.f);
@@ -1118,20 +1118,7 @@ void Renderer::Forward(int width, int height)
 			for (Section* o : m->GetObjects())
 			{
 				glm::mat4 mm = o->Parent->GetModelMatrix();
-				Vector direction = ActiveCamera->GetForwardVector();
-				Vector location = ActiveCamera->GetLocation();
-				glm::vec3 pos = mm[3];
-				glm::vec3 rad = glm::vec3((o->Parent->GetAABB().maxs - o->Parent->GetAABB().mins).Length()) * glm::mat3(mm);
-				float radii = glm::max(rad.x, glm::max(rad.y, rad.z));
-				glm::vec3 loc = glm::vec3(location.X, location.Z, location.Y);
-				glm::vec3 dir = glm::vec3(direction.X, direction.Z, direction.Y);
-				if ((loc - pos).length() > 2.f && (loc - pos).length() > radii)
-				{
-					if (glm::dot(dir, glm::normalize(loc - pos)) < 0.5f)
-					{
-						continue;
-					}
-				}
+				if (CullCheck(o)) continue;
 				s->SetUniform("Model", mm);
 				o->Render();
 
@@ -1212,17 +1199,17 @@ inline bool Renderer::CullCheck(Section* s)
 	Vector location = ActiveCamera->GetLocation();
 	glm::vec3 pos = mm[3];
 	Vector aabb = s->Parent->GetAABB().maxs - s->Parent->GetAABB().mins;
-	glm::vec3 rad = glm::vec3(aabb.X, aabb.Z, aabb.Y) * glm::mat3(mm);
+	glm::vec3 rad = glm::vec3(aabb.X, aabb.Y, aabb.Z) * glm::mat3(mm);
 	float radii = glm::max(rad.x, glm::max(rad.y, rad.z));
-	glm::vec3 loc = glm::vec3(location.X, location.Z, location.Y);
-	glm::vec3 dir = glm::vec3(direction.X, direction.Z, direction.Y);
+	glm::vec3 loc = glm::vec3(location.X, location.Y, location.Z);
+	glm::vec3 dir = glm::vec3(direction.X, direction.Y, direction.Z);
 	glm::vec3 d = loc - pos;
 	if (glm::length(d) > s->RenderDistance) {
 		return true;
 	}
 	else if (glm::length(d) > 2.f && glm::length(d) > radii)
 	{
-		if (glm::dot(dir, glm::normalize(loc - pos)) < 0.55f) // TODO: Calculate from FOV
+		if (glm::dot(dir, glm::normalize(pos - loc)) < 0.55f) // TODO: Calculate from FOV
 		{
 			return true;
 		}
@@ -1242,7 +1229,7 @@ void Renderer::Render(float delta)
 	GlobalVariables.Projection = ActiveCamera->GetProjectionMatrix();
 	GlobalVariables.View = glm::inverse(ActiveCamera->GetViewMatrix());
 	const Vector& loc = ActiveCamera->GetLocation();
-	GlobalVariables.ViewPoint = glm::vec4(loc.X, loc.Z, loc.Y, 1.f);
+	GlobalVariables.ViewPoint = glm::vec4(loc.X, loc.Y, loc.Z, 1.f);
 	GlobalVariables.ScreenSize = glm::ivec2(width, height);
 	GlobalVariables.SceneLightCount = (int)Lights->size();					//DOES NOT TAKE INTO ACCOUNT THAT LIGHTS CAN BE DISABLED/DELETED
 

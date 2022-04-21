@@ -34,8 +34,8 @@ void processMesh(LoadedMesh* meshHolder, aiMesh* mesh)
 	{
 		Vertex vertex;
 		vertex.position.x = mesh->mVertices[i].x;
-		vertex.position.y = mesh->mVertices[i].y;
-		vertex.position.z = mesh->mVertices[i].z;
+		vertex.position.y = -mesh->mVertices[i].z;
+		vertex.position.z = mesh->mVertices[i].y;
 		if (radius < mesh->mVertices[i].x) radius = mesh->mVertices[i].x;
 
 		vertex.normal.x = mesh->mNormals[i].x;
@@ -205,7 +205,7 @@ AssetType AssetManager::GetAssetType(const String& name)
 {
 	// TODO
 	if (name.find("Meshes") != String::npos) return AssetType::MeshStatic;
-	if (name.find("Textures") != String::npos) return AssetType::MeshStatic;
+	if (name.find("Textures") != String::npos) return AssetType::Texture;
 	if (name.find("Animations") != String::npos) return AssetType::MeshStatic;
 	return AssetType::Texture;
 }

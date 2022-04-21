@@ -35,10 +35,10 @@ RenderMeshStatic* GLMesh::CreateProcedural(SceneComponent* parent, String name, 
 		if (bounds.mins.Z > positions[i].Z) bounds.mins.Z = positions[i].Z;
 		else if (bounds.maxs.Z < positions[i].Z) bounds.maxs.Z = positions[i].Z;
 
-		verts[i].position = glm::vec3(positions[i].X, positions[i].Z, positions[i].Y);
+		verts[i].position = glm::vec3(positions[i].X, positions[i].Y, positions[i].Z);
 		verts[i].uv = glm::vec3(UV[i].X, UV[i].Y, UV[i].Z);
-		verts[i].normal = glm::vec3(normal[i].X, normal[i].Z, normal[i].Y);
-		verts[i].tangent = glm::vec3(tangent[i].X, tangent[i].Z, tangent[i].Y);
+		verts[i].normal = glm::vec3(normal[i].X, normal[i].Y, normal[i].Z);
+		verts[i].tangent = glm::vec3(tangent[i].X, tangent[i].Y, tangent[i].Z);
 	}
 
 	MeshDataHolder* section = new MeshDataHolder(verts.data(), positions.size(), indices.data(), indices.size());
@@ -202,11 +202,12 @@ void RenderMeshStaticGL::ApplyTransform()
 	}
 
 	Vector loc = finalT.Location;
-	Vector rot = finalT.Rotation;
+	Rotator rot = finalT.Rotation;
 	Vector sca = finalT.Scale;
-	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Z, loc.Y))
-		* glm::eulerAngleYXZ(glm::radians(rot.Z), glm::radians(rot.Y), glm::radians(rot.X))
-		* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Z, sca.Y));
+	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Y, loc.Z))
+		* glm::toMat4(glm::quat(rot.W, rot.X, rot.Y, rot.Z))
+		* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Y, sca.Z));
+
 
 	requireUpdate = false;
 
@@ -240,11 +241,11 @@ void RenderMeshStaticGL::SetInstances(int count, Transformation* dispArray)
 	}
 	for (int i = 0; i < InstanceCount; i++) {
 		Vector loc = dispArray[i].Location;
-		Vector rot = dispArray[i].Rotation;
+		Rotator rot = dispArray[i].Rotation;
 		Vector sca = dispArray[i].Scale;
-		Instances[i] = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Z, loc.Y))
-			* glm::eulerAngleYXZ(glm::radians(rot.Z), glm::radians(rot.Y), glm::radians(rot.X))
-			* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Z, sca.Y));
+		Instances[i] = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Y, loc.Z))
+			* glm::toMat4(glm::quat(-rot.W, rot.X, rot.Y, rot.Z))
+			* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Y, sca.Z));
 	}
 	InstancesDirty = true;
 	ApplyInstances();

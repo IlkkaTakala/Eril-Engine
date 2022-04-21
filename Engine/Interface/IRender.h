@@ -1,6 +1,7 @@
 #pragma once
 #include "Core.h"
 #include <functional>
+#include <Basic/Transformation.h>
 
 #define OPENGL
 
@@ -20,13 +21,13 @@ class Camera
 {
 public:
 	virtual ~Camera() {}
-	virtual void SetRotation(const Vector& rotation) = 0;
+	virtual void SetRotation(const Rotator& rotation) = 0;
 	virtual void SetLocation(const Vector& location) = 0;
 
 	virtual const Vector GetUpVector() const = 0;
 	virtual const Vector GetForwardVector() const = 0;
 	virtual const Vector GetRightVector() const = 0;
-	virtual const Vector& GetRotation() const = 0;
+	virtual const Rotator& GetRotation() const = 0;
 	virtual const Vector& GetLocation() const = 0;
 
 	virtual void SetLookAt(const Vector& to, const Vector& up = Vector(0.0f, 1.0f, 0.0f)) = 0;
