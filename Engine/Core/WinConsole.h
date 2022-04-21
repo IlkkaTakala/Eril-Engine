@@ -18,4 +18,8 @@ namespace Console {
 	void GetLogs(int lines, std::vector<String> data);
 
 	void Execute(const String& line);
+
+	void Evaluate();
+
+	
 }

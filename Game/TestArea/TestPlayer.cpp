@@ -156,10 +156,12 @@ void TestPlayer::InputOne(bool KeyDown)
 {
 	static String object = R"~~~(
 def execute() {
-	var objId = CreateObject("Ghost", 1);
-	SetLocation(objId, 1, 1, 2);
-	SetRotation(objId, 0, 0, 0);
-	SetScale(objId, 1, 1, 1);
+	var objId = CreateObject("VisibleObject", 1);
+	SetModel(objId, "Cube");
+	SetMaterial(objId, "hunter");
+	SetLocation(objId, 5, 5, 2);
+	#SetRotation(objId, 0, 0, 0);
+	#SetScale(objId, 1, 1, 1);
 	#DestroyObject(objId);
 })~~~";
 	if (!KeyDown) {
@@ -174,7 +176,7 @@ void TestPlayer::InputTwo(bool KeyDown)
 {
 	if (KeyDown)
 		InputMode = !InputMode;
-	//Scene::OpenLevel("Assets/Maps/test");
+	Scene::OpenLevel("Assets/Maps/test");
 	
 }
 
