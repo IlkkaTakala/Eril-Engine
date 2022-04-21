@@ -3,3 +3,4 @@ name=shader_002
 [Textures]
 Albedo=Assets/Textures/default/default_d.png
 Normal=Assets/Textures/default/map_n.png
+Roughness=Assets/Textures/default/rough_d.png
