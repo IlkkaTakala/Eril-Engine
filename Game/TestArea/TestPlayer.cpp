@@ -23,6 +23,7 @@
 #include <ECS/Components/AudioComponent.h>
 #include <ECS/Systems/AudioControllerSystem.h>
 
+#include <ScriptCore.h>
 
 void TestPlayer::OpenConsole(bool) {
 	Console::Create();
@@ -219,8 +220,22 @@ void TestPlayer::RunInputSpace(bool KeyDown)
 
 void TestPlayer::InputOne(bool KeyDown)
 {
-	if (KeyDown)
+	static String object = R"~~~(
+def execute() {
+	var objId = CreateObject("VisibleObject", 1);
+	SetModel(objId, "Cube");
+	SetMaterial(objId, "hunter");
+	SetLocation(objId, 5, 5, 2);
+	#SetRotation(objId, 0, 0, 0);
+	#SetScale(objId, 1, 1, 1);
+	#DestroyObject(objId);
+})~~~";
+	if (!KeyDown) {
 		InputMode = !InputMode;
+		int id = ScriptCore::CompileScript(object.c_str());
+		ScriptCore::EvaluateScript(id);
+		ScriptCore::CleanScript(id);
+	}
 }
 
 void TestPlayer::InputTwo(bool KeyDown)
@@ -228,6 +243,7 @@ void TestPlayer::InputTwo(bool KeyDown)
 	if (KeyDown)
 		InputMode = !InputMode;
 	Scene::OpenLevel("Assets/Maps/test");
+	
 }
 
 void TestPlayer::RunInputShift(bool KeyDown)
@@ -239,6 +255,7 @@ void TestPlayer::RunInputShift(bool KeyDown)
 
 void TestPlayer::LeftMouseDown(bool)
 {
+
 }
 
 void TestPlayer::RightMouseDown(bool KeyDown)
