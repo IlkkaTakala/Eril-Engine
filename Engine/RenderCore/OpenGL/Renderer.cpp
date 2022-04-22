@@ -924,14 +924,14 @@ constexpr glm::vec4 clearClrOne(1.f);
 void Renderer::Forward(int width, int height)
 {
 	PostProcess->Bind();
-	unsigned int attachments2[] = { GL_NONE, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5 };
-	glDrawBuffers(6, attachments2);
+	unsigned int attachments2[] = { GL_NONE, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5, GL_COLOR_ATTACHMENT6 };
+	glDrawBuffers(7, attachments2);
 
 	glClearBufferfv(GL_COLOR, 2, &clearClrZero[0]);
 	glClearBufferfv(GL_COLOR, 3, &clearClrOne[0]);
 
-	unsigned int attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_NONE, GL_NONE, GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5 };
-	glDrawBuffers(6, attachments);
+	unsigned int attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_NONE, GL_NONE, GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5, GL_COLOR_ATTACHMENT6 };
+	glDrawBuffers(7, attachments);
 
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LEQUAL);
@@ -1254,7 +1254,7 @@ void Renderer::Render(float delta)
 	BlurRender->Blur(PostProcess->GetBloom(), 10, ScreenVao);
 	PostProcess->BindTextures();
 	SSAO(width, height);
-	SSAORender->BindTextures(7);
+	SSAORender->BindTextures(8);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

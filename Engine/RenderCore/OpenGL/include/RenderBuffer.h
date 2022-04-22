@@ -20,7 +20,6 @@ public:
 
 private:
 	uint FrameBuffer;
-
 	uint NormalBuffer;
 	uint DepthBuffer;
 
@@ -41,6 +40,7 @@ public:
 	uint GetNormal() const { return NormalBuffer; }
 	uint GetColor() const { return ColorBuffer; }
 	uint GetPosition() const { return PositionBuffer; }
+	uint GetData() const { return DataBuffer; }
 
 	void BindTextures(int offset = 0);
 
@@ -54,6 +54,7 @@ private:
 	uint DepthBuffer;
 	uint NormalBuffer;
 	uint PositionBuffer;
+	uint DataBuffer;
 
 	PostBuffer(const PostBuffer&);
 	PostBuffer& operator=(const PostBuffer&);
