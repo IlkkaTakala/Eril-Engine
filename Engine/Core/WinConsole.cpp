@@ -583,6 +583,14 @@ private:
 				case WM_PAINT:
 				{
 					pDemoApp->OnRender();
+					
+				}
+				result = 0;
+				wasHandled = false;
+				break;
+
+				case WM_SETFOCUS:
+				{
 					SetFocus(pDemoApp->m_input);
 				}
 				result = 0;

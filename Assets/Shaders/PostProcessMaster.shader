@@ -104,7 +104,7 @@ void main()
 	
 	//result = applyFog(result, length(pixelPos - viewPos.xyz), normalize(pixelPos - viewPos.xyz), normalize(vec3(-1.0, 1.0, -1.0)));
 	
-    //FragColor = vec4(result, 1.0);
-	FragColor = vec4(vec3(texture(SSAO, TexCoords).r), 1.0);
+    FragColor = vec4(result, 1.0);
+	//FragColor = vec4(vec3(texture(SSAO, TexCoords).r), 1.0);
 }
 ###END_FRAGMENT###

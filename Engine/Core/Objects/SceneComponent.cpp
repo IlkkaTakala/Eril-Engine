@@ -22,7 +22,7 @@ namespace ScriptFunctions {
 		auto scene = dynamic_cast<SceneComponent*>(r);
 		if (scene) {
 			scene->SetRotation(Vector(x, y, z));
-			Console::Log("Rotation changed to: " + scene->GetRotation().ToString());
+			Console::Log("Rotation changed to: ");
 		}
 		else {
 			Console::Log("Can't change rotation");
