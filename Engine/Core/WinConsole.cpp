@@ -579,10 +579,11 @@ private:
 				result = 0;
 				wasHandled = true;
 				break;
-
+				
 				case WM_PAINT:
 				{
 					pDemoApp->OnRender();
+					SetFocus(pDemoApp->m_input);
 				}
 				result = 0;
 				wasHandled = false;
@@ -743,18 +744,23 @@ private:
 				if (wParam == VK_UP) {
 					if (historyIndex < history.size() && historyIndex >= 0) {
 						historyIndex++;
-						auto s = std::next(history.rbegin(), historyIndex - 1);
+						auto s = std::next(history.rbegin(), historyIndex - (int)1);
 						SendMessage(pDemoApp->m_input, WM_SETTEXT, NULL, (LPARAM)(s)->c_str());
 						SendMessage(pDemoApp->m_input, EM_SETSEL, s->size() + 1, s->size() + 1);
 					}
 					wasHandled = true;
 				}
 				else if (wParam == VK_DOWN) {
-					if (historyIndex < history.size() && historyIndex >= 0) {
-						historyIndex++;
-						auto s = std::next(history.rend(), historyIndex - 1);
-						SendMessage(pDemoApp->m_input, WM_SETTEXT, NULL, (LPARAM)(s)->c_str());
-						SendMessage(pDemoApp->m_input, EM_SETSEL, s->size() + 1, s->size() + 1);
+					if (historyIndex <= history.size() && historyIndex > 0) {
+						historyIndex--;
+						if (!historyIndex) {
+							SendMessage(pDemoApp->m_input, WM_SETTEXT, NULL, NULL);
+						} else {
+							auto s = std::next(history.rbegin(), historyIndex - (int)1);
+							SendMessage(pDemoApp->m_input, WM_SETTEXT, NULL, (LPARAM)(s)->c_str());
+							SendMessage(pDemoApp->m_input, EM_SETSEL, s->size() + 1, s->size() + 1);
+						}
+						
 					}
 					wasHandled = true;
 				}
