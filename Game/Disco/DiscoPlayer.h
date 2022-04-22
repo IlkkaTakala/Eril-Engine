@@ -6,6 +6,7 @@
 class Light;
 class MovementComponent;
 class PauseUI;
+class VisibleObject;
 
 //ECS TEST
 class ECSExample;
@@ -40,9 +41,9 @@ private:
 	void MouseMoved(float X, float Y);
 
 	void InputExit(bool);
-
 	void OpenConsole(bool);
 	void UseCursor(bool);
+	void RegisterInputs(InputComponent* com) override;
 
 	Ref<MovementComponent> Movement;
 	Ref<VisibleObject> Mesh;

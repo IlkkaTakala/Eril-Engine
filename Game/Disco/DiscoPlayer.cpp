@@ -7,6 +7,7 @@
 #include "PauseUI.h"
 #include <Interface/WindowManager.h>
 #include <GamePlay/Scene.h>
+#include "Objects/InputComponent.h"
 
 
 //ECS
@@ -41,21 +42,7 @@ DiscoPlayer::DiscoPlayer() : Player()
 	spawnCounter = 0;
 
 	//Reqister used Inputs
-	II->RegisterKeyContinuousInput(81, &DiscoPlayer::RunInputQ, this);
-	II->RegisterKeyContinuousInput(90, &DiscoPlayer::RunInputZ, this);
-	II->RegisterKeyContinuousInput(87, &DiscoPlayer::RunInputW, this);
-	II->RegisterKeyContinuousInput(65, &DiscoPlayer::RunInputA, this);
-	II->RegisterKeyContinuousInput(83, &DiscoPlayer::RunInputS, this);
-	II->RegisterKeyContinuousInput(68, &DiscoPlayer::RunInputD, this);
-	II->RegisterKeyInput(32, &DiscoPlayer::RunInputSpace, this);
-	II->RegisterKeyInput(340, &DiscoPlayer::RunInputShift, this);
-	II->RegisterKeyInput(0, &DiscoPlayer::LeftMouseDown, this);
-	II->RegisterKeyInput(49, &DiscoPlayer::InputOne, this);
-	II->RegisterKeyInput(50, &DiscoPlayer::InputTwo, this);
-	II->RegisterKeyInput(256, &DiscoPlayer::InputExit, this);
-	II->RegisterKeyInput(257, &DiscoPlayer::OpenConsole, this);
-	II->RegisterMouseInput(0, &DiscoPlayer::MouseMoved, this);
-	II->RegisterKeyInput(69, &DiscoPlayer::UseCursor, this);
+	
 
 	//Player Movement
 	Movement = SpawnObject<MovementComponent>();
@@ -78,6 +65,24 @@ DiscoPlayer::DiscoPlayer() : Player()
 	pause = nullptr;
 }
 
+void DiscoPlayer::RegisterInputs(InputComponent* com)
+{
+	com->RegisterKeyContinuousInput(81, &DiscoPlayer::RunInputQ, this);
+	com->RegisterKeyContinuousInput(90, &DiscoPlayer::RunInputZ, this);
+	com->RegisterKeyContinuousInput(87, &DiscoPlayer::RunInputW, this);
+	com->RegisterKeyContinuousInput(65, &DiscoPlayer::RunInputA, this);
+	com->RegisterKeyContinuousInput(83, &DiscoPlayer::RunInputS, this);
+	com->RegisterKeyContinuousInput(68, &DiscoPlayer::RunInputD, this);
+	com->RegisterKeyInput(32, &DiscoPlayer::RunInputSpace, this);
+	com->RegisterKeyInput(340, &DiscoPlayer::RunInputShift, this);
+	com->RegisterKeyInput(0, &DiscoPlayer::LeftMouseDown, this);
+	com->RegisterKeyInput(49, &DiscoPlayer::InputOne, this);
+	com->RegisterKeyInput(50, &DiscoPlayer::InputTwo, this);
+	com->RegisterKeyInput(256, &DiscoPlayer::InputExit, this);
+	com->RegisterKeyInput(257, &DiscoPlayer::OpenConsole, this);
+	com->RegisterMouseInput(0, &DiscoPlayer::MouseMoved, this);
+	com->RegisterKeyInput(69, &DiscoPlayer::UseCursor, this);
+}
 
 //Handle Inputs
 void DiscoPlayer::RunInputQ(float delta, bool KeyDown)
@@ -152,8 +157,11 @@ void DiscoPlayer::RightMouseDown(bool KeyDown)
 
 void DiscoPlayer::MouseMoved(float X, float Y)
 {
-	const Vector& rot = Rotation;
-	if (cursorState) SetRotation(Vector(rot.X + X * mouseSens, rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, rot.Z));
+	const Rotator& rot = Rotation;
+	if (cursorState) SetRotation(Vector(
+		rot.X,
+		rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y,
+		rot.Z + X * mouseSens));
 }
 
 void DiscoPlayer::InputExit(bool down)

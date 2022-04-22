@@ -9,6 +9,7 @@ class Light;
 class MovementComponent;
 class Terrain;
 class PauseUI;
+class VisibleObject;
 
 //ECS TEST
 class ECSExample;
@@ -45,6 +46,7 @@ private:
 
 	void OpenConsole(bool);
 	void UseCursor(bool);
+	void RegisterInputs(InputComponent* com);
 
 	Ref<MovementComponent> Movement;
 	Ref<VisibleObject> Mesh;

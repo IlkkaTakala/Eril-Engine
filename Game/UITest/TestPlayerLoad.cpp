@@ -8,6 +8,7 @@
 #include "PauseUI.h"
 #include <Interface/WindowManager.h>
 #include <GamePlay/Scene.h>
+#include "Objects/InputComponent.h"
 
 void TestPlayerLoad::OpenConsole(bool) {
 	Console::Create();
@@ -30,22 +31,7 @@ TestPlayerLoad::TestPlayerLoad() : Player()
 	spawnCounter = 0;
 
 	//Reqister used Inputs
-	II->RegisterKeyContinuousInput(81, &TestPlayerLoad::RunInputQ, this);
-	II->RegisterKeyContinuousInput(90, &TestPlayerLoad::RunInputZ, this);
-	II->RegisterKeyContinuousInput(87, &TestPlayerLoad::RunInputW, this);
-	II->RegisterKeyContinuousInput(65, &TestPlayerLoad::RunInputA, this);
-	II->RegisterKeyContinuousInput(83, &TestPlayerLoad::RunInputS, this);
-	II->RegisterKeyContinuousInput(68, &TestPlayerLoad::RunInputD, this);
-	II->RegisterKeyInput(32, &TestPlayerLoad::RunInputSpace, this);
-	II->RegisterKeyInput(340, &TestPlayerLoad::RunInputShift, this);
-	II->RegisterKeyInput(0, &TestPlayerLoad::LeftMouseDown, this);
-	II->RegisterKeyInput(49, &TestPlayerLoad::InputOne, this);
-	II->RegisterKeyInput(50, &TestPlayerLoad::InputTwo, this);
-	II->RegisterKeyInput(256, &TestPlayerLoad::InputExit, this);
-	II->RegisterKeyInput(257, &TestPlayerLoad::OpenConsole, this);
-	II->RegisterMouseInput(0, &TestPlayerLoad::MouseMoved, this);
-	II->RegisterKeyInput(69, &TestPlayerLoad::UseCursor, this);
-
+	
 	//Player Model
 	Mesh = SpawnObject<VisibleObject>();
 	Mesh->SetModel("Cube");
@@ -69,6 +55,24 @@ TestPlayerLoad::TestPlayerLoad() : Player()
 	pause = nullptr;
 }
 
+void TestPlayerLoad::RegisterInputs(InputComponent* com)
+{
+	com->RegisterKeyContinuousInput(81, &TestPlayerLoad::RunInputQ, this);
+	com->RegisterKeyContinuousInput(90, &TestPlayerLoad::RunInputZ, this);
+	com->RegisterKeyContinuousInput(87, &TestPlayerLoad::RunInputW, this);
+	com->RegisterKeyContinuousInput(65, &TestPlayerLoad::RunInputA, this);
+	com->RegisterKeyContinuousInput(83, &TestPlayerLoad::RunInputS, this);
+	com->RegisterKeyContinuousInput(68, &TestPlayerLoad::RunInputD, this);
+	com->RegisterKeyInput(32, &TestPlayerLoad::RunInputSpace, this);
+	com->RegisterKeyInput(340, &TestPlayerLoad::RunInputShift, this);
+	com->RegisterKeyInput(0, &TestPlayerLoad::LeftMouseDown, this);
+	com->RegisterKeyInput(49, &TestPlayerLoad::InputOne, this);
+	com->RegisterKeyInput(50, &TestPlayerLoad::InputTwo, this);
+	com->RegisterKeyInput(256, &TestPlayerLoad::InputExit, this);
+	com->RegisterKeyInput(257, &TestPlayerLoad::OpenConsole, this);
+	com->RegisterMouseInput(0, &TestPlayerLoad::MouseMoved, this);
+	com->RegisterKeyInput(69, &TestPlayerLoad::UseCursor, this);
+}
 
 //Handle Inputs
 void TestPlayerLoad::RunInputQ(float delta, bool KeyDown)
@@ -143,8 +147,8 @@ void TestPlayerLoad::RightMouseDown(bool KeyDown)
 
 void TestPlayerLoad::MouseMoved(float X, float Y)
 {
-	const Vector& rot = Rotation;
-	if (cursorState) SetRotation(Vector(rot.X + X * mouseSens, rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, rot.Z));
+	const Rotator& rot = Rotation;
+	if (cursorState) SetRotation(Rotator(rot.W, rot.X + X * mouseSens, rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, rot.Z));
 }
 
 void TestPlayerLoad::InputExit(bool down)

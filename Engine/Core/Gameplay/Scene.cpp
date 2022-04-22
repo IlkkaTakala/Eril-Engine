@@ -7,6 +7,7 @@
 #include "RenderCore/OpenGL/UI/UISpace.h"
 #include <Interface/WindowManager.h>
 #include <Interface/IECS.h>
+#include <Physics/BulletPhysics.h>
 
 String Scene::newLevel = "";
 
@@ -14,6 +15,7 @@ Scene::Scene() : BaseObject()
 {
 	gravity = 10.f;
 	SceneGraph.clear();
+	bLoading = false;
 }
 
 void ParseChildren(rapidxml::xml_node<>* node, SceneComponent* base) 
@@ -65,6 +67,11 @@ void Scene::CheckShouldLoad()
 	if (newLevel != "") LoadLevel();
 }
 
+bool Scene::isLoading()
+{
+	return Loop->World ? Loop->World->bLoading : false;
+}
+
 void Scene::OnDestroyed()
 {
 	while (SceneGraph.size() > 0) {
@@ -82,6 +89,7 @@ void Scene::AddSceneRoot(SceneComponent* obj)
 void Scene::RemoveSceneRoot(SceneComponent* obj)
 {
 	SceneGraph.remove(obj);
+	obj->SetScene(nullptr);
 }
 
 void Scene::LoadLevel()
@@ -90,6 +98,7 @@ void Scene::LoadLevel()
 	if (Loop->World != nullptr) {
 		ObjectManager::CleanObjects();
 		II->ClearInputs();
+		Physics::Destroy();
 	}
 
 	IECS::ResetECSWorld();
@@ -98,6 +107,8 @@ void Scene::LoadLevel()
 
 	ObjectManager::PrepareRecord(1, Constants::Record::LOADED);
 	Loop->World = SpawnObject<Scene>();
+	Loop->World->bLoading = true;
+	Physics::init();
 
 	ObjectManager::PrepareRecord(2, Constants::Record::LOADED);
 	Ref<GameState> State = SpawnObject<GameState>();
@@ -113,6 +124,7 @@ void Scene::LoadLevel()
 
 	delete doc;
 
+	Loop->World->BeginPlay();
 	for (const auto& base : Loop->World->SceneGraph) {
 		auto t = dynamic_cast<Tickable*>(base.GetPointer());
 		ObjectManager::AddTick(t);
@@ -124,4 +136,5 @@ void Scene::LoadLevel()
 	RI->GetUIManager()->RegisterInputs();
 
 	newLevel = "";
+	Loop->World->bLoading = false;
 }

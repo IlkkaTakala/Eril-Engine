@@ -22,12 +22,12 @@ void InstancedObject::LoadWithParameters(const String& args)
 	int instanceCount = 0;
 	std::vector<String> it;
 	Vector Scale = Vector(1, 1, 1);
-	Vector Rotation = Vector(0, 0, 0);
+	Rotator Rotation = Rotator(0.f);
 	Terrain* Terra = nullptr;
 
 	if (ran != data.end()) randCount = atoi(ran->second.c_str());
 	if (sca != data.end()) Scale = Vector(sca->second);
-	if (rot != data.end()) Rotation = Vector(rot->second);
+	if (rot != data.end()) Rotation = Rotator(rot->second);
 	if (ter != data.end()) Terra = ObjectManager::GetByRecord<Terrain>(std::stoul(ter->second, nullptr, 16));
 	if (ins != data.end()) {
 		it = split(ins->second, '/');
@@ -48,7 +48,7 @@ void InstancedObject::LoadWithParameters(const String& args)
 		{
 			arr[i + randCount].Location = Vector(it[i * 3]);
 			arr[i + randCount].Scale = Vector(it[i * 3 + 2]);
-			arr[i + randCount].Rotation = Vector(it[i * 3 + 1]);
+			arr[i + randCount].Rotation = Rotator(it[i * 3 + 1]);
 		}
 
 		AddInstances(randCount + instanceCount, arr);

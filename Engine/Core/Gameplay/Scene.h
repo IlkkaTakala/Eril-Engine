@@ -12,6 +12,7 @@ public:
 
 	static void OpenLevel(String map);
 	static void CheckShouldLoad();
+	static bool isLoading();
 
 	void OnDestroyed() override;
 	void AddSceneRoot(SceneComponent*);
@@ -25,4 +26,5 @@ private:
 	std::list<Ref<SceneComponent>> SceneGraph;
 
 	float gravity;
+	bool bLoading;
 };

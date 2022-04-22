@@ -2,17 +2,19 @@
 #include "UIEditor/Editor.h"
 #include "PauseUI.h"
 #include <Interface/WindowManager.h>
+#include "Objects/InputComponent.h"
 
 EditorPlayer::EditorPlayer()
 {
 	paused = nullptr;
 
-	II->RegisterKeyInput(256, &EditorPlayer::InputExit, this);
+	
 }
 
 
 void EditorPlayer::LoadWithParameters(const String& args)
 {
+	Player::LoadWithParameters(args);
 	auto ui = SpawnObject<Editor>();
 	UI::AddToScreen(ui, this);
 
@@ -30,4 +32,9 @@ void EditorPlayer::InputExit(bool down)
 		paused->DestroyObject();
 		paused = nullptr;
 	}
+}
+
+void EditorPlayer::RegisterInputs(InputComponent* com)
+{
+	com->RegisterKeyInput(256, &EditorPlayer::InputExit, this);
 }

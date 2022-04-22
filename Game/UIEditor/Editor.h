@@ -19,6 +19,7 @@ private:
 
 	void RightClick(float, bool);
 	void Edit(UIComponent* parent, UIComponent* target, const String& name);
+	virtual void RegisterInputs(InputComponent* com) override;
 
 	Panel* AddableComps;
 	Panel* EditCanvas;

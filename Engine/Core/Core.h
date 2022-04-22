@@ -1,5 +1,6 @@
 #pragma once
 #include "BasicTypes.h"
+#include <Basic/Rotation.h>
 #include "Objects/BaseObject.h"
 #include "ObjectManager.h"
 #include "Interface/IRender.h"
@@ -125,6 +126,8 @@ namespace helpers{
 		if (SpawnType != Constants::Record::LOADED) base->LoadWithParameters(args);
 		return next;
 	}
+
+	void SpawnHelper(BaseObject* obj, const String& args);
 }
 
 template <typename T>
@@ -149,10 +152,7 @@ T* SpawnObject(String args = "", uint32 ID = 0)
 	if (base == nullptr) {
 		next->DestroyObject();
 	}
-	base->LoadWithParameters(args);
-	base->BeginPlay();
-	auto t = dynamic_cast<Tickable*>(base);
-	ObjectManager::AddTick(t);
+	helpers::SpawnHelper(base, args);
 	return next;
 }
 

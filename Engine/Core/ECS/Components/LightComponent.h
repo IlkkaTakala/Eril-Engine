@@ -7,8 +7,9 @@ Author: Albert Uusi-Illikainen [RabbitTortoise]
 #include <Core.h>
 #include <ECS/Component.h>
 
-struct LightComponent : public Component
+class LightComponent : public Component
 {
+public:
 	LightComponent(){}
 	LightComponent(const LightComponent& c) : Component(static_cast<Component>(c)) 
 	{ 

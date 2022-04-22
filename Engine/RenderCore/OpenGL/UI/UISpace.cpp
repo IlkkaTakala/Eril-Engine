@@ -7,6 +7,7 @@
 #include <GLFW/glfw3.h>
 #include <Interface/WindowManager.h>
 #include <UI/TextBox.h>
+#include "Objects/InputComponent.h"
 
 UISpace::UISpace()
 {
@@ -168,6 +169,8 @@ void UISpace::Render(uint target)
 	//glDisable(GL_BLEND);
 	glDisable(GL_MULTISAMPLE);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthFunc(GL_ALWAYS);
 	glDisable(GL_CULL_FACE);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -208,8 +211,10 @@ void UISpace::RemoveComponent(UI* com)
 
 void UISpace::RegisterInputs()
 {
-	II->RegisterKeyInput(0, &UISpace::LeftClick, this);
-	II->RegisterTextInput(&UISpace::GetTextInput, this);
+	if (UInputComp != nullptr) UInputComp->DestroyObject();
+	UInputComp = SpawnObject<InputComponent>();
+	UInputComp->RegisterKeyInput(0, &UISpace::LeftClick, this);
+	UInputComp->RegisterTextInput(&UISpace::GetTextInput, this);
 }
 
 void UISpace::LeftClick(bool down)

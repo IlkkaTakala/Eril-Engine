@@ -43,6 +43,16 @@ BaseObject::BaseObject()
 	World = Loop->World;
 }
 
+void BaseObject::RegisterInputs(InputComponent* IC)
+{
+
+}
+
+void BaseObject::SetColliders(ColliderComponent* CC)
+{
+
+}
+
 const std::map<String, String> BaseObject::ParseOptions(const String& args)
 {
 	std::map<String, String> options;

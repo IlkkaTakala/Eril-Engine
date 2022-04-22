@@ -85,33 +85,33 @@ void AudioManager::PlayAudio(uint id)
 
 void AudioManager::PlayAudio(uint id, const Vector& position)
 {
-	alSource3f(id, AL_POSITION, position.X, position.Z, position.Y);
+	alSource3f(id, AL_POSITION, position.X, position.Y, position.Z);
 	alSourcePlay(id);
 }
 
 void AudioManager::PlayAudio(uint id, const Vector& position, const Vector& velocity)
 {
-	alSource3f(id, AL_POSITION, position.X, position.Z, position.Y);
-	alSource3f(id, AL_VELOCITY, velocity.X, velocity.Z, velocity.Y);
+	alSource3f(id, AL_POSITION, position.X, position.Y, position.Z);
+	alSource3f(id, AL_VELOCITY, velocity.X, velocity.Y, velocity.Z);
 	alSourcePlay(id);
 }
 
 void AudioManager::PlayAudio(uint id, const Vector& position, const Vector& velocity, float gain)
 {
-	alSource3f(id, AL_POSITION, position.X, position.Z, position.Y);
-	alSource3f(id, AL_VELOCITY, velocity.X, velocity.Z, velocity.Y);
+	alSource3f(id, AL_POSITION, position.X, position.Y, position.Z);
+	alSource3f(id, AL_VELOCITY, velocity.X, velocity.Y, velocity.Z);
 	alSourcef(id, AL_GAIN, gain);
 	alSourcePlay(id);
 }
 
 void AudioManager::SetAudioPosition(uint id, const Vector& position)
 {
-	alSource3f(id, AL_POSITION, position.X, position.Z, position.Y);
+	alSource3f(id, AL_POSITION, position.X, position.Y, position.Z);
 }
 
 void AudioManager::SetAudioVelocity(uint id, const Vector& velocity)
 {
-	alSource3f(id, AL_VELOCITY, velocity.X, velocity.Z, velocity.Y);
+	alSource3f(id, AL_VELOCITY, velocity.X, velocity.Y, velocity.Z);
 }
 
 void AudioManager::SetAudioPitch(uint id, const float pitch)
@@ -148,8 +148,8 @@ void AudioManager::StopAudio(uint id)
 
 void AudioManager::SetListener(const Vector& position, const Vector& orientation, const Vector& up)
 {
-	alListener3f(AL_POSITION, position.X, position.Z, position.Y);
-	float f[] = {orientation.X, -orientation.Z, orientation.Y, up.X, -up.Z, up.Y };
+	alListener3f(AL_POSITION, position.X, position.Y, position.Z);
+	float f[] = {orientation.X, orientation.Y, orientation.Z, up.X, up.Y, up.Z };
 	alListenerfv(AL_ORIENTATION, f);
 }
 

@@ -10,6 +10,12 @@ class MovementComponent;
 class Terrain;
 class Hunter;
 class PauseUI;
+class BoxCollisionShape;
+class SphereCollisionShape;
+class CylinderCollisionShape;
+class ConeCollisionShape;
+class CapsuleCollisionShape;
+class VisibleObject;
 
 //ECS TEST
 class ECSExample;
@@ -46,6 +52,7 @@ private:
 
 	void OpenConsole(bool);
 	void UseCursor(bool);
+	void RegisterInputs(InputComponent* com);
 
 	Ref<MovementComponent> Movement;
 	Ref<VisibleObject> Mesh;
@@ -54,10 +61,17 @@ private:
 	bool InputMode;
 	Ref<Light> DirLight;
 	Ref<VisibleObject> Sky;
-	Ref<Actor> Collider;
-	Ref<MovementComponent> ColliderModelMove;
-	Ref<VisibleObject> ColliderModel;
+	Ref<Actor> Box;
+	Ref<Actor> Box2;
+	Ref<MovementComponent> BoxModelMove;
+	Ref<VisibleObject> BoxModel;
+	Ref<BoxCollisionShape> BoxCol;
+	Ref<VisibleObject> BoxModel2;
+	Ref<CylinderCollisionShape> BoxCol2;
+	Ref<CapsuleCollisionShape> PlayerCol;
 
+	Ref<VisibleObject> Plane;
+	Ref<BoxCollisionShape> PlaneCol;
 
 	PauseUI* pause;
 

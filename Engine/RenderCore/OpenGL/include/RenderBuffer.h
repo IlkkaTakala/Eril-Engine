@@ -15,7 +15,7 @@ public:
 	uint GetBuffer() const { return FrameBuffer; }
 	uint GetDepth() const { return DepthBuffer; }
 
-	void BindTextures();
+	void BindTextures(int offset = 0);
 	void BindTexturesReading();
 
 private:
@@ -38,8 +38,11 @@ public:
 	void Unbind();
 	uint GetBuffer() const { return FrameBuffer; }
 	uint GetBloom() const { return BloomBuffer; }
+	uint GetNormal() const { return NormalBuffer; }
+	uint GetColor() const { return ColorBuffer; }
+	uint GetPosition() const { return PositionBuffer; }
 
-	void BindTextures();
+	void BindTextures(int offset = 0);
 
 private:
 	uint FrameBuffer;
@@ -49,6 +52,8 @@ private:
 	uint AccumBuffer;
 	uint RevealageBuffer;
 	uint DepthBuffer;
+	uint NormalBuffer;
+	uint PositionBuffer;
 
 	PostBuffer(const PostBuffer&);
 	PostBuffer& operator=(const PostBuffer&);
@@ -67,7 +72,7 @@ public:
 	uint GetSSAO() const { return ColorBuffer; }
 	uint GetSSAOBlur() const { return BlurBuffer; }
 
-	void BindTextures();
+	void BindTextures(int offset = 0);
 
 private:
 	uint FrameBuffer;
@@ -112,7 +117,7 @@ public:
 	uint GetBuffer() const { return FrameBuffer; }
 	uint GetShadows() const { return Shadow; }
 
-	void BindTextures();
+	void BindTextures(int offset = 0);
 
 private:
 	uint FrameBuffer;
@@ -157,7 +162,7 @@ public:
 	uint GetEnvironment() const { return Env; }
 	uint GetFilterEnvironment() const { return Filter; }
 
-	void BindTextures();
+	void BindTextures(int offset = 0);
 
 private:
 	uint FrameBuffer;

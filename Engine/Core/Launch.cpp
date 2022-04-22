@@ -27,7 +27,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		break;
 	}
 	Console::Log("Game closed, goodbye");
-	Sleep(1000);
+	Sleep(10000);
 	Console::Close();
 	return retur;
 }

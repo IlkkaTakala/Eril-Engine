@@ -12,6 +12,7 @@ class Hunter;
 class PauseUI;
 class EndScreen;
 class StartScreen;
+class VisibleObject;
 
 class Item : public BaseObject
 {
@@ -63,6 +64,7 @@ private:
 	void InputExit(bool);
 	void OpenConsole(bool);
 	void UseCursor(bool);
+	void RegisterInputs(InputComponent* com);
 
 	Ref<MovementComponent> Movement;
 	Ref<VisibleObject> Mesh;

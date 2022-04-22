@@ -1,6 +1,7 @@
 #include <iostream>
 #include "GameLoop.h"
 #include "Core.h"
+#include <Gameplay/Scene.h>
 #ifdef USE_SCRIPTCORE
 #include <ScriptCore.h>
 namespace ScriptFunctions {
@@ -12,7 +13,6 @@ namespace ScriptFunctions {
 	REGISTER_FUNCTION(CreateObject, global, 2);
 }
 #endif // SCRIPTCORE
-
 
 
 GameLoop* Loop = nullptr;
@@ -36,4 +36,12 @@ GameState* GetGameState() {
 BaseObject* FindObjectByRecord(const RecordInt& record)
 {
 	return ObjectManager::GetByRecord<BaseObject>(record);
+}
+
+void helpers::SpawnHelper(BaseObject* obj, const String& args)
+{
+	obj->LoadWithParameters(args);
+	if (!Scene::isLoading()) obj->BeginPlay();
+	auto t = dynamic_cast<Tickable*>(obj);
+	ObjectManager::AddTick(t);
 }

@@ -224,7 +224,7 @@ layout(std430, binding = 3) readonly buffer CharBuffer {
 };
 
 shared float width;
-const float fade = 0.1;
+const float fade = 0.25;
 
 #define TILE_SIZE 64
 layout(local_size_x = TILE_SIZE, local_size_y = 1, local_size_z = 1) in;
@@ -233,7 +233,7 @@ void main()
 	uint character = 0;
 	
 	if (gl_LocalInvocationIndex == 0) {
-		width = 0.47 - (weight / 100.0 - 1.0) * 0.13;
+		width = 0.42 - (weight / 100.0 - 1.0) * 0.13;
 	}
 
 	uint threadCount = TILE_SIZE;

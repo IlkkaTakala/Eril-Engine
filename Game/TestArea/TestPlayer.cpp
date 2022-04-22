@@ -10,6 +10,10 @@
 #include <Interface/WindowManager.h>
 #include <Interface/AudioManager.h>
 #include <GamePlay/Scene.h>
+#include "Objects/InputComponent.h"
+#include "Objects/CollisionShape.h"
+#include <Objects/ParticleComponent.h>
+#include "CloudParticle.h"
 
 //ECS
 #include <Interface/IECS.h>
@@ -33,6 +37,25 @@ void TestPlayer::UseCursor(bool keydown)
 	}
 }
 
+void TestPlayer::RegisterInputs(InputComponent* com)
+{
+	com->RegisterKeyContinuousInput(81, &TestPlayer::RunInputQ, this);
+	com->RegisterKeyContinuousInput(90, &TestPlayer::RunInputZ, this);
+	com->RegisterKeyContinuousInput(87, &TestPlayer::RunInputW, this);
+	com->RegisterKeyContinuousInput(65, &TestPlayer::RunInputA, this);
+	com->RegisterKeyContinuousInput(83, &TestPlayer::RunInputS, this);
+	com->RegisterKeyContinuousInput(68, &TestPlayer::RunInputD, this);
+	com->RegisterKeyInput(32, &TestPlayer::RunInputSpace, this);
+	com->RegisterKeyInput(340, &TestPlayer::RunInputShift, this);
+	com->RegisterKeyInput(0, &TestPlayer::LeftMouseDown, this);
+	com->RegisterKeyInput(49, &TestPlayer::InputOne, this);
+	com->RegisterKeyInput(50, &TestPlayer::InputTwo, this);
+	com->RegisterKeyInput(256, &TestPlayer::InputExit, this);
+	com->RegisterKeyInput(257, &TestPlayer::OpenConsole, this);
+	com->RegisterMouseInput(0, &TestPlayer::MouseMoved, this);
+	com->RegisterKeyInput(69, &TestPlayer::UseCursor, this);
+}
+
 TestPlayer::TestPlayer() : Player()
 {
 
@@ -41,35 +64,32 @@ TestPlayer::TestPlayer() : Player()
 	InputMode = true;
 	cursorState = true;
 	spawnCounter = 0;
-
-	//Reqister used Inputs
-	II->RegisterKeyContinuousInput(81, &TestPlayer::RunInputQ, this);
-	II->RegisterKeyContinuousInput(90, &TestPlayer::RunInputZ, this);
-	II->RegisterKeyContinuousInput(87, &TestPlayer::RunInputW, this);
-	II->RegisterKeyContinuousInput(65, &TestPlayer::RunInputA, this);
-	II->RegisterKeyContinuousInput(83, &TestPlayer::RunInputS, this);
-	II->RegisterKeyContinuousInput(68, &TestPlayer::RunInputD, this);
-	II->RegisterKeyInput(32, &TestPlayer::RunInputSpace, this);
-	II->RegisterKeyInput(340, &TestPlayer::RunInputShift, this);
-	II->RegisterKeyInput(0, &TestPlayer::LeftMouseDown, this);
-	II->RegisterKeyInput(49, &TestPlayer::InputOne, this);
-	II->RegisterKeyInput(50, &TestPlayer::InputTwo, this);
-	II->RegisterKeyInput(256, &TestPlayer::InputExit, this);
-	II->RegisterKeyInput(257, &TestPlayer::OpenConsole, this);
-	II->RegisterMouseInput(0, &TestPlayer::MouseMoved, this);
-	II->RegisterKeyInput(69, &TestPlayer::UseCursor, this);
+	
+	Rotation = Rotator(0.f);
 
 	//Player Model
 	Mesh = SpawnObject<VisibleObject>();
 	Mesh->SetModel("Cube");
-	Mesh->GetModel()->SetAABB(AABB(Vector(-1.f), Vector(1.f)));
-	
-	SetLocation(Vector(0, 0, 2));
+	Mesh->GetModel()->SetAABB(AABB(Vector(-1.f, -1.f, 0.f), Vector(1.f, 1.f, 2.f)));
+	SetLocation(Vector(15, 15, 1));
 
 	//Player Movement
 	Movement = SpawnObject<MovementComponent>();
 	Movement->SetTarget(dynamic_cast<Actor*>(this), Mesh->GetModel()->GetAABB());
 	Movement->SetGravity(true);
+	Movement->SetPhysics(false);
+	Movement->SetMaxSpeed(Speed);
+	Movement->SetFlightMaxSpeed(Speed);
+	Movement->SetAirBrake(10.f);
+	Movement->SetAcceleration(500.f);
+	Movement->SetAirControl(0.9f);
+
+	PlayerCol = SpawnObject<CapsuleCollisionShape>();
+	AddComponent(PlayerCol);
+	PlayerCol->SetLocation(Vector(0.f, 0.f, 1.f), true);
+	PlayerCol->SetType(2);
+	PlayerCol->SetSize(0.5, 1.f);
+	PlayerCol->SetMovementTarget(Movement);
 
 	//Skybox
 	Sky = SpawnObject<VisibleObject>();
@@ -78,35 +98,81 @@ TestPlayer::TestPlayer() : Player()
 	Sky->SetScale(Sky->GetScale() * 2.0f);
 
 	//Testing UI
-	auto ui = UI::LoadFromFile("Game/TestArea/testingui2.ui");
-	UI::AddToScreen(ui, this);
+	/*auto ui = UI::LoadFromFile("Game/TestArea/testingui2.ui");
+	UI::AddToScreen(ui, this);*/
 
 	pause = nullptr;
 
+	/*Plane = SpawnObject<VisibleObject>();
+	Plane->SetModel("Cube");
+	Plane->GetModel()->SetAABB(AABB(Vector(-20.f, -20.f, -0.5f), Vector(20.f, 20.f, 0.5f)));
+	Plane->SetScale(Vector(20.f, 20.f, 0.5f));
+	Plane->SetLocation(Vector(10.f, 10.f, 0.f));
 
-		
-	Collider = SpawnObject<Actor>();
+	PlaneCol = SpawnObject<BoxCollisionShape>();
+	PlaneCol->SetType(0);
+	PlaneCol->SetSize(Plane->GetModel()->GetAABB());
+	Plane->AddComponent(PlaneCol);*/
+
+	Box = SpawnObject<Actor>();
 
 	//Moment Model -> ColliderModel
-	ColliderModel = SpawnObject<VisibleObject>();
-	ColliderModel->SetModel("Cube");
-	ColliderModel->GetModel()->SetAABB(AABB(Vector(-0.5f), Vector(0.5f)));
+	BoxModel = SpawnObject<VisibleObject>();
+	BoxModel->SetModel("Cube");
+	BoxModel->GetModel()->SetAABB(AABB(Vector(-1.0f), Vector(1.0f)));
 
-	Collider->AddComponent(ColliderModel);
-	Collider->SetLocation(Vector(20, 2, 1));
+	Box->AddComponent(BoxModel);
+	Box->SetLocation(Vector(10.f, 10.f, 2.f));
+
+	BoxCol = SpawnObject<BoxCollisionShape>();
+	Box->AddComponent(BoxCol);
+	BoxCol->SetType(0);
+	BoxCol->SetSize(BoxModel->GetModel()->GetAABB());
 	
+	/*BoxModelMove = SpawnObject<MovementComponent>();
+	BoxModelMove->SetTarget(Box, BoxModel->GetModel()->GetAABB());
+	BoxModelMove->SetGravity(true);*/
+	//BoxModelMove->SetPhysics(true);
+	//BoxCol->SetTarget(Box);
 
-	ColliderModelMove = SpawnObject<MovementComponent>();
-	ColliderModelMove->SetTarget(Collider, ColliderModel->GetModel()->GetAABB());
+	Box2 = SpawnObject<Actor>();
+
+	BoxModel2 = SpawnObject<VisibleObject>();
+	BoxModel2->SetModel("cylinder");
+	//BoxModel2->SetRotation(Vector(0.f, 0.f, -90.f));
+	//BoxModel2->SetScale(0.5f);
+	//BoxModel2->GetModel()->SetAABB(AABB(Vector(-1.0f), Vector(1.0f)));
+
+	Box2->AddComponent(BoxModel2);
+	Box2->SetLocation(Vector(10.f, 10.f, 6.f));
+	Box2->SetRotation(Vector(90.f, 0.f, 0.f));
+
+	BoxCol2 = SpawnObject<CylinderCollisionShape>();
+	BoxCol2->SetType(1);
+	Box2->AddComponent(BoxCol2);
+	BoxCol2->SetSize(BoxModel2->GetModel()->GetAABB());
+	//BoxCol2->SetLocation(Vector(0.f, 0.f, 0.f));
+	//BoxCol2->SetRotation(Vector(0.f, 90.f, 0.f));
+
+
+	//BoxModelMove = SpawnObject<MovementComponent>();
+	//BoxModelMove->SetTarget(Box2, BoxModel2->GetModel()->GetAABB());
+	//BoxModelMove->SetGravity(true);
+	////BoxModelMove->SetPhysics(true);
+	//BoxCol2->SetTarget(BoxModelMove);
 
 	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
+
+	/*auto part = SpawnObject<ParticleComponent>();
+	part->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
+	part->SetLocation({10.f, 5.f, 0.5f});*/
 
 }
 
 void TestPlayer::TestTimer(float d)
 {
-	Console::Log("Location changed");
-	Collider->SetLocation(Vector(30, 0, 1), true);
+	//Console::Log("Location changed");
+	//Collider->SetLocation(Vector(30, 0, 1), true);
 }
 
 
@@ -124,7 +190,7 @@ void TestPlayer::RunInputZ(float delta, bool KeyDown)
 
 void TestPlayer::RunInputW(float delta, bool KeyDown)
 {
-	Vector dir = -GetCamera()->GetForwardVector();
+	Vector dir = GetCamera()->GetForwardVector();
 	dir.Z = 0.f;
 	Movement->AddInput(dir.Normalize());
 }
@@ -141,7 +207,7 @@ void TestPlayer::RunInputD(float delta, bool KeyDown)
 
 void TestPlayer::RunInputS(float delta, bool KeyDown)
 {
-	Vector dir = GetCamera()->GetForwardVector();
+	Vector dir = -GetCamera()->GetForwardVector();
 	dir.Z = 0.f;
 	Movement->AddInput(dir.Normalize());
 }
@@ -149,7 +215,7 @@ void TestPlayer::RunInputS(float delta, bool KeyDown)
 void TestPlayer::RunInputSpace(bool KeyDown)
 {
 	if (!Movement->IsInAir() && KeyDown)
-		Movement->AddImpulse(Vector(0.f, 0.f, 300.f));
+		Movement->AddImpulse(Vector(0.f, 0.f, 6000.f));
 }
 
 void TestPlayer::InputOne(bool KeyDown)
@@ -199,8 +265,16 @@ void TestPlayer::RightMouseDown(bool KeyDown)
 
 void TestPlayer::MouseMoved(float X, float Y)
 {
-	const Vector& rot = Rotation;
-	if (cursorState) SetRotation(Vector(rot.X + X * mouseSens, rot.Y + Y * mouseSens < 89.f && rot.Y + Y * mouseSens > -89.f ? rot.Y + Y * mouseSens : rot.Y, rot.Z));
+	if (cursorState) {
+		Camera* cam = GetCamera();
+		Rotator rot = cam->GetRotation();
+		float y = rot.PitchDegrees();
+		cam->SetRotation(Vector(
+			rot.RollDegrees(),
+			y + Y * mouseSens < 89.f && y + Y * mouseSens > -89.f ? y + Y * mouseSens : y,
+			rot.YawDegrees() + X * mouseSens
+		));
+	}
 }
 
 void TestPlayer::InputExit(bool down)
@@ -227,15 +301,19 @@ void TimeFunction (float d)
 
 void TestPlayer::Tick(float deltaTime)
 {
-	
-	Vector loc = Collider->GetLocation();
+	//Console::Log((BoxCol2->GetWorldLocation()).ToString() + " BoxCol2");
+	//Console::Log((BoxCol->GetWorldLocation()).ToString() + " BoxCol2");
+	//Console::Log((Box->GetWorldLocation()).ToString() + " Box");
+	//Console::Log((GetWorldLocation()).ToString() + " Player");
+	//Console::Log((PlayerCol->GetWorldLocation()).ToString() + " PlayerCol");
+
+	Vector loc = Box->GetLocation();
 	GetCamera()->SetLocation(Location + Vector(0.f, 0.f, 1.5f));
-	GetCamera()->SetRotation(Rotation);
 	Sky->SetLocation(Location);
 	
 	Vector listenerPos = Location;
 	Vector listenerOrientation = GetCamera()->GetForwardVector();
-	AudioManager::SetListener(listenerPos, -GetCamera()->GetForwardVector(), -GetCamera()->GetUpVector());
+	AudioManager::SetListener(listenerPos, GetCamera()->GetForwardVector(), GetCamera()->GetUpVector());
 }
 
 void TestPlayer::BeginPlay()
