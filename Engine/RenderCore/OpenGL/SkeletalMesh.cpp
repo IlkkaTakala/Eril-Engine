@@ -125,11 +125,13 @@ void RenderMeshSkeletalGL::SetAABB(AABB bounds)
 
 void RenderMeshSkeletalGL::UpdateBoneMatrices()
 {
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, BoneTranforms);
 	for (uint i = 0; i < Mesh->skeleton->BoneCount; i++) {
 		const Bone& b = Mesh->skeleton->Bones[i];
 		BoneTransformArray[i] *= b.offset;
 	}
 	glBufferData(GL_SHADER_STORAGE_BUFFER, Mesh->skeleton->BoneCount * sizeof(glm::mat4), BoneTransformArray.data(), GL_STATIC_DRAW);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
 void RenderMeshSkeletalGL::ApplyTransform(float delta)

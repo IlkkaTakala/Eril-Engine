@@ -148,6 +148,7 @@ public:
 	virtual ~IMesh() {}
 	virtual RenderMesh* GetStatic(SceneComponent* parent, const String& name) = 0;
 	virtual RenderMesh* GetSkeletal(SceneComponent* parent, const String& name) = 0;
+	virtual RenderMesh* GetSkeletalAsync(SceneComponent* parent, const String& name) = 0;
 	virtual RenderMesh* CreateProcedural(SceneComponent* parent, String name, std::vector<Vector>& positions, std::vector<Vector> UV, std::vector<Vector>& normal, std::vector<Vector>& tangent, std::vector<uint32>& indices) = 0;
 	virtual RenderMesh* MakeEmptyStatic() = 0;
 	virtual RenderMesh* MakeEmptySkeletal() = 0;

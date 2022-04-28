@@ -13,12 +13,13 @@ public:
 	virtual void LoadWithParameters(const String& args) override;
 
 	void SetModel(std::string Name);
+	void SetModelAsync(std::string Name);
 	void SetModel(RenderMesh* mesh);
 	std::string GetModelName() const { return std::string(); }
 	RenderMesh* GetModel() const { return RenderData; }
 
-	void SetController(AnimationController* a);
-	const AnimationController* GetController() const { return animControl; }
+	void SetAnimController(AnimationController* a);
+	const AnimationController* GetAnimController() const { return animControl; }
 
 	const std::string GetName() const { return std::string(""); }
 
@@ -26,7 +27,7 @@ public:
 protected:
 	friend class GC;
 
-	AnimationController* animControl;
+	Ref<AnimationController> animControl;
 	RenderMesh* RenderData;
 
 	void UpdateAnimations(float delta);

@@ -1,28 +1,38 @@
 #pragma once
 #include <Core.h>
 
+class Skeleton;
+
 enum class InterpType : uint8 
 {
 	Smoothstep,
 	Linear,
 };
 
-class Animation : public BaseObject
+class Animation
 {
 public:
+	Animation();
+
 	Vector GetLocation(int bone, float delta);
 	Rotator GetRotation(int bone, float delta);
 	Vector GetScale(int bone, float delta);
 
-private:
+	bool IsReady() const { return loaded; }
+
 	typedef std::tuple<Vector, InterpType> KeyframeLocation;
 	typedef std::tuple<Rotator, InterpType> KeyframeRotation;
 	typedef std::tuple<Vector, InterpType> KeyframeScale;
 
-	std::vector<std::list<std::pair<float, KeyframeLocation>>> LocationTrack;
-	std::vector<std::list<std::pair<float, KeyframeRotation>>> RotationTrack;
-	std::vector<std::list<std::pair<float, KeyframeScale>>> ScaleTrack;
+	std::vector<std::vector<std::pair<float, Vector>>> LocationTrack;
+	std::vector<std::vector<std::pair<float, Rotator>>> RotationTrack;
+	std::vector<std::vector<std::pair<float, Vector>>> ScaleTrack;
 
+	bool loaded;
 	bool looping;
+	float duration;
+	int tickSpeed;
+
+	Skeleton* skeleton;
 };
 

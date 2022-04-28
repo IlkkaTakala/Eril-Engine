@@ -6,24 +6,30 @@
 AnimationController::AnimationController()
 {
 	temp_anim = nullptr;
-	skeleton = nullptr;
+	animtime = 0.f;
 }
 
 void AnimationController::Tick(float delta)
 {
 }
 
-void AnimationController::UpdateBoneTransforms(float delta, RenderMesh* mesh) const
+void AnimationController::SetSkeleton(RenderMesh* s)
 {
+}
+
+void AnimationController::UpdateBoneTransforms(float delta, RenderMesh* mesh)
+{
+	if (!temp_anim) return;
 	auto m = dynamic_cast<RenderMeshSkeletalGL*>(mesh);
 	if (!m) return;
 
-	auto mats = m->GetBoneMatrices();
+	animtime += delta;
+	auto& mats = m->GetBoneMatrices();
 
-	for (int i = 0; i < mats.size(); i++) {
-		Vector loc = temp_anim->GetLocation(i, delta);
-		Rotator rot = temp_anim->GetRotation(i, delta);
-		Vector sca = temp_anim->GetScale(i, delta);
+	for (int i = 1; i < mats.size(); i++) {
+		Vector loc = temp_anim->GetLocation(i, animtime);
+		Rotator rot = temp_anim->GetRotation(i, animtime);
+		Vector sca = temp_anim->GetScale(i, animtime);
 
 		mats[i] = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Y, loc.Z))
 			* glm::toMat4(glm::quat(rot.W, rot.X, rot.Y, rot.Z))

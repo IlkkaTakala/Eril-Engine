@@ -98,6 +98,8 @@ public:
 	void UpdateBoneMatrices();
 	std::vector<glm::mat4>& GetBoneMatrices() { return BoneTransformArray; }
 
+	Skeleton* GetSkeleton() const { return Mesh->skeleton; }
+
 private:
 	friend class Renderer;
 	friend class SkinnedSection;

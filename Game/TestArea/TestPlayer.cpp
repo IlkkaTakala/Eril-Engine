@@ -15,6 +15,7 @@
 #include <Objects/ParticleComponent.h>
 #include "CloudParticle.h"
 #include <Objects/SkeletalObject.h>
+#include <Interface/AssetManager.h>
 
 //ECS
 #include <Interface/IECS.h>
@@ -132,6 +133,11 @@ TestPlayer::TestPlayer() : Player()
 	skel->SetModel("Assets/Meshes/AnimMesh");
 	skel->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/default_skel"));
 	skel->SetLocation({5, 5, 1});
+	auto animC = SpawnObject<AnimationController>();
+	animC->SetSkeleton(skel->GetModel());
+	skel->SetAnimController(animC);
+
+	animC->SetAnimation(AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Animation", skel->GetModel()));
 }
 
 void TestPlayer::TestTimer(float d)

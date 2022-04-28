@@ -10,6 +10,8 @@
 #include <Texture.h>
 #include <Basic/QueueSafe.h>
 
+#include <Animation.h>
+
 #include <glm/gtc/type_ptr.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -34,6 +36,7 @@ namespace AssetManager
 		std::unordered_map<String, LoadedMesh*> StaticMeshes;
 		std::unordered_map<String, LoadedSkeletalMesh*> SkeletalMeshes;
 		std::map<String, Texture*> LoadedTextures;
+		std::map<String, Animation*> LoadedAnimations;
 
 		SafeQueue<std::pair<String, void*>> LoadQueue;
 		SafeQueue<std::pair<String, void*>> UnloadQueue;
@@ -214,6 +217,45 @@ void processNode(LoadedMesh* mesh, aiNode* node, const aiScene* scene)
 	}
 }
 
+void processAnimNode(Animation* anim, const aiAnimation* aiAnim)
+{
+	anim->LocationTrack.resize(anim->skeleton->BoneCount);
+	anim->RotationTrack.resize(anim->skeleton->BoneCount);
+	anim->ScaleTrack.resize(anim->skeleton->BoneCount);
+
+	for (int c = 0; c < aiAnim->mNumChannels; c++) {
+		
+		String name = aiAnim->mChannels[c]->mNodeName.C_Str();
+		int id = -1;
+		for (int i = 0; i < anim->skeleton->BoneCount; i++) {
+			if (anim->skeleton->Bones[i].name == name) {
+				id = i;
+				break;
+			}
+		}
+		if (id == -1) {
+			Console::Warning("Missing bones found in animation");
+			continue;
+		}
+
+		for (int i = 0; i < aiAnim->mChannels[c]->mNumPositionKeys; i++) {
+			aiVector3D& val = aiAnim->mChannels[c]->mPositionKeys[i].mValue;
+			float time = aiAnim->mChannels[c]->mPositionKeys[i].mTime;
+			anim->LocationTrack[id].emplace_back(time, Vector{val.x, val.y, val.z});
+		}
+		for (int i = 0; i < aiAnim->mChannels[c]->mNumRotationKeys; i++) {
+			aiQuaternion& val = aiAnim->mChannels[c]->mRotationKeys[i].mValue;
+			float time = aiAnim->mChannels[c]->mRotationKeys[i].mTime;
+			anim->RotationTrack[id].emplace_back(time, Rotator{ val.w, val.x, val.y, val.z });
+		}
+		for (int i = 0; i < aiAnim->mChannels[c]->mNumScalingKeys; i++) {
+			aiVector3D& val = aiAnim->mChannels[c]->mScalingKeys[i].mValue;
+			float time = aiAnim->mChannels[c]->mScalingKeys[i].mTime;
+			anim->ScaleTrack[id].emplace_back(time, Vector{ val.x, val.y, val.z });
+		}
+	}
+}
+
 void processSkinnedNode(LoadedSkeletalMesh* mesh, BoneHierarchy& bh, aiNode* node, const aiScene* scene, bool usemesh)
 {
 	if (usemesh) {
@@ -303,6 +345,22 @@ LoadedSkeletalMesh* loadMeshesSkinned(const std::string& path)
 	return mesh;
 }
 
+void LoadAnimation(Animation* anim, const String& path)
+{
+	Assimp::Importer importer;
+	const aiScene* scene = importer.ReadFile(path + ".fbx", importOptions);
+	//Check for errors
+	if (!scene || !scene->mRootNode)
+	{
+		Console::Log("Error loading model file " + path + " : " + importer.GetErrorString());
+		return;
+	}
+	if (scene->HasAnimations())
+		anim->duration = scene->mAnimations[0]->mDuration;
+		anim->tickSpeed = scene->mAnimations[0]->mTicksPerSecond;
+		processAnimNode(anim, scene->mAnimations[0]);
+}
+
 namespace AssetManager
 {
 	namespace {
@@ -371,6 +429,15 @@ namespace AssetManager
 						IRender::SendCommand({ RC_MAKEOBJECT, (uint64)static_cast<OpenGLObject*>(m), 0 });
 				} break;
 
+				case AssetType::Animation: {
+					if (data.second) {
+						auto container = (Animation*)data.second;
+						LoadAnimation(container, name);
+						container->loaded = true;
+						LoadedAnimations.emplace(name, container);
+					}
+				} break;
+
 				case AssetType::Texture: {
 					TextureLoader(name, (Texture*)data.second);
 				} break;
@@ -409,6 +476,11 @@ void AssetManager::LoadTextureAsync(const String& name, Texture* empty)
 	LoadQueue.enqueue({ name, empty });
 }
 
+void AssetManager::LoadAnimationAsync(const String& name, Animation* empty)
+{
+	LoadQueue.enqueue({ name, empty });
+}
+
 AssetType AssetManager::GetAssetType(const String& name)
 {
 	if (name.find("Meshes") != String::npos) {
@@ -418,6 +490,26 @@ AssetType AssetManager::GetAssetType(const String& name)
 	if (name.find("Textures") != String::npos) return AssetType::Texture;
 	if (name.find("Animations") != String::npos) return AssetType::Animation;
 	return AssetType::None;
+}
+
+RenderMesh* AssetManager::LoadSkeletalMesh(const String& name)
+{
+	if (auto it = SkeletalMeshes.find(name); it != SkeletalMeshes.end()) {
+		auto mesh = new RenderMeshSkeletalGL();
+		mesh->SetMesh(it->second);
+		return mesh;
+	}
+	else {
+		auto mesh = loadMeshesSkinned(name);
+		if (!mesh) return nullptr;
+		auto container = new RenderMeshSkeletalGL();
+		container->SetMesh(mesh);
+		SkeletalMeshes.emplace(name, mesh);
+		for (auto& m : mesh->Holders)
+			IRender::SendCommand({ RC_MAKEOBJECT, (uint64)static_cast<OpenGLObject*>(m), 0 });
+		return container;
+	}
+	return nullptr;
 }
 
 RenderMesh* AssetManager::LoadMeshAsyncWithPromise(const String& name)
@@ -459,5 +551,23 @@ Texture* AssetManager::LoadTextureAsyncWithPromise(const String& name)
 		auto tex = new Texture();
 		LoadTextureAsync(name, tex);
 		return tex;
+	}
+}
+
+Animation* AssetManager::LoadAnimationAsyncWithPromise(const String& name, RenderMesh* skeletalMesh)
+{
+	auto mesh = dynamic_cast<RenderMeshSkeletalGL*>(skeletalMesh);
+	if (!mesh) return nullptr;
+
+	if (auto it = LoadedAnimations.find(name); it != LoadedAnimations.end()) {
+		if (it->second->skeleton == mesh->GetSkeleton())
+			return it->second;
+		else return nullptr;
+	}
+	else {
+		auto anim = new Animation();
+		anim->skeleton = mesh->GetSkeleton();
+		LoadAnimationAsync(name, anim);
+		return anim;
 	}
 }

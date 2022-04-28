@@ -40,6 +40,7 @@ public:
 	virtual RenderMesh* CreateProcedural(SceneComponent* parent, String name, std::vector<Vector>& positions, std::vector<Vector> UV, std::vector<Vector>& normal, std::vector<Vector>& tangent, std::vector<uint32>& indices) override;
 	virtual RenderMesh* GetStatic(SceneComponent* parent, const String& name) override;
 	virtual RenderMesh* GetSkeletal(SceneComponent* parent, const String& name) override;
+	virtual RenderMesh* GetSkeletalAsync(SceneComponent* parent, const String& name) override;
 	virtual RenderMesh* MakeEmptyStatic() override;
 	virtual RenderMesh* MakeEmptySkeletal() override;
 };

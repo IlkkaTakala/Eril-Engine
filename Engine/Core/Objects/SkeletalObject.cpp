@@ -5,6 +5,7 @@
 SkeletalObject::SkeletalObject() : SceneComponent()
 {
 	RenderData = nullptr;
+	animControl = nullptr;
 	//Physics::AddStatic(this);
 }
 
@@ -33,12 +34,21 @@ void SkeletalObject::LoadWithParameters(const String& args)
 
 void SkeletalObject::SetModel(std::string Name)
 {
+	if (RenderData) delete RenderData;
 	RenderData = MI->GetSkeletal(this, Name);
+	RenderData->AddRenderCallback("animation", std::bind(&SkeletalObject::UpdateAnimations, this, std::placeholders::_1));
+}
+
+void SkeletalObject::SetModelAsync(std::string Name)
+{
+	if (RenderData) delete RenderData;
+	RenderData = MI->GetSkeletalAsync(this, Name);
 	RenderData->AddRenderCallback("animation", std::bind(&SkeletalObject::UpdateAnimations, this, std::placeholders::_1));
 }
 
 void SkeletalObject::SetModel(RenderMesh* mesh)
 {
+	if (RenderData) delete RenderData;
 	if (mesh && mesh->GetMeshType() == RenderMesh::MeshType::Skeletal) {
 		RenderData = mesh;
 		RenderData->SetParent(this);
@@ -46,7 +56,7 @@ void SkeletalObject::SetModel(RenderMesh* mesh)
 	RenderData->AddRenderCallback("animation", std::bind(&SkeletalObject::UpdateAnimations, this, std::placeholders::_1));
 }
 
-void SkeletalObject::SetController(AnimationController* a)
+void SkeletalObject::SetAnimController(AnimationController* a)
 {
 	animControl = a;
 	RenderData->AddRenderCallback("animation", std::bind(&SkeletalObject::UpdateAnimations, this, std::placeholders::_1));
@@ -54,5 +64,5 @@ void SkeletalObject::SetController(AnimationController* a)
 
 void SkeletalObject::UpdateAnimations(float delta)
 {
-	animControl->UpdateBoneTransforms(delta, RenderData);
+	if (animControl) animControl->UpdateBoneTransforms(delta, RenderData);
 }

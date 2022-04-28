@@ -17,6 +17,13 @@ RenderMesh* GLMesh::GetStatic(SceneComponent* parent, const String& name)
 
 RenderMesh* GLMesh::GetSkeletal(SceneComponent* parent, const String& name)
 {
+	auto mesh = AssetManager::LoadSkeletalMesh(name);
+	mesh->SetParent(parent);
+	return mesh;
+}
+
+RenderMesh* GLMesh::GetSkeletalAsync(SceneComponent* parent, const String& name)
+{
 	auto mesh = AssetManager::LoadSkeletalMeshAsyncWithPromise(name);
 	mesh->SetParent(parent);
 	return mesh;

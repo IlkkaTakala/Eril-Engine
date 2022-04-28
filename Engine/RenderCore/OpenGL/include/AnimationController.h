@@ -11,15 +11,13 @@ public:
 	void BeginPlay() override {}
 	void Tick(float delta) override;
 	void SetAnimation(Animation* anim) { temp_anim = anim; }
-	void SetSkeleton(Skeleton* s) { skeleton = s; }
+	void SetSkeleton(Skeleton* s) { }
+	void SetSkeleton(RenderMesh* s);
 
-
-
-	void UpdateBoneTransforms(float delta, RenderMesh* mesh) const;
-
+	void UpdateBoneTransforms(float delta, RenderMesh* mesh);
 
 private:
-	Ref<Animation> temp_anim;
-	Skeleton* skeleton;
+	Animation* temp_anim;
+	float animtime;
 };
 
