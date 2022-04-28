@@ -133,13 +133,17 @@ public:
 	void AddRenderCallback(const String& id, std::function<void(float)> func) { renderCallbacks.emplace(id, func); }
 	void RemoveRenderCallback(const String& id) { renderCallbacks.erase(id); }
 
+	void SetRequireUpdate() { requireUpdate = true; }
+
 protected:
+
 	bool visible{ false };
 	SceneComponent* Parent{ nullptr };
 	AABB bounds;
 	std::function<void(void)> binds;
 	std::unordered_map<String, std::function<void(float)>> renderCallbacks;
 	MeshType type { MeshType::None };
+	bool requireUpdate;
 };
 
 class IMesh

@@ -1179,6 +1179,16 @@ void Renderer::LightCulling(int width, int height)
 void Renderer::UpdateTransforms(float delta) {
 	for (auto const& [name, s] : Shaders)
 	{
+		for (Material* m : s->GetUsers())
+		{
+			for (Section* o : m->GetObjects())
+			{
+				if (o->Parent) o->Parent->SetRequireUpdate();
+			}
+		}
+	}
+	for (auto const& [name, s] : Shaders)
+	{
 		if (s->FaceCulling == 1) glDisable(GL_CULL_FACE);
 		else glEnable(GL_CULL_FACE);
 

@@ -128,6 +128,12 @@ void RenderMeshSkeletalGL::UpdateBoneMatrices()
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, BoneTranforms);
 	for (uint i = 0; i < Mesh->skeleton->BoneCount; i++) {
 		const Bone& b = Mesh->skeleton->Bones[i];
+		int p = b.parent;
+		if (p < 0 || p > i) continue;
+		BoneTransformArray[i] = BoneTransformArray[p] * BoneTransformArray[i];
+	}
+	for (uint i = 0; i < Mesh->skeleton->BoneCount; i++) {
+		const Bone& b = Mesh->skeleton->Bones[i];
 		BoneTransformArray[i] *= b.offset;
 	}
 	glBufferData(GL_SHADER_STORAGE_BUFFER, Mesh->skeleton->BoneCount * sizeof(glm::mat4), BoneTransformArray.data(), GL_STATIC_DRAW);
@@ -136,6 +142,7 @@ void RenderMeshSkeletalGL::UpdateBoneMatrices()
 
 void RenderMeshSkeletalGL::ApplyTransform(float delta)
 {
+	if (!requireUpdate) return;
 	Transformation finalT;
 	SceneComponent* parent = Parent;
 	while (parent)

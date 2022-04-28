@@ -130,14 +130,16 @@ TestPlayer::TestPlayer() : Player()
 	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
 
 	auto skel = SpawnObject<SkeletalObject>();
-	skel->SetModel("Assets/Meshes/AnimMesh");
-	skel->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/default_skel"));
-	skel->SetLocation({5, 5, 1});
+	skel->SetModel("Assets/Meshes/Alien");
+	skel->GetModel()->SetMaterial(1, IRender::LoadMaterialByName("Assets/Materials/alien_upper"));
+	skel->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/alien_lower"));
+	skel->SetLocation({5.f, 5.f, -0.5f});
 	auto animC = SpawnObject<AnimationController>();
 	animC->SetSkeleton(skel->GetModel());
 	skel->SetAnimController(animC);
 
-	animC->SetAnimation(AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Animation", skel->GetModel()));
+	animC->SetAnimation(AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Breakdance", skel->GetModel()));
+	skel->SetScale(Vector(0.01f));
 }
 
 void TestPlayer::TestTimer(float d)

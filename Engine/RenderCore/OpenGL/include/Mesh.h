@@ -162,7 +162,6 @@ private:
 	StaticSection* Sections;
 	LoadedMesh* Mesh;
 	uint SectionCount;
-	bool requireUpdate;
 
 	int InstanceCount;
 	int InstanceCountMax;

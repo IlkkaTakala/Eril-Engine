@@ -36,14 +36,14 @@ void SkeletalObject::SetModel(std::string Name)
 {
 	if (RenderData) delete RenderData;
 	RenderData = MI->GetSkeletal(this, Name);
-	RenderData->AddRenderCallback("animation", std::bind(&SkeletalObject::UpdateAnimations, this, std::placeholders::_1));
+	if (RenderData) RenderData->AddRenderCallback("animation", std::bind(&SkeletalObject::UpdateAnimations, this, std::placeholders::_1));
 }
 
 void SkeletalObject::SetModelAsync(std::string Name)
 {
 	if (RenderData) delete RenderData;
 	RenderData = MI->GetSkeletalAsync(this, Name);
-	RenderData->AddRenderCallback("animation", std::bind(&SkeletalObject::UpdateAnimations, this, std::placeholders::_1));
+	if (RenderData) RenderData->AddRenderCallback("animation", std::bind(&SkeletalObject::UpdateAnimations, this, std::placeholders::_1));
 }
 
 void SkeletalObject::SetModel(RenderMesh* mesh)
@@ -52,8 +52,8 @@ void SkeletalObject::SetModel(RenderMesh* mesh)
 	if (mesh && mesh->GetMeshType() == RenderMesh::MeshType::Skeletal) {
 		RenderData = mesh;
 		RenderData->SetParent(this);
+		RenderData->AddRenderCallback("animation", std::bind(&SkeletalObject::UpdateAnimations, this, std::placeholders::_1));
 	}
-	RenderData->AddRenderCallback("animation", std::bind(&SkeletalObject::UpdateAnimations, this, std::placeholders::_1));
 }
 
 void SkeletalObject::SetAnimController(AnimationController* a)

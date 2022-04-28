@@ -108,7 +108,6 @@ in VS_OUT{
 uniform sampler2D Albedo;
 uniform sampler2D Normal;
 uniform sampler2D Roughness;
-uniform sampler2D AO;
 
 uniform int numberOfTilesX;
 
@@ -201,9 +200,8 @@ void main()
 	//vec4 data = texture(gData, TexCoords);
 	float gamma = 2.2;	
 	vec3 albedo = pow(texture(Albedo, fs_in.TexCoords).rgb, vec3(gamma));
-	float metallic = 0.0;//texture(Metallic, fs_in.TexCoords).r;
-	float AOt = texture(AO, fs_in.TexCoords).r;
-	float roughness = 1.0 - texture(Roughness, fs_in.TexCoords).r;
+	float metallic = 0.0;
+	float roughness = texture(Roughness, fs_in.TexCoords).r;
 	vec3 normal = texture(Normal, fs_in.TexCoords).rgb;
 	//normal.r = 1.0 - normal.r;
 	//normal.g = 1.0 - normal.g;
@@ -212,7 +210,7 @@ void main()
 	float shadow = 0;
 	//float SSAO = texture(gSSAO, TexCoords).r;
 	
-	vec3 ambient = vec3(0.01, 0.02, 0.06) * albedo * AOt;// * SSAO;
+	vec3 ambient = vec3(0.01, 0.02, 0.06) * albedo;
 	
 	vec3 Lo = vec3(0.0);
 	

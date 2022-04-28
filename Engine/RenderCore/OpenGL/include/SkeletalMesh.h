@@ -108,7 +108,6 @@ private:
 	LoadedSkeletalMesh* Mesh;
 	uint SectionCount;
 	uint BoneTranforms;
-	bool requireUpdate;
 	std::vector<glm::mat4> BoneTransformArray;
 
 	std::unordered_map<uint, Material*> Materials;

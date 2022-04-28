@@ -11,6 +11,7 @@ AnimationController::AnimationController()
 
 void AnimationController::Tick(float delta)
 {
+	animtime += delta;
 }
 
 void AnimationController::SetSkeleton(RenderMesh* s)
@@ -23,7 +24,6 @@ void AnimationController::UpdateBoneTransforms(float delta, RenderMesh* mesh)
 	auto m = dynamic_cast<RenderMeshSkeletalGL*>(mesh);
 	if (!m) return;
 
-	animtime += delta;
 	auto& mats = m->GetBoneMatrices();
 
 	for (int i = 1; i < mats.size(); i++) {
