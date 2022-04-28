@@ -14,6 +14,7 @@
 #include "Objects/CollisionShape.h"
 #include <Objects/ParticleComponent.h>
 #include "CloudParticle.h"
+#include <Objects/SkeletalObject.h>
 
 //ECS
 #include <Interface/IECS.h>
@@ -96,10 +97,6 @@ TestPlayer::TestPlayer() : Player()
 	Sky->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/Sky"));
 	Sky->SetScale(Sky->GetScale() * 2.0f);
 
-	//Testing UI
-	/*auto ui = UI::LoadFromFile("Game/TestArea/testingui2.ui");
-	UI::AddToScreen(ui, this);*/
-
 	pause = nullptr;
 
 	/*Plane = SpawnObject<VisibleObject>();
@@ -128,42 +125,13 @@ TestPlayer::TestPlayer() : Player()
 	BoxCol->SetType(0);
 	BoxCol->SetSize(BoxModel->GetModel()->GetAABB());
 	
-	/*BoxModelMove = SpawnObject<MovementComponent>();
-	BoxModelMove->SetTarget(Box, BoxModel->GetModel()->GetAABB());
-	BoxModelMove->SetGravity(true);*/
-	//BoxModelMove->SetPhysics(true);
-	//BoxCol->SetTarget(Box);
-
-	Box2 = SpawnObject<Actor>();
-
-	BoxModel2 = SpawnObject<VisibleObject>();
-	BoxModel2->SetModel("Assets/Meshes/cylinder");
-	BoxModel2->GetModel()->SetAABB(AABB(Vector(-1.0f), Vector(1.0f)));
-
-	Box2->AddComponent(BoxModel2);
-	Box2->SetLocation(Vector(10.f, 10.f, 6.f));
-	Box2->SetRotation(Vector(90.f, 0.f, 0.f));
-
-	BoxCol2 = SpawnObject<CylinderCollisionShape>();
-	BoxCol2->SetType(1);
-	Box2->AddComponent(BoxCol2);
-	BoxCol2->SetSize(BoxModel2->GetModel()->GetAABB());
-	//BoxCol2->SetLocation(Vector(0.f, 0.f, 0.f));
-	//BoxCol2->SetRotation(Vector(0.f, 90.f, 0.f));
-
-
-	//BoxModelMove = SpawnObject<MovementComponent>();
-	//BoxModelMove->SetTarget(Box2, BoxModel2->GetModel()->GetAABB());
-	//BoxModelMove->SetGravity(true);
-	////BoxModelMove->SetPhysics(true);
-	//BoxCol2->SetTarget(BoxModelMove);
 
 	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
 
-	/*auto part = SpawnObject<ParticleComponent>();
-	part->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
-	part->SetLocation({10.f, 5.f, 0.5f});*/
-
+	auto skel = SpawnObject<SkeletalObject>();
+	skel->SetModel("Assets/Meshes/AnimMesh");
+	skel->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/default_skel"));
+	skel->SetLocation({5, 5, 1});
 }
 
 void TestPlayer::TestTimer(float d)

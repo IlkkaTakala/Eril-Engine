@@ -241,6 +241,12 @@
     <ClCompile Include="Engine\Core\Basic\Rotation.cpp">
       <Filter>Engine\Basic</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\RenderCore\OpenGL\SkeletalMesh.cpp">
+      <Filter>Engine\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Objects\SkeletalObject.cpp">
+      <Filter>Engine\Objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -559,6 +565,12 @@
     </ClInclude>
     <ClInclude Include="Engine\Core\Basic\Transformation.h">
       <Filter>Engine\Basic</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\SkeletalMesh.h">
+      <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Objects\SkeletalObject.h">
+      <Filter>Engine\Objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

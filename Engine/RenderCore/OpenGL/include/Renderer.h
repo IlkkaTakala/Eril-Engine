@@ -60,7 +60,7 @@ private:
 	void Forward(int width, int height);
 	void PreDepth(int width, int height);
 	void LightCulling(int width, int height);
-	void UpdateTransforms();
+	void UpdateTransforms(float delta);
 	inline bool CullCheck(Section* s);
 
 	std::map<String, Shader*> Shaders;

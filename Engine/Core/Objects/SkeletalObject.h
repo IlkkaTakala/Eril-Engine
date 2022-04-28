@@ -1,14 +1,14 @@
 #pragma once
 #include <Core.h>
-#include <Objects/SceneComponent.h>
-#include "Interface/IRender.h"
+#include "SceneComponent.h"
+#include "AnimationController.h"
 
-class VisibleObject : public SceneComponent
+class SkeletalObject : public SceneComponent
 {
-	REGISTER(VisibleObject);
+	REGISTER(SkeletalObject);
 public:
-	VisibleObject();
-	virtual ~VisibleObject() { delete RenderData; }
+	SkeletalObject();
+	virtual ~SkeletalObject() { delete RenderData; }
 	virtual void OnDestroyed() override;
 	virtual void LoadWithParameters(const String& args) override;
 
@@ -17,12 +17,18 @@ public:
 	std::string GetModelName() const { return std::string(); }
 	RenderMesh* GetModel() const { return RenderData; }
 
+	void SetController(AnimationController* a);
+	const AnimationController* GetController() const { return animControl; }
+
 	const std::string GetName() const { return std::string(""); }
 
 	virtual void BeginPlay() override {};
 protected:
 	friend class GC;
 
+	AnimationController* animControl;
 	RenderMesh* RenderData;
-	
+
+	void UpdateAnimations(float delta);
 };
+

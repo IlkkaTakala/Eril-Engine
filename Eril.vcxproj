@@ -100,7 +100,7 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>ScriptCore.lib;LinearMath_Debug.lib;BulletDynamics_Debug.lib;BulletCollision_Debug.lib;BulletInverseDynamics_Debug.lib;Bullet3Common_Debug.lib;Bullet3Geometry_Debug.lib;Bullet3Collision_Debug.lib;Bullet3Dynamics_Debug.lib;OpenAL32.lib;dwrite.lib;d2d1.lib;assimp-vc140-mt.lib;zlibstaticd.lib;IrrXML.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>ScriptCore.lib;LinearMath_Debug.lib;BulletDynamics_Debug.lib;BulletCollision_Debug.lib;BulletInverseDynamics_Debug.lib;Bullet3Common_Debug.lib;Bullet3Geometry_Debug.lib;Bullet3Collision_Debug.lib;Bullet3Dynamics_Debug.lib;OpenAL32.lib;dwrite.lib;d2d1.lib;assimp-vc142-mt.lib;zlibstaticd.lib;IrrXML.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\Engine\external\openal-soft\build\Debug;$(SolutionDir)\build\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -145,7 +145,7 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>LinearMath.lib;BulletDynamics.lib;BulletCollision.lib;BulletInverseDynamics.lib;Bullet3Common.lib;Bullet3Geometry.lib;Bullet3Collision.lib;Bullet3Dynamics.lib;OpenAL32.lib;dwrite.lib;d2d1.lib;assimp-vc140-mt.lib;zlibstatic.lib;IrrXML.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>LinearMath.lib;BulletDynamics.lib;BulletCollision.lib;BulletInverseDynamics.lib;Bullet3Common.lib;Bullet3Geometry.lib;Bullet3Collision.lib;Bullet3Dynamics.lib;OpenAL32.lib;dwrite.lib;d2d1.lib;assimp-vc142-mt.lib;zlibstatic.lib;IrrXML.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\Engine\external\openal-soft\build\Debug;$(SolutionDir)\build\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -208,9 +208,11 @@
     <ClCompile Include="Engine\Core\CurveData.cpp" />
     <ClCompile Include="Engine\Core\Objects\InputComponent.cpp" />
     <ClCompile Include="Engine\Core\Objects\ParticleComponent.cpp" />
+    <ClCompile Include="Engine\Core\Objects\SkeletalObject.cpp" />
     <ClCompile Include="Engine\Interface\AssetManager.cpp" />
     <ClCompile Include="Engine\RenderCore\OpenGL\Animation.cpp" />
     <ClCompile Include="Engine\RenderCore\OpenGL\AnimationController.cpp" />
+    <ClCompile Include="Engine\RenderCore\OpenGL\SkeletalMesh.cpp" />
     <ClCompile Include="Engine\RenderCore\OpenGL\Skeleton.cpp" />
     <ClCompile Include="Engine\RenderCore\ParticleSystem.cpp" />
     <ClCompile Include="Engine\Core\BasicTypes.cpp" />
@@ -290,9 +292,11 @@
     <ClInclude Include="Engine\Core\CurveData.h" />
     <ClInclude Include="Engine\Core\Objects\InputComponent.h" />
     <ClInclude Include="Engine\Core\Objects\ParticleComponent.h" />
+    <ClInclude Include="Engine\Core\Objects\SkeletalObject.h" />
     <ClInclude Include="Engine\Interface\AssetManager.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\include\Animation.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\include\AnimationController.h" />
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\SkeletalMesh.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\include\Skeleton.h" />
     <ClInclude Include="Engine\RenderCore\OpenGL\OpenGLObject.h" />
     <ClInclude Include="Engine\RenderCore\Particle.h" />

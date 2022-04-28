@@ -726,7 +726,7 @@ void Renderer::Update(SafeQueue<RenderCommand>* commands, Renderer* RC)
 			break;
 
 		case RC_RECALCULATE:
-			RC->UpdateTransforms();
+			RC->UpdateTransforms(0.016f);
 			break;
 
 		case RC_RELIGHTS:
@@ -1176,7 +1176,7 @@ void Renderer::LightCulling(int width, int height)
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
 
-void Renderer::UpdateTransforms() {
+void Renderer::UpdateTransforms(float delta) {
 	for (auto const& [name, s] : Shaders)
 	{
 		if (s->FaceCulling == 1) glDisable(GL_CULL_FACE);
@@ -1186,7 +1186,7 @@ void Renderer::UpdateTransforms() {
 		{
 			for (Section* o : m->GetObjects())
 			{
-				o->Parent->ApplyTransform();
+				if (o->Parent) o->Parent->ApplyTransform(delta);
 			}
 		}
 	}
@@ -1198,7 +1198,7 @@ inline bool Renderer::CullCheck(Section* s)
 	Vector direction = ActiveCamera->GetForwardVector();
 	Vector location = ActiveCamera->GetLocation();
 	glm::vec3 pos = mm[3];
-	Vector aabb = s->Parent->GetAABB().maxs - s->Parent->GetAABB().mins;
+	Vector aabb = ((RenderMesh*)s->Parent)->GetAABB().maxs - ((RenderMesh*)s->Parent)->GetAABB().mins;
 	glm::vec3 rad = glm::vec3(aabb.X, aabb.Y, aabb.Z) * glm::mat3(mm);
 	float radii = glm::max(rad.x, glm::max(rad.y, rad.z));
 	glm::vec3 loc = glm::vec3(location.X, location.Y, location.Z);
@@ -1238,7 +1238,7 @@ void Renderer::Render(float delta)
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, GlobalUniforms);
 
-	UpdateTransforms();
+	UpdateTransforms(delta);
 
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, LightBuffer);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, VisibleLightIndicesBuffer);

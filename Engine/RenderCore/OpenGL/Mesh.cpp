@@ -6,20 +6,33 @@
 #include <glm/gtx/euler_angles.hpp>
 #include <Interface/AssetManager.h>
 #include <RenderCore/RenderCommands.h>
+#include <SkeletalMesh.h>
 
-RenderMeshStatic* GLMesh::GetStatic(SceneComponent* parent, const String& name)
+RenderMesh* GLMesh::GetStatic(SceneComponent* parent, const String& name)
 {
 	auto mesh = AssetManager::LoadMeshAsyncWithPromise(name);
 	mesh->SetParent(parent);
 	return mesh;
 }
 
-RenderMeshStatic* GLMesh::MakeEmptyStatic()
+RenderMesh* GLMesh::GetSkeletal(SceneComponent* parent, const String& name)
+{
+	auto mesh = AssetManager::LoadSkeletalMeshAsyncWithPromise(name);
+	mesh->SetParent(parent);
+	return mesh;
+}
+
+RenderMesh* GLMesh::MakeEmptyStatic()
 {
 	return new RenderMeshStaticGL();
 }
 
-RenderMeshStatic* GLMesh::CreateProcedural(SceneComponent* parent, String name, std::vector<Vector>& positions, std::vector<Vector> UV, std::vector<Vector>& normal, std::vector<Vector>& tangent, std::vector<uint32>& indices)
+RenderMesh* GLMesh::MakeEmptySkeletal()
+{
+	return new RenderMeshSkeletalGL();
+}
+
+RenderMesh* GLMesh::CreateProcedural(SceneComponent* parent, String name, std::vector<Vector>& positions, std::vector<Vector> UV, std::vector<Vector>& normal, std::vector<Vector>& tangent, std::vector<uint32>& indices)
 {
 	/*LoadedMesh* mesh = new LoadedMesh();
 
@@ -61,25 +74,33 @@ Section::Section()
 {
 	Instance = nullptr;
 	Parent = nullptr;
-	Holder = nullptr;
 	RenderDistance = 100000.f;
 	Radius = 0.f;
-	InstanceDisp = 0;
-	InstancesSet = true;
 }
 
 Section::~Section()
 {
 	if (Instance != nullptr) Instance->RemoveSection(this);
+}
+
+StaticSection::StaticSection()
+{
+	Holder = nullptr;
+	InstanceDisp = 0;
+	InstancesSet = true;
+}
+
+StaticSection::~StaticSection()
+{
 	glDeleteBuffers(1, &InstanceDisp); // TODO
 }
 
-void Section::Render()
+void StaticSection::Render()
 {
-	if (Holder->VAO == 0) return;
+	if (Holder->VAO == 0 || !Parent->IsVisible()) return;
 	if (!InstancesSet) {
-		if (Parent->Instanced)
-			Parent->ApplyInstances();
+		if (mesh->Instanced)
+			mesh->ApplyInstances();
 		else {
 			glBindBuffer(GL_ARRAY_BUFFER, Holder->defaultInstanced);
 			glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(0));
@@ -92,15 +113,15 @@ void Section::Render()
 
 	glBindVertexArray(Holder->VAO);
 
-	if (Parent->GetBinds()) Parent->GetBinds()();
+	if (mesh->GetBinds()) mesh->GetBinds()();
 
-	if (Parent->Instanced) {
+	if (mesh->Instanced) {
 		glBindBuffer(GL_ARRAY_BUFFER, InstanceDisp);
 		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(0));
 		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 4));
 		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 8));
 		glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 12));
-		glDrawElementsInstanced(GL_TRIANGLES, Holder->IndexCount, GL_UNSIGNED_INT, 0, Parent->InstanceCount);
+		glDrawElementsInstanced(GL_TRIANGLES, Holder->IndexCount, GL_UNSIGNED_INT, 0, mesh->InstanceCount);
 	}
 	else glDrawElements(GL_TRIANGLES, Holder->IndexCount, GL_UNSIGNED_INT, 0);
 }
@@ -113,7 +134,7 @@ void RenderMeshStaticGL::SetMesh(LoadedMesh* mesh)
 	float extent = 0.f;
 
 	SectionCount = mesh->HolderCount;
-	Sections = new Section[SectionCount]();
+	Sections = new StaticSection[SectionCount]();
 	for (uint32 i = 0; i < mesh->HolderCount; i++) {
 		Sections[i].Holder = mesh->Holders[i];
 		Sections[i].Radius = mesh->Holders[i]->Radius;
@@ -122,27 +143,30 @@ void RenderMeshStaticGL::SetMesh(LoadedMesh* mesh)
 			SetMaterial(i, it->second);
 		else SetMaterial(i, mesh->Holders[i]->DefaultMaterial);
 		Sections[i].Parent = this;
+		Sections[i].mesh = this;
 
 		if (Sections[i].GetRadius() > extent) extent = Sections[i].GetRadius();
 	}
 	ApplyInstances();
 	bounds = extent;
 	requireUpdate = true;
+
+	SetVisible(true);
 }
 
-RenderMeshStaticGL::RenderMeshStaticGL()
+RenderMeshStaticGL::RenderMeshStaticGL() : RenderMeshGL()
 {
 	Parent = nullptr;
 	Sections = nullptr;
 	Mesh = nullptr;
 	SectionCount = 0;
 	requireUpdate = true;
-	ModelMatrix = glm::mat4(1.f);
 	InstanceCount = 1;
 	InstanceCountMax = 1;
 	InstancesDirty = false;
 	Instances = nullptr;
 	Instanced = false;
+	type = MeshType::Static;
 }
 
 RenderMeshStaticGL::~RenderMeshStaticGL()
@@ -162,25 +186,9 @@ void RenderMeshStaticGL::SetMaterial(uint section, Material* nextMat)
 	}
 }
 
-const glm::mat4& RenderMeshStaticGL::GetModelMatrix()
-{
-	requireUpdate = true;
-	return ModelMatrix;
-}
-
-void RenderMeshStaticGL::SetBinds(std::function<void(void)> bind)
-{
-	binds = bind;
-}
-
-std::function<void(void)>& RenderMeshStaticGL::GetBinds()
-{
-	return binds;
-}
-
 void RenderMeshStaticGL::SetAABB(AABB bounds)
 {
-	RenderMeshStatic::SetAABB(bounds);
+	RenderMesh::SetAABB(bounds);
 
 	float rad = glm::max(glm::max(bounds.maxs.X, bounds.maxs.Y), bounds.maxs.Z);
 	for (uint i = 0; i < SectionCount; i++) {
@@ -188,7 +196,7 @@ void RenderMeshStaticGL::SetAABB(AABB bounds)
 	}
 }
 
-void RenderMeshStaticGL::ApplyTransform()
+void RenderMeshStaticGL::ApplyTransform(float delta)
 {
 	Transformation finalT;
 	SceneComponent* parent = Parent;

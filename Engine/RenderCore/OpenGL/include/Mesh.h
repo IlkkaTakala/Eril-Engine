@@ -11,7 +11,7 @@
 class LoadedMesh;
 class MeshDataHolder;
 class Section;
-class RenderMeshStaticGL;
+class RenderMeshGL;
 
 struct Vertex
 {
@@ -37,9 +37,11 @@ class GLMesh : public IMesh
 public:
 	GLMesh() {}
 	virtual ~GLMesh() {}
-	virtual RenderMeshStatic* CreateProcedural(SceneComponent* parent, String name, std::vector<Vector>& positions, std::vector<Vector> UV, std::vector<Vector>& normal, std::vector<Vector>& tangent, std::vector<uint32>& indices) override;
-	virtual RenderMeshStatic* GetStatic(SceneComponent* parent, const String& name) override;
-	virtual RenderMeshStatic* MakeEmptyStatic() override;
+	virtual RenderMesh* CreateProcedural(SceneComponent* parent, String name, std::vector<Vector>& positions, std::vector<Vector> UV, std::vector<Vector>& normal, std::vector<Vector>& tangent, std::vector<uint32>& indices) override;
+	virtual RenderMesh* GetStatic(SceneComponent* parent, const String& name) override;
+	virtual RenderMesh* GetSkeletal(SceneComponent* parent, const String& name) override;
+	virtual RenderMesh* MakeEmptyStatic() override;
+	virtual RenderMesh* MakeEmptySkeletal() override;
 };
 
 class MeshDataHolder : public OpenGLObject
@@ -80,28 +82,59 @@ class Section
 {
 public:
 	Section();
-	~Section();
+	virtual ~Section();
+	RenderMeshGL* Parent;
 	Material* Instance;
-	RenderMeshStaticGL* Parent;
 	float Radius;
 	float RenderDistance;
+
+	virtual void Render() = 0;
+	float GetRadius() const { return Radius; }
+
+	virtual const uint32 GetVertexCount() const = 0;
+	virtual const uint32 GetFaceCount() const = 0;
+};
+
+class StaticSection : public Section
+{
+public:
+	StaticSection();
+	virtual ~StaticSection();
 	uint InstanceDisp;
 	bool InstancesSet;
+	RenderMeshStaticGL* mesh;
 
-	void Render();
-	float GetRadius() const { return Radius; }
+	void Render() override;
 
 	const uint32 GetVertexCount() const { return Holder->VertexCount; }
 	const uint32 GetFaceCount() const { return Holder->IndexCount / 3; }
-
 private:
 	friend class RenderMeshStaticGL;
 
 	MeshDataHolder* Holder;
 };
 
+class RenderMeshGL : public RenderMesh, public OpenGLObject
+{
+public:
+	virtual ~RenderMeshGL() {};
+	virtual void ApplyTransform(float delta) = 0;
+	virtual void CreateState() {};
+	virtual void RefreshState() {};
+	virtual void Clear() {};
 
-class RenderMeshStaticGL : public RenderMeshStatic
+	const glm::mat4& GetModelMatrix() const { return ModelMatrix; }
+
+protected:
+	RenderMeshGL() : RenderMesh() { ModelMatrix = glm::mat4(1.f); }
+	
+	glm::mat4 ModelMatrix;
+private:
+	RenderMeshGL(const RenderMeshGL&) = delete;
+	RenderMeshGL& operator=(const RenderMeshGL&) = delete;
+};
+
+class RenderMeshStaticGL : public RenderMeshGL
 {
 public:
 	RenderMeshStaticGL();
@@ -111,8 +144,7 @@ public:
 
 	virtual void SetMaterial(uint section, Material* nextMat) override;
 	virtual Material* GetMaterial(uint section) const override { if (section < SectionCount) return Sections[section].Instance; else if (auto it = Materials.find(section); it != Materials.end()) return it->second; else return nullptr; }
-	const glm::mat4& GetModelMatrix();
-	virtual void ApplyTransform() override;
+	virtual void ApplyTransform(float delta) override;
 	virtual void SetInstances(int count, Transformation* dispArray) override;
 	virtual void SetInstanceCount(int count) override;
 
@@ -120,23 +152,15 @@ public:
 
 	virtual void SetSectionRenderDistance(uint section, float distance) override;
 
-	virtual SceneComponent* GetParent() const { return Parent; }
-	virtual void SetParent(SceneComponent* p) override { Parent = p; }
-
-	virtual void SetBinds(std::function<void(void)> bind) override;
-	virtual std::function<void(void)>& GetBinds() override;
-
 	virtual void SetAABB(AABB bounds) override;
 
 private:
 	friend class Renderer;
-	friend class Section;
+	friend class StaticSection;
 
-	SceneComponent* Parent;
-	Section* Sections;
+	StaticSection* Sections;
 	LoadedMesh* Mesh;
 	uint SectionCount;
-	glm::mat4 ModelMatrix;
 	bool requireUpdate;
 
 	int InstanceCount;
@@ -146,48 +170,4 @@ private:
 	bool Instanced;
 
 	std::unordered_map<uint, Material*> Materials;
-
-	std::function<void(void)> binds;
-};
-
-class RenderMeshSkeletalGL : public RenderMeshSkeletal
-{
-public:
-	RenderMeshSkeletalGL();
-	virtual ~RenderMeshSkeletalGL();
-
-	void SetMesh(LoadedMesh* mesh);
-
-	virtual void SetMaterial(uint section, Material* nextMat) override;
-	virtual Material* GetMaterial(uint section) const override { if (section < SectionCount) return Sections[section].Instance; else if (auto it = Materials.find(section); it != Materials.end()) return it->second; else return nullptr; }
-	const glm::mat4& GetModelMatrix();
-	virtual void ApplyTransform() override;
-
-	virtual void SetSectionRenderDistance(uint section, float distance) override;
-
-	virtual SceneComponent* GetParent() const { return Parent; }
-	virtual void SetParent(SceneComponent* p) override { Parent = p; }
-
-	virtual void SetBinds(std::function<void(void)> bind) override;
-	virtual std::function<void(void)>& GetBinds() override;
-
-	virtual void SetAABB(AABB bounds) override;
-
-private:
-	friend class Renderer;
-	friend class Section;
-
-	SceneComponent* Parent;
-	Section* Sections;
-	LoadedMesh* Mesh;
-	uint SectionCount;
-	glm::mat4 ModelMatrix;
-	bool requireUpdate;
-
-	AnimationController* animControl;
-	Skeleton* skeleton;
-
-	std::unordered_map<uint, Material*> Materials;
-
-	std::function<void(void)> binds;
 };

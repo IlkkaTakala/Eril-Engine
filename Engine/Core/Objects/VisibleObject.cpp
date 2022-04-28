@@ -10,6 +10,7 @@ VisibleObject::VisibleObject() : SceneComponent()
 
 void VisibleObject::OnDestroyed()
 {
+	if (RenderData) RenderData->SetVisible(false);
 	SceneComponent::OnDestroyed();
 	Physics::RemoveStatic(this);
 }
@@ -35,7 +36,7 @@ void VisibleObject::SetModel(std::string Name)
 	RenderData = MI->GetStatic(this, Name);
 }
 
-void VisibleObject::SetModel(RenderMeshStatic* mesh)
+void VisibleObject::SetModel(RenderMesh* mesh)
 {
-	RenderData = mesh;
+	if (mesh && mesh->GetMeshType() == RenderMesh::MeshType::Static) RenderData = mesh;
 }

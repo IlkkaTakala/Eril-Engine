@@ -3,7 +3,7 @@
 #include <deque>
 
 struct Particle;
-class RenderMeshStatic;
+class RenderMesh;
 class ParticleSystemConstruction;
 class ParticleSystem;
 class CurveData;
@@ -63,7 +63,7 @@ public:
 protected:
 	ParticleSystem();
 	void SetMaterial(Material* mat) { Material = mat; }
-	void SetModel(RenderMeshStatic* object) { Sprite = object; }
+	void SetModel(RenderMesh* object) { Sprite = object; }
 	void SetMaxCount(int count) { MaxParticleCount = count; }
 
 private:
@@ -89,7 +89,7 @@ private:
 	DefaultParticle Constructor;
 	DefaultUpdate Updator;
 
-	RenderMeshStatic* Sprite;
+	RenderMesh* Sprite;
 	Material* Material;
 	RefWeak<SceneComponent> Parent;
 
