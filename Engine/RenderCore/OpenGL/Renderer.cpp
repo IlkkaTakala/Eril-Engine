@@ -1310,8 +1310,8 @@ void processMesh(LoadedMesh* meshHolder, aiMesh* mesh)
 	{
 		Vertex vertex;
 		vertex.position.x = mesh->mVertices[i].x;
-		vertex.position.y = -mesh->mVertices[i].z;
-		vertex.position.z = mesh->mVertices[i].y;
+		vertex.position.y = mesh->mVertices[i].y;
+		vertex.position.z = mesh->mVertices[i].z;
 		if (radius < mesh->mVertices[i].x) radius = mesh->mVertices[i].x;
 
 		vertex.normal.x = mesh->mNormals[i].x;

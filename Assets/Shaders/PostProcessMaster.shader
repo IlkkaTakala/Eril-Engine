@@ -92,17 +92,16 @@ vec3 applyFogLower( in vec3  rgb,      // original color of the pixel
     return mix( rgb, fogColor, fogAmount );
 }
 
-const float rayStep = 0.1;
+const float rayStep = 0.05;
 const float minRayStep = 0.1;
-const float searchDistance = 5;
-const float reflectionSpecularFalloffExponent = 3.0;
 const int maxSteps = 30;
 const int numBinarySearchSteps = 5;
-const vec3 scale = vec3(0.8);
-const float K = 19.19;
-float metallic;
+const float reflectionSpecularFalloffExponent = 3.0;
 
-vec3 BinarySearch(inout vec3 dir, inout vec3 hitCoord, inout float dDepth) {
+#define scale vec3(.8, .8, .8)
+#define K 19.19
+
+vec3 binarySearch(inout vec3 dir, inout vec3 hitCoord, inout float dDepth) {
 	float depth;
 	vec4 projectedCoord;
 	
@@ -110,7 +109,8 @@ vec3 BinarySearch(inout vec3 dir, inout vec3 hitCoord, inout float dDepth) {
 		projectedCoord = projection * vec4(hitCoord, 1.0);
 		projectedCoord.xy /= projectedCoord.w;
 		projectedCoord.xy = projectedCoord.xy * 0.5 + 0.5;
-		depth = texture(Position, projectedCoord.xy).z;
+		
+		depth = (view * texture(Position, projectedCoord.xy)).z;
 		dDepth = hitCoord.z - depth;
 		dir *= 0.5;
 		hitCoord += (dDepth > 0.0) ? dir : -dir;
@@ -128,7 +128,6 @@ vec4 rayCast(vec3 dir, inout vec3 hitCoord, out float dDepth){
 	dir *= rayStep;
 	
 	float depth;
-	int steps;
 	vec4 projectedCoord;
 	
 	for(int i = 0; i < maxSteps; i++){
@@ -136,28 +135,28 @@ vec4 rayCast(vec3 dir, inout vec3 hitCoord, out float dDepth){
 		projectedCoord = projection * vec4(hitCoord, 1.0);
 		projectedCoord.xy /= projectedCoord.w;
 		projectedCoord.xy = projectedCoord.xy * 0.5 + 0.5;
-		depth = texture(Position, projectedCoord.xy).z;
-		
-		if(depth > 1000.0){
+		depth = (view * texture(Position, projectedCoord.xy)).z;
+				
+		if(depth > 1000.0)
 			continue;
-		}
-		
+
 		dDepth = hitCoord.z - depth;
-		if((dir.z - dDepth) < 1.2){
-			if(dDepth <= 0.0){
-				vec4 Result;
-				Result = vec4(BinarySearch(dir, hitCoord, dDepth), 1.0);
-				return Result;
+		
+		if ((dir.z - dDepth) < 1.2) {
+		if (dDepth <= 0.0) {
+			vec4 Result;
+			Result = vec4(binarySearch(dir, hitCoord, dDepth), 1.0);
+			return Result;
 			}
 		}
-		steps++;
 	}
 	return vec4(projectedCoord.xy, depth, 0.0);
 }
 
-vec3 fresnelSchlick(float cosTheta, vec3 F0){
-	return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
-}
+vec3 fresnelSchlick(float cosTheta, vec3 F0)
+{
+    return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
+}   
 
 vec3 hash(vec3 a){
 	a = fract(a * scale);
@@ -167,22 +166,17 @@ vec3 hash(vec3 a){
 
 void main()
 {
-    vec3 hdrColor = texture(Color, TexCoords).rgb;  
+    vec4 hdrColor = texture(Color, TexCoords);  
 	hdrColor = hdrColor * texture(SSAO, TexCoords).r;  
-    vec3 bloomColor = texture(Bloom, TexCoords).rgb;
+    vec4 bloomColor = texture(Bloom, TexCoords);
     hdrColor += 0.3 * bloomColor;
-    vec3 result = vec3(1.0) - exp(-hdrColor * exposure);  
-    result = pow(result, vec3(1.0 / gamma));
-	
-	vec3 pixelPos = WorldPosFromDepth(texture(Depth, TexCoords).r);
 	
 	vec2 metallicEmissive = texture(Data, TexCoords).rg;
-	metallic = metallicEmissive.r;
-	if(metallic < 0.01)
-        discard;
-	vec3 viewNormal = (inverse(view) * texture(Normal, TexCoords)).xyz;
-	vec3 viewPosition = (inverse(view) * texture(Position, TexCoords)).xyz;
-	vec3 albedo = result;
+	float metallic = metallicEmissive.r;
+	
+	vec3 viewNormal = mat3(view) * texture(Normal, TexCoords).xyz;
+    vec3 viewPosition = (view * texture(Position, TexCoords)).xyz;
+	vec3 albedo = hdrColor.rgb;
 	float spec = texture(Data, TexCoords).g;
 	
 	vec3 F0 = vec3(0.04);
@@ -193,19 +187,22 @@ void main()
 	vec3 hitPos = viewPosition;
 	float dDepth;
 	
-	vec3 worldPos = vec3(vec4(viewPosition, 1.0));
+	vec3 worldPos = texture(Position, TexCoords).xyz;
 	vec3 jitt = mix(vec3(0.0), normalize(vec3(hash(worldPos))), spec);
-	vec4 coords = rayCast(reflected * max(minRayStep, -viewPosition.z), hitPos, dDepth);
+	vec4 coords = rayCast(jitt + reflected * max(minRayStep, -viewPosition.z), hitPos, dDepth);
 	vec2 dCoords = smoothstep(0.2, 0.6, abs(vec2(0.5, 0.5) - coords.xy));
 	float screenEdge = clamp(1.0 - (dCoords.x + dCoords.y), 0.0, 1.0);
 	float multiplier = pow(metallic, reflectionSpecularFalloffExponent) * screenEdge * -reflected.z;
+	int ssrMultiplier = 1;
+	if(metallic < 0.01) ssrMultiplier = 0;
 	
-	vec3 ssr = result * clamp(multiplier, 0.0, 0.9) * fresnel;
+	vec3 ssr = texture(Color, coords.xy).rgb * clamp(multiplier, 0.0, 0.9) * fresnel * ssrMultiplier;
 	
-	//result = applyFog(result, length(pixelPos - viewPos.xyz), normalize(pixelPos - viewPos.xyz), normalize(vec3(-1.0, 1.0, -1.0)));
+	vec3 result = ssr + hdrColor.rgb;
+	result = vec3(1.0) - exp(-result * exposure);  
+    result = pow(result, vec3(1.0 / gamma));
 	
-    //FragColor = vec4(result, 1.0);
-    FragColor = vec4(ssr, metallic);
-	//FragColor = vec4(vec3(texture(SSAO, TexCoords).r), 1.0);
+	FragColor = vec4(result, 1.0);
 }
+
 ###END_FRAGMENT###

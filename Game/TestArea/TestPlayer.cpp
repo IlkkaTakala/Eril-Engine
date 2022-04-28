@@ -103,7 +103,7 @@ TestPlayer::TestPlayer() : Player()
 
 	pause = nullptr;
 
-	/*Plane = SpawnObject<VisibleObject>();
+	Plane = SpawnObject<VisibleObject>();
 	Plane->SetModel("Cube");
 	Plane->GetModel()->SetAABB(AABB(Vector(-20.f, -20.f, -0.5f), Vector(20.f, 20.f, 0.5f)));
 	Plane->SetScale(Vector(20.f, 20.f, 0.5f));
@@ -112,7 +112,7 @@ TestPlayer::TestPlayer() : Player()
 	PlaneCol = SpawnObject<BoxCollisionShape>();
 	PlaneCol->SetType(0);
 	PlaneCol->SetSize(Plane->GetModel()->GetAABB());
-	Plane->AddComponent(PlaneCol);*/
+	Plane->AddComponent(PlaneCol);
 
 	Box = SpawnObject<Actor>();
 

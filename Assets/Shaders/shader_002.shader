@@ -22,7 +22,7 @@ out VS_OUT {
 	vec3 Normals;
 	vec3 BiTangents;
 	vec3 Tangents;
-	mat3 TBN;
+	
 } vs_out;
 
 uniform mat4 Model;
@@ -42,7 +42,7 @@ void main()
 	vs_out.Normals = N;
 	vs_out.BiTangents = B;
 	vs_out.Tangents = T;
-	vs_out.TBN = mat3(T, B, N);
+	
 	//vs_out.normal = normalize(mat3(Model * in_disp) * in_normal).xyz;
 
 	/*
@@ -85,7 +85,7 @@ in VS_OUT{
 	vec3 Normals;
 	vec3 BiTangents;
 	vec3 Tangents;
-	mat3 TBN;
+	
 } gs_in[];
 
 out GS_OUT
@@ -239,7 +239,7 @@ in VS_OUT{
 	vec3 Normals;
 	vec3 BiTangents;
 	vec3 Tangents;
-	mat3 TBN;
+	
 } fs_in;
 
 uniform sampler2D Albedo;
@@ -356,7 +356,7 @@ void main()
 	mat3 TBN = mat3(fs_in.Tangents, fs_in.BiTangents, fs_in.Normals);
 
 
-	vec3 N = normalize(fs_in.TBN * normal);
+	vec3 N = normalize(TBN * normal);
     vec3 V = normalize(viewPos - fs_in.FragPos).xyz;
 
 	uint offset = index * 1024;
