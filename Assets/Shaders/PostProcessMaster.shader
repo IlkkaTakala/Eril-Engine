@@ -92,7 +92,7 @@ vec3 applyFogLower( in vec3  rgb,      // original color of the pixel
     return mix( rgb, fogColor, fogAmount );
 }
 
-const float rayStep = 0.05;
+const float rayStep = 0.1;
 const float minRayStep = 0.1;
 const int maxSteps = 30;
 const int numBinarySearchSteps = 5;
@@ -162,7 +162,7 @@ vec3 hash(vec3 a){
 	a = fract(a * scale);
 	a += dot(a, a.yxz + K);
 	return fract((a.xxy + a.yxx) * a.zyx);
-}
+}	
 
 void main()
 {
@@ -188,7 +188,7 @@ void main()
 	float dDepth;
 	
 	vec3 worldPos = texture(Position, TexCoords).xyz;
-	vec3 jitt = mix(vec3(0.0), normalize(vec3(hash(worldPos))), spec);
+	vec3 jitt = mix(vec3(0.0), normalize(vec3(hash(worldPos))), spec * 0.3);
 	vec4 coords = rayCast(jitt + reflected * max(minRayStep, -viewPosition.z), hitPos, dDepth);
 	vec2 dCoords = smoothstep(0.2, 0.6, abs(vec2(0.5, 0.5) - coords.xy));
 	float screenEdge = clamp(1.0 - (dCoords.x + dCoords.y), 0.0, 1.0);
