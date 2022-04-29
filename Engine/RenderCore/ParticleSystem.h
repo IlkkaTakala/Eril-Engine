@@ -18,6 +18,11 @@ public:
 		virtual bool Check(float) = 0;
 	};
 
+	struct Constructor {
+		static void BoxLocation(Particle&, Vector size);
+
+	};
+
 	struct Updator {
 		Updator(ParticleSystem* s) : system(s) {}
 		ParticleSystem* system;
@@ -28,6 +33,9 @@ public:
 		void Alpha(float delta, const CurveData& curve) const;
 		void SpriteSize(float delta, const CurveData & curve) const;
 		void SpriteRotationRate(float delta, const CurveData & curve) const;
+		void ColorBySpeed(float delta, const VectorCurveData & curve) const;
+		void AddVelocity(float delta, const Vector& velocity) const;
+
 	};
 
 private:

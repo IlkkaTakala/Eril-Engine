@@ -134,6 +134,23 @@ public:
 
 	}
 
+	static Rotator LookAt(const Vector& sourcePoint, const Vector& destPoint, const Vector& front, const Vector& up)
+	{
+		Vector toVector = (destPoint - sourcePoint).Normalize();
+
+		//compute rotation axis
+		Vector rotAxis = Vector::Cross(front, toVector).Normalize();
+		if (rotAxis.LengthSquared() == 0)
+			rotAxis = up;
+
+		//find the angle around rotation axis
+		float dot = Vector::Dot({1, 0, 0}, toVector);
+		float ang = acosf(dot);
+
+		//convert axis angle to quaternion
+		return FromAxisAngle(ang, rotAxis);
+	}
+
 	inline double Yaw() const {
 		double siny_cosp = 2 * (W * Z + X * Y);
 		double cosy_cosp = 1 - 2 * (Y * Y + Z * Z);

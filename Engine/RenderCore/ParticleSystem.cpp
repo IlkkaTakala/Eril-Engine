@@ -98,10 +98,9 @@ void ParticleSystem::Update(float delta)
 		Transforms[t_idx].Scale = p.scale;
 		Transforms[t_idx].Location = p.location;
 		if (FaceCamera) {
-			Rotator cam = RI->GetActiveCamera()->GetRotation();
-			Transforms[t_idx].Rotation.Z = cam.Z;
-			Transforms[t_idx].Rotation.Y = cam.Y;
-			Transforms[t_idx].Rotation.X = p.rotation.X;
+			Vector camDir = (RI->GetActiveCamera()->GetLocation() - p.location).Normalize();
+			Transforms[t_idx].Rotation = Rotator::LookAt(p.location, RI->GetActiveCamera()->GetLocation(), camDir, RI->GetActiveCamera()->GetUpVector());
+			//Transforms[t_idx].Rotation.W = p.rotation.W;
 		}
 		else Transforms[t_idx].Rotation = p.rotation;
 
@@ -150,19 +149,9 @@ void ParticleSystemConstruction::Updator::UpdateVelocities(float delta) const
 		if (!p.enabled) continue;
 
 		p.location += p.velocity * delta;
-		p.rotation += p.rotationRate * delta;
-		if (p.rotation.X > 360.f)
-			p.rotation.X -= 360.f;
-		else if (p.rotation.X < 0.f)
-			p.rotation.X += 360.f;
-		if (p.rotation.Y > 360.f)
-			p.rotation.Y -= 360.f;
-		else if (p.rotation.Y < 0.f)
-			p.rotation.Y += 360.f;
-		if (p.rotation.Z > 360.f)
-			p.rotation.Z -= 360.f;
-		else if (p.rotation.Z < 0.f)
-			p.rotation.Z += 360.f;
+		p.rotation += p.rotationRate * delta; // TODO fix
+		if (p.rotation.W > 360.f)
+			p.rotation.W -= 360.f;
 	}
 }
 
@@ -215,9 +204,29 @@ void ParticleSystemConstruction::Updator::SpriteRotationRate(float delta, const 
 		Particle& p = system->Particles[i];
 		if (!p.enabled) continue;
 
-		p.rotation.X += delta * curve.EvaluateCurve(p.lifetime / p.max_lifetime);
-		if (p.rotation.X > 360.f)
-			p.rotation.X -= 360.f;
+		p.rotation.W += delta * curve.EvaluateCurve(p.lifetime / p.max_lifetime);
+		if (p.rotation.W > 360.f)
+			p.rotation.W -= 360.f;
+	}
+}
+
+void ParticleSystemConstruction::Updator::ColorBySpeed(float delta, const VectorCurveData& curve) const
+{
+	for (uint i = 0; i <= system->ParticleCount; i++) {
+		Particle& p = system->Particles[i];
+		if (!p.enabled) continue;
+
+		p.colour = p.initialColour * curve.EvaluateCurve(p.velocity.Length());
+	}
+}
+
+void ParticleSystemConstruction::Updator::AddVelocity(float delta, const Vector& velocity) const
+{
+	for (uint i = 0; i <= system->ParticleCount; i++) {
+		Particle& p = system->Particles[i];
+		if (!p.enabled) continue;
+
+		p.velocity += velocity * delta;
 	}
 }
 
@@ -230,4 +239,11 @@ void ParticleSystemConstruction::Updator::Color(float delta, const VectorCurveDa
 		p.colour = p.initialColour * curve.EvaluateCurve(p.lifetime / p.max_lifetime);
 
 	}
+}
+
+void ParticleSystemConstruction::Constructor::BoxLocation(Particle& p, Vector size)
+{
+	p.location.X = RandomFloatInRange(-size.X, size.X) * 0.5f;
+	p.location.Y = RandomFloatInRange(-size.Y, size.Y) * 0.5f;
+	p.location.Z = RandomFloatInRange(-size.Z, size.Z) * 0.5f;
 }

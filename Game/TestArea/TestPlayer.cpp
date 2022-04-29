@@ -163,9 +163,9 @@ TestPlayer::TestPlayer() : Player()
 
 	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
 
-	/*auto part = SpawnObject<ParticleComponent>();
+	auto part = SpawnObject<ParticleComponent>();
 	part->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
-	part->SetLocation({10.f, 5.f, 0.5f});*/
+	part->SetLocation({10.f, 5.f, 0.5f});
 
 }
 

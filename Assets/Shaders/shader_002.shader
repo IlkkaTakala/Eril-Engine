@@ -338,7 +338,7 @@ void main()
 	//vec4 data = texture(gData, TexCoords);
 	float gamma = 2.2;	
 	vec3 albedo = pow(texture(Albedo, fs_in.TexCoords).rgb, vec3(gamma));
-	float metallic = 1.0;//texture(Metallic, fs_in.TexCoords).r;
+	float metallic = 0.0;//texture(Metallic, fs_in.TexCoords).r;
 	float AOt = texture(AO, fs_in.TexCoords).r;
 	float roughness = 0.3;//1.0 - texture(Roughness, fs_in.TexCoords).r;
 	vec3 normal = texture(Normal, fs_in.TexCoords).rgb;
