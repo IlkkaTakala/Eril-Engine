@@ -216,6 +216,16 @@ PostBuffer::PostBuffer(int width, int height)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT5, GL_TEXTURE_2D, PositionBuffer, 0);
 
+	// - data
+	glGenTextures(1, &DataBuffer);
+	glBindTexture(GL_TEXTURE_2D, DataBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT6, GL_TEXTURE_2D, DataBuffer, 0);
+
 	// - tell OpenGL which color attachments we'll use (of this framebuffer) for rendering 
 	unsigned int attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 	glDrawBuffers(2, attachments);
@@ -248,6 +258,7 @@ PostBuffer::~PostBuffer()
 	glDeleteTextures(1, &RevealageBuffer);
 	glDeleteTextures(1, &DepthBuffer);
 	glDeleteTextures(1, &PositionBuffer);
+	glDeleteTextures(1, &DataBuffer);
 	glDeleteFramebuffers(1, &FrameBuffer);
 }
 
@@ -282,6 +293,10 @@ void PostBuffer::BindTextures(int offset)
 
 	glActiveTexture(GL_TEXTURE6 + offset);
 	glBindTexture(GL_TEXTURE_2D, PositionBuffer);
+
+	glActiveTexture(GL_TEXTURE7 + offset);
+	glBindTexture(GL_TEXTURE_2D, DataBuffer);
+	
 }
 
 SSAOBuffer::SSAOBuffer(int width, int height)
