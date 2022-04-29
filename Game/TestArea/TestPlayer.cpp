@@ -138,8 +138,23 @@ TestPlayer::TestPlayer() : Player()
 	animC->SetSkeleton(skel->GetModel());
 	skel->SetAnimController(animC);
 
-	animC->SetAnimation(AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Breakdance", skel->GetModel()));
+	//animC->SetOverrideAnimation(AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Breakdance", skel->GetModel()));
 	skel->SetScale(Vector(0.01f));
+
+
+	new AnimationStateMachine(
+		{
+			MAKE_SM_STATE(Base, new TestCombiner()),
+			MAKE_SM_STATE(Idle, new TestCombiner()),
+			MAKE_SM_STATE(Run, new TestCombiner()),
+		},
+		{
+			MAKE_SM_PATH(Base, Idle, []() ->bool { return true; }),
+			MAKE_SM_PATH(Idle, Base, []() ->bool { return false; }),
+			MAKE_SM_PATH(Idle, Run, []() ->bool { return true; })
+		}
+	);
+
 }
 
 void TestPlayer::TestTimer(float d)
