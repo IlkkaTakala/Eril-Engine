@@ -2,6 +2,9 @@
 #include <Core.h>
 #include <Skeleton.h>
 #include <Animation.h>
+#include <Interface/AssetManager.h>
+
+class SkeletalObject;
 
 struct LoadedAnimation
 {
@@ -9,7 +12,63 @@ struct LoadedAnimation
 	float localTime;
 };
 
-struct AnimationBlendSpace
+struct AnimationBlendSpace1D
+{
+	std::vector<std::pair<float, Animation*>> anims;
+
+	float min;
+	float max;
+
+	Transform Evaluate(float delta, int bone, float axisValue) const {
+		const std::pair<float, Animation*>* first = nullptr;
+		const std::pair<float, Animation*>* second = nullptr;
+
+		if (anims.size() == 0) return Transform();
+
+		if (axisValue <= anims[0].first) return anims[0].second->GetTransform(bone, delta);
+		if (axisValue >= anims.rbegin()->first) return anims.rbegin()->second->GetTransform(bone, delta);
+
+		for (int i = (int)anims.size() - 1; i >= 0; i--) {
+			if (anims[i].first <= axisValue) {
+				first = &anims[i];
+				if (i + 1 < anims.size()) second = &anims[i + 1];
+				break;
+			}
+		}
+		Transform finalTrans;
+
+		if (first) {
+			if (second) {
+				float last = first->first;
+				float next = second->first;
+				float scale = (axisValue - last) / (next - last);
+
+				Transform tempFirstTrans;
+				Transform tempNextTrans;
+				if (scale <= 0.5) {
+					tempFirstTrans = first->second->GetTransform(bone, delta);
+					tempNextTrans = second->second->GetTransformByPercentage(bone, first->second->GetPercentageFromDuration(delta));
+				}
+				else
+				{
+					tempFirstTrans = first->second->GetTransformByPercentage(bone, second->second->GetPercentageFromDuration(delta));
+					tempNextTrans = second->second->GetTransform(bone, delta);
+				}
+
+				finalTrans.Location = tempFirstTrans.Location * (1 - scale) + tempNextTrans.Location * scale;
+				finalTrans.Rotation = Rotator::Slerp(tempFirstTrans.Rotation, tempNextTrans.Rotation, scale).FastNormalize();
+				finalTrans.Scale = tempFirstTrans.Scale * (1 - scale) + tempNextTrans.Scale * scale;
+			}
+			else {
+				finalTrans = first->second->GetTransform(bone, delta);
+			}
+		}
+
+		return finalTrans;
+	}
+};
+
+struct AnimationBlendSpace2D 
 {
 
 };
@@ -38,42 +97,40 @@ private:
 #define MAKE_SM_STATE(NAME, ANIMCOMBINER) {#NAME, ANIMCOMBINER}
 #define MAKE_SM_PATH(NAME, NAME2, FUNC) {#NAME, {#NAME2, FUNC}}
 
-struct TestCombiner : public AnimationCombiner
-{
-	void Evaluate(float delta, int bone, Vector& location, Rotator& rotation, Vector& scale) {
-		switch (state)
-		{
-		case 0:
-			test();
-			test2();
-			return animationcombiner.evaluate();
-		default:
-			break;
-		}
-	}
-
-	Animation* base;
-};
-
 class AnimationController : public BaseObject, public Tickable
 {
 public:
-	AnimationController();
+	AnimationController(SkeletalObject* owner);
 
-	void BeginPlay() override {}
-	void Tick(float delta) override;
+	virtual void BeginPlay() override {}
+	virtual void Tick(float delta) override;
 	void SetOverrideAnimation(Animation* anim) { temp_anim = anim; animoverride = true; }
-	void SetCombiner(AnimationCombiner* anim) { combiner = anim; }
 	void SetSkeleton(Skeleton* s) { }
 	void SetSkeleton(RenderMesh* s);
 
 	void UpdateBoneTransforms(float delta, RenderMesh* mesh);
 
-private:
-	AnimationCombiner* combiner;
+protected:
+	virtual Transform EvaluateBone(int bone) const = 0;
+
 	Animation* temp_anim;
 	float animtime;
 
 	bool animoverride;
+
+	SkeletalObject* owner;
 };
 
+class TestAnimControl : public AnimationController
+{
+public:
+	TestAnimControl(SkeletalObject* owner) : AnimationController(owner) {}
+
+	void BeginPlay() override;
+
+	Transform EvaluateBone(int bone) const override {
+		return blender.Evaluate(animtime, bone, 0.51f);
+	}
+
+	AnimationBlendSpace1D blender;
+};

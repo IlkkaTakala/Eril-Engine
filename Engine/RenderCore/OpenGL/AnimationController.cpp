@@ -2,8 +2,9 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <SkeletalMesh.h>
+#include <Objects/SkeletalObject.h>
 
-AnimationController::AnimationController()
+AnimationController::AnimationController(SkeletalObject* owner) : owner(owner)
 {
 	temp_anim = nullptr;
 	animtime = 0.f;
@@ -36,13 +37,13 @@ void AnimationController::UpdateBoneTransforms(float delta, RenderMesh* mesh)
 				* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Y, sca.Z));
 		}
 	}
-	else if (combiner) {
+	else {
 		
 		for (int i = 1; i < mats.size(); i++) {
-			Vector loc;
-			Rotator rot;
-			Vector sca;
-			combiner->Evaluate(delta, i, loc, rot, sca);
+			Transform temp = EvaluateBone(i);
+			Vector& loc = temp.Location;
+			Rotator& rot = temp.Rotation;
+			Vector& sca = temp.Scale;
 
 			mats[i] = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Y, loc.Z))
 				* glm::toMat4(glm::quat(rot.W, rot.X, rot.Y, rot.Z))
@@ -87,4 +88,10 @@ AnimationCombiner* AnimationStateMachine::Evaluate()
 		it.first++;
 	}
 	return Coms[currentState];
+}
+
+void TestAnimControl::BeginPlay()
+{
+	blender.anims.emplace_back(0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Walking", owner->GetModel()));
+	blender.anims.emplace_back(1.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Running", owner->GetModel()));
 }

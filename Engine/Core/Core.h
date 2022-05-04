@@ -143,7 +143,7 @@ bool do_register(String name) {
 //#define FOO(...) GET_MACRO(__VA_ARGS__, REGISTER_NAME, REGISTER)(__VA_ARGS__)
 
 template <class T = BaseObject>
-T* SpawnObject(String args = "", uint32 ID = 0)
+T* SpawnObjectWithID(String args, uint32 ID)
 {
 	if (ID != 0) ObjectManager::PrepareRecord(ID);
 	Ref<T> next = new T();
@@ -153,6 +153,19 @@ T* SpawnObject(String args = "", uint32 ID = 0)
 		next->DestroyObject();
 	}
 	helpers::SpawnHelper(base, args);
+	return next;
+}
+
+template <class T = BaseObject, typename... Args>
+T* SpawnObject(Args&&... args)
+{
+	Ref<T> next = new T(std::forward<Args>(args)...);
+	//ObjectManager::CreateRecord(next, 0, Constants::Record::SPAWNED);
+	BaseObject* base = dynamic_cast<BaseObject*>(next.GetPointer());
+	if (base == nullptr) {
+		next->DestroyObject();
+	}
+	helpers::SpawnHelper(base, "");
 	return next;
 }
 

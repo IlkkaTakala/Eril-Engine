@@ -14,9 +14,14 @@ class Animation
 public:
 	Animation();
 
-	Vector GetLocation(int bone, float delta);
-	Rotator GetRotation(int bone, float delta);
-	Vector GetScale(int bone, float delta);
+	Vector GetLocation(int bone, float delta) const;
+	Rotator GetRotation(int bone, float delta) const;
+	Vector GetScale(int bone, float delta) const;
+	Transform GetTransform(int bone, float delta) const;
+	Transform GetTransformByPercentage(int bone, float percent) const;
+
+	float GetDuration() const;
+	float GetPercentageFromDuration(float time) const;
 
 	bool IsReady() const { return loaded; }
 
