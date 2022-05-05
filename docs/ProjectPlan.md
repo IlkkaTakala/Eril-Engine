@@ -36,10 +36,10 @@ These are the features we will add on top of the existing features:
 - [x] Input system rework
 - [x] Scripting
 - [x] SSAO
-- [ ] Reflections
+- [x] Reflections (Screen space)
 - [ ] Global illumination, IBL
 - [ ] Shadows
-- [ ] Animations
+- [x] Animations
 - [ ] Editors
 - [ ] UI Framework improvements
 - [x] Particles
@@ -92,7 +92,7 @@ Input Rework           :done,       mdes3, 13-01, 1w
 Collisions             :done,       mdes1, after mdes3, 4w
 Collision improvements :done,       mdes5, after mdes1, 31-03
 Script integrations    :active,     mdes4, after mdes1, 4w
-Graphical improvements :active,     mdes6, after mdes5, 4w
+Graphical improvements :done,       mdes6, after mdes5, 4w
 UI Improvements        :            mdes2, after mdes1, 3w
 ```
 
