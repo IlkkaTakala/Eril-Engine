@@ -64,6 +64,12 @@ void processMesh(LoadedMesh* meshHolder, aiMesh* mesh)
 		vertex.tangent.y = mesh->mTangents[i].y;
 		vertex.tangent.z = mesh->mTangents[i].z;
 
+		if (mesh->HasVertexColors(0)) {
+			vertex.color.x = mesh->mColors[0][i].r;
+			vertex.color.y = mesh->mColors[0][i].g;
+			vertex.color.z = mesh->mColors[0][i].b;
+		}
+
 		if (mesh->HasTextureCoords(0))
 		{
 			vertex.uv.x = mesh->mTextureCoords[0][i].x;
@@ -297,7 +303,10 @@ LoadedMesh* loadMeshes(const std::string& path)
 	LoadedMesh* mesh = new LoadedMesh();
 	//read file with Assimp
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path + ".obj", importOptions);
+	String file = path;
+	if (std::filesystem::exists(path + ".fbx")) file += ".fbx";
+	else file += ".obj";
+	const aiScene* scene = importer.ReadFile(file, importOptions);
 	//Check for errors
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
@@ -391,7 +400,7 @@ namespace AssetManager
 				stbi_image_free(data);
 			}
 			next->SetName(name);
-			LoadedTextures.emplace(name, next);
+			if (LoadedTextures.find(name) == LoadedTextures.end()) LoadedTextures.emplace(name, next);
 			IRender::SendCommand({ RC_MAKEOBJECT, (uint64)static_cast<OpenGLObject*>(next), 0 });
 			Console::Log("Texture loaded: " + name);
 		}
@@ -483,11 +492,9 @@ void AssetManager::LoadAnimationAsync(const String& name, Animation* empty)
 
 AssetType AssetManager::GetAssetType(const String& name)
 {
-	if (name.find("Meshes") != String::npos) {
-		if (std::filesystem::exists(name + ".fbx")) return AssetType::MeshSkeletal;
-		else return AssetType::MeshStatic;
-	}
-	if (name.find("Textures") != String::npos) return AssetType::Texture;
+	if (name.find("Meshes") != String::npos) return AssetType::MeshStatic;
+	if (name.find("Skeletal") != String::npos) return AssetType::MeshSkeletal;
+	if (name.find("Textures") != String::npos || name.ends_with(".jpg") || name.ends_with(".png")) return AssetType::Texture;
 	if (name.find("Animations") != String::npos) return AssetType::Animation;
 	return AssetType::None;
 }
@@ -549,6 +556,7 @@ Texture* AssetManager::LoadTextureAsyncWithPromise(const String& name)
 	}
 	else {
 		auto tex = new Texture();
+		LoadedTextures[name] = tex;
 		LoadTextureAsync(name, tex);
 		return tex;
 	}

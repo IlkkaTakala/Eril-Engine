@@ -1210,16 +1210,17 @@ inline bool Renderer::CullCheck(Section* s)
 	glm::vec3 pos = mm[3];
 	Vector aabb = ((RenderMesh*)s->Parent)->GetAABB().maxs - ((RenderMesh*)s->Parent)->GetAABB().mins;
 	glm::vec3 rad = glm::vec3(aabb.X, aabb.Y, aabb.Z) * glm::mat3(mm);
-	float radii = glm::max(rad.x, glm::max(rad.y, rad.z));
+	float radius = glm::max(rad.x, glm::max(rad.y, rad.z));
 	glm::vec3 loc = glm::vec3(location.X, location.Y, location.Z);
 	glm::vec3 dir = glm::vec3(direction.X, direction.Y, direction.Z);
-	glm::vec3 d = loc - pos;
+	glm::vec3 d = pos - loc;
 	if (glm::length(d) > s->RenderDistance) {
 		return true;
 	}
-	else if (glm::length(d) > 2.f && glm::length(d) > radii)
+	else if (glm::length(d) > 2.f && glm::length(d) > radius)
 	{
-		if (glm::dot(dir, glm::normalize(pos - loc)) < 0.55f) // TODO: Calculate from FOV
+		glm::vec3 newPosition = glm::normalize(-d + dir * glm::length(d)) * radius;
+		if (glm::dot(dir, glm::normalize(d + newPosition)) < 0.75f) // TODO: Calculate from FOV
 		{
 			return true;
 		}

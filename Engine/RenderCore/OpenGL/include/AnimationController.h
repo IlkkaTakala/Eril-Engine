@@ -41,15 +41,7 @@ private:
 struct TestCombiner : public AnimationCombiner
 {
 	void Evaluate(float delta, int bone, Vector& location, Rotator& rotation, Vector& scale) {
-		switch (state)
-		{
-		case 0:
-			test();
-			test2();
-			return animationcombiner.evaluate();
-		default:
-			break;
-		}
+		
 	}
 
 	Animation* base;

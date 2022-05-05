@@ -7,6 +7,8 @@ AnimationController::AnimationController()
 {
 	temp_anim = nullptr;
 	animtime = 0.f;
+	combiner = nullptr;
+	animoverride = false;
 }
 
 void AnimationController::Tick(float delta)
@@ -47,6 +49,12 @@ void AnimationController::UpdateBoneTransforms(float delta, RenderMesh* mesh)
 			mats[i] = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Y, loc.Z))
 				* glm::toMat4(glm::quat(rot.W, rot.X, rot.Y, rot.Z))
 				* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Y, sca.Z));
+		}
+	}
+	else {
+		return;
+		for (int i = 1; i < mats.size(); i++) {
+			mats[i] = glm::mat4(1.f);
 		}
 	}
 

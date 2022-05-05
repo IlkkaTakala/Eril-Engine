@@ -19,17 +19,7 @@ struct Vertex
 	glm::vec3 normal;
 	glm::vec3 uv;
 	glm::vec3 tangent;
-};
-
-struct SkeletalVertex
-{
-	glm::vec3 position;
-	glm::vec3 normal;
-	glm::vec3 uv;
-	glm::vec3 tangent;
-
-	glm::vec4 weights;
-	glm::ivec4 bones;
+	glm::vec3 color;
 };
 
 class GLMesh : public IMesh
