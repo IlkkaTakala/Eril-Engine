@@ -45,16 +45,12 @@ struct AnimationBlendSpace1D
 
 				Transform tempFirstTrans;
 				Transform tempNextTrans;
-				if (scale <= 0.5) {
-					tempFirstTrans = first->second->GetTransform(bone, delta);
-					tempNextTrans = second->second->GetTransformByPercentage(bone, first->second->GetPercentageFromDuration(delta));
-				}
-				else
-				{
-					tempFirstTrans = first->second->GetTransformByPercentage(bone, second->second->GetPercentageFromDuration(delta));
-					tempNextTrans = second->second->GetTransform(bone, delta);
-				}
+				//tempFirstTrans = first->second->GetTransform(bone, delta);
+				float p = first->second->GetPercentageFromDuration(delta) * (1 - scale) + second->second->GetPercentageFromDuration(delta) * scale;
+				tempNextTrans = second->second->GetTransformByPercentage(bone, p);
+				tempFirstTrans = first->second->GetTransformByPercentage(bone, p);
 
+				//tempNextTrans = second->second->GetTransform(bone, delta);
 				finalTrans.Location = tempFirstTrans.Location * (1 - scale) + tempNextTrans.Location * scale;
 				finalTrans.Rotation = Rotator::Slerp(tempFirstTrans.Rotation, tempNextTrans.Rotation, scale).FastNormalize();
 				finalTrans.Scale = tempFirstTrans.Scale * (1 - scale) + tempNextTrans.Scale * scale;
