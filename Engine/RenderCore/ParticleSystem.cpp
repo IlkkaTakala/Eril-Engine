@@ -36,6 +36,16 @@ ParticleSystem::ParticleSystem()
 
 void ParticleSystem::ApplyMaterial()
 {
+	if (MaterialBuffer == 0) {
+		glGenBuffers(1, &MaterialBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, MaterialBuffer);
+		glBufferData(GL_ARRAY_BUFFER, MaxParticleCount * sizeof(MaterialParams), nullptr, GL_DYNAMIC_DRAW);
+	}
+	if (Dirty) {
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, MaterialBuffer);
+		glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, MatData.size() * sizeof(MaterialParams), MatData.data());
+	}
+
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 10, MaterialBuffer);
 }
 
@@ -58,23 +68,20 @@ void ParticleSystem::Initialize(SceneComponent* attach)
 	Parent = attach;
 
 	if (!Sprite) {
-		Sprite = MI->LoadData(attach, "sprite");
+		Sprite = MI->GetStatic(attach, "Assets/Meshes/sprite");
 		Sprite->SetAABB(AABB({ -10 }, { 10 }));
 	}
 	else Sprite->SetParent(attach);
 	if (!Sprite) return;
 	if (!Material) {
-		Material = RI->LoadMaterialByName("Assets/Materials/sprite");
+		Material = IRender::LoadMaterialByName("Assets/Materials/sprite");
 	}
 	Sprite->SetMaterial(0, Material);
 	Sprite->SetInstances(MaxParticleCount, Transforms.data());
 	Sprite->SetInstanceCount(ParticleCount);
 	Sprite->SetBinds(std::bind(&ParticleSystem::ApplyMaterial, this));
 
-	glGenBuffers(1, &MaterialBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, MaterialBuffer);
-	glBufferData(GL_ARRAY_BUFFER, MaxParticleCount * sizeof(MaterialParams), nullptr, GL_DYNAMIC_DRAW);
-
+	
 }
 
 void ParticleSystem::Update(float delta)
@@ -88,8 +95,7 @@ void ParticleSystem::Update(float delta)
 
 	if (Updator) Updator(this, delta);
 
-	std::vector<MaterialParams> params;
-	params.reserve(ParticleCount);
+	MatData.resize(ParticleCount);
 	for (uint i = 0; i <= ParticleCount; i++) {
 		if (!Particles[i].enabled) continue;
 
@@ -98,23 +104,21 @@ void ParticleSystem::Update(float delta)
 		Transforms[t_idx].Scale = p.scale;
 		Transforms[t_idx].Location = p.location;
 		if (FaceCamera) {
-			Rotator cam = RI->GetActiveCamera()->GetRotation();
+			Rotator cam = IRender::GetActiveCamera()->GetRotation();
 			Transforms[t_idx].Rotation.Z = cam.Z;
 			Transforms[t_idx].Rotation.Y = cam.Y;
 			Transforms[t_idx].Rotation.X = p.rotation.X;
 		}
 		else Transforms[t_idx].Rotation = p.rotation;
 
-		params.push_back({ glm::vec4(p.colour.X, p.colour.Y, p.colour.Z, p.alpha), {p.lifetime, p.lifetime / p.max_lifetime, 0.f, 0.f} });
+		MatData[t_idx] = { glm::vec4(p.colour.X, p.colour.Y, p.colour.Z, p.alpha), {p.lifetime, p.lifetime / p.max_lifetime, 0.f, 0.f} };
 
 		t_idx++;
 		last_active = i;
 	}
 	Sprite->SetInstances(t_idx, Transforms.data());
-
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, MaterialBuffer);
-	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, t_idx * sizeof(MaterialParams), params.data());
-
+	MatData.resize(t_idx);
+	Dirty = true;
 
 	ParticleCount = last_active;
 }
@@ -125,7 +129,7 @@ bool ParticleSystemConstruction::RateSpawner::Check(float delta)
 	SpawnLast += delta;
 	if (SpawnLast < SpawnInterval) return false;
 	SpawnLast = 0.f;
-	int idx = 0;
+	uint32 idx = 0;
 	if (system->FreeIdx.empty())
 		idx = ++system->ParticleCount;
 	else {

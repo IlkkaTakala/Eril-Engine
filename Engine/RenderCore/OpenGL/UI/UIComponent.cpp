@@ -39,7 +39,7 @@ UIComponent::UIComponent()
 	hovered = false;
 
 	parent = nullptr;
-	space = RI->GetUIManager();
+	space = IRender::GetUIManager();
 
 	redraw = true;
 	recalculate = true;
@@ -62,7 +62,7 @@ UIComponent::~UIComponent()
 
 void UIComponent::UpdateMatrices(const Vector2D& size)
 {
-	const Vector2D ScreenSize = RI->GetUIManager()->GetSize();
+	const Vector2D ScreenSize = IRender::GetUIManager()->GetSize();
 	const glm::mat4 view = glm::ortho(0.f, (float)ScreenSize.X, (float)ScreenSize.Y, 0.f, 10.f, 0.1f);;
 	const Vector loc = transform.Location;
 	const Rotator rot = transform.Rotation;
@@ -146,7 +146,7 @@ void UIComponent::HoverCheck(Vector2D& point)
 	if (point.X == -1) {
 		if (hovered) {
 			hovered = false;
-			if (RI->GetUIManager()->Hovered == this) RI->GetUIManager()->Hovered = nullptr;
+			if (IRender::GetUIManager()->Hovered == this) IRender::GetUIManager()->Hovered = nullptr;
 			OnLeave();
 		}
 		return;
@@ -158,7 +158,7 @@ void UIComponent::HoverCheck(Vector2D& point)
 			point.X = -1;
 			if (!hovered) {
 				hovered = true;
-				RI->GetUIManager()->Hovered = this;
+				IRender::GetUIManager()->Hovered = this;
 				OnEnter();
 			}
 			else OnHover();
@@ -166,7 +166,7 @@ void UIComponent::HoverCheck(Vector2D& point)
 		else {
 			if (hovered) {
 				hovered = false;
-				if (RI->GetUIManager()->Hovered == this) RI->GetUIManager()->Hovered = nullptr;
+				if (IRender::GetUIManager()->Hovered == this) IRender::GetUIManager()->Hovered = nullptr;
 				OnLeave();
 			}
 		}

@@ -4,7 +4,7 @@
 
 CloudParticle::CloudParticle() : ParticleSystem()
 {
-	SetMaterial(RI->LoadMaterialByName("Assets/Materials/cloud_sprite"));
+	SetMaterial(IRender::LoadMaterialByName("Assets/Materials/cloud_sprite"));
 	SetMaxCount(200);
 
 	SetConstructor([](Particle& p) {

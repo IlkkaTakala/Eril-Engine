@@ -14,10 +14,11 @@ GLCamera::GLCamera()
 	Location = Vector(0.f, 0.f, 0.f);
 	Rotation = Rotator(Vector{ 0.f, 0.f, 0.f });
 	Orientation = glm::mat4(1.0f);
+	postProcess = nullptr;
 
 	ApplyTransformation();
 
-	SetPostProcess("PostProcessMaster");
+	SetPostProcess("Assets/Materials/PostProcess");
 
 	int x = std::atoi(INI->GetValue("Render", "ResolutionX").c_str());
 	int y = std::atoi(INI->GetValue("Render", "ResolutionY").c_str());
@@ -27,7 +28,7 @@ GLCamera::GLCamera()
 
 GLCamera::~GLCamera()
 {
-	if (RI->GetActiveCamera() == this) RI->SetActiveCamera(nullptr);
+	if (IRender::GetActiveCamera() == this) IRender::SetActiveCamera(nullptr);
 }
 
 void GLCamera::SetFov(float fov)
@@ -100,7 +101,7 @@ void GLCamera::SetLookAt(const Vector& to, const Vector& up) {
 
 void GLCamera::SetPostProcess(const String& name)
 {
-	postProcess = dynamic_cast<Renderer*>(RI)->Shaders.at(name);
+	postProcess = IRender::LoadMaterialByName(name);
 }
 
 void GLCamera::ApplyTransformation()

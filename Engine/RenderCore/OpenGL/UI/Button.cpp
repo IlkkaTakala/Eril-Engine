@@ -31,19 +31,19 @@ Button::Button()
 
 	glDeleteBuffers(1, &uniformBuffer);
 
-	normal = UIStyle(Vector(1.f), 1.f, RI->LoadTextureByName("Assets/Textures/button.png"));
+	normal = UIStyle(Vector(1.f), 1.f, IRender::LoadTextureByName("Assets/Textures/button.png"));
 	UIStyleGLM n(normal);
 	glGenBuffers(1, &normalBuffer);
 	glBindBuffer(GL_UNIFORM_BUFFER, normalBuffer);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(UIStyleGLM), &n, GL_DYNAMIC_DRAW);
 
-	hovered = UIStyle(Vector(0.8f), 1.f, RI->LoadTextureByName("Assets/Textures/button.png"));
+	hovered = UIStyle(Vector(0.8f), 1.f, IRender::LoadTextureByName("Assets/Textures/button.png"));
 	UIStyleGLM h(hovered);
 	glGenBuffers(1, &hoverBuffer);
 	glBindBuffer(GL_UNIFORM_BUFFER, hoverBuffer);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(UIStyleGLM), &h, GL_DYNAMIC_DRAW);
 
-	pressed = UIStyle(Vector(0.6f), 1.f, RI->LoadTextureByName("Assets/Textures/buttonPressed.png"));
+	pressed = UIStyle(Vector(0.6f), 1.f, IRender::LoadTextureByName("Assets/Textures/buttonPressed.png"));
 	UIStyleGLM p(pressed);
 	glGenBuffers(1, &pressBuffer);
 	glBindBuffer(GL_UNIFORM_BUFFER, pressBuffer);
@@ -209,7 +209,7 @@ void Button::LoadWithParameters(const std::map<String, String>& args)
 		case 8: s.Tint.Z = (float)atof(dats[7].c_str());
 		case 7: s.Tint.Y = (float)atof(dats[6].c_str());
 		case 6: s.Tint.X = (float)atof(dats[5].c_str());
-		case 5: s.texture = RI->LoadTextureByName(dats[4]);
+		case 5: s.texture = IRender::LoadTextureByName(dats[4]);
 		case 4: s.Opacity = (float)atof(dats[3].c_str());
 		case 3: s.Color.Z = (float)atof(dats[2].c_str());
 		case 2: s.Color.Y = (float)atof(dats[1].c_str());
@@ -230,7 +230,7 @@ void Button::LoadWithParameters(const std::map<String, String>& args)
 		case 8: s.Tint.Z = (float)atof(dats[7].c_str());
 		case 7: s.Tint.Y = (float)atof(dats[6].c_str());
 		case 6: s.Tint.X = (float)atof(dats[5].c_str());
-		case 5: s.texture = RI->LoadTextureByName(dats[4]);
+		case 5: s.texture = IRender::LoadTextureByName(dats[4]);
 		case 4: s.Opacity = (float)atof(dats[3].c_str());
 		case 3: s.Color.Z = (float)atof(dats[2].c_str());
 		case 2: s.Color.Y = (float)atof(dats[1].c_str());
@@ -251,7 +251,7 @@ void Button::LoadWithParameters(const std::map<String, String>& args)
 		case 8: s.Tint.Z = (float)atof(dats[7].c_str());
 		case 7: s.Tint.Y = (float)atof(dats[6].c_str());
 		case 6: s.Tint.X = (float)atof(dats[5].c_str());
-		case 5: s.texture = RI->LoadTextureByName(dats[4]);
+		case 5: s.texture = IRender::LoadTextureByName(dats[4]);
 		case 4: s.Opacity = (float)atof(dats[3].c_str());
 		case 3: s.Color.Z = (float)atof(dats[2].c_str());
 		case 2: s.Color.Y = (float)atof(dats[1].c_str());

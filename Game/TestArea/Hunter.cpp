@@ -11,7 +11,7 @@ Hunter::Hunter() : Actor()
 	Mesh = SpawnObject<VisibleObject>();
 	AddComponent(Mesh);
 	Mesh->SetModel("hunter");
-	Mesh->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/hunter"));
+	Mesh->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/hunter"));
 
 	move = SpawnObject<MovementComponent>();
 	move->SetTarget(this);

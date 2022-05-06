@@ -11,7 +11,7 @@ void TestUI::Construct()
 	fpsText = Create<Text>();
 	AddComponent(
 		Create<Panel>()->AddChild(
-			Create<Image>()->SetStyle(UIStyle(Vector(1.f, 0.f, 0.f), 1.0f, RI->LoadTextureByName("Assets/Textures/trees2/Leaves_d.png")))
+			Create<Image>()->SetStyle(UIStyle(Vector(1.f, 0.f, 0.f), 1.0f, IRender::LoadTextureByName("Assets/Textures/trees2/Leaves_d.png")))
 		)->AddChild(
 			fpsText->SetStyle(UIStyle(Vector(0.f), 1.0f, nullptr))
 		)

@@ -110,7 +110,7 @@ public:
 		return (lhs * scale) + (rhs * time);
 	}	
 
-	inline static Rotator Slerp(Rotator lhs, Rotator rhs, float time, float threshold)
+	inline static Rotator Slerp(Rotator lhs, Rotator rhs, float time, float threshold = 0.001)
 	{
 		float angle = Dot(lhs, rhs);
 		if (angle < 0.0f)

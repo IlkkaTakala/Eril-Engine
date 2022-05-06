@@ -220,14 +220,32 @@
     <ClCompile Include="Game\ForestGame\StartScreen.cpp">
       <Filter>Game\ForestGame</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Interface\AssetManager.cpp">
+      <Filter>Engine\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\RenderCore\OpenGL\Animation.cpp">
+      <Filter>Engine\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\RenderCore\OpenGL\AnimationController.cpp">
+      <Filter>Engine\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\RenderCore\OpenGL\Skeleton.cpp">
+      <Filter>Engine\OpenGL</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\Core\Objects\CollisionShape.cpp">
       <Filter>Engine\Objects\Physics</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Core\Basic\Math.cpp">
-      <Filter>Engine\Public\Basic</Filter>
+      <Filter>Engine\Basic</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Core\Basic\Rotation.cpp">
-      <Filter>Engine\Public\Basic</Filter>
+      <Filter>Engine\Basic</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\RenderCore\OpenGL\SkeletalMesh.cpp">
+      <Filter>Engine\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Objects\SkeletalObject.cpp">
+      <Filter>Engine\Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -303,8 +321,8 @@
     <Filter Include="Game\ForestGame">
       <UniqueIdentifier>{734f2662-5704-48ce-8f67-7c7c45fe62c9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Public\Basic">
-      <UniqueIdentifier>{d569de2a-930e-4331-ac70-fe7d1f065f86}</UniqueIdentifier>
+    <Filter Include="Engine\Basic">
+      <UniqueIdentifier>{496e8a96-ea8b-458f-9cc1-45d3a7bb71c2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -539,14 +557,20 @@
     <ClInclude Include="Engine\Core\Objects\CollisionShape.h">
       <Filter>Engine\Objects\Physics</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Core\Basic\Math.h">
+      <Filter>Engine\Basic</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\Core\Basic\Rotation.h">
-      <Filter>Engine\Public\Basic</Filter>
+      <Filter>Engine\Basic</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\Basic\Transformation.h">
-      <Filter>Engine\Public\Basic</Filter>
+      <Filter>Engine\Basic</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\Basic\Math.h">
-      <Filter>Engine\Public\Basic</Filter>
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\SkeletalMesh.h">
+      <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Objects\SkeletalObject.h">
+      <Filter>Engine\Objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -576,6 +600,27 @@
     </ClInclude>
     <ClInclude Include="Game\ForestGame\StartScreen.h">
       <Filter>Game\ForestGame</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Basic\QueueSafe.h">
+      <Filter>Engine\Basic</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\RenderCommands.h">
+      <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Interface\AssetManager.h">
+      <Filter>Engine\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\OpenGLObject.h">
+      <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\Animation.h">
+      <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\AnimationController.h">
+      <Filter>Engine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RenderCore\OpenGL\include\Skeleton.h">
+      <Filter>Engine\OpenGL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -14,6 +14,8 @@
 #include "Objects/CollisionShape.h"
 #include <Objects/ParticleComponent.h>
 #include "CloudParticle.h"
+#include <Objects/SkeletalObject.h>
+#include <Interface/AssetManager.h>
 
 //ECS
 #include <Interface/IECS.h>
@@ -69,7 +71,7 @@ TestPlayer::TestPlayer() : Player()
 
 	//Player Model
 	Mesh = SpawnObject<VisibleObject>();
-	Mesh->SetModel("Cube");
+	Mesh->SetModel("Assets/Meshes/Cube");
 	Mesh->GetModel()->SetAABB(AABB(Vector(-1.f, -1.f, 0.f), Vector(1.f, 1.f, 2.f)));
 	SetLocation(Vector(15, 15, 1));
 
@@ -93,13 +95,9 @@ TestPlayer::TestPlayer() : Player()
 
 	//Skybox
 	Sky = SpawnObject<VisibleObject>();
-	Sky->SetModel(MI->LoadData(Sky, "SkySphere"));
-	Sky->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/Sky"));
+	Sky->SetModel("Assets/Meshes/SkySphere");
+	Sky->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/Sky"));
 	Sky->SetScale(Sky->GetScale() * 2.0f);
-
-	//Testing UI
-	/*auto ui = UI::LoadFromFile("Game/TestArea/testingui2.ui");
-	UI::AddToScreen(ui, this);*/
 
 	pause = nullptr;
 
@@ -118,7 +116,7 @@ TestPlayer::TestPlayer() : Player()
 
 	//Moment Model -> ColliderModel
 	BoxModel = SpawnObject<VisibleObject>();
-	BoxModel->SetModel("Cube");
+	BoxModel->SetModel("Assets/Meshes/Cube");
 	BoxModel->GetModel()->SetAABB(AABB(Vector(-1.0f), Vector(1.0f)));
 
 	Box->AddComponent(BoxModel);
@@ -129,43 +127,35 @@ TestPlayer::TestPlayer() : Player()
 	BoxCol->SetType(0);
 	BoxCol->SetSize(BoxModel->GetModel()->GetAABB());
 	
-	/*BoxModelMove = SpawnObject<MovementComponent>();
-	BoxModelMove->SetTarget(Box, BoxModel->GetModel()->GetAABB());
-	BoxModelMove->SetGravity(true);*/
-	//BoxModelMove->SetPhysics(true);
-	//BoxCol->SetTarget(Box);
-
-	Box2 = SpawnObject<Actor>();
-
-	BoxModel2 = SpawnObject<VisibleObject>();
-	BoxModel2->SetModel("cylinder");
-	//BoxModel2->SetRotation(Vector(0.f, 0.f, -90.f));
-	//BoxModel2->SetScale(0.5f);
-	//BoxModel2->GetModel()->SetAABB(AABB(Vector(-1.0f), Vector(1.0f)));
-
-	Box2->AddComponent(BoxModel2);
-	Box2->SetLocation(Vector(10.f, 10.f, 6.f));
-	Box2->SetRotation(Vector(90.f, 0.f, 0.f));
-
-	BoxCol2 = SpawnObject<CylinderCollisionShape>();
-	BoxCol2->SetType(1);
-	Box2->AddComponent(BoxCol2);
-	BoxCol2->SetSize(BoxModel2->GetModel()->GetAABB());
-	//BoxCol2->SetLocation(Vector(0.f, 0.f, 0.f));
-	//BoxCol2->SetRotation(Vector(0.f, 90.f, 0.f));
-
-
-	//BoxModelMove = SpawnObject<MovementComponent>();
-	//BoxModelMove->SetTarget(Box2, BoxModel2->GetModel()->GetAABB());
-	//BoxModelMove->SetGravity(true);
-	////BoxModelMove->SetPhysics(true);
-	//BoxCol2->SetTarget(BoxModelMove);
 
 	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
 
-	/*auto part = SpawnObject<ParticleComponent>();
-	part->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
-	part->SetLocation({10.f, 5.f, 0.5f});*/
+	auto skel = SpawnObject<SkeletalObject>();
+	skel->SetModel("Assets/Meshes/Alien");
+	skel->GetModel()->SetMaterial(1, IRender::LoadMaterialByName("Assets/Materials/alien_upper"));
+	skel->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/alien_lower"));
+	skel->SetLocation({5.f, 5.f, -0.5f});
+	auto animC = SpawnObject<TestAnimControl>(skel);
+	animC->BeginPlay();
+	animC->SetSkeleton(skel->GetModel());
+	skel->SetAnimController(animC);
+
+	//animC->SetOverrideAnimation(AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Breakdance", skel->GetModel()));
+	skel->SetScale(Vector(0.01f));
+
+
+	/*new AnimationStateMachine(
+		{
+			MAKE_SM_STATE(Base, new TestCombiner()),
+			MAKE_SM_STATE(Idle, new TestCombiner()),
+			MAKE_SM_STATE(Run, new TestCombiner()),
+		},
+		{
+			MAKE_SM_PATH(Base, Idle, []() ->bool { return true; }),
+			MAKE_SM_PATH(Idle, Base, []() ->bool { return false; }),
+			MAKE_SM_PATH(Idle, Run, []() ->bool { return true; })
+		}
+	);*/
 
 }
 
@@ -352,7 +342,7 @@ void TestPlayer::BeginPlay()
 		DirLight->Size = 3.f;
 		DirLight->Intensity = 1.f;
 		DirLight->Color = Vector(1.f);
-		DirLight->Rotation = Vector(0.5, 0.5, -0.5);
+		DirLight->Rotation = Vector(0.5, 0.5, -0.5).Normalize();
 
 		for (int i = 0; i < 50; i++)
 		{

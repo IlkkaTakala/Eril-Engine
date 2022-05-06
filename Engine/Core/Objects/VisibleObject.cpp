@@ -43,6 +43,7 @@ VisibleObject::VisibleObject() : SceneComponent()
 
 void VisibleObject::OnDestroyed()
 {
+	if (RenderData) RenderData->SetVisible(false);
 	SceneComponent::OnDestroyed();
 	Physics::RemoveStatic(this);
 }
@@ -58,20 +59,22 @@ void VisibleObject::LoadWithParameters(const String& args)
 	auto mesh = data.find("Mesh");
 
 	if (mesh != data.end()) SetModel(mesh->second);
-	if (mat1 != data.end()) GetModel()->SetMaterial(0, RI->LoadMaterialByName(mat1->second));
-	if (mat2 != data.end()) GetModel()->SetMaterial(1, RI->LoadMaterialByName(mat2->second));
-	if (mat3 != data.end()) GetModel()->SetMaterial(2, RI->LoadMaterialByName(mat3->second));
+	if (mat1 != data.end()) GetModel()->SetMaterial(0, IRender::LoadMaterialByName(mat1->second));
+	if (mat2 != data.end()) GetModel()->SetMaterial(1, IRender::LoadMaterialByName(mat2->second));
+	if (mat3 != data.end()) GetModel()->SetMaterial(2, IRender::LoadMaterialByName(mat3->second));
 }
 
 void VisibleObject::SetModel(std::string Name)
 {
 	delete RenderData;
-	RenderData = MI->LoadData(this, Name);
+	RenderData = MI->GetStatic(this, Name);
 }
 
 void VisibleObject::SetModel(RenderMesh* mesh)
 {
-	delete RenderData;
-	RenderData = mesh;
+	if (mesh && mesh->GetMeshType() == RenderMesh::MeshType::Static) {
+		delete RenderData;
+		RenderData = mesh;
+	}
 }
 

@@ -6,6 +6,7 @@
 
 static void* WindowInstance = nullptr;
 static std::map<uint, GLFWwindow*> Windows;
+static int CursorMode = GLFW_CURSOR_NORMAL;
 
 void WindowManager::AddWindow()
 {
@@ -41,7 +42,7 @@ uint WindowManager::CreateMainWindow(int width, int height)
 		glfwTerminate();
 		return -1;
 	}
-	uint idx = Windows.size() > 0 ? Windows.rbegin()->first + 1 : 1;
+	uint idx = Windows.size() > 0 ? Windows.rbegin()->first + 1 : 0;
 	Windows.emplace(idx, Window);
 
 	if (INI->GetValue("Render", "ResolutionY").c_str() == "false")
@@ -124,16 +125,17 @@ void WindowManager::SetShowCursor(uint window, bool show)
 		glfwSetInputMode(Windows[idx], GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		if (glfwRawMouseMotionSupported())
 			glfwSetInputMode(Windows[idx], GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
+		CursorMode = GLFW_CURSOR_NORMAL;
 	}
 	else {
 		glfwSetInputMode(Windows[idx], GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		if (glfwRawMouseMotionSupported())
 			glfwSetInputMode(Windows[idx], GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+		CursorMode = GLFW_CURSOR_DISABLED;
 	}
 }
 
 bool WindowManager::GetShowCursor(uint window)
 {
-	int mode = glfwGetInputMode(Windows[window], GLFW_CURSOR);
-	return mode == GLFW_CURSOR_NORMAL;
+	return CursorMode == GLFW_CURSOR_NORMAL;
 }
