@@ -21,7 +21,7 @@ namespace ScriptFunctions {
 		auto m = ObjectManager::GetByRecord<BaseObject>(id);
 		auto mater = dynamic_cast<VisibleObject*>(m);
 		if (mater) {
-			mater->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/" + *name));
+			mater->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/" + *name));
 			Console::Log("Material Changed to: " + *name);
 		}
 		else {
@@ -56,12 +56,14 @@ void VisibleObject::LoadWithParameters(const String& args)
 	auto mat1 = data.find("Material1");
 	auto mat2 = data.find("Material2");
 	auto mat3 = data.find("Material3");
+	auto mat4 = data.find("Material4");
 	auto mesh = data.find("Mesh");
 
 	if (mesh != data.end()) SetModel(mesh->second);
 	if (mat1 != data.end()) GetModel()->SetMaterial(0, IRender::LoadMaterialByName(mat1->second));
 	if (mat2 != data.end()) GetModel()->SetMaterial(1, IRender::LoadMaterialByName(mat2->second));
 	if (mat3 != data.end()) GetModel()->SetMaterial(2, IRender::LoadMaterialByName(mat3->second));
+	if (mat3 != data.end()) GetModel()->SetMaterial(3, IRender::LoadMaterialByName(mat4->second));
 }
 
 void VisibleObject::SetModel(std::string Name)

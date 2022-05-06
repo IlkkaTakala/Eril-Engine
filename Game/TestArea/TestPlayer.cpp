@@ -97,7 +97,7 @@ TestPlayer::TestPlayer() : Player()
 	Sky = SpawnObject<VisibleObject>();
 	Sky->SetModel("Assets/Meshes/SkySphere");
 	Sky->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/Sky"));
-	Sky->SetScale(Sky->GetScale() * 2.0f);
+	Sky->SetScale(Sky->GetScale() * 4.0f);
 
 	pause = nullptr;
 
@@ -295,7 +295,7 @@ void TestPlayer::Tick(float deltaTime)
 void TestPlayer::BeginPlay()
 {
 
-	Terrain* terrain = ObjectManager::GetByRecord<Terrain>(0xA0005554);
+	//Terrain* terrain = ObjectManager::GetByRecord<Terrain>(0xA0005554);
 
 	
 	//ECS
@@ -307,7 +307,7 @@ void TestPlayer::BeginPlay()
 	//AudioControllerSystem* audioControllerSystem = static_cast<AudioControllerSystem*>(systemsManager->GetSystemByName("AudioControllerSystem"));
 	//audioComponentID = audio->GetID();
 
-	Vector audioPos = Vector(20.0f, 20.0f, terrain->GetHeight(20.0f, 20.0f) + 1.5f);
+	Vector audioPos = Vector(20.0f, 20.0f, 1.5f);
 	audio->SetSourceID(AudioManager::LoadAudio("clicketi.WAV"));
 	audio->SetPosition(audioPos);
 	Mesh->SetLocation(audioPos);
@@ -338,7 +338,7 @@ void TestPlayer::BeginPlay()
 			//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
 
 			LightComponent* light = lightSystem->AddComponentToSystem();
-			light->Location = Vector(x, y, terrain->GetHeight(x, y));
+			light->Location = Vector(x, y, 2.f);
 			light->LightType = LIGHT_POINT;
 			light->Size = 5.f;
 			light->Intensity = rand() / (float)RAND_MAX * 20.f;
