@@ -131,7 +131,7 @@ TestPlayer::TestPlayer() : Player()
 	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
 
 	auto skel = SpawnObject<SkeletalObject>();
-	skel->SetModel("Assets/Meshes/Alien");
+	skel->SetModel("Assets/Skeletal/Alien");
 	skel->GetModel()->SetMaterial(1, IRender::LoadMaterialByName("Assets/Materials/alien_upper"));
 	skel->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/alien_lower"));
 	skel->SetLocation({5.f, 5.f, -0.5f});
@@ -142,20 +142,6 @@ TestPlayer::TestPlayer() : Player()
 
 	//animC->SetOverrideAnimation(AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Breakdance", skel->GetModel()));
 	skel->SetScale(Vector(0.01f));
-
-
-	/*new AnimationStateMachine(
-		{
-			MAKE_SM_STATE(Base, new TestCombiner()),
-			MAKE_SM_STATE(Idle, new TestCombiner()),
-			MAKE_SM_STATE(Run, new TestCombiner()),
-		},
-		{
-			MAKE_SM_PATH(Base, Idle, []() ->bool { return true; }),
-			MAKE_SM_PATH(Idle, Base, []() ->bool { return false; }),
-			MAKE_SM_PATH(Idle, Run, []() ->bool { return true; })
-		}
-	);*/
 
 }
 

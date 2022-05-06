@@ -229,14 +229,14 @@ void SkeletalMeshDataHolder::CreateState()
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(SkinnedVertex), (void*)offsetof(SkinnedVertex, tangent));
 	glEnableVertexAttribArray(3);
 
-	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(SkinnedVertex), (void*)offsetof(SkinnedVertex, weights));
+	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(SkinnedVertex), (void*)offsetof(SkinnedVertex, color));
 	glEnableVertexAttribArray(4);
 
-	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(SkinnedVertex), (void*)offsetof(SkinnedVertex, weights));
-	glEnableVertexAttribArray(4);
-		
-	glVertexAttribIPointer(5, 4, GL_INT, sizeof(SkinnedVertex), (void*)offsetof(SkinnedVertex, bones));
+	glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(SkinnedVertex), (void*)offsetof(SkinnedVertex, weights));
 	glEnableVertexAttribArray(5);
+		
+	glVertexAttribIPointer(6, 4, GL_INT, sizeof(SkinnedVertex), (void*)offsetof(SkinnedVertex, bones));
+	glEnableVertexAttribArray(6);
 
 	glBindVertexArray(0);
 

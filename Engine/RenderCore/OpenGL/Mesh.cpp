@@ -362,24 +362,27 @@ void MeshDataHolder::CreateState()
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tangent));
 	glEnableVertexAttribArray(3);
 
+	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
+	glEnableVertexAttribArray(4);
+
 	if (defaultInstanced != 0) glDeleteBuffers(1, &defaultInstanced);
 	glm::mat4 trans(1.f);
 	glGenBuffers(1, &defaultInstanced);
 	glBindBuffer(GL_ARRAY_BUFFER, defaultInstanced);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4), &trans, GL_STATIC_DRAW);
 
-	glEnableVertexAttribArray(4);
 	glEnableVertexAttribArray(5);
 	glEnableVertexAttribArray(6);
 	glEnableVertexAttribArray(7);
-	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(0));
-	glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 4));
-	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 8));
-	glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 12));
-	glVertexAttribDivisor(4, 1);
+	glEnableVertexAttribArray(8);
+	glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(0));
+	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 4));
+	glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 8));
+	glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4 * 4, (void*)(sizeof(float) * 12));
 	glVertexAttribDivisor(5, 1);
 	glVertexAttribDivisor(6, 1);
 	glVertexAttribDivisor(7, 1);
+	glVertexAttribDivisor(8, 1);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
