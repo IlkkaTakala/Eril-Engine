@@ -39,7 +39,7 @@ inline bool GetFirst(const T& list, float duration, int tickSpeed, float delta, 
 	return true;
 }
 
-Vector Animation::GetLocation(int bone, float delta)
+Vector Animation::GetLocation(int bone, float delta) const
 {
 	if (bone >= LocationTrack.size() || LocationTrack[bone].size() == 0) return 0.f;
 
@@ -55,7 +55,7 @@ Vector Animation::GetLocation(int bone, float delta)
 	return finalPosition;
 }
 
-Rotator Animation::GetRotation(int bone, float delta)
+Rotator Animation::GetRotation(int bone, float delta) const
 {
 	if (bone >= RotationTrack.size() || RotationTrack[bone].size() == 0) return Rotator(0.f);
 
@@ -70,7 +70,7 @@ Rotator Animation::GetRotation(int bone, float delta)
 	return finalRotation;
 }
 
-Vector Animation::GetScale(int bone, float delta)
+Vector Animation::GetScale(int bone, float delta) const
 {
 	if (bone >= ScaleTrack.size() || ScaleTrack[bone].size() == 0) return 1.f;
 
@@ -84,4 +84,26 @@ Vector Animation::GetScale(int bone, float delta)
 	Vector finalScale = frames[begin].second * (1 - scaleFactor) + frames[next].second * scaleFactor;
 
 	return finalScale;
+}
+
+Transform Animation::GetTransform(int bone, float delta) const
+{
+	return { GetLocation(bone, delta), GetRotation(bone, delta), GetScale(bone, delta) };
+}
+
+Transform Animation::GetTransformByPercentage(int bone, float percent) const
+{
+	return GetTransform(bone, GetDuration() * percent);
+}
+
+float Animation::GetDuration() const
+{
+	return duration / tickSpeed;
+}
+
+float Animation::GetPercentageFromDuration(float time) const
+{
+	float a = time * tickSpeed;
+	float frametime = a - floor(a / duration) * duration;
+	return frametime / tickSpeed;
 }

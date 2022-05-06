@@ -134,7 +134,8 @@ TestPlayer::TestPlayer() : Player()
 	skel->GetModel()->SetMaterial(1, IRender::LoadMaterialByName("Assets/Materials/alien_upper"));
 	skel->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/alien_lower"));
 	skel->SetLocation({5.f, 5.f, -0.5f});
-	auto animC = SpawnObject<AnimationController>();
+	auto animC = SpawnObject<TestAnimControl>(skel);
+	animC->BeginPlay();
 	animC->SetSkeleton(skel->GetModel());
 	skel->SetAnimController(animC);
 
@@ -142,7 +143,7 @@ TestPlayer::TestPlayer() : Player()
 	skel->SetScale(Vector(0.01f));
 
 
-	new AnimationStateMachine(
+	/*new AnimationStateMachine(
 		{
 			MAKE_SM_STATE(Base, new TestCombiner()),
 			MAKE_SM_STATE(Idle, new TestCombiner()),
@@ -153,7 +154,7 @@ TestPlayer::TestPlayer() : Player()
 			MAKE_SM_PATH(Idle, Base, []() ->bool { return false; }),
 			MAKE_SM_PATH(Idle, Run, []() ->bool { return true; })
 		}
-	);
+	);*/
 
 }
 
