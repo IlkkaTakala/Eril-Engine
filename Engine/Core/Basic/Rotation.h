@@ -40,32 +40,7 @@ public:
 	// Roll, Pitch, Yaw
 	Vector AsEuler() const
 	{
-		Vector euler;
-		const float sqw = W * W;
-		const float sqx = X * X;
-		const float sqy = Y * Y;
-		const float sqz = Z * Z;
-		const float test = 2.f * (Y * W - X * Z);
-		
-		if (Math::Equals(test, 1.0))
-		{
-			euler.Z = (float)(-2.0 * atan2(X, W));
-			euler.X = 0;
-			euler.Y = (float)(PI * 0.5);
-		}
-		else if (Math::Equals(test, -1.0))
-		{
-			euler.Z = (float)(2.0 * atan2(X, W));
-			euler.X = 0;
-			euler.Y = (float)(PI * -0.5);
-		}
-		else
-		{
-			euler.Z = (float)atan2(2.0 * (X * Y + Z * W), (sqx - sqy - sqz + sqw));
-			euler.X = (float)atan2(2.0 * (Y * Z + X * W), (-sqx - sqy + sqz + sqw));
-			euler.Y = (float)asin(Math::Clamp(test, -1.0, 1.0));
-		}
-		return euler;
+		return { RollDegrees(), PitchDegrees(), YawDegrees() };
 	}
 
 	inline Vector GetImaginary() const
@@ -130,25 +105,14 @@ public:
 		return Lerp(lhs, rhs, time).FastNormalize();
 	}
 
-	static Vector RotatorToEuler(const Rotator& vec) {
-
-	}
-
-	static Rotator LookAt(const Vector& sourcePoint, const Vector& destPoint, const Vector& front, const Vector& up)
+	static Rotator LookAt(const Vector& point, const Vector& position, const Vector& front, const Vector& up)
 	{
-		Vector toVector = (destPoint - sourcePoint).Normalize();
+		Vector forwardVector = (point - position).Normalize();
+		float dot = Vector::Dot((0.0f, 1.0f, 0.0f), forwardVector);
 
-		//compute rotation axis
-		Vector rotAxis = Vector::Cross(front, toVector).Normalize();
-		if (rotAxis.LengthSquared() == 0)
-			rotAxis = up;
-
-		//find the angle around rotation axis
-		float dot = Vector::Dot({1, 0, 0}, toVector);
-		float ang = acosf(dot);
-
-		//convert axis angle to quaternion
-		return FromAxisAngle(ang, rotAxis);
+		float rotationAngle = (float)acos(dot);
+		Vector rotationAxis = Vector::Cross({ 0.0f, 1.0f, 0.0f }, forwardVector).Normalize();
+		return Rotator::FromAxisAngle(rotationAngle, rotationAxis).FastNormalize();
 	}
 
 	inline double Yaw() const {

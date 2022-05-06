@@ -99,8 +99,8 @@ void ParticleSystem::Update(float delta)
 		Transforms[t_idx].Location = p.location;
 		if (FaceCamera) {
 			Vector camDir = (RI->GetActiveCamera()->GetLocation() - p.location).Normalize();
-			Transforms[t_idx].Rotation = Rotator::LookAt(p.location, RI->GetActiveCamera()->GetLocation(), camDir, RI->GetActiveCamera()->GetUpVector());
-			//Transforms[t_idx].Rotation.W = p.rotation.W;
+			Vector cam = RI->GetActiveCamera()->GetRotation().AsEuler();
+			Transforms[t_idx].Rotation = Vector(p.rotation.W, cam.Y + 90.f, cam.Z);
 		}
 		else Transforms[t_idx].Rotation = p.rotation;
 
@@ -149,7 +149,7 @@ void ParticleSystemConstruction::Updator::UpdateVelocities(float delta) const
 		if (!p.enabled) continue;
 
 		p.location += p.velocity * delta;
-		p.rotation += p.rotationRate * delta; // TODO fix
+		p.rotation.W += p.rotationRate.X * delta; // TODO fix
 		if (p.rotation.W > 360.f)
 			p.rotation.W -= 360.f;
 	}

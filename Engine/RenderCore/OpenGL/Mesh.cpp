@@ -223,7 +223,7 @@ void RenderObject::SetInstances(int count, Transformation* dispArray)
 		Rotator rot = dispArray[i].Rotation;
 		Vector sca = dispArray[i].Scale;
 		arr[i] = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Y, loc.Z))
-			* glm::toMat4(glm::quat(-rot.W, rot.X, rot.Y, rot.Z))
+			* glm::toMat4(glm::quat(rot.W, rot.X, rot.Y, rot.Z))
 			* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Y, sca.Z));
 	}
 	for (uint i = 0; i < SectionCount; i++) {
