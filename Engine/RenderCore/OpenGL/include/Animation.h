@@ -39,7 +39,7 @@ public:
 	float duration;
 	int tickSpeed;
 	float durationSeconds;
-	float normDuration;
+	float speedFactor;
 
 	Skeleton* skeleton;
 };

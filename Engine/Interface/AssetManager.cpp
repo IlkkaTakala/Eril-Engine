@@ -246,17 +246,17 @@ void processAnimNode(Animation* anim, const aiAnimation* aiAnim)
 
 		for (int i = 0; i < aiAnim->mChannels[c]->mNumPositionKeys; i++) {
 			aiVector3D& val = aiAnim->mChannels[c]->mPositionKeys[i].mValue;
-			float time = aiAnim->mChannels[c]->mPositionKeys[i].mTime;
+			float time = aiAnim->mChannels[c]->mPositionKeys[i].mTime / anim->duration;
 			anim->LocationTrack[id].emplace_back(time, Vector{val.x, val.y, val.z});
 		}
 		for (int i = 0; i < aiAnim->mChannels[c]->mNumRotationKeys; i++) {
 			aiQuaternion& val = aiAnim->mChannels[c]->mRotationKeys[i].mValue;
-			float time = aiAnim->mChannels[c]->mRotationKeys[i].mTime;
+			float time = aiAnim->mChannels[c]->mRotationKeys[i].mTime / anim->duration;
 			anim->RotationTrack[id].emplace_back(time, Rotator{ val.w, val.x, val.y, val.z });
 		}
 		for (int i = 0; i < aiAnim->mChannels[c]->mNumScalingKeys; i++) {
 			aiVector3D& val = aiAnim->mChannels[c]->mScalingKeys[i].mValue;
-			float time = aiAnim->mChannels[c]->mScalingKeys[i].mTime;
+			float time = aiAnim->mChannels[c]->mScalingKeys[i].mTime / anim->duration;
 			anim->ScaleTrack[id].emplace_back(time, Vector{ val.x, val.y, val.z });
 		}
 	}
@@ -368,7 +368,7 @@ void LoadAnimation(Animation* anim, const String& path)
 		anim->duration = scene->mAnimations[0]->mDuration;
 		anim->tickSpeed = scene->mAnimations[0]->mTicksPerSecond;
 		anim->durationSeconds = anim->duration / anim->tickSpeed;
-		anim->normDuration = 1.f / anim->durationSeconds;
+		anim->speedFactor = 1.f / anim->durationSeconds;
 		processAnimNode(anim, scene->mAnimations[0]);
 }
 
@@ -445,7 +445,6 @@ namespace AssetManager
 						auto container = (Animation*)data.second;
 						LoadAnimation(container, name);
 						container->loaded = true;
-						LoadedAnimations.emplace(name, container);
 					}
 				} break;
 
@@ -558,7 +557,7 @@ Texture* AssetManager::LoadTextureAsyncWithPromise(const String& name)
 	}
 	else {
 		auto tex = new Texture();
-		LoadedTextures[name] = tex;
+		LoadedTextures.emplace(name, tex);
 		LoadTextureAsync(name, tex);
 		return tex;
 	}
@@ -576,6 +575,7 @@ Animation* AssetManager::LoadAnimationAsyncWithPromise(const String& name, Rende
 	}
 	else {
 		auto anim = new Animation();
+		LoadedAnimations.emplace(name, anim);
 		anim->skeleton = mesh->GetSkeleton();
 		LoadAnimationAsync(name, anim);
 		return anim;
