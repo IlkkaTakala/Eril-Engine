@@ -22,6 +22,7 @@ out VS_OUT {
 	vec3 Normals;
 	vec3 BiTangents;
 	vec3 Tangents;
+	
 } vs_out;
 
 uniform mat4 Model;
@@ -41,6 +42,7 @@ void main()
 	vs_out.Normals = N;
 	vs_out.BiTangents = B;
 	vs_out.Tangents = T;
+	
 	//vs_out.normal = normalize(mat3(Model * in_disp) * in_normal).xyz;
 
 	/*
@@ -83,6 +85,7 @@ in VS_OUT{
 	vec3 Normals;
 	vec3 BiTangents;
 	vec3 Tangents;
+	
 } gs_in[];
 
 out GS_OUT
@@ -225,6 +228,9 @@ layout(std430, binding = 2) readonly buffer VisibleLightIndicesBuffer {
 
 layout (location = 0) out vec4 ColorBuffer;
 layout (location = 1) out vec4 BloomBuffer;
+layout (location = 4) out vec4 NormalBuffer;
+layout (location = 5) out vec4 PositionBuffer;
+layout (location = 6) out vec4 DataBuffer;
 
 in VS_OUT{
 	vec2 TexCoords;
@@ -233,6 +239,7 @@ in VS_OUT{
 	vec3 Normals;
 	vec3 BiTangents;
 	vec3 Tangents;
+	
 } fs_in;
 
 uniform sampler2D Albedo;
@@ -331,9 +338,9 @@ void main()
 	//vec4 data = texture(gData, TexCoords);
 	float gamma = 2.2;	
 	vec3 albedo = pow(texture(Albedo, fs_in.TexCoords).rgb, vec3(gamma));
-	float metallic = 0.0;//texture(Metallic, fs_in.TexCoords).r;
+	float metallic = 1.0;//texture(Metallic, fs_in.TexCoords).r;
 	float AOt = texture(AO, fs_in.TexCoords).r;
-	float roughness = 1.0 - texture(Roughness, fs_in.TexCoords).r;
+	float roughness = 0.3;//1.0 - texture(Roughness, fs_in.TexCoords).r;
 	vec3 normal = texture(Normal, fs_in.TexCoords).rgb;
 	//normal.r = 1.0 - normal.r;
 	//normal.g = 1.0 - normal.g;
@@ -436,5 +443,8 @@ void main()
 	
 	ColorBuffer = color;
 	BloomBuffer = clamp(color - exposure, 0.0, 100.0);
+	NormalBuffer = vec4(N, 1.0);
+	PositionBuffer = vec4(fs_in.FragPos);
+	DataBuffer = vec4(metallic, roughness, 1.0, 1.0);
 }
 ###END_FRAGMENT###

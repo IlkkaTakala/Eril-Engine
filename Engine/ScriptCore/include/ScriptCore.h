@@ -3,7 +3,7 @@
 #include <functional>
 #include "Value.h"
 
-#define REGISTER_FUNCTION(NAME, SCOPE, ARG_C) static bool reg_ ## SCOPE ## _ ## NAME = ScriptCore::AddFuncs<ARG_C>(#SCOPE, #NAME, &NAME);
+#define REGISTER_FUNCTION(NAME, SCOPE, ARG_C) extern bool reg_ ## SCOPE ## _ ## NAME = ScriptCore::AddFuncs<ARG_C>(#SCOPE, #NAME, &NAME);
 
 namespace ScriptCore {
 

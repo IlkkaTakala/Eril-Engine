@@ -1,6 +1,67 @@
-#include "VisibleObject.h"
+#include "SceneComponent.h"
 #include "Physics.h"
 #include <Gameplay/Scene.h>
+#ifdef USE_SCRIPTCORE
+#include <ScriptCore.h>
+namespace ScriptFunctions {
+	int64 SetLocation(int64 id, int x, int y, int z) {
+		auto l = ObjectManager::GetByRecord<BaseObject>(id);
+		auto scene = dynamic_cast<SceneComponent*>(l);
+		if (scene) {
+			scene->SetLocation(Vector( x, y, z ));
+			Console::Log("Location changed to: " + scene->GetLocation().ToString());
+		}
+		else {
+			Console::Log("Can't change location");
+		}
+		return id;
+	}
+
+	int64 SetRotation(int64 id, int x, int y, int z) {
+		auto r = ObjectManager::GetByRecord<BaseObject>(id);
+		auto scene = dynamic_cast<SceneComponent*>(r);
+		if (scene) {
+			scene->SetRotation(Vector(x, y, z));
+			Console::Log("Rotation changed to: ");
+		}
+		else {
+			Console::Log("Can't change rotation");
+		}
+		return id;
+	}
+
+	int64 SetScale(int64 id, int x, int y, int z) {
+		auto s = ObjectManager::GetByRecord<BaseObject>(id);
+		auto scene = dynamic_cast<SceneComponent*>(s);
+		if (scene) {
+			scene->SetScale(Vector(x, y, z));
+			Console::Log("Scale changed to: " + scene->GetScale().ToString());
+		}
+		else {
+			Console::Log("Can't change scale");
+		}
+		return id;
+	}
+
+	int64 DestroyObject(int64 id) {
+		auto s = ObjectManager::GetByRecord<BaseObject>(id);
+		auto scene = dynamic_cast<SceneComponent*>(s);
+		if (scene) {
+			scene->DestroyObject();
+			Console::Log("Destroyed object: " + scene->GetRecord().ToString());
+		} else {
+			Console::Log("Can't destroy object");
+		}
+		return id;
+	}
+
+	REGISTER_FUNCTION(SetLocation, global, 4);
+	REGISTER_FUNCTION(SetRotation, global, 4);
+	REGISTER_FUNCTION(SetScale, global, 4);
+	REGISTER_FUNCTION(DestroyObject, global, 1);
+}
+#endif // SCRIPTCORE
+
 
 SceneComponent::SceneComponent() : BaseObject()
 {

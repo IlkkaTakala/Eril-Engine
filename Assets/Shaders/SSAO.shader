@@ -31,17 +31,33 @@ layout(std430, binding = 1) readonly buffer SSAOKernels {
 	vec3 data[];
 } samples;
 
-uniform sampler2D gPosition;
-uniform sampler2D gNormal;
-uniform sampler2D texNoise;
+layout (binding = 4) uniform sampler2D gDepth;
+layout (binding = 5) uniform sampler2D gNormal;
+layout (binding = 6) uniform sampler2D gPosition;
+layout (binding = 7) uniform sampler2D texNoise;
 
 in vec2 TexCoords;
 
+vec4 WorldPosFromDepth(float depth) {
+    float z = depth * 2.0 - 1.0;
+
+    vec4 clipSpacePosition = vec4(TexCoords * 2.0 - 1.0, z, 1.0);
+    vec4 viewSpacePosition = inverse(projection) * clipSpacePosition;
+
+    // Perspective division
+    viewSpacePosition /= viewSpacePosition.w;
+
+    vec4 worldSpacePosition = inverse(view) * viewSpacePosition;
+
+    return vec4(worldSpacePosition.xyz, 1.0);
+}
+
 void main()
 {
+	
 	vec2 noiseScale = vec2(screenSize.x/4.0, screenSize.y/4.0);
 	vec3 fragPos   = (view * texture(gPosition, TexCoords)).xyz;
-	vec3 normal    = mat3(view) * normalize(texture(gNormal, TexCoords)).rgb;
+	vec3 normal    = mat3(view) * normalize(texture(gNormal, TexCoords)).rbg;
 	vec3 randomVec = texture(texNoise, TexCoords * noiseScale).xyz;
 	
 	vec3 tangent   = normalize(randomVec - normal * dot(randomVec, normal));
@@ -50,13 +66,13 @@ void main()
 	
 	int kernelSize = 64;
 	float radius = 0.6;
-	float bias = 0.025;
+	float bias = 1.0;
 	
 	float occlusion = 0.0;
 	for(int i = 0; i < kernelSize; ++i)
 	{
 		// get sample position
-		vec3 samplePos = TBN * samples.data[i]; // from tangent to view-space
+		vec3 samplePos = TBN * samples.data[i].xyz; // from tangent to view-space
 		samplePos = fragPos + samplePos * radius; 
 		
 		vec4 offset = vec4(samplePos, 1.0);
@@ -70,5 +86,6 @@ void main()
 	occlusion = 1.0 - (occlusion / kernelSize);
 	SSAOBuffer = texture(gNormal, TexCoords).w <= 0.0 ? 1.0 : occlusion;
 	SSAOBlurBuffer = 0.0;
+
 }
 ###END_FRAGMENT###

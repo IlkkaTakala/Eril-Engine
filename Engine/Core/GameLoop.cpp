@@ -108,6 +108,7 @@ int GameLoop::MainLoop()
 			if (found) continue;
 			t->Tick(duration.count());
 		}
+		Console::Evaluate();
 
 		SystemsManager* ECSWorldSystemsManager = IECS::GetSystemsManager();
 		ECSWorldSystemsManager->UpdateSystems(duration.count());

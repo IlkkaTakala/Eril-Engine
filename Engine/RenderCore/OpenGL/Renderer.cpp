@@ -913,24 +913,23 @@ void Renderer::Shadows(int width, int height)
 
 void Renderer::SSAO(int width, int height)
 {
+	SSAORender->Bind();
 	glClearColor(0.f, 0.f, 0.f, 0.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glActiveTexture(GL_TEXTURE5);
+	glActiveTexture(GL_TEXTURE7);
 	glBindTexture(GL_TEXTURE_2D, SSAONoise);
 
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, SSAOKernelBuffer);
 
 	SSAOShader->Bind();
-	SSAOShader->SetUniform("gPosition", 0);
-	SSAOShader->SetUniform("gNormal", 1);
-	SSAOShader->SetUniform("texNoise", 5);
+	PostProcess->BindTextures();
 
 	glDepthFunc(GL_ALWAYS);
 	glBindVertexArray(ScreenVao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
 
-	SSAORender->BindBlur();
+	/*SSAORender->BindBlur();
 	glActiveTexture(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, SSAORender->GetSSAO());
 	SSAOBlurShader->Bind();
@@ -939,7 +938,7 @@ void Renderer::SSAO(int width, int height)
 	glDepthFunc(GL_ALWAYS);
 	glBindVertexArray(ScreenVao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glBindVertexArray(0);
+	glBindVertexArray(0);*/
 
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
 }
@@ -950,14 +949,14 @@ constexpr glm::vec4 clearClrOne(1.f);
 void Renderer::Forward(int width, int height)
 {
 	PostProcess->Bind();
-	unsigned int attachments2[] = { GL_NONE, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-	glDrawBuffers(4, attachments2);
+	unsigned int attachments2[] = { GL_NONE, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5, GL_COLOR_ATTACHMENT6 };
+	glDrawBuffers(7, attachments2);
 
 	glClearBufferfv(GL_COLOR, 2, &clearClrZero[0]);
 	glClearBufferfv(GL_COLOR, 3, &clearClrOne[0]);
 
-	unsigned int attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_NONE, GL_NONE };
-	glDrawBuffers(4, attachments);
+	unsigned int attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_NONE, GL_NONE, GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5, GL_COLOR_ATTACHMENT6 };
+	glDrawBuffers(7, attachments);
 
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LEQUAL);
@@ -1287,9 +1286,12 @@ void Renderer::Render(float delta)
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, 0);
 
 	//EnvCube(width, height);
-
 	BlurRender->Blur(PostProcess->GetBloom(), 10, ScreenVao);
 	PostProcess->BindTextures();
+	SSAO(width, height);
+	SSAORender->BindTextures(8);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	Material* post = ActiveCamera->GetPostProcess();
 	if (post) {

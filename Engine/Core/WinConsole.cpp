@@ -3,6 +3,9 @@
 #include <thread>
 #include <queue>
 #include <mutex>
+#ifdef USE_SCRIPTCORE
+#include <ScriptCore.h>
+#endif
 //#define	WIN32_LEAN_AND_MEAN
 //#include <windows.h>
 //#include <stdio.h>
@@ -75,6 +78,11 @@ static int yPos = 0;
 static int yStep = 14;
 static bool ConsoleOpen = false;
 static WNDPROC oldEditProc;
+
+// TODO: Change to safe queue
+static std::list<std::string> commands;
+static std::list<std::string> history;
+int historyIndex = 0;
 
 static std::wofstream outLogs("Log.txt", std::wofstream::out);
 
@@ -513,6 +521,11 @@ private:
 			Console::Log("Flushed console, file written");
 			outLogs.flush();
 		}
+		else {
+			commands.push_back(line);
+		}
+		history.push_back(line);
+		historyIndex = 0;
 	}
 
 	// The windows procedure.
@@ -566,10 +579,19 @@ private:
 				result = 0;
 				wasHandled = true;
 				break;
-
+				
 				case WM_PAINT:
 				{
 					pDemoApp->OnRender();
+					
+				}
+				result = 0;
+				wasHandled = false;
+				break;
+
+				case WM_SETFOCUS:
+				{
+					SetFocus(pDemoApp->m_input);
 				}
 				result = 0;
 				wasHandled = false;
@@ -667,7 +689,7 @@ private:
 				wasHandled = true;
 				result = 0;
 				break;
-
+				
 				case WM_MOUSEWHEEL:
 				{
 					float distance = GET_WHEEL_DELTA_WPARAM(wParam);
@@ -723,7 +745,34 @@ private:
 					result = 0;
 					break;
 				}
-			}
+			} break;
+
+			case WM_KEYDOWN:
+			{
+				if (wParam == VK_UP) {
+					if (historyIndex < history.size() && historyIndex >= 0) {
+						historyIndex++;
+						auto s = std::next(history.rbegin(), historyIndex - (int)1);
+						SendMessage(pDemoApp->m_input, WM_SETTEXT, NULL, (LPARAM)(s)->c_str());
+						SendMessage(pDemoApp->m_input, EM_SETSEL, s->size() + 1, s->size() + 1);
+					}
+					wasHandled = true;
+				}
+				else if (wParam == VK_DOWN) {
+					if (historyIndex <= history.size() && historyIndex > 0) {
+						historyIndex--;
+						if (!historyIndex) {
+							SendMessage(pDemoApp->m_input, WM_SETTEXT, NULL, NULL);
+						} else {
+							auto s = std::next(history.rbegin(), historyIndex - (int)1);
+							SendMessage(pDemoApp->m_input, WM_SETTEXT, NULL, (LPARAM)(s)->c_str());
+							SendMessage(pDemoApp->m_input, EM_SETSEL, s->size() + 1, s->size() + 1);
+						}
+						
+					}
+					wasHandled = true;
+				}
+			} break;
 			}
 		}
 		if (!wasHandled)
@@ -836,4 +885,19 @@ void Console::GetLogs(int lines, std::vector<String> data)
 
 void Console::Execute(const String& line)
 {
+	commands.push_back(line);
+}
+
+void Console::Evaluate()
+{
+#ifdef USE_SCRIPTCORE
+	while (!commands.empty()) {
+		String& line = commands.front();
+		uint command = ScriptCore::CompileScript(line.c_str());
+		ScriptCore::EvaluateScript(command);
+		ScriptCore::CleanScript(command);
+		commands.pop_front();
+	}
+#endif
+	commands.clear();
 }
