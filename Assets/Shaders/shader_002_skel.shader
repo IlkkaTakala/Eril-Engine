@@ -5,8 +5,9 @@ layout (location = 0) in vec3 in_position;
 layout (location = 1) in vec2 in_texCoord;
 layout (location = 2) in vec3 in_normal;
 layout (location = 3) in vec3 in_tangent;
-layout (location = 4) in vec4 weights;
-layout (location = 5) in ivec4 bones;
+layout (location = 4) in vec3 in_color;
+layout (location = 5) in vec4 weights;
+layout (location = 6) in ivec4 bones;
 
 layout (std140, binding = 0) uniform Globals
 {
@@ -23,6 +24,7 @@ out VS_OUT {
 	vec3 Normals;
 	vec3 BiTangents;
 	vec3 Tangents;
+	vec3 Colors;
 } vs_out;
 
 const int MAX_BONES = 100;
@@ -47,17 +49,19 @@ void main()
 	vs_out.FragPos = pos;
 	vs_out.TexCoords = in_texCoord;
 	
-	vec4 normal = BoneTransform * vec4(in_normal, 1.0);
-	vec4 tangent = BoneTransform * vec4(in_tangent, 1.0);
+	vec3 normal = mat3(BoneTransform) * in_normal;
+	vec3 tangent = mat3(BoneTransform) * in_tangent;
 	
-	vec3 T = normalize(Model * tangent).xyz;
-	vec3 N = normalize(Model * normal).xyz;
+	vec3 T = normalize(mat3(Model) * tangent);
+	vec3 N = normalize(mat3(Model) * normal);
 	T = normalize(T - dot(T, N) * N);
 	vec3 B = cross(N, T);
 
 	vs_out.Normals = N;
 	vs_out.BiTangents = B;
 	vs_out.Tangents = T;
+	
+	vs_out.Colors = in_color;
 	
 }
 ###END_VERTEX###
@@ -103,6 +107,7 @@ in VS_OUT{
 	vec3 Normals;
 	vec3 BiTangents;
 	vec3 Tangents;
+	vec3 Colors;
 } fs_in;
 
 uniform sampler2D Albedo;

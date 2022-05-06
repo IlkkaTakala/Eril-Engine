@@ -18,6 +18,7 @@ struct SkinnedVertex
 	glm::vec3 normal;
 	glm::vec3 uv;
 	glm::vec3 tangent;
+	glm::vec3 color;
 
 	glm::vec4 weights;
 	glm::ivec4 bones;
