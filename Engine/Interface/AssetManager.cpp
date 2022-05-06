@@ -367,6 +367,8 @@ void LoadAnimation(Animation* anim, const String& path)
 	if (scene->HasAnimations())
 		anim->duration = scene->mAnimations[0]->mDuration;
 		anim->tickSpeed = scene->mAnimations[0]->mTicksPerSecond;
+		anim->durationSeconds = anim->duration / anim->tickSpeed;
+		anim->normDuration = 1.f / anim->durationSeconds;
 		processAnimNode(anim, scene->mAnimations[0]);
 }
 

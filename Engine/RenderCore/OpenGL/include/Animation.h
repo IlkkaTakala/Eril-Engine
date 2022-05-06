@@ -14,13 +14,14 @@ class Animation
 public:
 	Animation();
 
-	Vector GetLocation(int bone, float delta) const;
-	Rotator GetRotation(int bone, float delta) const;
-	Vector GetScale(int bone, float delta) const;
-	Transform GetTransform(int bone, float delta) const;
+	Vector GetLocation(int bone, float delta, float speed = 1.f) const;
+	Rotator GetRotation(int bone, float delta, float speed = 1.f) const;
+	Vector GetScale(int bone, float delta, float speed = 1.f) const;
+	Transform GetTransform(int bone, float delta, float speed = 1.f) const;
 	Transform GetTransformByPercentage(int bone, float percent) const;
 
 	float GetDuration() const;
+	float GetSpeedFactor() const;
 	float GetPercentageFromDuration(float time) const;
 
 	bool IsReady() const { return loaded; }
@@ -37,6 +38,8 @@ public:
 	bool looping;
 	float duration;
 	int tickSpeed;
+	float durationSeconds;
+	float normDuration;
 
 	Skeleton* skeleton;
 };

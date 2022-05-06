@@ -19,10 +19,11 @@ Animation::Animation()
 }
 
 template <typename T>
-inline bool GetFirst(const T& list, float duration, int tickSpeed, float delta, int& begin, int& next, float& scale)
+inline bool GetFirst(const T& list, float duration, float speed, float delta, int& begin, int& next, float& scale)
 {
-	float a = delta * tickSpeed;
-	float frametime = a - floor(a / duration) * duration;
+	float clamped = delta - floor(delta / duration) * duration;
+	float a = clamped * speed;
+	float frametime = a * 30;
 	begin = 0;
 	for (int i = (int)list.size() - 1; i >= 0; i--) {
 		if (frametime >= list[i].first) {
@@ -39,7 +40,7 @@ inline bool GetFirst(const T& list, float duration, int tickSpeed, float delta, 
 	return true;
 }
 
-Vector Animation::GetLocation(int bone, float delta) const
+Vector Animation::GetLocation(int bone, float delta, float speed) const
 {
 	if (bone >= LocationTrack.size() || LocationTrack[bone].size() == 0) return 0.f;
 
@@ -47,7 +48,7 @@ Vector Animation::GetLocation(int bone, float delta) const
 	int begin = 0;
 	int next = 0;
 	float scaleFactor = 0.f;
-	GetFirst(frames, duration, tickSpeed, delta, begin, next, scaleFactor);
+	GetFirst(frames, normDuration, speed, delta, begin, next, scaleFactor);
 
 
 	Vector finalPosition = frames[begin].second * (1 - scaleFactor) + frames[next].second * scaleFactor;
@@ -55,7 +56,7 @@ Vector Animation::GetLocation(int bone, float delta) const
 	return finalPosition;
 }
 
-Rotator Animation::GetRotation(int bone, float delta) const
+Rotator Animation::GetRotation(int bone, float delta, float speed) const
 {
 	if (bone >= RotationTrack.size() || RotationTrack[bone].size() == 0) return Rotator(0.f);
 
@@ -63,14 +64,14 @@ Rotator Animation::GetRotation(int bone, float delta) const
 	int begin = 0;
 	int next = 0;
 	float scaleFactor = 0.f;
-	GetFirst(frames, duration, tickSpeed, delta, begin, next, scaleFactor);
+	GetFirst(frames, normDuration, speed, delta, begin, next, scaleFactor);
 
 	Rotator finalRotation = Rotator::Slerp(frames[begin].second, frames[next].second, scaleFactor).FastNormalize();
 
 	return finalRotation;
 }
 
-Vector Animation::GetScale(int bone, float delta) const
+Vector Animation::GetScale(int bone, float delta, float speed) const
 {
 	if (bone >= ScaleTrack.size() || ScaleTrack[bone].size() == 0) return 1.f;
 
@@ -79,26 +80,31 @@ Vector Animation::GetScale(int bone, float delta) const
 	int begin = 0;
 	int next = 0;
 	float scaleFactor = 0.f;
-	GetFirst(frames, duration, tickSpeed, delta, begin, next, scaleFactor);
+	GetFirst(frames, normDuration, speed, delta, begin, next, scaleFactor);
 
 	Vector finalScale = frames[begin].second * (1 - scaleFactor) + frames[next].second * scaleFactor;
 
 	return finalScale;
 }
 
-Transform Animation::GetTransform(int bone, float delta) const
+Transform Animation::GetTransform(int bone, float delta, float speed) const
 {
-	return { GetLocation(bone, delta), GetRotation(bone, delta), GetScale(bone, delta) };
+	return { GetLocation(bone, delta, speed), GetRotation(bone, delta, speed), GetScale(bone, delta, speed) };
 }
 
 Transform Animation::GetTransformByPercentage(int bone, float percent) const
 {
-	return GetTransform(bone, GetDuration() * percent);
+	return GetTransform(bone, durationSeconds * percent);
 }
 
 float Animation::GetDuration() const
 {
-	return duration / tickSpeed;
+	return durationSeconds;
+}
+
+float Animation::GetSpeedFactor() const
+{
+	return normDuration;
 }
 
 float Animation::GetPercentageFromDuration(float time) const

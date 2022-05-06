@@ -43,12 +43,9 @@ struct AnimationBlendSpace1D
 				float next = second->first;
 				float scale = (axisValue - last) / (next - last);
 
-				Transform tempFirstTrans;
-				Transform tempNextTrans;
-				//tempFirstTrans = first->second->GetTransform(bone, delta);
-				float p = first->second->GetPercentageFromDuration(delta) * (1 - scale) + second->second->GetPercentageFromDuration(delta) * scale;
-				tempNextTrans = second->second->GetTransformByPercentage(bone, p);
-				tempFirstTrans = first->second->GetTransformByPercentage(bone, p);
+				float p = first->second->GetSpeedFactor() * (1 - scale) + second->second->GetSpeedFactor() * scale;
+				Transform tempFirstTrans = first->second->GetTransform(bone, delta, p);
+				Transform tempNextTrans = second->second->GetTransform(bone, delta, p);
 
 				//tempNextTrans = second->second->GetTransform(bone, delta);
 				finalTrans.Location = tempFirstTrans.Location * (1 - scale) + tempNextTrans.Location * scale;
@@ -125,7 +122,7 @@ public:
 	void BeginPlay() override;
 
 	Transform EvaluateBone(int bone) const override {
-		return blender.Evaluate(animtime, bone, 0.51f);
+		return blender.Evaluate(animtime, bone, 1.0f);
 	}
 
 	AnimationBlendSpace1D blender;

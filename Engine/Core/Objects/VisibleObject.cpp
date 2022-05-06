@@ -21,7 +21,7 @@ namespace ScriptFunctions {
 		auto m = ObjectManager::GetByRecord<BaseObject>(id);
 		auto mater = dynamic_cast<VisibleObject*>(m);
 		if (mater) {
-			mater->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/" + *name));
+			mater->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/" + *name));
 			Console::Log("Material Changed to: " + *name);
 		}
 		else {
