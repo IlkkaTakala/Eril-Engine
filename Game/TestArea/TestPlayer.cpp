@@ -56,6 +56,7 @@ void TestPlayer::RegisterInputs(InputComponent* com)
 	com->RegisterKeyInput(257, &TestPlayer::OpenConsole, this);
 	com->RegisterMouseInput(0, &TestPlayer::MouseMoved, this);
 	com->RegisterKeyInput(69, &TestPlayer::UseCursor, this);
+	com->RegisterKeyInput(1, &TestPlayer::RightMouseDown, this);
 }
 
 TestPlayer::TestPlayer() : Player()
@@ -66,6 +67,8 @@ TestPlayer::TestPlayer() : Player()
 	InputMode = true;
 	cursorState = true;
 	spawnCounter = 0;
+	Changing = false;
+	walk = 0.f;
 	
 	Rotation = Rotator(0.f);
 
@@ -139,6 +142,7 @@ TestPlayer::TestPlayer() : Player()
 	animC->BeginPlay();
 	animC->SetSkeleton(skel->GetModel());
 	skel->SetAnimController(animC);
+	//skel->SetParent(this);
 
 	//animC->SetOverrideAnimation(AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Breakdance", skel->GetModel()));
 	skel->SetScale(Vector(0.01f));
@@ -236,12 +240,12 @@ void TestPlayer::LeftMouseDown(bool)
 
 void TestPlayer::RightMouseDown(bool KeyDown)
 {
-
+	Changing = KeyDown;
 }
 
 void TestPlayer::MouseMoved(float X, float Y)
 {
-	if (cursorState) {
+	if (cursorState && !Changing) {
 		Camera* cam = GetCamera();
 		Rotator rot = cam->GetRotation();
 		float y = rot.PitchDegrees();
@@ -250,6 +254,9 @@ void TestPlayer::MouseMoved(float X, float Y)
 			y + Y * mouseSens < 89.f && y + Y * mouseSens > -89.f ? y + Y * mouseSens : y,
 			rot.YawDegrees() + X * mouseSens
 		));
+	}
+	if (Changing) {
+		walk += X * 0.001f;
 	}
 }
 

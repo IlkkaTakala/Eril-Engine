@@ -746,7 +746,7 @@ void Renderer::Update(SafeQueue<RenderCommand>* commands, Renderer* RC)
 			break;
 
 		case RC_SHOWCURSOR:
-			WindowManager::SetShowCursor(c.param2, c.param1);
+			WindowManager::SetShowCursor((uint)c.param2, c.param1);
 			break;
 
 		case RC_GAMESTART:
