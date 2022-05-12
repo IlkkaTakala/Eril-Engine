@@ -59,10 +59,10 @@ void AnimationController::UpdateBoneTransforms(float delta, RenderMesh* mesh)
 
 void TestAnimControl::BeginPlay()
 {
-	blender.anims.emplace_back(0.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Walking", owner->GetModel()));
-	blender.anims.emplace_back(1.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Running", owner->GetModel()));
+	blender.AddKey(0.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Walking", owner->GetModel()));
+	blender.AddKey(1.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Running", owner->GetModel()));
 
-	dance.anim = AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Breakdance", owner->GetModel());
+	dance.SetAnimation(AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Breakdance", owner->GetModel()));
 	walk = 0.f;
 
 	states.AddState("Walk", [&](float delta, BoneArray arr) {
@@ -95,7 +95,7 @@ void TestAnimControl::Tick(float delta)
 
 void TestAnimControl::EvaluateBones(BoneArray bones)
 {
-	dance.Update(last_delta, dance.anim->GetSpeedFactor());
+	dance.Update(last_delta, dance.GetFactor());
 	perBone.Evaluate(last_delta, bones);
 	//states.Evaluate(last_delta, bones);
 }

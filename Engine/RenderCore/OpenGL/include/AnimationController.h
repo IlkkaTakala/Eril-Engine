@@ -6,9 +6,15 @@
 
 class SkeletalObject;
 
-struct AnimationBlendSpace1D
+class AnimationBlendSpace1D
 {
 	std::vector<std::pair<float, AnimationInstance>> anims;
+
+public:
+
+	void AddKey(float time, Animation* animation) {
+		anims.emplace_back(time, animation);
+	}
 
 	void Evaluate(float delta, BoneArray bones, float axisValue) {
 
@@ -23,7 +29,7 @@ struct AnimationBlendSpace1D
 		if (axisValue <= anims[0].first) {
 
 			for (auto& a : anims)
-				a.second.Update(delta, anims[0].second.anim->GetSpeedFactor());
+				a.second.Update(delta, anims[0].second.GetFactor());
 
 			anims[0].second.MakeTransforms(bones);
 			return;
@@ -31,7 +37,7 @@ struct AnimationBlendSpace1D
 		else if (axisValue >= anims.rbegin()->first) {
 
 			for (auto& a : anims)
-				a.second.Update(delta, anims.rbegin()->second.anim->GetSpeedFactor());
+				a.second.Update(delta, anims.rbegin()->second.GetFactor());
 
 			anims.rbegin()->second.MakeTransforms(bones);
 			return;
@@ -50,7 +56,7 @@ struct AnimationBlendSpace1D
 					float last = first->first;
 					float next = second->first;
 					float scale = (axisValue - last) / (next - last);
-					float p = first->second.anim->GetSpeedFactor() * (1 - scale) + second->second.anim->GetSpeedFactor() * scale;
+					float p = first->second.GetFactor() * (1 - scale) + second->second.GetFactor() * scale;
 
 					for (auto& a : anims)
 						a.second.Update(delta, p);
@@ -71,9 +77,15 @@ struct AnimationBlendSpace1D
 	}
 };
 
-struct AnimationBlendSpace2D 
+class AnimationBlendSpace2D 
 {
 	std::vector<std::tuple<float, float, AnimationInstance>> anims;
+
+public:
+
+	void AddKey(float x, float y, Animation* animation) {
+		anims.emplace_back(x, y, animation);
+	}
 
 	void Evaluate(float delta, BoneArray bones, float axisValueX, float axisValueY) {
 
@@ -146,10 +158,10 @@ struct AnimationBlendSpace2D
 
 		float speed = 0.f;
 
-		if (first) speed += first->anim->GetSpeedFactor() * upleft;
-		if (second) speed += second->anim->GetSpeedFactor() * upright;
-		if (third) speed += third->anim->GetSpeedFactor() * downright;
-		if (fourth) speed += fourth->anim->GetSpeedFactor() * downleft;
+		if (first) speed += first->GetFactor() * upleft;
+		if (second) speed += second->GetFactor() * upright;
+		if (third) speed += third->GetFactor() * downright;
+		if (fourth) speed += fourth->GetFactor() * downleft;
 
 		for (auto& [x, y, anim] : anims)
 			anim.Update(delta, speed);

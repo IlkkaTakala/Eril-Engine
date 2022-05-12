@@ -58,7 +58,7 @@ void ObjectManager::RemoveRef(const RecordInt record, const RefHold* obj)
 	if (obj->bWeak) ObjectRecords.find(record)->second->weakRefs.remove(obj);
 	else ObjectRecords.find(record)->second->pointerRefs.remove(obj);
 }
-#pragma optimize("", off)
+
 void ObjectManager::CreateRecord(Data* object, short protection)
 {
 	if (Prepared == 0) {
@@ -85,7 +85,6 @@ void ObjectManager::CreateRecord(Data* object, short protection)
 		Prepared = 0;
 	}
 }
-#pragma optimize("", on)
 
 void ObjectManager::ThreadSafeDelete(const RecordInt& record)
 {

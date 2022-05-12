@@ -129,7 +129,7 @@ void ExtractBoneWeightForVertices(std::vector<SkinnedVertex>& vertices, LoadedSk
 	{
 		int boneID = -1;
 		std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
-		for (int i = 0; i < holder->skeleton->BoneCount; i++) {
+		for (uint i = 0; i < holder->skeleton->BoneCount; i++) {
 			if (holder->skeleton->Bones[i].name == boneName) {
 				boneID = holder->skeleton->Bones[i].id;
 				holder->skeleton->Bones[i].offset = glm::transpose(glm::make_mat4(&mesh->mBones[boneIndex]->mOffsetMatrix.a1));
@@ -229,11 +229,11 @@ void processAnimNode(Animation* anim, const aiAnimation* aiAnim)
 	anim->RotationTrack.resize(anim->skeleton->BoneCount);
 	anim->ScaleTrack.resize(anim->skeleton->BoneCount);
 
-	for (int c = 0; c < aiAnim->mNumChannels; c++) {
+	for (uint c = 0; c < aiAnim->mNumChannels; c++) {
 		
 		String name = aiAnim->mChannels[c]->mNodeName.C_Str();
 		int id = -1;
-		for (int i = 0; i < anim->skeleton->BoneCount; i++) {
+		for (uint i = 0; i < anim->skeleton->BoneCount; i++) {
 			if (anim->skeleton->Bones[i].name == name) {
 				id = i;
 				break;
@@ -244,19 +244,19 @@ void processAnimNode(Animation* anim, const aiAnimation* aiAnim)
 			continue;
 		}
 
-		for (int i = 0; i < aiAnim->mChannels[c]->mNumPositionKeys; i++) {
+		for (uint i = 0; i < aiAnim->mChannels[c]->mNumPositionKeys; i++) {
 			aiVector3D& val = aiAnim->mChannels[c]->mPositionKeys[i].mValue;
-			float time = aiAnim->mChannels[c]->mPositionKeys[i].mTime / anim->duration;
+			float time = (float)aiAnim->mChannels[c]->mPositionKeys[i].mTime / anim->duration;
 			anim->LocationTrack[id].emplace_back(time, Vector{val.x, val.y, val.z});
 		}
-		for (int i = 0; i < aiAnim->mChannels[c]->mNumRotationKeys; i++) {
+		for (uint i = 0; i < aiAnim->mChannels[c]->mNumRotationKeys; i++) {
 			aiQuaternion& val = aiAnim->mChannels[c]->mRotationKeys[i].mValue;
-			float time = aiAnim->mChannels[c]->mRotationKeys[i].mTime / anim->duration;
+			float time = (float)aiAnim->mChannels[c]->mRotationKeys[i].mTime / anim->duration;
 			anim->RotationTrack[id].emplace_back(time, Rotator{ val.w, val.x, val.y, val.z });
 		}
-		for (int i = 0; i < aiAnim->mChannels[c]->mNumScalingKeys; i++) {
+		for (uint i = 0; i < aiAnim->mChannels[c]->mNumScalingKeys; i++) {
 			aiVector3D& val = aiAnim->mChannels[c]->mScalingKeys[i].mValue;
-			float time = aiAnim->mChannels[c]->mScalingKeys[i].mTime / anim->duration;
+			float time = (float)aiAnim->mChannels[c]->mScalingKeys[i].mTime / anim->duration;
 			anim->ScaleTrack[id].emplace_back(time, Vector{ val.x, val.y, val.z });
 		}
 	}
@@ -342,7 +342,7 @@ LoadedSkeletalMesh* loadMeshesSkinned(const std::string& path)
 	processSkinnedNode(mesh, bh, scene->mRootNode, scene, false);
 
 	mesh->skeleton->Bones = new Bone[bh.size()]();
-	mesh->skeleton->BoneCount = bh.size();
+	mesh->skeleton->BoneCount = (uint)bh.size();
 	Bone* bones = mesh->skeleton->Bones;
 	for (int i = 0; i < bh.size(); i++) {
 		bones[i] = bh[i].second;
@@ -365,8 +365,8 @@ void LoadAnimation(Animation* anim, const String& path)
 		return;
 	}
 	if (scene->HasAnimations())
-		anim->duration = scene->mAnimations[0]->mDuration;
-		anim->tickSpeed = scene->mAnimations[0]->mTicksPerSecond;
+		anim->duration = (float)scene->mAnimations[0]->mDuration;
+		anim->tickSpeed = (int)scene->mAnimations[0]->mTicksPerSecond;
 		anim->durationSeconds = anim->duration / anim->tickSpeed;
 		anim->speedFactor = 1.f / anim->durationSeconds;
 		processAnimNode(anim, scene->mAnimations[0]);
@@ -465,6 +465,11 @@ void AssetManager::StartLoader()
 }
 
 void AssetManager::LoadAssetAsync(const String& name)
+{
+	LoadQueue.enqueue({ name, nullptr });
+}
+
+void AssetManager::LoadAssetAsyncWithCallback(const String& name, const AssetLoadCallback& callback)
 {
 	LoadQueue.enqueue({ name, nullptr });
 }

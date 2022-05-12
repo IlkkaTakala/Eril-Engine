@@ -11,6 +11,8 @@
 
 String Scene::newLevel = "";
 
+std::map<String, Scene*> LoadedScenes;
+
 Scene::Scene() : BaseObject()
 {
 	gravity = 10.f;
@@ -118,6 +120,14 @@ void Scene::LoadLevel()
 
 	xml_document<>* doc = new xml_document<>();
 	doc->parse<0>(loaded.data());
+
+	auto assets = doc->first_node("Asset");
+	if (assets) {
+		auto names = split(assets->value(), ',');
+		for (const auto& n : names) {
+
+		}
+	}
 
 	ParseChildren(doc, nullptr);
 

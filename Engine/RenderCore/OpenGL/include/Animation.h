@@ -49,8 +49,22 @@ public:
 
 struct AnimationInstance
 {
+private:
 	Animation* anim{nullptr};
 	float frametime{0};
+
+public:
+	AnimationInstance() : anim(nullptr) {}
+	AnimationInstance(Animation* a) : anim(a) {}
+
+	void SetAnimation(Animation* a) {
+		anim = a;
+		frametime = 0.f;
+	}
+
+	float GetFactor() const {
+		return anim->GetSpeedFactor();
+	}
 
 	void Update(float delta, float factor) {
 		frametime += delta * factor;
