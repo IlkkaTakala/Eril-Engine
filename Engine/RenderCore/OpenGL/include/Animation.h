@@ -68,8 +68,8 @@ public:
 
 	void Update(float delta, float factor) {
 		frametime += delta * factor;
-		if (frametime > 1.f) frametime -= 1.f;
-		else if (frametime < 0.f) frametime += 1.f;
+		if (frametime > 1.f) frametime -= floor(frametime);
+		else if (frametime < 0.f) frametime -= floor(1.f);
 	}
 
 	void MakeTransforms(BoneArray bones) const {

@@ -19,7 +19,6 @@
 
 //ECS
 #include <Interface/IECS.h>
-#include <ECS_Examples/ECSExample.h>
 #include <ECS/Components/LightComponent.h>
 #include <ECS/Systems/LightControllerSystem.h>
 #include <ECS/Components/AudioComponent.h>
@@ -73,13 +72,13 @@ TestPlayer::TestPlayer() : Player()
 	Rotation = Rotator(0.f);
 
 	//Player Model
-	Mesh = SpawnObject<VisibleObject>();
+	Mesh = SpawnObject<VisibleObject>(this);
 	Mesh->SetModel("Assets/Meshes/Cube");
 	Mesh->GetModel()->SetAABB(AABB(Vector(-1.f, -1.f, 0.f), Vector(1.f, 1.f, 2.f)));
 	SetLocation(Vector(15, 15, 1));
 
 	//Player Movement
-	Movement = SpawnObject<MovementComponent>();
+	Movement = SpawnObject<MovementComponent>(this);
 	Movement->SetTarget(dynamic_cast<Actor*>(this), Mesh->GetModel()->GetAABB());
 	Movement->SetGravity(true);
 	Movement->SetPhysics(false);
@@ -89,7 +88,7 @@ TestPlayer::TestPlayer() : Player()
 	Movement->SetAcceleration(500.f);
 	Movement->SetAirControl(0.9f);
 
-	PlayerCol = SpawnObject<CapsuleCollisionShape>();
+	PlayerCol = SpawnObject<CapsuleCollisionShape>(this);
 	AddComponent(PlayerCol);
 	PlayerCol->SetLocation(Vector(0.f, 0.f, 1.f), true);
 	PlayerCol->SetType(2);
@@ -97,35 +96,35 @@ TestPlayer::TestPlayer() : Player()
 	PlayerCol->SetMovementTarget(Movement);
 
 	//Skybox
-	Sky = SpawnObject<VisibleObject>();
+	Sky = SpawnObject<VisibleObject>(this);
 	Sky->SetModel("Assets/Meshes/SkySphere");
 	Sky->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/Sky"));
 	Sky->SetScale(Sky->GetScale() * 2.0f);
 
 	pause = nullptr;
 
-	Plane = SpawnObject<VisibleObject>();
+	Plane = SpawnObject<VisibleObject>(this);
 	Plane->SetModel("Cube");
 	Plane->GetModel()->SetAABB(AABB(Vector(-20.f, -20.f, -0.5f), Vector(20.f, 20.f, 0.5f)));
 	Plane->SetScale(Vector(20.f, 20.f, 0.5f));
 	Plane->SetLocation(Vector(10.f, 10.f, 0.f));
 
-	PlaneCol = SpawnObject<BoxCollisionShape>();
+	PlaneCol = SpawnObject<BoxCollisionShape>(this);
 	PlaneCol->SetType(0);
 	PlaneCol->SetSize(Plane->GetModel()->GetAABB());
 	Plane->AddComponent(PlaneCol);
 
-	Box = SpawnObject<Actor>();
+	Box = SpawnObject<Actor>(this);
 
 	//Moment Model -> ColliderModel
-	BoxModel = SpawnObject<VisibleObject>();
+	BoxModel = SpawnObject<VisibleObject>(this);
 	BoxModel->SetModel("Assets/Meshes/Cube");
 	BoxModel->GetModel()->SetAABB(AABB(Vector(-1.0f), Vector(1.0f)));
 
 	Box->AddComponent(BoxModel);
 	Box->SetLocation(Vector(10.f, 10.f, 2.f));
 
-	BoxCol = SpawnObject<BoxCollisionShape>();
+	BoxCol = SpawnObject<BoxCollisionShape>(this);
 	Box->AddComponent(BoxCol);
 	BoxCol->SetType(0);
 	BoxCol->SetSize(BoxModel->GetModel()->GetAABB());
@@ -133,12 +132,12 @@ TestPlayer::TestPlayer() : Player()
 
 	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
 
-	auto skel = SpawnObject<SkeletalObject>();
+	auto skel = SpawnObject<SkeletalObject>(this);
 	skel->SetModel("Assets/Skeletal/Alien");
 	skel->GetModel()->SetMaterial(1, IRender::LoadMaterialByName("Assets/Materials/alien_upper"));
 	skel->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/alien_lower"));
 	skel->SetLocation({5.f, 5.f, -0.5f});
-	auto animC = SpawnObject<TestAnimControl>(skel);
+	auto animC = SpawnObject<TestAnimControl>(this, skel);
 	animC->BeginPlay();
 	animC->SetSkeleton(skel->GetModel());
 	skel->SetAnimController(animC);
@@ -221,8 +220,7 @@ def execute() {
 void TestPlayer::InputTwo(bool KeyDown)
 {
 	if (KeyDown)
-		InputMode = !InputMode;
-	Scene::OpenLevel("Assets/Maps/test");
+		Scene::OpenLevel("Assets/Maps/test");
 	
 }
 
@@ -264,7 +262,7 @@ void TestPlayer::InputExit(bool down)
 {
 	if (!down) return;
 	if (pause == nullptr) {
-		pause = SpawnObject<PauseUI>();
+		pause = SpawnObject<PauseUI>(this);
 		UI::AddToScreen(pause, this);
 		WindowManager::SetShowCursor(0, true);
 		cursorState = false;
@@ -301,10 +299,10 @@ void TestPlayer::Tick(float deltaTime)
 
 void TestPlayer::BeginPlay()
 {
+	Player::BeginPlay();
 
 	Terrain* terrain = ObjectManager::GetByRecord<Terrain>(0xA0005554);
 
-	
 	//ECS
 	SystemsManager* systemsManager = IECS::GetSystemsManager();
 	//Audio Testing

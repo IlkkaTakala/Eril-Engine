@@ -5,7 +5,7 @@
 #include <Objects/BaseObject.h>
 #include <mutex>
 
-typedef BaseObject* (*SpawnFunction)(const String&, uint32, uint, bool, uint16);
+typedef BaseObject* (*SpawnFunction)(Scene*, const String&, uint32, uint, bool, uint16);
 
 struct Record
 {

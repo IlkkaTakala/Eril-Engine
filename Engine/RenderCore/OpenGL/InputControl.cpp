@@ -81,7 +81,7 @@ void GLInput::ProcessInputs(float delta)
 	while (!Inputs.empty()) {
 		KeyAction key = Inputs.front();
 		for (const auto& ic : ICs) {
-			if(!ic->GetInputDisabled())
+			if(!ic->GetInputDisabled() && ic->IsActive())
 			ic->HandleInputs({key.key, key.scancode, key.action, key.mods }, delta);
 		}
 		Inputs.pop();
@@ -91,7 +91,7 @@ void GLInput::ProcessInputs(float delta)
 	//glfwGetCursorPos(dynamic_cast<Renderer*>(RI)->Window, &x, &y);
 	WindowManager::GetCursorPosition(0, x, y); // TODO
 	for (const auto& m : ICs) {
-		if (!m->GetInputDisabled())
+		if (!m->GetInputDisabled() && m->IsActive())
 		m->HandleMouse(x, y, delta);
 	}
 }

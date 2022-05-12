@@ -10,6 +10,8 @@ AnimationController::AnimationController(SkeletalObject* owner) : owner(owner)
 {
 	temp_anim = nullptr;
 	animtime = 0.f;
+	last_delta = 0.f;
+	animoverride = false;
 }
 
 void AnimationController::Tick(float delta)
@@ -24,6 +26,7 @@ void AnimationController::SetSkeleton(RenderMesh* s)
 
 void AnimationController::UpdateBoneTransforms(float delta, RenderMesh* mesh)
 {
+	if (!IsActive()) return;
 	auto m = dynamic_cast<RenderMeshSkeletalGL*>(mesh);
 	if (!m) return;
 

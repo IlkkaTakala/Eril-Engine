@@ -8,7 +8,7 @@ class SceneComponent : public BaseObject
 public:
 	SceneComponent();
 	virtual ~SceneComponent() { }
-	virtual void BeginPlay() {}
+	virtual void BeginPlay();
 	virtual void OnDestroyed() override;
 	virtual void LoadWithParameters(const String& args) override;
 

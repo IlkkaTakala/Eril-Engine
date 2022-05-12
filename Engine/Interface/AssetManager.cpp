@@ -38,8 +38,8 @@ namespace AssetManager
 		std::map<String, Texture*> LoadedTextures;
 		std::map<String, Animation*> LoadedAnimations;
 
-		SafeQueue<std::pair<String, void*>> LoadQueue;
-		SafeQueue<std::pair<String, void*>> UnloadQueue;
+		SafeQueue<std::tuple<String, void*, AssetLoadCallback>> LoadQueue;
+		SafeQueue<std::tuple<String, void*, AssetLoadCallback>> UnloadQueue;
 	}
 }
 
@@ -412,48 +412,55 @@ namespace AssetManager
 			bool exit = false;
 			while (!exit) {
 				auto data = LoadQueue.dequeue();
-				String& name = data.first;
+				bool wasLoaded = false;
+				auto& [name, ptr, callback] = data;
 				AssetType type = GetAssetType(name);
 				switch (type)
 				{
 				case AssetType::MeshStatic: {
 					auto mesh = loadMeshes(name);
 					if (!mesh) continue;
-					if (data.second) {
-						auto container = (RenderMeshStaticGL*)data.second;
+					if (ptr) {
+						auto container = (RenderMeshStaticGL*)ptr;
 						container->SetMesh(mesh);
 					}
 					StaticMeshes.emplace(name, mesh);
 					for (auto& m : mesh->Holders)
 						IRender::SendCommand({ RC_MAKEOBJECT, (uint64)static_cast<OpenGLObject*>(m), 0 });
+					wasLoaded = true;
 				} break;
 
 				case AssetType::MeshSkeletal: {
 					auto mesh = loadMeshesSkinned(name);
 					if (!mesh) continue;
-					if (data.second) {
-						auto container = (RenderMeshSkeletalGL*)data.second;
+					if (ptr) {
+						auto container = (RenderMeshSkeletalGL*)ptr;
 						container->SetMesh(mesh);
 					}
 					SkeletalMeshes.emplace(name, mesh);
 					for (auto& m : mesh->Holders)
 						IRender::SendCommand({ RC_MAKEOBJECT, (uint64)static_cast<OpenGLObject*>(m), 0 });
+					wasLoaded = true;
 				} break;
 
 				case AssetType::Animation: {
-					if (data.second) {
-						auto container = (Animation*)data.second;
+					if (ptr) {
+						auto container = (Animation*)ptr;
 						LoadAnimation(container, name);
 						container->loaded = true;
+						wasLoaded = true;
 					}
 				} break;
 
 				case AssetType::Texture: {
-					TextureLoader(name, (Texture*)data.second);
+					TextureLoader(name, (Texture*)ptr);
+					wasLoaded = true;
 				} break;
 				default:
 					break;
 				}
+
+				if (callback) callback(name, wasLoaded);
 			}
 		}
 	}
@@ -464,36 +471,136 @@ void AssetManager::StartLoader()
 	LoaderThread = new std::thread(&Loader);
 }
 
-void AssetManager::LoadAssetAsync(const String& name)
+void AssetManager::LoadAssetAsync(const String& name, const AssetLoadCallback& callback)
 {
-	LoadQueue.enqueue({ name, nullptr });
+	bool Loaded = false;
+	AssetType type = GetAssetType(name);
+	switch (type)
+	{
+	case AssetType::None: {
+		Loaded = true;
+	} break;
+
+	case AssetType::MeshStatic:
+	{
+		if (auto it = StaticMeshes.find(name); it != StaticMeshes.end()) {
+			Loaded = true;
+		}
+	} break;
+
+	case AssetType::MeshSkeletal:
+	{
+		if (auto it = SkeletalMeshes.find(name); it != SkeletalMeshes.end()) {
+			Loaded = true;
+		}
+	} break;
+
+	case AssetType::Animation:
+	{
+		if (auto it = LoadedAnimations.find(name); it != LoadedAnimations.end()) {
+			Loaded = true;
+		}
+	} break;
+
+	case AssetType::Texture:
+	{
+		if (auto it = LoadedTextures.find(name); it != LoadedTextures.end()) {
+			Loaded = true;
+		}
+	} break;
+
+	default:
+		Loaded = true;
+		break;
+	}
+	if (Loaded) callback(name, true);
+	else LoadQueue.enqueue({ name, nullptr, callback });
 }
 
-void AssetManager::LoadAssetAsyncWithCallback(const String& name, const AssetLoadCallback& callback)
+bool AssetManager::LoadAsset(const String& name)
 {
-	LoadQueue.enqueue({ name, nullptr });
+	bool wasLoaded = false;
+	AssetType type = GetAssetType(name);
+	switch (type)
+	{
+	case AssetType::MeshStatic: {
+		if (auto it = StaticMeshes.find(name); it != StaticMeshes.end()) {
+			return true;
+		}
+		else {
+			auto container1 = MI->MakeEmptyStatic();
+			auto mesh = loadMeshes(name);
+			if (!mesh) return false;
+			auto container = (RenderMeshStaticGL*)container1;
+			container->SetMesh(mesh);
+			StaticMeshes.emplace(name, mesh);
+			for (auto& m : mesh->Holders)
+				IRender::SendCommand({ RC_MAKEOBJECT, (uint64)static_cast<OpenGLObject*>(m), 0 });
+		}
+		return true;
+	} break;
+
+	case AssetType::MeshSkeletal: {
+		if (auto it = SkeletalMeshes.find(name); it != SkeletalMeshes.end()) {
+			return true;
+		}
+		else {
+			auto mesh = loadMeshesSkinned(name);
+			if (!mesh) return false;
+			auto container = new RenderMeshSkeletalGL();
+			container->SetMesh(mesh);
+			SkeletalMeshes.emplace(name, mesh);
+			for (auto& m : mesh->Holders)
+				IRender::SendCommand({ RC_MAKEOBJECT, (uint64)static_cast<OpenGLObject*>(m), 0 });
+		}
+		return true;
+	} break;
+
+	case AssetType::Animation: {
+		if (auto it = LoadedAnimations.find(name); it != LoadedAnimations.end()) {
+			return true;
+		}
+		else
+			return false;
+	} break;
+
+	case AssetType::Texture: {
+		if (auto it = LoadedTextures.find(name); it != LoadedTextures.end()) {
+			return true;
+		}
+		else {
+			auto tex = new Texture();
+			LoadedTextures.emplace(name, tex);
+			TextureLoader(name, tex);
+			return true;
+		}
+	} break;
+	default:
+		return false;
+		break;
+	}
 }
 
-void AssetManager::LoadMeshAsync(const String& name, RenderMesh* empty)
+void AssetManager::LoadMeshAsync(const String& name, RenderMesh* empty, const AssetLoadCallback& callback)
 {
 	if (empty && empty->GetMeshType() == RenderMesh::MeshType::Static)
-		LoadQueue.enqueue({ name, empty });
+		LoadQueue.enqueue({ name, empty, callback });
 }
 
-void AssetManager::LoadSkeletalMeshAsync(const String& name, RenderMesh* empty)
+void AssetManager::LoadSkeletalMeshAsync(const String& name, RenderMesh* empty, const AssetLoadCallback& callback)
 {
 	if (empty && empty->GetMeshType() == RenderMesh::MeshType::Skeletal)
-		LoadQueue.enqueue({ name, empty });
+		LoadQueue.enqueue({ name, empty, callback });
 }
 
-void AssetManager::LoadTextureAsync(const String& name, Texture* empty)
+void AssetManager::LoadTextureAsync(const String& name, Texture* empty, const AssetLoadCallback& callback)
 {
-	LoadQueue.enqueue({ name, empty });
+	LoadQueue.enqueue({ name, empty, callback });
 }
 
-void AssetManager::LoadAnimationAsync(const String& name, Animation* empty)
+void AssetManager::LoadAnimationAsync(const String& name, Animation* empty, const AssetLoadCallback& callback)
 {
-	LoadQueue.enqueue({ name, empty });
+	LoadQueue.enqueue({ name, empty, callback });
 }
 
 AssetType AssetManager::GetAssetType(const String& name)

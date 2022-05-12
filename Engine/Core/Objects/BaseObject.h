@@ -56,8 +56,10 @@ public:
 	virtual void BeginPlay() = 0;
 	virtual void OnDestroyed() {};
 	Scene* GetScene() const { return World; }
-	void SetScene(Scene* scene) { World = scene; }
+	void SetScene(Scene* scene);
 	virtual void LoadWithParameters(const String& args) {}
+	bool IsActive() const { return active; }
+	void SetActive(bool status) { active = status; }
 
 protected:
 	virtual ~BaseObject() {};
@@ -65,4 +67,5 @@ protected:
 	static const std::map<String, String> ParseOptions(const String& args);
 private:
 	Scene* World;
+	bool active;
 };

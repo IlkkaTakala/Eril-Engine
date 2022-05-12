@@ -1,3 +1,0 @@
-<Panel Transform="0,0,0,0, 0,1, 0,1">
-	<Image Transform="100,200,100,300, 0,0, 0,0" Style="1,0,0.5,0.9,Assets/Textures/SimpleLogo.png, 0.1,0.2,0.3"/>
-</Panel>

@@ -21,7 +21,7 @@ void InputComponent::OnDestroyed()
 
 void InputComponent::Tick(float delta)
 {
-	if (InputDisabled) return;
+	if (InputDisabled || !IsActive()) return;
 	for (auto const& [key, value] : Hold) {
 		auto t = KeyCallersHold.find(key);
 		if (t != KeyCallersHold.end()) {

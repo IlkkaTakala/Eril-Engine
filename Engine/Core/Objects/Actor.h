@@ -14,7 +14,7 @@ public:
 	//void SetModel(const char* NewModel) { Model = NewModel; }
 protected:
 	virtual void Tick(float Delta) override;
-	virtual void BeginPlay() override {};
+	virtual void BeginPlay() override;
 
 private:
 	Ref<InputComponent> InputComp;

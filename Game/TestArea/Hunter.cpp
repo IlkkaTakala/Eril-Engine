@@ -8,12 +8,12 @@
 
 Hunter::Hunter() : Actor()
 {
-	Mesh = SpawnObject<VisibleObject>();
+	Mesh = SpawnObject<VisibleObject>(this);
 	AddComponent(Mesh);
 	Mesh->SetModel("hunter");
 	Mesh->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/hunter"));
 
-	move = SpawnObject<MovementComponent>();
+	move = SpawnObject<MovementComponent>(this);
 	move->SetTarget(this);
 	move->SetGravity(true);
 	move->SetMaxSpeed(7.f);

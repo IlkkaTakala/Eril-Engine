@@ -106,6 +106,8 @@ int GameLoop::MainLoop()
 				}
 			}
 			if (found) continue;
+			if (auto it = dynamic_cast<BaseObject*>(t); it && !it->IsActive())
+				continue;
 			t->Tick(duration.count());
 		}
 		Console::Evaluate();

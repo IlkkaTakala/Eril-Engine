@@ -43,7 +43,7 @@ void MovementComponent::OnDestroyed()
 
 void MovementComponent::Tick(float time)
 {
-	if (!allowMovement || Object == nullptr) return;
+	if (!allowMovement || Object == nullptr || !IsActive()) return;
 	DesiredState.location = Object->GetLocation();
 	DesiredState.rotation = Object->GetRotation();
 	//getrotation

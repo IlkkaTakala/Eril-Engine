@@ -1203,6 +1203,7 @@ void Renderer::UpdateTransforms(float delta) {
 
 inline bool Renderer::CullCheck(Section* s)
 {
+	if (!s->Parent->GetParent()->IsActive()) return true;
 	glm::mat4 mm = s->Parent->GetModelMatrix();
 	Vector direction = ActiveCamera->GetForwardVector();
 	Vector location = ActiveCamera->GetLocation();

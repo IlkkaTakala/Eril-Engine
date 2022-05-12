@@ -8,8 +8,10 @@
 #include <Interface/WindowManager.h>
 #include <Interface/IECS.h>
 #include <Physics/BulletPhysics.h>
+#include <Interface/AssetManager.h>
 
 String Scene::newLevel = "";
+String Scene::loadMap = "";
 
 std::map<String, Scene*> LoadedScenes;
 
@@ -18,9 +20,10 @@ Scene::Scene() : BaseObject()
 	gravity = 10.f;
 	SceneGraph.clear();
 	bLoading = false;
+	assetsLoading = false;
 }
 
-void ParseChildren(rapidxml::xml_node<>* node, SceneComponent* base) 
+void ParseChildren(Scene* scene, rapidxml::xml_node<>* node, SceneComponent* base) 
 {
 	for (auto n = node->first_node(); n; n = n->next_sibling())
 	{
@@ -36,26 +39,16 @@ void ParseChildren(rapidxml::xml_node<>* node, SceneComponent* base)
 			auto arg_ptr = n->first_attribute("args");
 			if (arg_ptr != 0) args = arg_ptr->value();
 
-			BaseObject* obj = ObjectManager::TypeList()[type](args, id, Constants::Record::LOADED, false, 0);
+			BaseObject* obj = ObjectManager::TypeList()[type](scene, args, id, Constants::Record::LOADED, false, 0);
+			obj->SetScene(scene);
 			Console::Log("Spawned object with record: " + obj->GetRecord().ToString());
 
 			SceneComponent* scenic = dynamic_cast<SceneComponent*>(obj);
 			if (scenic != nullptr && base != nullptr) base->AddComponent(scenic);
 
 			obj->LoadWithParameters(args);
-			ParseChildren(n, scenic);
+			ParseChildren(scene, n, scenic);
 		}
-	}
-}
-
-void LoopSceneChildren(const Ref<SceneComponent>& base) 
-{
-	for (const auto& c : base->GetChildren()) {
-		auto t = dynamic_cast<Tickable*>(base.GetPointer());
-		ObjectManager::AddTick(t);
-		c->BeginPlay();
-
-		LoopSceneChildren(c);
 	}
 }
 
@@ -66,7 +59,19 @@ void Scene::OpenLevel(String map)
 
 void Scene::CheckShouldLoad()
 {
-	if (newLevel != "") LoadLevel();
+	if (Loop->World && Loop->World->assetsLoading) {
+		auto& mp = Loop->World->loadingStatus;
+		bool result = false;
+		if (!mp.empty()) {
+			result = std::all_of(mp.begin(), mp.end(),
+				[](const auto& t) { return t.second; });
+		}
+		if (result) {
+			HardLoadLevel(newLevel);
+			newLevel = "";
+		}
+	}
+	else if (newLevel != "") LoadLevel();
 }
 
 bool Scene::isLoading()
@@ -74,12 +79,22 @@ bool Scene::isLoading()
 	return Loop->World ? Loop->World->bLoading : false;
 }
 
+void Scene::SetLoadingMap(const String& name)
+{
+	loadMap = name;
+}
+
 void Scene::OnDestroyed()
 {
-	while (SceneGraph.size() > 0) {
-		if (*SceneGraph.begin() != nullptr) (*SceneGraph.begin())->DestroyObject();
-		else SceneGraph.pop_front();
+	while (AllObjects.size() > 0) {
+		if (*AllObjects.begin() != nullptr) {
+			auto ptr = *AllObjects.begin();
+			ptr->SetScene(nullptr);
+			ptr->DestroyObject();
+		}
+		else AllObjects.pop_front();
 	}
+	SceneGraph.clear();
 	Loop->World = nullptr;
 }
 
@@ -91,10 +106,20 @@ void Scene::AddSceneRoot(SceneComponent* obj)
 void Scene::RemoveSceneRoot(SceneComponent* obj)
 {
 	SceneGraph.remove(obj);
-	obj->SetScene(nullptr);
 }
 
-void Scene::LoadLevel()
+void Scene::AddObject(BaseObject* data)
+{
+	AllObjects.push_back(data);
+
+}
+
+void Scene::RemoveObject(BaseObject* data)
+{
+	AllObjects.remove(data);
+}
+
+void Scene::HardLoadLevel(const String& level)
 {
 	if (Loop->World != nullptr) {
 		ObjectManager::CleanObjects();
@@ -107,16 +132,16 @@ void Scene::LoadLevel()
 	using namespace rapidxml;
 
 	ObjectManager::PrepareRecord(1, Constants::Record::LOADED);
-	Loop->World = SpawnObject<Scene>();
+	Loop->World = SpawnObject<Scene>(nullptr);
 	Loop->World->bLoading = true;
 	Physics::init();
 
 	ObjectManager::PrepareRecord(2, Constants::Record::LOADED);
-	Ref<GameState> State = SpawnObject<GameState>();
+	Ref<GameState> State = SpawnObject<GameState>(nullptr);
 	Loop->State = State;
 
 	String loaded;
-	FileManager::RequestData(newLevel + ".map", loaded);
+	FileManager::RequestData(level + ".map", loaded);
 
 	xml_document<>* doc = new xml_document<>();
 	doc->parse<0>(loaded.data());
@@ -124,26 +149,52 @@ void Scene::LoadLevel()
 	auto assets = doc->first_node("Asset");
 	if (assets) {
 		auto names = split(assets->value(), ',');
-		for (const auto& n : names) {
-
+		for (auto& n : names) {
+			AssetManager::LoadAsset(n.erase(0, n.find_first_not_of(" \t\n")).erase(n.find_last_not_of(" \t\n") + 1));
 		}
 	}
 
-	ParseChildren(doc, nullptr);
+	ParseChildren(Loop->World, doc, nullptr);
 
 	delete doc;
 
 	Loop->World->BeginPlay();
-	for (const auto& base : Loop->World->SceneGraph) {
-		auto t = dynamic_cast<Tickable*>(base.GetPointer());
+	
+	for (auto& c : Loop->World->AllObjects) {
+		auto t = dynamic_cast<Tickable*>(c.GetPointer());
 		ObjectManager::AddTick(t);
-		base->BeginPlay();
-
-		LoopSceneChildren(base);
+		c->BeginPlay();
+		c->SetActive(true);
 	}
 
 	if (IRender::GetUIManager()) IRender::GetUIManager()->RegisterInputs();
 
-	newLevel = "";
 	Loop->World->bLoading = false;
+}
+
+void Scene::LoadLevel()
+{
+	if (loadMap == "") HardLoadLevel(newLevel);
+	else {
+		HardLoadLevel(loadMap);
+
+		String loaded;
+		FileManager::RequestData(newLevel + ".map", loaded);
+		using namespace rapidxml;
+		xml_document<>* doc = new xml_document<>();
+		doc->parse<0>(loaded.data());
+
+		auto assets = doc->first_node("Asset");
+		Loop->World->assetsLoading = true;
+		if (assets) {
+			auto names = split(assets->value(), ',');
+			for (auto& n : names) {
+				String as = n.erase(0, n.find_first_not_of(" \t\n")).erase(n.find_last_not_of(" \t\n") + 1);
+				Loop->World->loadingStatus.emplace(as, false);
+				AssetManager::LoadAssetAsync(as, [&](const String& name, bool) {
+					Loop->World->loadingStatus[name] = true;
+				});
+			}
+		}
+	}
 }
