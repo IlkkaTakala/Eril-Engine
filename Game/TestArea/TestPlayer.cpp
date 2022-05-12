@@ -62,7 +62,7 @@ TestPlayer::TestPlayer() : Player()
 {
 
 	mouseSens = 0.5f;
-	Speed = 5.f;
+	Speed = 10.f;
 	InputMode = true;
 	cursorState = true;
 	spawnCounter = 0;
@@ -101,7 +101,7 @@ TestPlayer::TestPlayer() : Player()
 
 	pause = nullptr;
 
-	Plane = SpawnObject<VisibleObject>();
+	/*Plane = SpawnObject<VisibleObject>();
 	Plane->SetModel("Cube");
 	Plane->GetModel()->SetAABB(AABB(Vector(-20.f, -20.f, -0.5f), Vector(20.f, 20.f, 0.5f)));
 	Plane->SetScale(Vector(20.f, 20.f, 0.5f));
@@ -110,12 +110,12 @@ TestPlayer::TestPlayer() : Player()
 	PlaneCol = SpawnObject<BoxCollisionShape>();
 	PlaneCol->SetType(0);
 	PlaneCol->SetSize(Plane->GetModel()->GetAABB());
-	Plane->AddComponent(PlaneCol);
+	Plane->AddComponent(PlaneCol);*/
 
 	Box = SpawnObject<Actor>();
 
 	//Moment Model -> ColliderModel
-	BoxModel = SpawnObject<VisibleObject>();
+	/*BoxModel = SpawnObject<VisibleObject>();
 	BoxModel->SetModel("Assets/Meshes/Cube");
 	BoxModel->GetModel()->SetAABB(AABB(Vector(-1.0f), Vector(1.0f)));
 
@@ -125,7 +125,7 @@ TestPlayer::TestPlayer() : Player()
 	BoxCol = SpawnObject<BoxCollisionShape>();
 	Box->AddComponent(BoxCol);
 	BoxCol->SetType(0);
-	BoxCol->SetSize(BoxModel->GetModel()->GetAABB());
+	BoxCol->SetSize(BoxModel->GetModel()->GetAABB());*/
 	
 
 	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
@@ -287,9 +287,9 @@ void TestPlayer::Tick(float deltaTime)
 	GetCamera()->SetLocation(Location + Vector(0.f, 0.f, 1.5f));
 	Sky->SetLocation(Location);
 	
-	Vector listenerPos = Location;
+	/*Vector listenerPos = Location;
 	Vector listenerOrientation = GetCamera()->GetForwardVector();
-	AudioManager::SetListener(listenerPos, GetCamera()->GetForwardVector(), GetCamera()->GetUpVector());
+	AudioManager::SetListener(listenerPos, GetCamera()->GetForwardVector(), GetCamera()->GetUpVector());*/
 }
 
 void TestPlayer::BeginPlay()
@@ -330,20 +330,20 @@ void TestPlayer::BeginPlay()
 		DirLight->Color = Vector(1.f);
 		DirLight->Rotation = Vector(0.5, 0.5, -0.5).Normalize();
 
-		for (int i = 0; i < 50; i++)
-		{
-			//Console::Log("Light addded " + std::to_string(i));
-			float x = (float)(rand() % 100);
-			float y = (float)(rand() % 100);
-			//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
+		//for (int i = 0; i < 50; i++)
+		//{
+		//	//Console::Log("Light addded " + std::to_string(i));
+		//	float x = (float)(rand() % 100);
+		//	float y = (float)(rand() % 100);
+		//	//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
 
-			LightComponent* light = lightSystem->AddComponentToSystem();
-			light->Location = Vector(x, y, 2.f);
-			light->LightType = LIGHT_POINT;
-			light->Size = 5.f;
-			light->Intensity = rand() / (float)RAND_MAX * 20.f;
-			light->Color = Vector(x, y, 2.5f);
-		}
+		//	LightComponent* light = lightSystem->AddComponentToSystem();
+		//	light->Location = Vector(x, y, 2.f);
+		//	light->LightType = LIGHT_POINT;
+		//	light->Size = 5.f;
+		//	light->Intensity = rand() / (float)RAND_MAX * 20.f;
+		//	light->Color = Vector(x, y, 2.5f);
+		//}
 	}
 	Console::Log("Hello beautiful world");
 }

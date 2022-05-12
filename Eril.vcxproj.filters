@@ -247,6 +247,9 @@
     <ClCompile Include="Engine\Core\Objects\SkeletalObject.cpp">
       <Filter>Engine\Objects</Filter>
     </ClCompile>
+    <ClCompile Include="Game\TestArea\LightSpawner.cpp">
+      <Filter>Game\TestArea</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -571,6 +574,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Core\Objects\SkeletalObject.h">
       <Filter>Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\TestArea\LightSpawner.h">
+      <Filter>Game\TestArea</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
