@@ -8,3 +8,8 @@ public:
 	CloudParticle();
 };
 
+class SmokeParticle : public ParticleSystem
+{
+public:
+	SmokeParticle();
+};

@@ -62,7 +62,7 @@ TestPlayer::TestPlayer() : Player()
 {
 
 	mouseSens = 0.5f;
-	Speed = 10.f;
+	Speed = 12.f;
 	InputMode = true;
 	cursorState = true;
 	spawnCounter = 0;
@@ -128,7 +128,7 @@ TestPlayer::TestPlayer() : Player()
 	BoxCol->SetSize(BoxModel->GetModel()->GetAABB());*/
 	
 
-	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
+	/*Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
 
 	auto skel = SpawnObject<SkeletalObject>();
 	skel->SetModel("Assets/Skeletal/Alien");
@@ -138,10 +138,23 @@ TestPlayer::TestPlayer() : Player()
 	auto animC = SpawnObject<TestAnimControl>(skel);
 	animC->BeginPlay();
 	animC->SetSkeleton(skel->GetModel());
-	skel->SetAnimController(animC);
+	skel->SetAnimController(animC);*/
 
 	//animC->SetOverrideAnimation(AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Breakdance", skel->GetModel()));
-	skel->SetScale(Vector(0.01f));
+	//skel->SetScale(Vector(0.01f));
+
+	auto Particle = SpawnObject<ParticleComponent>();
+	Particle->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
+	Particle->SetLocation(Vector(-116.f, -104.f, 44.f));
+	
+	auto Particle2 = SpawnObject<ParticleComponent>();
+	Particle2->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
+	Particle2->SetLocation(Vector(-60.f, -94.f, 44.f));
+
+	auto smoke = SpawnObject<ParticleComponent>();
+	smoke->SetSystem(ParticleSystem::MakeSystem<SmokeParticle>());
+	smoke->SetLocation(Vector(71.f, -40.f, 11.f));
+
 
 }
 
@@ -323,12 +336,12 @@ void TestPlayer::BeginPlay()
 	if (lightSystem != nullptr)
 	{
 		LightComponent* DirLight = lightSystem->AddComponentToSystem();
-		DirLight->Location = Vector(0.f, 0.f, 1.f);
+		DirLight->Location = Vector(0.f, 0.f, 0.f);
 		DirLight->LightType = LIGHT_DIRECTIONAL;
 		DirLight->Size = 3.f;
-		DirLight->Intensity = 1.f;
+		DirLight->Intensity = 2.f;
 		DirLight->Color = Vector(1.f);
-		DirLight->Rotation = Vector(0.5, 0.5, -0.5).Normalize();
+		DirLight->Rotation = Vector(0.5, -0.5, 1.0).Normalize();
 
 		//for (int i = 0; i < 50; i++)
 		//{

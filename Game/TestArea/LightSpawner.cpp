@@ -21,17 +21,19 @@ void LightSpawner::LoadWithParameters(const String& args)
 		for (int i = 0; i < it.size(); i++) {
 			LightComponent* DirLight = lightSystem->AddComponentToSystem();
 			auto dat = split(it[i], ',');
-			if (dat.size() != 7) continue;
+			if (dat.size() != 8) continue;
 			DirLight->Location.X = std::stof(dat[0]);
 			DirLight->Location.Y = std::stof(dat[1]);
 			DirLight->Location.Z = std::stof(dat[2]);
 			DirLight->Color.X = std::stof(dat[3]);
-			DirLight->Color.X = std::stof(dat[4]);
-			DirLight->Color.X = std::stof(dat[5]);
+			DirLight->Color.Y = std::stof(dat[4]);
+			DirLight->Color.Z = std::stof(dat[5]);
 			DirLight->Intensity = std::stof(dat[6]);
+			DirLight->Size = std::stof(dat[7]);
 
 			DirLight->LightType = LIGHT_POINT;
-			DirLight->Size = 5.f;
+			//DirLight->Intensity = 40.f;
+			//DirLight->Size = 5.f;
 		}
 	}
 }

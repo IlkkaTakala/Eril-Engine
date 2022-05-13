@@ -173,7 +173,7 @@ void ParticleSystemConstruction::Updator::UpdateVelocities(float delta) const
 void ParticleSystemConstruction::Updator::UpdateLifetime(float delta) const
 {
 	uint last_active = 0;
-	for (uint i = 0; i <= system->ParticleCount; i++) {
+	for (uint i = 0; i <= system->ParticleCount && i < system->Particles.size(); i++) {
 		Particle& p = system->Particles[i];
 
 		if (!p.enabled) continue;
