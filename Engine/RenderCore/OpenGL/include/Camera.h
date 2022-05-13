@@ -30,6 +30,7 @@ public:
 	virtual void SetPostProcess(const String& name) override;
 	Material* GetPostProcess() const { return postProcess; }
 
+	void ApplyTransformation();
 private:
 	glm::mat4 Projection;
 	glm::mat4 View;
@@ -38,7 +39,6 @@ private:
 	Rotator Rotation;
 	Material* postProcess;
 
-	inline void ApplyTransformation();
 
 	float Fov;
 	bool Perspective;

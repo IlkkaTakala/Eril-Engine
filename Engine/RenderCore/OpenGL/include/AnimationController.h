@@ -102,6 +102,7 @@ public:
 
 		float upleft, downleft, upright, downright;
 		upleft = downleft = upright = downright = std::numeric_limits<float>::infinity();
+		float max = 0.f;
 
 		for (const auto& [x, y, anim] : anims) {
 			float deltaY = y - axisValueY;
@@ -109,7 +110,7 @@ public:
 			float distance = deltaX * deltaX + deltaY * deltaY;
 			if (deltaX <= 0.f) {
 				if (deltaY <= 0.f) {
-					if (distance < upleft) {
+					if (distance < downleft) {
 						downleft = distance;
 						fourth = &anim;
 					}
@@ -143,17 +144,35 @@ public:
 		if (!third) { downright = 0.f; --count; }
 		if (!fourth) { downleft = 0.f; --count; }
 
-		float norm = 1.f / (upleft + downleft + upright + downright);
-		upleft = upleft * norm;
-		downleft = downleft * norm;
-		upright = upright * norm;
-		downright = downright * norm;
+		if (upleft > max) max = upleft;
+		if (upright > max) max = upright;
+		if (downleft > max) max = downleft;
+		if (downright > max) max = downright;
 
-		if (count > 1) {
-			upleft = 1.f - upleft;
-			downleft = 1.f - downleft;
-			upright = 1.f - upright;
-			downright = 1.f - downright;
+		float norm = 1.f / max;
+		upleft = ( max - upleft) * norm;
+		downleft = ( max - downleft) * norm;
+		upright = ( max - upright) * norm;
+		downright = ( max - downright) * norm;
+
+		if (count <= 1) {
+			upleft = 1.f;
+			downleft = 1.f;
+			upright = 1.f;
+			downright = 1.f;
+		}
+		else {
+			if (!first) { upleft = 0.f; }
+			if (!second) { upright = 0.f; }
+			if (!third) { downright = 0.f; }
+			if (!fourth) { downleft = 0.f; }
+
+			float total = upleft + downleft + upright + downright;
+			norm = 1.f / total;
+			upleft = upleft * norm;
+			downleft = downleft * norm;
+			upright = upright * norm;
+			downright = downright * norm;
 		}
 
 		float speed = 0.f;
@@ -347,7 +366,5 @@ public:
 
 	AnimationBlendSpace2D blender;
 	AnimationStateMachine states;
-	AnimationPerBoneBlend perBone;
-	AnimationInstance dance;
-	float walk;
+	Vector walk;
 };

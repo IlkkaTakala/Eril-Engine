@@ -205,29 +205,26 @@ void RenderMeshStaticGL::SetAABB(AABB bounds)
 
 void RenderMeshStaticGL::ApplyTransform(float delta)
 {
-	Transformation finalT;
+	if (!requireUpdate) return;
+	glm::mat4 finalT(1.f);
 	SceneComponent* parent = Parent;
 	while (parent)
 	{
-		finalT += parent->GetTransformation();
+		Vector loc = parent->GetLocation();
+		Rotator rot = parent->GetRotation();
+		Vector sca = parent->GetScale();
 
-		if (parent->GetParent() == nullptr) break;
+		finalT = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Y, loc.Z))
+			* glm::toMat4(glm::quat(rot.W, rot.X, rot.Y, rot.Z))
+			* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Y, sca.Z))
+			* finalT;
 
 		parent = parent->GetParent();
 	}
 
-	Vector loc = finalT.Location;
-	Rotator rot = finalT.Rotation;
-	Vector sca = finalT.Scale;
-	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Y, loc.Z))
-		* glm::toMat4(glm::quat(rot.W, rot.X, rot.Y, rot.Z))
-		* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Y, sca.Z));
-
+	ModelMatrix = finalT;
 
 	requireUpdate = false;
-
-	glm::vec3 test(1.f);
-	glm::mat4 test2(2.f);
 }
 
 void RenderMeshStaticGL::SetInstances(int count, Transformation* dispArray)

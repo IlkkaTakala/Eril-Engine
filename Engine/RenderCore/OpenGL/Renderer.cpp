@@ -1222,7 +1222,7 @@ inline bool Renderer::CullCheck(Section* s)
 		glm::vec3 newPosition = glm::normalize(-d + dir * glm::length(d)) * radius;
 		if (glm::dot(dir, glm::normalize(d + newPosition)) < 0.75f) // TODO: Calculate from FOV
 		{
-			return true;
+			return false;
 		}
 	}
 	return false;
@@ -1236,7 +1236,7 @@ void Renderer::Render(float delta)
 	int width = size.X;
 	int height = size.Y;
 
-
+	ActiveCamera->ApplyTransformation();
 	GlobalVariables.Projection = ActiveCamera->GetProjectionMatrix();
 	GlobalVariables.View = glm::inverse(ActiveCamera->GetViewMatrix());
 	const Vector& loc = ActiveCamera->GetLocation();

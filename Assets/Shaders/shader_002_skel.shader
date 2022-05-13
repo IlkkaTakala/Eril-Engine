@@ -99,6 +99,9 @@ layout(std430, binding = 2) readonly buffer VisibleLightIndicesBuffer {
 
 layout (location = 0) out vec4 ColorBuffer;
 layout (location = 1) out vec4 BloomBuffer;
+layout (location = 4) out vec4 NormalBuffer;
+layout (location = 5) out vec4 PositionBuffer;
+layout (location = 6) out vec4 DataBuffer;
 
 in VS_OUT{
 	vec2 TexCoords;
@@ -309,5 +312,8 @@ void main()
 	
 	ColorBuffer = color;
 	BloomBuffer = clamp(color - exposure, 0.0, 100.0);
+	NormalBuffer = vec4(N, 1.0);
+	PositionBuffer = vec4(fs_in.FragPos);
+	DataBuffer = vec4(metallic, roughness, 1.0, 1.0);
 }
 ###END_FRAGMENT###

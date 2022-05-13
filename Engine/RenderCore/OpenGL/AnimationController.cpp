@@ -62,25 +62,23 @@ void AnimationController::UpdateBoneTransforms(float delta, RenderMesh* mesh)
 
 void TestAnimControl::BeginPlay()
 {
-	blender.AddKey(0.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Walking", owner->GetModel()));
-	blender.AddKey(1.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Running", owner->GetModel()));
+	blender.AddKey(0.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Idle", owner->GetModel()));
+	blender.AddKey(5.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/RightStrafeWalk", owner->GetModel()));
+	blender.AddKey(-5.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/LeftStrafeWalk", owner->GetModel()));
+	//blender.AddKey(2.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/RightStrafe", owner->GetModel()));
+	//blender.AddKey(-2.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/LeftStrafe", owner->GetModel()));
+	blender.AddKey(0.f, 5.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Walking", owner->GetModel()));
+	//blender.AddKey(0.f, 2.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Running", owner->GetModel()));
+	blender.AddKey(0.f, -5.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/WalkBack", owner->GetModel()));
+	//blender.AddKey(0.f, -2.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/RunBack", owner->GetModel()));
 
-	dance.SetAnimation(AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Breakdance", owner->GetModel()));
 	walk = 0.f;
 
 	states.AddState("Walk", [&](float delta, BoneArray arr) {
-		blender.Evaluate(delta, arr, walk, 0.f);
-	});
-	states.AddState("Dance", [&](float delta, BoneArray arr) {
-		dance.MakeTransforms(arr);
+		blender.Evaluate(delta, arr, walk.X, walk.Y);
 	});
 	auto mesh = dynamic_cast<RenderMeshSkeletalGL*>(owner->GetModel());
 	
-	perBone.Init([&](float delta, BoneArray base) {
-		blender.Evaluate(delta, base, walk, 0.f);
-	}, [&](float delta, BoneArray blend) {
-		dance.MakeTransforms(blend);
-	}, mesh->GetSkeleton(), "mixamorig:Spine");
 
 	//states.AddPaths("Walk", { {"Dance", [&]()->bool {return walk <= 0.f; }, 0.5f} });
 	//states.AddPaths("Dance", {{"Walk", [&]()->bool {return walk > 0.f; }, 0.5f}});
@@ -98,7 +96,6 @@ void TestAnimControl::Tick(float delta)
 
 void TestAnimControl::EvaluateBones(BoneArray bones)
 {
-	dance.Update(last_delta, dance.GetFactor());
-	perBone.Evaluate(last_delta, bones);
-	//states.Evaluate(last_delta, bones);
+	//perBone.Evaluate(last_delta, bones);
+	states.Evaluate(last_delta, bones);
 }

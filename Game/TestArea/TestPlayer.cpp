@@ -70,12 +70,31 @@ TestPlayer::TestPlayer() : Player()
 	walk = 0.f;
 	
 	Rotation = Rotator(0.f);
+	SetLocation(Vector(2, 0, 1));
 
 	//Player Model
-	Mesh = SpawnObject<VisibleObject>(this);
-	Mesh->SetModel("Assets/Meshes/Cube");
+	Mesh = SpawnObject<SkeletalObject>(this);
+
+	Mesh->SetModel("Assets/Skeletal/Alien");
+	Mesh->GetModel()->SetMaterial(1, IRender::LoadMaterialByName("Assets/Materials/alien_upper"));
+	Mesh->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/alien_lower"));
 	Mesh->GetModel()->SetAABB(AABB(Vector(-1.f, -1.f, 0.f), Vector(1.f, 1.f, 2.f)));
-	SetLocation(Vector(15, 15, 1));
+	Mesh->SetRotation(-180);
+	auto animC = SpawnObject<TestAnimControl>(this, Mesh);
+	animC->SetSkeleton(Mesh->GetModel());
+	Mesh->SetAnimController(animC);
+
+	Spring = SpawnObject<SceneComponent>(this);
+	AddComponent(Spring);
+
+	GetCamera()->SetParent(Spring);
+	Spring->SetLocation({0.f, 0.f, 1.5f});
+	GetCamera()->SetLocation({0.f, -2.5f, 0.f});
+
+	AddComponent(Mesh);
+
+	//animC->SetOverrideAnimation(AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Breakdance", skel->GetModel()));
+	Mesh->SetScale(Vector(0.01f));
 
 	//Player Movement
 	Movement = SpawnObject<MovementComponent>(this);
@@ -104,7 +123,7 @@ TestPlayer::TestPlayer() : Player()
 	pause = nullptr;
 
 	Plane = SpawnObject<VisibleObject>(this);
-	Plane->SetModel("Cube");
+	Plane->SetModel("Assets/Meshes/Cube");
 	Plane->GetModel()->SetAABB(AABB(Vector(-20.f, -20.f, -0.5f), Vector(20.f, 20.f, 0.5f)));
 	Plane->SetScale(Vector(20.f, 20.f, 0.5f));
 	Plane->SetLocation(Vector(10.f, 10.f, 0.f));
@@ -114,37 +133,7 @@ TestPlayer::TestPlayer() : Player()
 	PlaneCol->SetSize(Plane->GetModel()->GetAABB());
 	Plane->AddComponent(PlaneCol);
 
-	Box = SpawnObject<Actor>(this);
-
-	//Moment Model -> ColliderModel
-	BoxModel = SpawnObject<VisibleObject>(this);
-	BoxModel->SetModel("Assets/Meshes/Cube");
-	BoxModel->GetModel()->SetAABB(AABB(Vector(-1.0f), Vector(1.0f)));
-
-	Box->AddComponent(BoxModel);
-	Box->SetLocation(Vector(10.f, 10.f, 2.f));
-
-	BoxCol = SpawnObject<BoxCollisionShape>(this);
-	Box->AddComponent(BoxCol);
-	BoxCol->SetType(0);
-	BoxCol->SetSize(BoxModel->GetModel()->GetAABB());
-	
-
 	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
-
-	auto skel = SpawnObject<SkeletalObject>(this);
-	skel->SetModel("Assets/Skeletal/Alien");
-	skel->GetModel()->SetMaterial(1, IRender::LoadMaterialByName("Assets/Materials/alien_upper"));
-	skel->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/alien_lower"));
-	skel->SetLocation({5.f, 5.f, -0.5f});
-	auto animC = SpawnObject<TestAnimControl>(this, skel);
-	animC->BeginPlay();
-	animC->SetSkeleton(skel->GetModel());
-	skel->SetAnimController(animC);
-	//skel->SetParent(this);
-
-	//animC->SetOverrideAnimation(AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Breakdance", skel->GetModel()));
-	skel->SetScale(Vector(0.01f));
 
 }
 
@@ -245,12 +234,17 @@ void TestPlayer::MouseMoved(float X, float Y)
 {
 	if (cursorState && !Changing) {
 		Camera* cam = GetCamera();
-		Rotator rot = cam->GetRotation();
+		Rotator rot = Spring->GetRotation();
 		float y = rot.PitchDegrees();
-		cam->SetRotation(Vector(
+		Spring->SetRotation(Vector(
 			rot.RollDegrees(),
 			y + Y * mouseSens < 89.f && y + Y * mouseSens > -89.f ? y + Y * mouseSens : y,
-			rot.YawDegrees() + X * mouseSens
+			rot.YawDegrees()
+		));
+		SetRotation(Vector(
+			0.f, 
+			0.f,
+			Rotation.YawDegrees() + X * mouseSens
 		));
 	}
 	if (Changing) {
@@ -282,26 +276,19 @@ void TimeFunction (float d)
 
 void TestPlayer::Tick(float deltaTime)
 {
-	//Console::Log((BoxCol2->GetWorldLocation()).ToString() + " BoxCol2");
-	//Console::Log((BoxCol->GetWorldLocation()).ToString() + " BoxCol2");
-	//Console::Log((Box->GetWorldLocation()).ToString() + " Box");
-	//Console::Log((GetWorldLocation()).ToString() + " Player");
-	//Console::Log((PlayerCol->GetWorldLocation()).ToString() + " PlayerCol");
-
-	Vector loc = Box->GetLocation();
-	GetCamera()->SetLocation(Location + Vector(0.f, 0.f, 1.5f));
 	Sky->SetLocation(Location);
 	
 	Vector listenerPos = Location;
 	Vector listenerOrientation = GetCamera()->GetForwardVector();
 	AudioManager::SetListener(listenerPos, GetCamera()->GetForwardVector(), GetCamera()->GetUpVector());
+
 }
 
 void TestPlayer::BeginPlay()
 {
 	Player::BeginPlay();
 
-	Terrain* terrain = ObjectManager::GetByRecord<Terrain>(0xA0005554);
+	//Terrain* terrain = ObjectManager::GetByRecord<Terrain>(0xA0005554);
 
 	//ECS
 	SystemsManager* systemsManager = IECS::GetSystemsManager();
@@ -312,10 +299,9 @@ void TestPlayer::BeginPlay()
 	//AudioControllerSystem* audioControllerSystem = static_cast<AudioControllerSystem*>(systemsManager->GetSystemByName("AudioControllerSystem"));
 	//audioComponentID = audio->GetID();
 
-	Vector audioPos = Vector(20.0f, 20.0f, terrain->GetHeight(20.0f, 20.0f) + 1.5f);
+	Vector audioPos = Vector(20.0f, 20.0f, 1.5f);
 	audio->SetSourceID(AudioManager::LoadAudio("clicketi.WAV"));
 	audio->SetPosition(audioPos);
-	Mesh->SetLocation(audioPos);
 	audio->SetGain(1.0f);
 	audio->SetPitch(1.0f);
 	audio->SetLooping(true);
@@ -343,7 +329,7 @@ void TestPlayer::BeginPlay()
 			//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
 
 			LightComponent* light = lightSystem->AddComponentToSystem();
-			light->Location = Vector(x, y, terrain->GetHeight(x, y));
+			light->Location = Vector(x, y, 1.f);
 			light->LightType = LIGHT_POINT;
 			light->Size = 5.f;
 			light->Intensity = rand() / (float)RAND_MAX * 20.f;
@@ -355,4 +341,15 @@ void TestPlayer::BeginPlay()
 
 void TestPlayer::OnDestroyed()
 {
+}
+
+Vector TestPlayer::GetWalk()
+{
+	Vector w = {
+		Vector::Dot(Rotation.GetRightVector(), Movement->DesiredState.velocity),
+		Vector::Dot(Rotation.GetForwardVector(), Movement->DesiredState.velocity),
+		0.f
+	};
+	Console::Log(w.ToString());
+	return w;
 }
