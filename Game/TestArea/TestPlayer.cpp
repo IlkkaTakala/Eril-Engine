@@ -62,12 +62,13 @@ TestPlayer::TestPlayer() : Player()
 {
 
 	mouseSens = 0.5f;
-	Speed = 5.f;
+	Speed = 2.f;
 	InputMode = true;
 	cursorState = true;
 	spawnCounter = 0;
 	Changing = false;
 	walk = 0.f;
+	gunOut = false;
 	
 	Rotation = Rotator(0.f);
 	SetLocation(Vector(2, 0, 1));
@@ -88,7 +89,7 @@ TestPlayer::TestPlayer() : Player()
 	AddComponent(Spring);
 
 	GetCamera()->SetParent(Spring);
-	Spring->SetLocation({0.f, 0.f, 1.5f});
+	Spring->SetLocation({-0.6f, 0.f, 1.5f});
 	GetCamera()->SetLocation({0.f, -2.5f, 0.f});
 
 	AddComponent(Mesh);
@@ -102,10 +103,10 @@ TestPlayer::TestPlayer() : Player()
 	Movement->SetGravity(true);
 	Movement->SetPhysics(false);
 	Movement->SetMaxSpeed(Speed);
-	Movement->SetFlightMaxSpeed(Speed);
-	Movement->SetAirBrake(10.f);
-	Movement->SetAcceleration(500.f);
-	Movement->SetAirControl(0.9f);
+	Movement->SetFlightMaxSpeed(10000.f);
+	Movement->SetAirBrake(2000.f);
+	Movement->SetAcceleration(50.f);
+	Movement->SetAirControl(0.2f);
 
 	PlayerCol = SpawnObject<CapsuleCollisionShape>(this);
 	AddComponent(PlayerCol);
@@ -215,14 +216,14 @@ void TestPlayer::InputTwo(bool KeyDown)
 
 void TestPlayer::RunInputShift(bool KeyDown)
 {
-	if (KeyDown) Movement->SetMaxSpeed(10.f);
-	else Movement->SetMaxSpeed(5.f);
+	if (KeyDown) Movement->SetMaxSpeed(6.f);
+	else Movement->SetMaxSpeed(Speed);
 }
 
 
-void TestPlayer::LeftMouseDown(bool)
+void TestPlayer::LeftMouseDown(bool keydown)
 {
-
+	if (keydown) gunOut = !gunOut;
 }
 
 void TestPlayer::RightMouseDown(bool KeyDown)
@@ -350,6 +351,5 @@ Vector TestPlayer::GetWalk()
 		Vector::Dot(Rotation.GetForwardVector(), Movement->DesiredState.velocity),
 		0.f
 	};
-	Console::Log(w.ToString());
 	return w;
 }

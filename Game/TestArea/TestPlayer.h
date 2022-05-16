@@ -26,6 +26,7 @@ public:
 	virtual void OnDestroyed() override;
 
 	Vector GetWalk();
+	bool GetGun() const { return gunOut; }
 
 private:
 	float mouseSens;
@@ -75,6 +76,7 @@ private:
 
 	float walk;
 	bool Changing;
+	bool gunOut;
 
 	void TestTimer(float d);
 };

@@ -364,12 +364,14 @@ void LoadAnimation(Animation* anim, const String& path)
 		Console::Log("Error loading model file " + path + " : " + importer.GetErrorString());
 		return;
 	}
-	if (scene->HasAnimations())
+	if (scene->HasAnimations()) {
+		anim->name = path;
 		anim->duration = (float)scene->mAnimations[0]->mDuration;
 		anim->tickSpeed = (int)scene->mAnimations[0]->mTicksPerSecond;
 		anim->durationSeconds = anim->duration / anim->tickSpeed;
 		anim->speedFactor = 1.f / anim->durationSeconds;
 		processAnimNode(anim, scene->mAnimations[0]);
+	}
 }
 
 namespace AssetManager

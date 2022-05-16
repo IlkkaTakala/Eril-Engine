@@ -32,6 +32,8 @@ public:
 	typedef std::tuple<Vector, InterpType> KeyframeLocation;
 	typedef std::tuple<Rotator, InterpType> KeyframeRotation;
 	typedef std::tuple<Vector, InterpType> KeyframeScale;
+	
+	String name;
 
 	std::vector<std::vector<std::pair<float, Vector>>> LocationTrack;
 	std::vector<std::vector<std::pair<float, Rotator>>> RotationTrack;
@@ -45,6 +47,7 @@ public:
 	float speedFactor;
 
 	Skeleton* skeleton;
+
 };
 
 struct AnimationInstance
@@ -70,6 +73,10 @@ public:
 		frametime += delta * factor;
 		if (frametime > 1.f) frametime -= floor(frametime);
 		else if (frametime < 0.f) frametime -= floor(1.f);
+		if (isnan(frametime))
+		{
+			frametime = 0.f;
+		}
 	}
 
 	void MakeTransforms(BoneArray bones) const {
