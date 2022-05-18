@@ -16,16 +16,16 @@ Animation::Animation()
 	skeleton = nullptr;
 	duration = 0.f;
 	tickSpeed = 24;
+	speedFactor = 0.f;
+	durationSeconds = 0.f;
 }
 
 template <typename T>
-inline bool GetFirst(const T& list, float duration, int tickSpeed, float delta, int& begin, int& next, float& scale)
+inline bool GetFirst(const T& list, float delta, int& begin, int& next, float& scale)
 {
-	float a = delta * tickSpeed;
-	float frametime = a - floor(a / duration) * duration;
 	begin = 0;
 	for (int i = (int)list.size() - 1; i >= 0; i--) {
-		if (frametime >= list[i].first) {
+		if (delta >= list[i].first) {
 			begin = i;
 			break;
 		}
@@ -34,7 +34,7 @@ inline bool GetFirst(const T& list, float duration, int tickSpeed, float delta, 
 	next = begin;
 	if (next + 1 < list.size()) ++next;
 	scale = GetScaleFactor(list[begin].first,
-		list[next].first, frametime);
+		list[next].first, delta);
 
 	return true;
 }
@@ -47,7 +47,7 @@ Vector Animation::GetLocation(int bone, float delta) const
 	int begin = 0;
 	int next = 0;
 	float scaleFactor = 0.f;
-	GetFirst(frames, duration, tickSpeed, delta, begin, next, scaleFactor);
+	GetFirst(frames, delta, begin, next, scaleFactor);
 
 
 	Vector finalPosition = frames[begin].second * (1 - scaleFactor) + frames[next].second * scaleFactor;
@@ -63,7 +63,7 @@ Rotator Animation::GetRotation(int bone, float delta) const
 	int begin = 0;
 	int next = 0;
 	float scaleFactor = 0.f;
-	GetFirst(frames, duration, tickSpeed, delta, begin, next, scaleFactor);
+	GetFirst(frames, delta, begin, next, scaleFactor);
 
 	Rotator finalRotation = Rotator::Slerp(frames[begin].second, frames[next].second, scaleFactor).FastNormalize();
 
@@ -79,7 +79,7 @@ Vector Animation::GetScale(int bone, float delta) const
 	int begin = 0;
 	int next = 0;
 	float scaleFactor = 0.f;
-	GetFirst(frames, duration, tickSpeed, delta, begin, next, scaleFactor);
+	GetFirst(frames, delta, begin, next, scaleFactor);
 
 	Vector finalScale = frames[begin].second * (1 - scaleFactor) + frames[next].second * scaleFactor;
 
@@ -93,12 +93,17 @@ Transform Animation::GetTransform(int bone, float delta) const
 
 Transform Animation::GetTransformByPercentage(int bone, float percent) const
 {
-	return GetTransform(bone, GetDuration() * percent);
+	return GetTransform(bone, durationSeconds * percent);
 }
 
 float Animation::GetDuration() const
 {
-	return duration / tickSpeed;
+	return durationSeconds;
+}
+
+float Animation::GetSpeedFactor() const
+{
+	return speedFactor;
 }
 
 float Animation::GetPercentageFromDuration(float time) const

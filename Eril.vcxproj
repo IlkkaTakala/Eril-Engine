@@ -108,7 +108,8 @@
       <ImportLibrary>$(SolutionDir)/build/Debug/Eril.lib</ImportLibrary>
       <ProgramDataBaseFile>$(SolutionDir)/build/Debug/Eril.pdb</ProgramDataBaseFile>
       <SubSystem>Windows</SubSystem>
-      <ForceFileOutput>Enabled</ForceFileOutput>
+      <ForceFileOutput>
+      </ForceFileOutput>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>

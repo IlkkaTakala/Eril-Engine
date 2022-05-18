@@ -3,6 +3,8 @@
 #include <glm/gtx/quaternion.hpp>
 #include <SkeletalMesh.h>
 #include <Objects/SkeletalObject.h>
+#include "TestArea/TestPlayer.h"
+#include "Gameplay/GameState.h"
 
 AnimationController::AnimationController(SkeletalObject* owner) : owner(owner)
 {
@@ -14,6 +16,7 @@ AnimationController::AnimationController(SkeletalObject* owner) : owner(owner)
 void AnimationController::Tick(float delta)
 {
 	animtime += delta;
+	last_delta = delta;
 }
 
 void AnimationController::SetSkeleton(RenderMesh* s)
@@ -39,12 +42,12 @@ void AnimationController::UpdateBoneTransforms(float delta, RenderMesh* mesh)
 		}
 	}
 	else {
-		
+		if (boneTransforms.size() < mats.size()) boneTransforms.resize(mats.size());
+		EvaluateBones(boneTransforms);
 		for (int i = 1; i < mats.size(); i++) {
-			Transform temp = EvaluateBone(i);
-			Vector& loc = temp.Location;
-			Rotator& rot = temp.Rotation;
-			Vector& sca = temp.Scale;
+			Vector& loc = boneTransforms[i].Location;
+			Rotator& rot = boneTransforms[i].Rotation;
+			Vector& sca = boneTransforms[i].Scale;
 
 			mats[i] = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Y, loc.Z))
 				* glm::toMat4(glm::quat(rot.W, rot.X, rot.Y, rot.Z))
@@ -55,44 +58,45 @@ void AnimationController::UpdateBoneTransforms(float delta, RenderMesh* mesh)
 	m->UpdateBoneMatrices();
 }
 
-AnimationStateMachine::AnimationStateMachine(const std::unordered_map<String, AnimationCombiner*>& combiners, const std::multimap<String, std::pair<String, PathFunc>>& paths)
-{
-
-	std::unordered_map<String, int> ids;
-	int begin = 0;
-	for (auto& [name, com] : combiners) {
-		Coms.push_back(com);
-		ids.emplace(name, begin++);
-	}
-	for (auto& [name, pair] : paths) {
-		const String& from = name;
-		const String& to = pair.first;
-
-		if (auto it = ids.find(from); it != ids.end()) {
-			if (auto path = ids.find(to); path != ids.end()) {
-				Paths.emplace(it->second, std::pair<int, PathFunc>{ path->second, pair.second });
-			}
-		}
-	}
-
-	currentState = 0;
-}
-
-AnimationCombiner* AnimationStateMachine::Evaluate()
-{
-	auto it = Paths.equal_range(currentState);
-	while (it.first != it.second) {
-		if (it.first->second.second()) {
-			currentState = it.first->second.first;
-			return Coms[currentState];
-		}
-		it.first++;
-	}
-	return Coms[currentState];
-}
-
 void TestAnimControl::BeginPlay()
 {
-	blender.anims.emplace_back(0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Walking", owner->GetModel()));
-	blender.anims.emplace_back(1.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Running", owner->GetModel()));
+	blender.anims.emplace_back(0.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Walking", owner->GetModel()));
+	blender.anims.emplace_back(1.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Running", owner->GetModel()));
+
+	dance.anim = AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Breakdance", owner->GetModel());
+	walk = 0.f;
+
+	states.AddState("Walk", [&](float delta, BoneArray arr) {
+		blender.Evaluate(delta, arr, walk, 0.f);
+	});
+	states.AddState("Dance", [&](float delta, BoneArray arr) {
+		dance.MakeTransforms(arr);
+	});
+	auto mesh = dynamic_cast<RenderMeshSkeletalGL*>(owner->GetModel());
+	
+	perBone.Init([&](float delta, BoneArray base) {
+		blender.Evaluate(delta, base, walk, 0.f);
+	}, [&](float delta, BoneArray blend) {
+		dance.MakeTransforms(blend);
+	}, mesh->GetSkeleton(), "mixamorig:Spine");
+
+	//states.AddPaths("Walk", { {"Dance", [&]()->bool {return walk <= 0.f; }, 0.5f} });
+	//states.AddPaths("Dance", {{"Walk", [&]()->bool {return walk > 0.f; }, 0.5f}});
+}
+
+void TestAnimControl::Tick(float delta)
+{
+	AnimationController::Tick(delta);
+
+	auto player = dynamic_cast<TestPlayer*>(GetGameState()->CurrentPlayer.GetPointer());
+	if (player) {
+		walk = player->GetWalk();
+	}
+}
+
+void TestAnimControl::EvaluateBones(BoneArray bones)
+{
+	dance.Update(last_delta, dance.anim->GetSpeedFactor());
+	perBone.Evaluate(last_delta, bones);
+	//states.Evaluate(last_delta, bones);
 }

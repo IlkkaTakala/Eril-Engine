@@ -197,8 +197,8 @@ SkeletalMeshDataHolder::~SkeletalMeshDataHolder()
 
 void SkeletalMeshDataHolder::CreateState()
 {
-	VertexCount = temp_vertices.size();
-	IndexCount = temp_indices.size();
+	VertexCount = (uint32)temp_vertices.size();
+	IndexCount = (uint32)temp_indices.size();
 
 	glGenVertexArrays(1, &VAO);
 
