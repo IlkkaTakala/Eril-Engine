@@ -10,6 +10,7 @@ AnimationController::AnimationController(SkeletalObject* owner) : owner(owner)
 {
 	temp_anim = nullptr;
 	animtime = 0.f;
+	animoverride = false;
 }
 
 void AnimationController::Tick(float delta)
