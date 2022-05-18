@@ -104,8 +104,9 @@ void ParticleSystem::Update(float delta)
 		Transforms[t_idx].Scale = p.scale;
 		Transforms[t_idx].Location = p.location;
 		if (FaceCamera) {
-			Vector camDir = (RI->GetActiveCamera()->GetLocation() - p.location).Normalize();
-			Transforms[t_idx].Rotation = Rotator::LookAt(p.location, RI->GetActiveCamera()->GetLocation(), camDir, RI->GetActiveCamera()->GetUpVector());
+			Camera* c = IRender::GetActiveCamera();
+			Vector camDir = (c->GetLocation() - p.location).Normalize();
+			Transforms[t_idx].Rotation = Rotator::LookAt(p.location, c->GetLocation(), Transforms[t_idx].Rotation.GetForwardVector(), c->GetUpVector());
 			//Transforms[t_idx].Rotation.W = p.rotation.W;
 		}
 		else Transforms[t_idx].Rotation = p.rotation;

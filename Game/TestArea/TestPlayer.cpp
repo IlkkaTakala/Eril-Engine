@@ -131,7 +131,7 @@ TestPlayer::TestPlayer() : Player()
 	BoxCol->SetSize(BoxModel->GetModel()->GetAABB());*/
 	
 
-	/*Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
+	//Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
 
 	auto skel = SpawnObject<SkeletalObject>();
 	skel->SetModel("Assets/Skeletal/Alien");
@@ -145,7 +145,7 @@ TestPlayer::TestPlayer() : Player()
 	//skel->SetParent(this);
 
 	//animC->SetOverrideAnimation(AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Breakdance", skel->GetModel()));
-	//skel->SetScale(Vector(0.01f));
+	skel->SetScale(Vector(0.01f));
 
 	auto Particle = SpawnObject<ParticleComponent>();
 	Particle->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
@@ -159,9 +159,9 @@ TestPlayer::TestPlayer() : Player()
 	smoke->SetSystem(ParticleSystem::MakeSystem<SmokeParticle>());
 	smoke->SetLocation(Vector(71.f, -40.f, 11.f));
 
-	/*auto part = SpawnObject<ParticleComponent>();
+	auto part = SpawnObject<ParticleComponent>();
 	part->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
-	part->SetLocation({10.f, 5.f, 0.5f});*/
+	part->SetLocation({10.f, 5.f, 0.5f});
 
 }
 
