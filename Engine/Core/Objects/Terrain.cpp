@@ -300,7 +300,7 @@ void Terrain::InitTerrain(int r, Vector scale, String material)
 		}
 	}
 	Mesh->SetModel(MI->CreateProcedural(Mesh, "Terrain_" + std::to_string(GetRecord()), pos, uvs, normals, tangents, inds));
-	Mesh->GetModel()->SetMaterial(0, RI->LoadMaterialByName(material == "" ? "Assets/Materials/ground" : material));
+	if (Mesh->GetModel()) Mesh->GetModel()->SetMaterial(0, IRender::LoadMaterialByName(material == "" ? "Assets/Materials/ground" : material));
 
 	btHeightfieldTerrainShape* heightFieldShape = new btHeightfieldTerrainShape(r + 1, r + 1, m_rawHeightfieldData, 1, -128, 128, 1, PHY_FLOAT, false);
 	btTransform tr;

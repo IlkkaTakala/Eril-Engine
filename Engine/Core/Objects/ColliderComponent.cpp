@@ -101,6 +101,7 @@ void ColliderComponent::OnDestroyed()
 
 void ColliderComponent::LoadWithParameters(const String& args)
 {
+	SceneComponent::LoadWithParameters(args);
 	Physics::AddCollider(this);
 }
 

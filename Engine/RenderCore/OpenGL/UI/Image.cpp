@@ -123,7 +123,7 @@ void Image::LoadWithParameters(const std::map<String, String>& args)
 		case 8: s.Tint.Z = (float)atof(dats[7].c_str());
 		case 7: s.Tint.Y = (float)atof(dats[6].c_str());
 		case 6: s.Tint.X = (float)atof(dats[5].c_str());
-		case 5: s.texture = RI->LoadTextureByName(dats[4]);
+		case 5: s.texture = IRender::LoadTextureByName(dats[4]);
 		case 4: s.Opacity = (float)atof(dats[3].c_str());
 		case 3: s.Color.Z = (float)atof(dats[2].c_str());
 		case 2: s.Color.Y = (float)atof(dats[1].c_str());

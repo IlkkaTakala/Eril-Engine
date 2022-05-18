@@ -1,5 +1,7 @@
 #pragma once
 #include <list>
+#include <RenderCore/RenderCommands.h>
+#include <Basic/QueueSafe.h>
 
 class Shader;
 class Texture;
@@ -19,32 +21,33 @@ struct GLFWwindow;
 
 struct Globals;
 
-class Renderer : public IRender
+class Renderer
 {
 public:
 	Renderer();
 	virtual ~Renderer();
 
-	virtual int SetupWindow(int width, int height) override;
-	virtual void CleanRenderer() override;
+	int SetupWindow(int width, int height);
+	void CleanRenderer();
 
-	virtual Camera* CreateCamera(SceneComponent* parent = nullptr) override;
-	virtual void SetActiveCamera(Camera*) override;
-	virtual Camera* GetActiveCamera() const override;
+	Camera* CreateCamera(SceneComponent* parent = nullptr);
+	void SetActiveCamera(Camera*);
+	Camera* GetActiveCamera() const;
 	
 	void UpdateLights();
 
-	virtual void LoadShaders() override;
-	virtual Material* GetMaterialByName(String name) const override;
-	virtual Material* LoadMaterialByName(String name) override;
-	virtual Texture* LoadTextureByName(String name) override;
+	void LoadShaders();
+	Material* GetMaterialByName(const String& name) const;
+	Material* LoadMaterialByName(const String& name);
 
-	virtual void Update() override;
-	virtual void Render(float delta) override;
-	virtual void GameStart() override;
-	virtual void DestroyWindow() override;
+	static void Update(SafeQueue<RenderCommand>* commands, Renderer* RC);
+	void Render(float delta);
+	void GameStart();
+	void DestroyWindow();
 
-	virtual UISpace* GetUIManager(int screen = 0) const override { return UIHolder; }
+	virtual UISpace* GetUIManager(int screen = 0) const { return UIHolder; }
+
+	virtual uint GetMainWindowHandle() const;
 
 private:
 	friend class GLInput;
@@ -57,13 +60,14 @@ private:
 	void Forward(int width, int height);
 	void PreDepth(int width, int height);
 	void LightCulling(int width, int height);
-	void UpdateTransforms();
+	void UpdateTransforms(float delta);
 	inline bool CullCheck(Section* s);
 
 	std::map<String, Shader*> Shaders;
 	std::map<String, Material*> BaseMaterials;
-	std::map<String, Texture*> LoadedTextures;
 	//std::vector<const LightData*> Lights;
+
+	bool ready;
 
 	Shader* LightCullingShader;
 	Shader* PreDepthShader;
@@ -109,22 +113,4 @@ private:
 	bool fpsCounter;
 
 	std::vector<LightComponent>* Lights;
-};
-
-class GLMesh : public IMesh
-{
-public:
-	GLMesh();
-	virtual ~GLMesh();
-	virtual	RenderMesh* LoadData(SceneComponent* parent, String name) override;
-	virtual RenderMesh* CreateProcedural(SceneComponent* parent, String name, std::vector<Vector>& positions, std::vector<Vector> UV, std::vector<Vector>& normal, std::vector<Vector>& tangent, std::vector<uint32>& indices) override;
-	virtual void StartLoading() override;
-
-	virtual void MarkUnused() override;
-	virtual void ClearUnused() override;
-
-private:
-	//std::map<std::string, std::ifstream*> ModelStreams;
-	std::map<String, String> ModelStreams;
-	String ActiveDir;
 };

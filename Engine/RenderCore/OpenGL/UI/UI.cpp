@@ -25,7 +25,7 @@ void UI::AddToScreen(UI* component, Player* Owner, int screen)
 
 	component->Owner = Owner;
 
-	UISpace* manager = RI->GetUIManager();
+	UISpace* manager = IRender::GetUIManager();
 
 	manager->AddComponent(component);
 
@@ -36,12 +36,12 @@ void UI::AddToScreen(UI* component, Player* Owner, int screen)
 
 void UI::RemoveAllUI()
 {
-	UISpace* manager = RI->GetUIManager();
+	UISpace* manager = IRender::GetUIManager();
 }
 
 void UI::RemoveFromScreen(int screen)
 {
-	UISpace* manager = RI->GetUIManager();
+	UISpace* manager = IRender::GetUIManager();
 	manager->RemoveComponent(this);
 }
 

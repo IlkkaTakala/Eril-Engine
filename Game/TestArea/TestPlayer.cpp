@@ -14,6 +14,8 @@
 #include "Objects/CollisionShape.h"
 #include <Objects/ParticleComponent.h>
 #include "CloudParticle.h"
+#include <Objects/SkeletalObject.h>
+#include <Interface/AssetManager.h>
 
 //ECS
 #include <Interface/IECS.h>
@@ -54,22 +56,25 @@ void TestPlayer::RegisterInputs(InputComponent* com)
 	com->RegisterKeyInput(257, &TestPlayer::OpenConsole, this);
 	com->RegisterMouseInput(0, &TestPlayer::MouseMoved, this);
 	com->RegisterKeyInput(69, &TestPlayer::UseCursor, this);
+	com->RegisterKeyInput(1, &TestPlayer::RightMouseDown, this);
 }
 
 TestPlayer::TestPlayer() : Player()
 {
 
 	mouseSens = 0.5f;
-	Speed = 5.f;
+	Speed = 12.f;
 	InputMode = true;
 	cursorState = true;
 	spawnCounter = 0;
+	Changing = false;
+	walk = 0.f;
 	
 	Rotation = Rotator(0.f);
 
 	//Player Model
 	Mesh = SpawnObject<VisibleObject>();
-	Mesh->SetModel("Cube");
+	Mesh->SetModel("Assets/Meshes/Cube");
 	Mesh->GetModel()->SetAABB(AABB(Vector(-1.f, -1.f, 0.f), Vector(1.f, 1.f, 2.f)));
 	SetLocation(Vector(15, 15, 1));
 
@@ -93,17 +98,13 @@ TestPlayer::TestPlayer() : Player()
 
 	//Skybox
 	Sky = SpawnObject<VisibleObject>();
-	Sky->SetModel(MI->LoadData(Sky, "SkySphere"));
-	Sky->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/Sky"));
-	Sky->SetScale(Sky->GetScale() * 2.0f);
-
-	//Testing UI
-	/*auto ui = UI::LoadFromFile("Game/TestArea/testingui2.ui");
-	UI::AddToScreen(ui, this);*/
+	Sky->SetModel("Assets/Meshes/SkySphere");
+	Sky->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/Sky"));
+	Sky->SetScale(Sky->GetScale() * 4.0f);
 
 	pause = nullptr;
 
-	Plane = SpawnObject<VisibleObject>();
+	/*Plane = SpawnObject<VisibleObject>();
 	Plane->SetModel("Cube");
 	Plane->GetModel()->SetAABB(AABB(Vector(-20.f, -20.f, -0.5f), Vector(20.f, 20.f, 0.5f)));
 	Plane->SetScale(Vector(20.f, 20.f, 0.5f));
@@ -112,13 +113,13 @@ TestPlayer::TestPlayer() : Player()
 	PlaneCol = SpawnObject<BoxCollisionShape>();
 	PlaneCol->SetType(0);
 	PlaneCol->SetSize(Plane->GetModel()->GetAABB());
-	Plane->AddComponent(PlaneCol);
+	Plane->AddComponent(PlaneCol);*/
 
 	Box = SpawnObject<Actor>();
 
 	//Moment Model -> ColliderModel
-	BoxModel = SpawnObject<VisibleObject>();
-	BoxModel->SetModel("Cube");
+	/*BoxModel = SpawnObject<VisibleObject>();
+	BoxModel->SetModel("Assets/Meshes/Cube");
 	BoxModel->GetModel()->SetAABB(AABB(Vector(-1.0f), Vector(1.0f)));
 
 	Box->AddComponent(BoxModel);
@@ -127,45 +128,40 @@ TestPlayer::TestPlayer() : Player()
 	BoxCol = SpawnObject<BoxCollisionShape>();
 	Box->AddComponent(BoxCol);
 	BoxCol->SetType(0);
-	BoxCol->SetSize(BoxModel->GetModel()->GetAABB());
+	BoxCol->SetSize(BoxModel->GetModel()->GetAABB());*/
 	
-	/*BoxModelMove = SpawnObject<MovementComponent>();
-	BoxModelMove->SetTarget(Box, BoxModel->GetModel()->GetAABB());
-	BoxModelMove->SetGravity(true);*/
-	//BoxModelMove->SetPhysics(true);
-	//BoxCol->SetTarget(Box);
 
-	Box2 = SpawnObject<Actor>();
+	/*Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
 
-	BoxModel2 = SpawnObject<VisibleObject>();
-	BoxModel2->SetModel("cylinder");
-	//BoxModel2->SetRotation(Vector(0.f, 0.f, -90.f));
-	//BoxModel2->SetScale(0.5f);
-	//BoxModel2->GetModel()->SetAABB(AABB(Vector(-1.0f), Vector(1.0f)));
+	auto skel = SpawnObject<SkeletalObject>();
+	skel->SetModel("Assets/Skeletal/Alien");
+	skel->GetModel()->SetMaterial(1, IRender::LoadMaterialByName("Assets/Materials/alien_upper"));
+	skel->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/alien_lower"));
+	skel->SetLocation({5.f, 5.f, -0.5f});
+	auto animC = SpawnObject<TestAnimControl>(skel);
+	animC->BeginPlay();
+	animC->SetSkeleton(skel->GetModel());
+	skel->SetAnimController(animC);
+	//skel->SetParent(this);
 
-	Box2->AddComponent(BoxModel2);
-	Box2->SetLocation(Vector(10.f, 10.f, 6.f));
-	Box2->SetRotation(Vector(90.f, 0.f, 0.f));
+	//animC->SetOverrideAnimation(AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Breakdance", skel->GetModel()));
+	//skel->SetScale(Vector(0.01f));
 
-	BoxCol2 = SpawnObject<CylinderCollisionShape>();
-	BoxCol2->SetType(1);
-	Box2->AddComponent(BoxCol2);
-	BoxCol2->SetSize(BoxModel2->GetModel()->GetAABB());
-	//BoxCol2->SetLocation(Vector(0.f, 0.f, 0.f));
-	//BoxCol2->SetRotation(Vector(0.f, 90.f, 0.f));
+	auto Particle = SpawnObject<ParticleComponent>();
+	Particle->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
+	Particle->SetLocation(Vector(-116.f, -104.f, 44.f));
+	
+	auto Particle2 = SpawnObject<ParticleComponent>();
+	Particle2->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
+	Particle2->SetLocation(Vector(-60.f, -94.f, 44.f));
 
+	auto smoke = SpawnObject<ParticleComponent>();
+	smoke->SetSystem(ParticleSystem::MakeSystem<SmokeParticle>());
+	smoke->SetLocation(Vector(71.f, -40.f, 11.f));
 
-	//BoxModelMove = SpawnObject<MovementComponent>();
-	//BoxModelMove->SetTarget(Box2, BoxModel2->GetModel()->GetAABB());
-	//BoxModelMove->SetGravity(true);
-	////BoxModelMove->SetPhysics(true);
-	//BoxCol2->SetTarget(BoxModelMove);
-
-	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
-
-	auto part = SpawnObject<ParticleComponent>();
+	/*auto part = SpawnObject<ParticleComponent>();
 	part->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
-	part->SetLocation({10.f, 5.f, 0.5f});
+	part->SetLocation({10.f, 5.f, 0.5f});*/
 
 }
 
@@ -260,12 +256,12 @@ void TestPlayer::LeftMouseDown(bool)
 
 void TestPlayer::RightMouseDown(bool KeyDown)
 {
-
+	Changing = KeyDown;
 }
 
 void TestPlayer::MouseMoved(float X, float Y)
 {
-	if (cursorState) {
+	if (cursorState && !Changing) {
 		Camera* cam = GetCamera();
 		Rotator rot = cam->GetRotation();
 		float y = rot.PitchDegrees();
@@ -274,6 +270,9 @@ void TestPlayer::MouseMoved(float X, float Y)
 			y + Y * mouseSens < 89.f && y + Y * mouseSens > -89.f ? y + Y * mouseSens : y,
 			rot.YawDegrees() + X * mouseSens
 		));
+	}
+	if (Changing) {
+		walk += X * 0.001f;
 	}
 }
 
@@ -311,15 +310,15 @@ void TestPlayer::Tick(float deltaTime)
 	GetCamera()->SetLocation(Location + Vector(0.f, 0.f, 1.5f));
 	Sky->SetLocation(Location);
 	
-	Vector listenerPos = Location;
+	/*Vector listenerPos = Location;
 	Vector listenerOrientation = GetCamera()->GetForwardVector();
-	AudioManager::SetListener(listenerPos, GetCamera()->GetForwardVector(), GetCamera()->GetUpVector());
+	AudioManager::SetListener(listenerPos, GetCamera()->GetForwardVector(), GetCamera()->GetUpVector());*/
 }
 
 void TestPlayer::BeginPlay()
 {
 
-	Terrain* terrain = ObjectManager::GetByRecord<Terrain>(0xA0005554);
+	//Terrain* terrain = ObjectManager::GetByRecord<Terrain>(0xA0005554);
 
 	
 	//ECS
@@ -331,7 +330,7 @@ void TestPlayer::BeginPlay()
 	//AudioControllerSystem* audioControllerSystem = static_cast<AudioControllerSystem*>(systemsManager->GetSystemByName("AudioControllerSystem"));
 	//audioComponentID = audio->GetID();
 
-	Vector audioPos = Vector(20.0f, 20.0f, terrain->GetHeight(20.0f, 20.0f) + 1.5f);
+	Vector audioPos = Vector(20.0f, 20.0f, 1.5f);
 	audio->SetSourceID(AudioManager::LoadAudio("clicketi.WAV"));
 	audio->SetPosition(audioPos);
 	Mesh->SetLocation(audioPos);
@@ -347,27 +346,27 @@ void TestPlayer::BeginPlay()
 	if (lightSystem != nullptr)
 	{
 		LightComponent* DirLight = lightSystem->AddComponentToSystem();
-		DirLight->Location = Vector(0.f, 0.f, 1.f);
+		DirLight->Location = Vector(0.f, 0.f, 0.f);
 		DirLight->LightType = LIGHT_DIRECTIONAL;
 		DirLight->Size = 3.f;
-		DirLight->Intensity = 1.f;
+		DirLight->Intensity = 2.f;
 		DirLight->Color = Vector(1.f);
-		DirLight->Rotation = Vector(0.5, 0.5, -0.5);
+		DirLight->Rotation = Vector(0.5, -0.5, 1.0).Normalize();
 
-		for (int i = 0; i < 50; i++)
-		{
-			//Console::Log("Light addded " + std::to_string(i));
-			float x = (float)(rand() % 100);
-			float y = (float)(rand() % 100);
-			//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
+		//for (int i = 0; i < 50; i++)
+		//{
+		//	//Console::Log("Light addded " + std::to_string(i));
+		//	float x = (float)(rand() % 100);
+		//	float y = (float)(rand() % 100);
+		//	//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
 
-			LightComponent* light = lightSystem->AddComponentToSystem();
-			light->Location = Vector(x, y, terrain->GetHeight(x, y));
-			light->LightType = LIGHT_POINT;
-			light->Size = 5.f;
-			light->Intensity = rand() / (float)RAND_MAX * 20.f;
-			light->Color = Vector(x, y, 2.5f);
-		}
+		//	LightComponent* light = lightSystem->AddComponentToSystem();
+		//	light->Location = Vector(x, y, 2.f);
+		//	light->LightType = LIGHT_POINT;
+		//	light->Size = 5.f;
+		//	light->Intensity = rand() / (float)RAND_MAX * 20.f;
+		//	light->Color = Vector(x, y, 2.5f);
+		//}
 	}
 	Console::Log("Hello beautiful world");
 }

@@ -28,7 +28,7 @@ void DiscoPlayer::OpenConsole(bool) {
 void DiscoPlayer::UseCursor(bool keydown)
 {
 	if (keydown && pause == nullptr) {
-		WindowManager::SetShowCursor(0, cursorState);
+		SetShowCursor(cursorState);
 		cursorState = !cursorState;
 	}
 }
@@ -170,13 +170,13 @@ void DiscoPlayer::InputExit(bool down)
 	if (pause == nullptr) {
 		pause = SpawnObject<PauseUI>();
 		UI::AddToScreen(pause, this);
-		WindowManager::SetShowCursor(0, true);
+		SetShowCursor(true);
 		cursorState = false;
 	}
 	else {
 		pause->DestroyObject();
 		pause = nullptr;
-		WindowManager::SetShowCursor(0, false);
+		SetShowCursor(false);
 		cursorState = true;
 	}
 	

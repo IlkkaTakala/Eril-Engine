@@ -1,6 +1,7 @@
 #include "Material.h"
 #include <glad/gl.h>
 #include "Core.h"
+#include <GameLoop.h>
 #include <Interface/WindowManager.h>
 #include "Renderer.h"
 #include "Camera.h"
@@ -8,7 +9,6 @@
 #include "Texture.h"
 #include "RenderBuffer.h"
 #include <Objects/VisibleObject.h>
-//#include "LightData.h" //Lights have been moved to be handled by the ECS-system.
 #include "Settings.h"
 #include <filesystem>
 #include <stdexcept>
@@ -16,15 +16,11 @@
 #include <random>
 #include "UI/UISpace.h"
 #include "UI/Panel.h"
+#include <condition_variable>
 
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/quaternion.hpp>
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
 
 #include <Interface/IECS.h>
 #include <Core/ECS/System.h>
@@ -102,6 +98,7 @@ Renderer::Renderer()
 	WorkGroupsY = 0;
 	fpsCounter = 0;
 
+	ready = false;
 }
 
 Renderer::~Renderer()
@@ -112,10 +109,6 @@ Renderer::~Renderer()
 
 	for (auto const& s : Shaders) {
 		delete s.second;
-	}
-
-	for (auto const& t : LoadedTextures) {
-		delete t.second;
 	}
 
 	delete DepthBuffer;
@@ -368,6 +361,8 @@ int Renderer::SetupWindow(int width, int height)
 
 
 	Lights = static_cast<IComponentArrayQuerySystem<LightComponent>*>(IECS::GetSystemsManager()->GetSystemByName("LightControllerSystem"))->GetComponentVector();
+
+	ready = true;
 
 	return 0;
 }
@@ -673,7 +668,7 @@ void Renderer::LoadShaders()
 	}
 }
 
-Material* Renderer::GetMaterialByName(String name) const
+Material* Renderer::GetMaterialByName(const String& name) const
 {
 	if (BaseMaterials.find(name) != BaseMaterials.end()) {
 		return BaseMaterials.find(name)->second;
@@ -683,7 +678,7 @@ Material* Renderer::GetMaterialByName(String name) const
 	}
 }
 
-Material* Renderer::LoadMaterialByName(String name)
+Material* Renderer::LoadMaterialByName(const String& name)
 {
 	if (Shaders.size() < 1) return nullptr;
 	if (BaseMaterials.find(name) != BaseMaterials.end()) {
@@ -698,7 +693,7 @@ Material* Renderer::LoadMaterialByName(String name)
 				Material* nMat = new Material(Shaders[shaderName]);
 				auto const& textures = params.GetSection("Textures");
 				for (auto& [name, tex] : textures) {
-					nMat->Textures.emplace(name, LoadTextureByName(tex));
+					nMat->Textures.emplace(name, IRender::LoadTextureByName(tex));
 				}
 				auto const& scalars = params.GetSection("Scalars");
 				for (auto const& [name, sca] : scalars) {
@@ -717,45 +712,75 @@ Material* Renderer::LoadMaterialByName(String name)
 	}
 }
 
-Texture* Renderer::LoadTextureByName(String name)
+void Renderer::Update(SafeQueue<RenderCommand>* commands, Renderer* RC)
 {
-	if (name == "") return nullptr;
-	if (LoadedTextures.find(name) != LoadedTextures.end()) {
-		return LoadedTextures.find(name)->second;
-	}
-	else {
-		Texture* next = nullptr;
-		int width, height, nrChannels;
-		if (stbi_is_hdr(name.c_str())) {
-			float* data = stbi_loadf(name.c_str(), &width, &height, &nrChannels, 0);
-			if (data == nullptr) return nullptr;
-			next = new Texture(width, height, nrChannels, data);
-			stbi_image_free(data);
-		}
-		else
-		{
-			uint8* data = stbi_load(name.c_str(), &width, &height, &nrChannels, 0);
-			if (data == nullptr) return nullptr;
-			int type = 0;
-			if (name.rbegin()[4] == 'd' || name.rbegin()[5] == 'd') type = 0;
-			else if (name.rbegin()[4] == 'n' || name.rbegin()[5] == 'n') type = 1;
-			next = new Texture(width, height, nrChannels, data, type);
-			stbi_image_free(data);
-		}
-		next->SetName(name);
-		LoadedTextures.emplace(name, next);
-		Console::Log("Texture loaded: " + name);
-		return next;
-	}
-}
+	if (RC->Window != 0 && WindowManager::GetShouldWindowClose(RC->Window)) Exit();
 
-void Renderer::Update()
-{
-	if (WindowManager::GetShouldWindowClose(Window)) Exit();
+	while (!commands->isEmpty()) {
+		auto c = commands->dequeue();
+
+		switch (c.command)
+		{
+		case RC_SETUP:
+			RC->SetupWindow((int)c.param1, (int)c.param2);
+			break;
+
+		case RC_RECALCULATE:
+			RC->UpdateTransforms(0.016f);
+			break;
+
+		case RC_RELIGHTS:
+			if (RC->Lights->size() != 0) RC->UpdateLights();
+			break;
+
+		case RC_LOADSHADERS:
+			RC->LoadShaders();
+			break;
+
+		case RC_DESTROY:
+			RC->CleanRenderer();
+			break;
+
+		case RC_ACTIVECAMERA:
+			RC->ActiveCamera = dynamic_cast<GLCamera*>((Camera*)c.param1);
+			break;
+
+		case RC_SHOWCURSOR:
+			WindowManager::SetShowCursor((uint)c.param2, c.param1);
+			break;
+
+		case RC_GAMESTART:
+			RC->GameStart();
+			break;
+
+		case RC_REFRESH:
+			WindowManager::PollEvents();
+			break;
+
+		case RC_MAKEOBJECT: {
+			auto obj = (OpenGLObject*)c.param1;
+			obj->CreateState();
+		} break;
+
+		case RC_DELETEOBJECT: {
+			auto obj = (OpenGLObject*)c.param1;
+			obj->Clear();
+		} break;
+
+		case RC_MAKEINSTANCE: {
+			auto mesh = (RenderMeshStaticGL*)c.param1;
+			mesh->ApplyInstances();
+		} break;
+
+		default:
+			break;
+		}
+	}
 }
 
 void Renderer::EnvReflection(int width, int height)
 {
+	if (!ready) return;
 	glViewport(0, 0, EnvSizeX, EnvSizeY);
 	EnvironmentRender->Bind();
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -969,7 +994,7 @@ void Renderer::Forward(int width, int height)
 				if (param.second > 0) {
 					s->SetUniform(param.first, round);
 					glActiveTexture(GL_TEXTURE0 + round);
-					glBindTexture(GL_TEXTURE_2D, param.second->GetTextureID());
+					if (param.second->GetTextureID() != 0) glBindTexture(GL_TEXTURE_2D, param.second->GetTextureID());
 					round++;
 				}
 			}
@@ -1022,7 +1047,7 @@ void Renderer::Forward(int width, int height)
 				if (param.second > 0) {
 					s->SetUniform(param.first, round);
 					glActiveTexture(GL_TEXTURE0 + round);
-					glBindTexture(GL_TEXTURE_2D, param.second->GetTextureID());
+					if (param.second->GetTextureID() != 0) glBindTexture(GL_TEXTURE_2D, param.second->GetTextureID());
 					round++;
 				}
 			}
@@ -1084,7 +1109,7 @@ void Renderer::Forward(int width, int height)
 				if (param.second > 0) {
 					s->SetUniform(param.first, round);
 					glActiveTexture(GL_TEXTURE0 + round);
-					glBindTexture(GL_TEXTURE_2D, param.second->GetTextureID());
+					if (param.second->GetTextureID() != 0) glBindTexture(GL_TEXTURE_2D, param.second->GetTextureID());
 					round++;
 				}
 			}
@@ -1150,7 +1175,17 @@ void Renderer::LightCulling(int width, int height)
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
 
-void Renderer::UpdateTransforms() {
+void Renderer::UpdateTransforms(float delta) {
+	for (auto const& [name, s] : Shaders)
+	{
+		for (Material* m : s->GetUsers())
+		{
+			for (Section* o : m->GetObjects())
+			{
+				if (o->Parent) o->Parent->SetRequireUpdate();
+			}
+		}
+	}
 	for (auto const& [name, s] : Shaders)
 	{
 		if (s->FaceCulling == 1) glDisable(GL_CULL_FACE);
@@ -1160,7 +1195,7 @@ void Renderer::UpdateTransforms() {
 		{
 			for (Section* o : m->GetObjects())
 			{
-				o->Parent->ApplyTransform();
+				if (o->Parent) o->Parent->ApplyTransform(delta);
 			}
 		}
 	}
@@ -1172,18 +1207,19 @@ inline bool Renderer::CullCheck(Section* s)
 	Vector direction = ActiveCamera->GetForwardVector();
 	Vector location = ActiveCamera->GetLocation();
 	glm::vec3 pos = mm[3];
-	Vector aabb = s->Parent->GetAABB().maxs - s->Parent->GetAABB().mins;
+	Vector aabb = ((RenderMesh*)s->Parent)->GetAABB().maxs - ((RenderMesh*)s->Parent)->GetAABB().mins;
 	glm::vec3 rad = glm::vec3(aabb.X, aabb.Y, aabb.Z) * glm::mat3(mm);
-	float radii = glm::max(rad.x, glm::max(rad.y, rad.z));
+	float radius = glm::max(rad.x, glm::max(rad.y, rad.z));
 	glm::vec3 loc = glm::vec3(location.X, location.Y, location.Z);
 	glm::vec3 dir = glm::vec3(direction.X, direction.Y, direction.Z);
-	glm::vec3 d = loc - pos;
+	glm::vec3 d = pos - loc;
 	if (glm::length(d) > s->RenderDistance) {
 		return true;
 	}
-	else if (glm::length(d) > 2.f && glm::length(d) > radii)
+	else if (glm::length(d) > 2.f && glm::length(d) > radius)
 	{
-		if (glm::dot(dir, glm::normalize(pos - loc)) < 0.55f) // TODO: Calculate from FOV
+		glm::vec3 newPosition = glm::normalize(-d + dir * glm::length(d)) * radius;
+		if (glm::dot(dir, glm::normalize(d + newPosition)) < 0.75f) // TODO: Calculate from FOV
 		{
 			return true;
 		}
@@ -1199,7 +1235,6 @@ void Renderer::Render(float delta)
 	int width = size.X;
 	int height = size.Y;
 
-	UpdateTransforms();
 
 	GlobalVariables.Projection = ActiveCamera->GetProjectionMatrix();
 	GlobalVariables.View = glm::inverse(ActiveCamera->GetViewMatrix());
@@ -1213,12 +1248,13 @@ void Renderer::Render(float delta)
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, GlobalUniforms);
 
+	UpdateTransforms(delta);
 
-	if (Lights->size() != 0) UpdateLights();
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, LightBuffer);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, VisibleLightIndicesBuffer);
 
 	//EnvReflection(width, height);
+	UpdateLights();
 
 	glViewport(0, 0, width, height);
 	glEnable(GL_DEPTH_TEST);
@@ -1258,7 +1294,17 @@ void Renderer::Render(float delta)
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	ActiveCamera->GetPostProcess()->Bind();
+	Material* post = ActiveCamera->GetPostProcess();
+	if (post) {
+		post->Shade->Bind();
+		for (auto const& param : post->GetVectorParameters()) {
+			post->Shade->SetUniform(param.first, param.second);
+		}
+
+		for (auto const& param : post->GetScalarParameters()) {
+			post->Shade->SetUniform(param.first, param.second);
+		}
+	}
 
 	glDepthFunc(GL_ALWAYS);
 	glBindVertexArray(ScreenVao);
@@ -1288,194 +1334,7 @@ void Renderer::DestroyWindow()
 	WindowManager::CloseWindow(Window);
 }
 
-GLMesh::GLMesh()
+uint Renderer::GetMainWindowHandle() const
 {
-	ActiveDir = "";
-}
-
-GLMesh::~GLMesh()
-{
-	for (auto const& i : LoadedMeshes) {
-		delete i.second;
-	}
-	ModelStreams.clear();
-}
-
-void processMesh(LoadedMesh* meshHolder, aiMesh* mesh)
-{
-	std::vector<Vertex> vertices;
-	std::vector<uint32> indices;
-	float radius = 0.f;
-	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
-	{
-		Vertex vertex;
-		vertex.position.x = mesh->mVertices[i].x;
-		vertex.position.y = mesh->mVertices[i].y;
-		vertex.position.z = mesh->mVertices[i].z;
-		if (radius < mesh->mVertices[i].x) radius = mesh->mVertices[i].x;
-
-		vertex.normal.x = mesh->mNormals[i].x;
-		vertex.normal.y = mesh->mNormals[i].y;
-		vertex.normal.z = mesh->mNormals[i].z;
-
-		vertex.tangent.x = mesh->mTangents[i].x;
-		vertex.tangent.y = mesh->mTangents[i].y;
-		vertex.tangent.z = mesh->mTangents[i].z;
-
-		if (mesh->HasTextureCoords(0))
-		{
-			vertex.uv.x = mesh->mTextureCoords[0][i].x;
-			vertex.uv.y = mesh->mTextureCoords[0][i].y;
-		}
-		else {
-			vertex.uv.x = 0;
-			vertex.uv.y = 0;
-		}
-
-		vertices.push_back(vertex);
-	}
-	//Now retrieve the corresponding vertex indices
-	for (unsigned int i = 0; i < mesh->mNumFaces; i++)
-	{
-		aiFace face = mesh->mFaces[i];
-		for (unsigned int j = 0; j < face.mNumIndices; j++)
-		{
-			indices.push_back(face.mIndices[j]);
-		}
-	}
-	std::vector<uint> adjacent;
-	MeshDataHolder* section = new MeshDataHolder(vertices.data(), (uint32)vertices.size(), indices.data(), (uint32)indices.size());
-	section->Radius = radius;
-
-	section->Instance = RI->LoadMaterialByName("Assets/Materials/default");
-
-	meshHolder->HolderCount++;
-	meshHolder->Holders.push_back(section);
-}
-
-void processNode(LoadedMesh* mesh, aiNode* node, const aiScene* scene)
-{
-	// process each mesh located at the current node
-	for (unsigned int i = 0; i < node->mNumMeshes; i++)
-	{
-		// the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
-		// the node object only contains indices to index the actual objects in the scene.
-		aiMesh* meshed = scene->mMeshes[node->mMeshes[i]];
-		processMesh(mesh, meshed);
-	}
-	// after we've processed all of the meshes (if any) we then recursively process each of the children nodes
-	for (unsigned int i = 0; i < node->mNumChildren; i++)
-	{
-		processNode(mesh, node->mChildren[i], scene);
-	}
-}
-
-LoadedMesh* loadMeshes(const std::string& path)
-{
-	LoadedMesh* mesh = new LoadedMesh();
-	//read file with Assimp
-	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals);
-	//Check for errors
-	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-	{
-		Console::Log("Error loading model file " + path + " : " + importer.GetErrorString());
-		delete mesh;
-		return nullptr;
-	}
-	// retrieve the directory path of the filepath
-	std::string dir = path.substr(0, path.find_last_of('/'));
-
-	processNode(mesh, scene->mRootNode, scene);
-
-	return mesh;
-}
-
-RenderMesh* GLMesh::LoadData(SceneComponent* parent, String name)
-{
-	auto result = LoadedMeshes.find(name);
-	if (result == LoadedMeshes.end()) {
-		auto r = ModelStreams.find(name);
-		if (r == ModelStreams.end()) return nullptr;
-
-		LoadedMesh* mesh = loadMeshes(r->second);
-		LoadedMeshes.emplace(name, mesh);
-
-		RenderObject* obj = new RenderObject(mesh);
-		obj->SetParent(parent);
-		return obj;
-	}
-	else 
-	{
-		RenderObject* obj = new RenderObject(result->second);
-		obj->SetParent(parent);
-		return obj;
-	}
-}
-
-RenderMesh* GLMesh::CreateProcedural(SceneComponent* parent, String name, std::vector<Vector>& positions, std::vector<Vector> UV, std::vector<Vector>& normal, std::vector<Vector>& tangent, std::vector<uint32>& indices)
-{
-	LoadedMesh* mesh = new LoadedMesh();
-
-	std::vector<Vertex> verts;
-	verts.resize(positions.size());
-
-	AABB bounds;
-	for (auto i = 0; i < positions.size(); i++) {
-		if		(bounds.mins.X > positions[i].X) bounds.mins.X = positions[i].X;
-		else if (bounds.maxs.X < positions[i].X) bounds.maxs.X = positions[i].X;
-		if		(bounds.mins.Y > positions[i].Y) bounds.mins.Y = positions[i].Y;
-		else if (bounds.maxs.Y < positions[i].Y) bounds.maxs.Y = positions[i].Y;
-		if		(bounds.mins.Z > positions[i].Z) bounds.mins.Z = positions[i].Z;
-		else if (bounds.maxs.Z < positions[i].Z) bounds.maxs.Z = positions[i].Z;
-
-		verts[i].position = glm::vec3(positions[i].X, positions[i].Y, positions[i].Z);
-		verts[i].uv = glm::vec3(UV[i].X, UV[i].Y, UV[i].Z);
-		verts[i].normal = glm::vec3(normal[i].X, normal[i].Y, normal[i].Z);
-		verts[i].tangent = glm::vec3(tangent[i].X, tangent[i].Y, tangent[i].Z);
-	}
-
-	MeshDataHolder* section = new MeshDataHolder(verts.data(), positions.size(), indices.data(), indices.size());
-
-	mesh->HolderCount++;
-	mesh->Holders.push_back(section);
-	section->Radius = bounds.maxs.Length();
-
-	LoadedMeshes.emplace(name, mesh);
-	RenderObject* obj = new RenderObject(mesh);
-	obj->SetParent(parent);
-	obj->SetAABB(bounds);
-	return obj;
-}
-
-void GLMesh::StartLoading()
-{
-	namespace fs = std::filesystem;
-	ActiveDir = INI->GetValue("Engine", "DataFolder") + "/Meshes";
-	for (const auto& f : fs::recursive_directory_iterator(ActiveDir)) {
-		if (f.path().extension() == ".obj") {
-			ModelStreams[f.path().filename().replace_extension("").string()] = f.path().string();
-		}
-	}
-}
-
-void GLMesh::MarkUnused()
-{
-	for (auto& m : LoadedMeshes) {
-		if (m.second->Users == 0)
-			m.second->Time++;
-	}
-}
-
-void GLMesh::ClearUnused()
-{
-	auto it = LoadedMeshes.begin();
-	while (it != LoadedMeshes.end() ) {
-		if (it->second->Time > 5) {
-			it = LoadedMeshes.erase(it);
-		}
-		else {
-			++it;
-		}
-	}
+	return Window;
 }

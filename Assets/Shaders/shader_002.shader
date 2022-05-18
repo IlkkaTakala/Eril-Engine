@@ -5,7 +5,8 @@ layout (location = 0) in vec3 in_position;
 layout (location = 1) in vec2 in_texCoord;
 layout (location = 2) in vec3 in_normal;
 layout (location = 3) in vec3 in_tangent;
-layout (location = 4) in mat4 in_disp;
+layout (location = 4) in vec3 in_color;
+layout (location = 5) in mat4 in_disp;
 
 layout (std140, binding = 0) uniform Globals
 {
@@ -22,14 +23,14 @@ out VS_OUT {
 	vec3 Normals;
 	vec3 BiTangents;
 	vec3 Tangents;
-	
+	vec3 Colors;
 } vs_out;
 
 uniform mat4 Model;
 
 void main()
 {
-	vec4 pos = Model * in_disp * vec4(in_position, 1.0);
+	vec4 pos = Model * vec4(in_position, 1.0);
 	gl_Position = projection * view * pos;
 	vs_out.FragPos = pos;
 	vs_out.TexCoords = in_texCoord;
@@ -45,155 +46,9 @@ void main()
 	
 	//vs_out.normal = normalize(mat3(Model * in_disp) * in_normal).xyz;
 
-	/*
-	//vec3 T = (Model * in_disp * vec4(in_tangent, 1.0f)).xyz;
-	//vec3 N = (Model * in_disp * vec4(in_normal, 1.0f)).xyz;
-	vec3 T = (Model * in_disp * vec4(in_tangent, 0.0f)).xyz;
-	vec3 N = (Model * in_disp * vec4(in_normal, 0.0f)).xyz;
-	T = normalize(T);
-	N = normalize(N);
-	
-	*/
+	vs_out.Colors = in_color;
 }
 ###END_VERTEX###
-
-###GEOMETRY###
-#version 430 core
-
-layout(triangles) in;
-
-// Three lines will be generated: 6 vertices
-layout(line_strip, max_vertices = 12) out;
-
-// Shader storage buffer objects
-layout(std140, binding = 0) uniform Globals
-{
-	mat4 projection;
-	mat4 view;
-	vec4 viewPos;
-	ivec2 screenSize;
-	int sceneLightCount;
-};
-
-//uniform float normal_length;
-//uniform mat4 gxl3d_ModelViewProjectionMatrix;
-
-
-in VS_OUT{
-	vec2 TexCoords;
-	vec4 FragPos;
-	vec3 Normals;
-	vec3 BiTangents;
-	vec3 Tangents;
-	
-} gs_in[];
-
-out GS_OUT
-{
-	vec2 TexCoords;
-	vec4 FragPos;
-	vec3 Normals;
-	vec3 BiTangents;
-	vec3 Tangents;
-} gs_out;
-
-
-void main()							 
-{			
-	
-
-	//Make Normal Triangle
-	float normal_length = 0.5;
-	int i;
-	for (i = 0; i < gs_in.length(); i++)
-	{
-		gs_out.TexCoords = gs_in[i].TexCoords;
-		gs_out.FragPos = gs_in[i].FragPos;
-		gs_out.Normals = gs_in[i].Normals;
-		gs_out.BiTangents = gs_in[i].BiTangents;
-		gs_out.Tangents = gs_in[i].Tangents;
-
-		
-	}	 
-
-	vec4 P = gl_in[0].gl_Position;
-	vec4 N = vec4(gs_in[0].Normals, 1.0);
-
-	//WireFrame
-	/*
-	P = gl_in[0].gl_Position;
-	gl_Position = P;
-	EmitVertex();
-
-	P = gl_in[1].gl_Position;
-	gl_Position = P;
-	EmitVertex();
-	EndPrimitive();
-
-	P = gl_in[1].gl_Position;
-	gl_Position = P;
-	EmitVertex();
-
-	P = gl_in[2].gl_Position;
-	gl_Position = P;
-	EmitVertex();
-	EndPrimitive();
-
-	P = gl_in[2].gl_Position;
-	gl_Position = P;
-	EmitVertex();
-
-	P = gl_in[0].gl_Position;
-	gl_Position = P;
-	EmitVertex();
-	EndPrimitive();
-	*/
-
-	//Normals
-	P = gl_in[0].gl_Position;
-	N = projection * view * vec4(gs_in[0].Normals, 0.0) * normal_length;
-	gl_Position = P;
-	EmitVertex();
-
-	gl_Position = P + N;
-	EmitVertex();
-	EndPrimitive();
-
-	//Tangents
-	P = gl_in[0].gl_Position;
-	vec4 T = projection * view * vec4(gs_in[0].Tangents, 0.0) * normal_length;
-	gl_Position = P;
-	EmitVertex();
-
-	gl_Position = P + T;
-	EmitVertex();
-	EndPrimitive();
-
-	//BiTangents
-	
-	P = gl_in[0].gl_Position;
-	vec4 B = projection * view * vec4(gs_in[0].BiTangents, 0.0) * normal_length;
-	gl_Position = P;
-	EmitVertex();
-
-	gl_Position = P + B;
-	EmitVertex();
-	EndPrimitive();
-	
-	
-
-
-	
-
-
-
-
-}
-
-
-
-###END_GEOMETRY###
-
 ###FRAGMENT###
 #version 430 core
 
@@ -239,7 +94,7 @@ in VS_OUT{
 	vec3 Normals;
 	vec3 BiTangents;
 	vec3 Tangents;
-	
+	vec3 Colors;
 } fs_in;
 
 uniform sampler2D Albedo;
@@ -441,7 +296,7 @@ void main()
 	//const float gamma = 2.2;
 	const float exposure = 1.0;
 	
-	ColorBuffer = color;
+	ColorBuffer = vec4(N, 1.0);
 	BloomBuffer = clamp(color - exposure, 0.0, 100.0);
 	NormalBuffer = vec4(N, 1.0);
 	PositionBuffer = vec4(fs_in.FragPos);

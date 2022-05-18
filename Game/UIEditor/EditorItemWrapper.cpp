@@ -9,7 +9,7 @@ EditorItemWrapper::EditorItemWrapper()
 	editer = nullptr;
 	BackGround = new Image();
 	BackGround->SetHit(HitReg::HitTestVisible)->SetFocusable(true);
-	BackGround->SetStyle(UIStyle(Vector(0.f, 0.5f, 0.f), 1.f, RI->LoadTextureByName("Game/UIEditor/editBorder.png")))->SetTransform(0.f, 0.f, 0.f, 0.f, Vector(0.f, 1.f, 0.f), Vector(0.f, 1.f, 0.f))
+	BackGround->SetStyle(UIStyle(Vector(0.f, 0.5f, 0.f), 1.f, IRender::LoadTextureByName("Game/UIEditor/editBorder.png")))->SetTransform(0.f, 0.f, 0.f, 0.f, Vector(0.f, 1.f, 0.f), Vector(0.f, 1.f, 0.f))
 		->SetEventCallback(Constants::UI::UI_ON_FOCUS, [this]() { editer->SetActive(this); })
 		->SetEventCallback(Constants::UI::UI_ON_LOST_FOCUS, [this]() { active_button = -1; })
 		->SetEventCallback(Constants::UI::UI_ON_MOUSE_DOWN, [this]() { active_button = 8; })

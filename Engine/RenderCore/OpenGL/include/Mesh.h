@@ -1,13 +1,17 @@
 #pragma once
+#include <Interface/IRender.h>
 #include <glad/gl.h>
 #include <glm/glm.hpp>
 #include <vector>
 #include "Material.h"
+#include "../OpenGLObject.h"
+#include "AnimationController.h"
+#include "Skeleton.h"
 
 class LoadedMesh;
 class MeshDataHolder;
 class Section;
-class RenderObject;
+class RenderMeshGL;
 
 struct Vertex
 {
@@ -15,19 +19,38 @@ struct Vertex
 	glm::vec3 normal;
 	glm::vec3 uv;
 	glm::vec3 tangent;
+	glm::vec3 color;
 };
 
-class MeshDataHolder
+class GLMesh : public IMesh
+{
+public:
+	GLMesh() {}
+	virtual ~GLMesh() {}
+	virtual RenderMesh* CreateProcedural(SceneComponent* parent, String name, std::vector<Vector>& positions, std::vector<Vector> UV, std::vector<Vector>& normal, std::vector<Vector>& tangent, std::vector<uint32>& indices) override;
+	virtual RenderMesh* GetStatic(SceneComponent* parent, const String& name) override;
+	virtual RenderMesh* GetSkeletal(SceneComponent* parent, const String& name) override;
+	virtual RenderMesh* GetSkeletalAsync(SceneComponent* parent, const String& name) override;
+	virtual RenderMesh* MakeEmptyStatic() override;
+	virtual RenderMesh* MakeEmptySkeletal() override;
+};
+
+class MeshDataHolder : public OpenGLObject
 {
 public:
 	MeshDataHolder(Vertex* verts, uint32 vertCount, uint32* indices, uint32 indexCount);
 	~MeshDataHolder();
+	void CreateState() override;
+	void Clear() override;
 
 	uint VAO;
 	uint VBO;
 	uint EBO;
+	uint defaultInstanced;
 
-	Material* Instance;
+	std::vector<Vertex> temp_vertices;
+	std::vector<uint32> temp_indices;
+	Material* DefaultMaterial;
 	uint32 VertexCount;
 	uint32 IndexCount;
 	float Radius;
@@ -50,61 +73,91 @@ class Section
 {
 public:
 	Section();
-	~Section();
+	virtual ~Section();
+	RenderMeshGL* Parent;
 	Material* Instance;
-	RenderObject* Parent;
-	bool Instanced;
-	int InstanceCount;
-	int InstanceCountMax;
-	uint InstanceDisp;
 	float Radius;
 	float RenderDistance;
 
-	void Render();
-	void MakeInstanced(int count, const glm::mat4* modelM);
+	virtual void Render() = 0;
 	float GetRadius() const { return Radius; }
+
+	virtual const uint32 GetVertexCount() const = 0;
+	virtual const uint32 GetFaceCount() const = 0;
+};
+
+class StaticSection : public Section
+{
+public:
+	StaticSection();
+	virtual ~StaticSection();
+	uint InstanceDisp;
+	bool InstancesSet;
+	RenderMeshStaticGL* mesh;
+
+	void Render() override;
 
 	const uint32 GetVertexCount() const { return Holder->VertexCount; }
 	const uint32 GetFaceCount() const { return Holder->IndexCount / 3; }
-
 private:
-	friend class RenderObject;
+	friend class RenderMeshStaticGL;
 
 	MeshDataHolder* Holder;
 };
 
-
-class RenderObject : public RenderMesh
+class RenderMeshGL : public RenderMesh, public OpenGLObject
 {
 public:
-	RenderObject(LoadedMesh* mesh);
-	virtual ~RenderObject();
+	virtual ~RenderMeshGL() {};
+	virtual void ApplyTransform(float delta) = 0;
+	virtual void CreateState() {};
+	virtual void RefreshState() {};
+	virtual void Clear() {};
+
+	const glm::mat4& GetModelMatrix() const { return ModelMatrix; }
+
+protected:
+	RenderMeshGL() : RenderMesh() { ModelMatrix = glm::mat4(1.f); }
+	
+	glm::mat4 ModelMatrix;
+private:
+	RenderMeshGL(const RenderMeshGL&) = delete;
+	RenderMeshGL& operator=(const RenderMeshGL&) = delete;
+};
+
+class RenderMeshStaticGL : public RenderMeshGL
+{
+public:
+	RenderMeshStaticGL();
+	virtual ~RenderMeshStaticGL();
+
+	void SetMesh(LoadedMesh* mesh);
 
 	virtual void SetMaterial(uint section, Material* nextMat) override;
-	virtual Material* GetMaterial(uint section) const override { if (section < SectionCount) return Sections[section].Instance; else return nullptr; }
-	const glm::mat4& GetModelMatrix();
-	virtual void ApplyTransform() override;
+	virtual Material* GetMaterial(uint section) const override { if (section < SectionCount) return Sections[section].Instance; else if (auto it = Materials.find(section); it != Materials.end()) return it->second; else return nullptr; }
+	virtual void ApplyTransform(float delta) override;
 	virtual void SetInstances(int count, Transformation* dispArray) override;
 	virtual void SetInstanceCount(int count) override;
 
+	void ApplyInstances();
+
 	virtual void SetSectionRenderDistance(uint section, float distance) override;
-
-	virtual SceneComponent* GetParent() const { return Parent; }
-	virtual void SetParent(SceneComponent* p) override { Parent = p; }
-
-	virtual void SetBinds(std::function<void(void)> bind) override;
-	virtual std::function<void(void)>& GetBinds() override;
 
 	virtual void SetAABB(AABB bounds) override;
 
 private:
 	friend class Renderer;
-	SceneComponent* Parent;
-	Section* Sections;
+	friend class StaticSection;
+
+	StaticSection* Sections;
 	LoadedMesh* Mesh;
 	uint SectionCount;
-	glm::mat4 ModelMatrix;
-	bool requireUpdate;
 
-	std::function<void(void)> binds;
+	int InstanceCount;
+	int InstanceCountMax;
+	glm::mat4* Instances;
+	bool InstancesDirty;
+	bool Instanced;
+
+	std::unordered_map<uint, Material*> Materials;
 };

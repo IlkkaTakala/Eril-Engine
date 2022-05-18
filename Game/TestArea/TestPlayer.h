@@ -30,6 +30,8 @@ public:
 	virtual void BeginPlay() override;
 	virtual void OnDestroyed() override;
 
+	float GetWalk() const { return walk; }
+
 private:
 	float mouseSens;
 	float Speed;
@@ -81,6 +83,9 @@ private:
 	int audioComponentID;
 
 	int spawnCounter;
+
+	float walk;
+	bool Changing;
 
 	void TestTimer(float d);
 };

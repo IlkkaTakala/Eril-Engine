@@ -26,7 +26,7 @@ uniform mat4 Model;
 
 void main()
 {
-	vec4 pos = Model * in_disp * vec4(in_position, 1.0);
+	vec4 pos = Model * vec4(in_position, 1.0);
 	gl_Position = projection * view * pos;
 	vs_out.FragPos = pos;
 	vs_out.TexCoords = in_texCoord;

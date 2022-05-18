@@ -7,12 +7,15 @@
 
 class Material;
 class Texture;
-class RenderObject;
+class RenderMeshStaticGL;
 class SceneComponent;
 class LoadedMesh;
 //struct LightData; //Lights have been moved to be handled by the ECS-system.
 struct Vertex;
 class UISpace;
+struct RenderCommand;
+struct MeshCommand;
+class RenderHandler;
 
 class Camera
 {
@@ -37,37 +40,37 @@ protected:
 	SceneComponent* Parent;
 };
 
-class IRender
+namespace IRender
 {
-public: 
-	virtual ~IRender() {}
-	virtual int SetupWindow(int width, int height) = 0;
-	virtual void CleanRenderer() = 0;
+	void SendCommand(RenderCommand c);
 
-	virtual Camera* CreateCamera(SceneComponent* parent = nullptr) = 0;
-	virtual void SetActiveCamera(Camera*) = 0;
-	virtual Camera* GetActiveCamera() const = 0;
-	
-	//virtual void CreateLight(const LightData*) = 0; //Lights have been moved to be handled by the ECS-system.
-	//virtual void RemoveLight(const LightData*) = 0; //Lights have been moved to be handled by the ECS-system.
-	
+	void CleanRenderer();
 
-	virtual void LoadShaders() = 0;
-	virtual Material* GetMaterialByName(String name) const = 0;
-	virtual Material* LoadMaterialByName(String name) = 0;
-	virtual Texture* LoadTextureByName(String name) = 0;
+	Camera* CreateCamera(SceneComponent* parent = nullptr);
+	void SetActiveCamera(Camera*);
+	Camera* GetActiveCamera();
 
-	virtual void Update() = 0;
-	virtual void Render(float delta) = 0;
-	virtual void GameStart() = 0;
-	virtual void DestroyWindow() = 0;
-	virtual UISpace* GetUIManager(int screen = 0) const = 0;
+	int SetupWindow(int width, int height);
 
+	void LoadShaders();
+	Material* GetMaterialByName(const String& name);
+	Material* LoadMaterialByName(const String& name);
+	Texture* LoadTextureByName(const String& name);
+
+	void Update();
+	void Render(float delta);
+	void GameStart();
+	void DestroyWindow();
+	UISpace* GetUIManager(int screen = 0);
+
+	void SetShowCursor(bool show, uint window = 0);
+	bool GetShowCursor(uint window = 0);
 };
 
 class IInput
 {
 public:
+	virtual void Update() = 0;
 	virtual void SetInputHandler(void(*Callback)(int, int, int, int) = 0) = 0;
 	virtual void ProcessInputs(float delta) = 0;
 	void SetTextMode(bool mode) { isText = mode; }
@@ -92,46 +95,69 @@ struct AABB
 	Vector maxs;
 };
 
-class RenderMesh
+class RenderMesh 
 {
 public:
-	virtual ~RenderMesh() {}
-	virtual void ApplyTransform() = 0;
+	enum class MeshType
+	{
+		None,
+		Static,
+		Skeletal
+	};
+
+	virtual ~RenderMesh() {};
+
+	virtual void ApplyTransform(float delta) = 0;
 	virtual void SetMaterial(uint section, Material* nextMat) = 0;
 	virtual Material* GetMaterial(uint section) const = 0;
-	virtual void SetInstances(int count, Transformation* dispArray) = 0;
-	virtual void SetInstanceCount(int count) = 0;
-	virtual SceneComponent* GetParent() const = 0;
-	virtual void SetParent(SceneComponent* p) = 0;
+
+	MeshType GetMeshType() const { return type; }
+
+	bool IsVisible() const { return visible; }
+	void SetVisible(bool v) { visible = v; }
+
+	SceneComponent* GetParent() const { return Parent; }
+	void SetParent(SceneComponent* p) { Parent = p; }
+
+	virtual void SetInstances(int count, Transformation* dispArray) {};
+	virtual void SetInstanceCount(int count) {};
+
 	virtual void SetSectionRenderDistance(uint section, float distance) = 0;
 
 	AABB GetAABB() const { return bounds; }
 	virtual void SetAABB(AABB bounds) { this->bounds = bounds; }
 
-	virtual void SetBinds(std::function<void(void)> bind) = 0;
-	virtual std::function<void(void)>& GetBinds() = 0;
+	void SetBinds(std::function<void(void)> bind) { binds = bind; }
+	std::function<void(void)>& GetBinds() { return binds; }
+
+	void AddRenderCallback(const String& id, std::function<void(float)> func) { renderCallbacks.emplace(id, func); }
+	void RemoveRenderCallback(const String& id) { renderCallbacks.erase(id); }
+
+	void SetRequireUpdate() { requireUpdate = true; }
+
 protected:
-	AABB bounds; // low level " collision " --> tänne collision
+
+	bool visible{ false };
+	SceneComponent* Parent{ nullptr };
+	AABB bounds;
+	std::function<void(void)> binds;
+	std::unordered_map<String, std::function<void(float)>> renderCallbacks;
+	MeshType type { MeshType::None };
+	bool requireUpdate;
 };
 
 class IMesh
 {
 public:
 	virtual ~IMesh() {}
-	virtual RenderMesh* LoadData(SceneComponent* parent, String name) = 0;
+	virtual RenderMesh* GetStatic(SceneComponent* parent, const String& name) = 0;
+	virtual RenderMesh* GetSkeletal(SceneComponent* parent, const String& name) = 0;
+	virtual RenderMesh* GetSkeletalAsync(SceneComponent* parent, const String& name) = 0;
 	virtual RenderMesh* CreateProcedural(SceneComponent* parent, String name, std::vector<Vector>& positions, std::vector<Vector> UV, std::vector<Vector>& normal, std::vector<Vector>& tangent, std::vector<uint32>& indices) = 0;
-	virtual void StartLoading() = 0;
-	virtual void MarkUnused() = 0;
-	virtual void ClearUnused() = 0;
-
-protected:
-	friend class GC;
-
-	std::unordered_map<String, LoadedMesh*> LoadedMeshes;
-
+	virtual RenderMesh* MakeEmptyStatic() = 0;
+	virtual RenderMesh* MakeEmptySkeletal() = 0;
 };
 
-extern IRender* RI;
 extern IInput* II;
 extern IMesh* MI;
 
