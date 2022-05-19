@@ -228,8 +228,8 @@ void TestPlayer::LeftMouseDown(bool keydown)
 		auto p = SpawnObject<VisibleObject>(this);
 		p->SetModel("Assets/Meshes/tracer");
 		p->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/default"));
-		p->SetLocation(Location + Vector{0, 0, 1});
-		p->SetRotation(GetCamera()->GetRotation());
+		p->SetLocation(Location + Vector{0.f, 0.f, 1.3f});
+		p->SetRotation(Spring->GetWorldRotation());
 		p->SetLifetime(0.5f);
 	}
 }
