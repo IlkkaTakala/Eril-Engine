@@ -1,7 +1,0 @@
-[Shader]
-name=shader_002
-[Textures]
-Albedo=Assets/Textures/marbleTile/tile_albedo.png
-Normal=Assets/Textures/marbleTile/tile_normal.png
-Roughness=Assets/Textures/marbleTile/tile_roughness.png
-AO=Assets/Textures/marbleTile/tile_ao.png

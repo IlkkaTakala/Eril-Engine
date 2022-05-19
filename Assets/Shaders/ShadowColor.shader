@@ -5,10 +5,11 @@ layout (location = 0) in vec3 in_position;
 
 out vec2 TexCoords;
 uniform mat4 lSpace;
+uniform mat4 Model;
 
 void main()
 {
-	gl_Position = lSpace * vec4(in_position, 1.0);
+	gl_Position = lSpace * Model * vec4(in_position, 1.0);
 }
 ###END_VERTEX###
 ###FRAGMENT###

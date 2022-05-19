@@ -89,7 +89,7 @@ TestPlayer::TestPlayer() : Player()
 	AddComponent(Spring);
 
 	GetCamera()->SetParent(Spring);
-	Spring->SetLocation({-0.6f, 0.f, 1.5f});
+	Spring->SetLocation({0.6f, 0.f, 1.5f});
 	GetCamera()->SetLocation({0.f, -2.5f, 0.f});
 
 	AddComponent(Mesh);

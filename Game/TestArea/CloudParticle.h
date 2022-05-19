@@ -7,4 +7,3 @@ class CloudParticle : public ParticleSystem
 public:
 	CloudParticle();
 };
-

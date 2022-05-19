@@ -393,13 +393,8 @@ public:
 	void EvaluateBones(BoneArray bones) override;
 
 	AnimationBlendSpace2D blender;
+	AnimationBlendSpace2D blenderRifle;
 	AnimationStateMachine states;
-	AnimationInstance idle;
-	AnimationInstance gunPose;
-	AnimationPerBoneBlend perBoneGun;
 	Vector walk;
-	float gun;
 	bool gunStatus;
-	bool gunInterp;
-	float gunTime;
 };

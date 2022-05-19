@@ -1,8 +1,0 @@
-[Shader]
-name=shader_002
-[Scalars]
-delta=0.0
-[Vectors]
-velocity=0,0,0
-[Textures]
-Albedo=Assets/Textures/forestGame/ghost.png

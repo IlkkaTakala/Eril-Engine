@@ -62,6 +62,9 @@ void AnimationController::UpdateBoneTransforms(float delta, RenderMesh* mesh)
 
 void TestAnimControl::BeginPlay()
 {
+
+	walk = 0.f;
+	gunStatus = false;
 	blender.AddKey(0.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Idle", owner->GetModel()));
 	blender.AddKey(2.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/RightStrafeWalk", owner->GetModel()));
 	blender.AddKey(-2.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/LeftStrafeWalk", owner->GetModel()));
@@ -72,30 +75,34 @@ void TestAnimControl::BeginPlay()
 	blender.AddKey(0.f, 4.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Running", owner->GetModel()));
 	blender.AddKey(0.f, -4.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/RunBack", owner->GetModel()));
 
-	walk = 0.f;
-	gunStatus = false;
-	gun = 0.f;
-	gunTime = 0.3f;
-	gunInterp = false;
-
-	idle = AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Idle", owner->GetModel());
-	gunPose = AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/GunPose", owner->GetModel());
+	blenderRifle.AddKey(0.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/rifleIdle", owner->GetModel()));
+	blenderRifle.AddKey(2.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/rifleStrafeWalkRight", owner->GetModel()));
+	blenderRifle.AddKey(-2.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/rifleStrafeWalkLeft", owner->GetModel()));
+	blenderRifle.AddKey(0.f, 2.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/rifleWalk", owner->GetModel()));
+	blenderRifle.AddKey(0.f, -2.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/rifleWalkBack", owner->GetModel()));
+	blenderRifle.AddKey(4.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/rifleStrafeRunRight", owner->GetModel()));
+	blenderRifle.AddKey(-4.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/rifleStrafeRunLeft", owner->GetModel()));
+	blenderRifle.AddKey(0.f, 4.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/rifleRun", owner->GetModel()));
+	blenderRifle.AddKey(0.f, -4.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/rifleRunBack", owner->GetModel()));
 
 	states.AddState("Walk", [&](float delta, BoneArray arr) {
 		blender.Evaluate(delta, arr, walk.X, walk.Y);
 	});
+	states.AddState("Rifle", [&](float delta, BoneArray arr) {
+		blenderRifle.Evaluate(delta, arr, walk.X, walk.Y);
+	});
 
-	auto skel = dynamic_cast<RenderMeshSkeletalGL*>(owner->GetModel())->GetSkeleton();
+	states.AddPaths("Rifle", { {"Walk", [&]()->bool { return !gunStatus; }, 0.1f} });
+	states.AddPaths("Walk", { {"Rifle", [&]()->bool { return gunStatus; }, 0.1f} });
+
+	/*auto skel = dynamic_cast<RenderMeshSkeletalGL*>(owner->GetModel())->GetSkeleton();
 	perBoneGun.Init([&](float delta, BoneArray bones) {
 		blender.Evaluate(delta, bones, walk.X, walk.Y);
 	}, [&](float delta, BoneArray bones) {
 		gunPose.MakeTransforms(bones);
 	}, skel, "mixamorig:Spine");
 	auto mesh = dynamic_cast<RenderMeshSkeletalGL*>(owner->GetModel());
-	
-
-	//states.AddPaths("Idle", { {"Walk", [&]()->bool { return walk.Length() > 0.01f; }, 0.1f} });
-	//states.AddPaths("Walk", { {"Idle", [&]()->bool { return walk.Length() <= 0.01f; }, 0.1f}});
+	*/
 }
 
 void TestAnimControl::Tick(float delta)
@@ -105,33 +112,11 @@ void TestAnimControl::Tick(float delta)
 	auto player = dynamic_cast<TestPlayer*>(GetGameState()->CurrentPlayer.GetPointer());
 	if (player) {
 		walk = player->GetWalk();
-		if (gunStatus != player->GetGun()) {
-			gunInterp = true;
-			gunStatus = player->GetGun();
-		}
-	}
-	if (gunInterp) {
-		if (gunStatus) {
-			gun += delta;
-			if (gun > gunTime) {
-				gun = gunTime;
-				gunInterp = false;
-			}
-		}
-		else {
-			gun -= delta;
-			if (gun < 0.f) {
-				gun = 0.f;
-				gunInterp = false;
-			}
-		}
+		gunStatus = player->GetGun();
 	}
 }
 
 void TestAnimControl::EvaluateBones(BoneArray bones)
 {
-	idle.Update(last_delta, idle.GetFactor());
-	gunPose.Update(last_delta, gunPose.GetFactor());
-	perBoneGun.SetBlendFactor(gun / gunTime);
-	perBoneGun.Evaluate(last_delta, bones);
+	states.Evaluate(last_delta, bones);
 }

@@ -98,6 +98,7 @@ int GameLoop::MainLoop()
 
 		II->ProcessInputs(duration.count());
 
+		ObjectManager::UpdateLifetimes(duration.count());
 		for (Tickable* t : TickList) {
 			bool found = false;
 			for (Tickable* old : TickListRemoval) {
