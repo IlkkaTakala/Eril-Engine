@@ -30,7 +30,7 @@ layout (binding = 4) uniform sampler2D Depth;
 layout (binding = 5) uniform sampler2D Normal;
 layout (binding = 6) uniform sampler2D Position;
 layout (binding = 7) uniform sampler2D Data;
-layout (binding = 8) uniform sampler2D SSAO;
+layout (binding = 9) uniform sampler2D SSAO;
 
 in vec2 TexCoords;
 out vec4 FragColor;

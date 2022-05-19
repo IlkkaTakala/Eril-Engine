@@ -43,8 +43,8 @@ void BoxCollisionShape::SetType(int t)
 void BoxCollisionShape::SetSize(AABB s)
 {
 	float width = s.maxs.X - s.mins.X;
-	float height = s.maxs.Y - s.mins.Y;
-	float depth = s.maxs.Z - s.mins.Z;
+	float height = s.maxs.Z - s.mins.Z;
+	float depth = s.maxs.Y - s.mins.Y;
 	size = s;
 	btBoxShape* box = new btBoxShape(btVector3(width / 2.f, height / 2.f, depth / 2.f));
 	body->setCollisionShape(box);

@@ -5,5 +5,5 @@
 
 void EngineInterface::CreateDefaults()
 {
-    Scene::OpenLevel("Maps/test");
+    Scene::OpenLevel("Assets/Maps/demo");
 }

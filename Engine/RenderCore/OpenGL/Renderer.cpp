@@ -916,7 +916,7 @@ void Renderer::SSAO(int width, int height)
 	SSAORender->Bind();
 	glClearColor(0.f, 0.f, 0.f, 0.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glActiveTexture(GL_TEXTURE7);
+	glActiveTexture(GL_TEXTURE8);
 	glBindTexture(GL_TEXTURE_2D, SSAONoise);
 
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, SSAOKernelBuffer);
@@ -929,7 +929,7 @@ void Renderer::SSAO(int width, int height)
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
 
-	/*SSAORender->BindBlur();
+	SSAORender->BindBlur();
 	glActiveTexture(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, SSAORender->GetSSAO());
 	SSAOBlurShader->Bind();
@@ -938,7 +938,7 @@ void Renderer::SSAO(int width, int height)
 	glDepthFunc(GL_ALWAYS);
 	glBindVertexArray(ScreenVao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glBindVertexArray(0);*/
+	glBindVertexArray(0);
 
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
 }
@@ -1219,7 +1219,7 @@ inline bool Renderer::CullCheck(Section* s)
 	else if (glm::length(d) > 2.f && glm::length(d) > radius)
 	{
 		glm::vec3 newPosition = glm::normalize(-d + dir * glm::length(d)) * radius;
-		if (glm::dot(dir, glm::normalize(d + newPosition)) < 0.75f) // TODO: Calculate from FOV
+		if (glm::dot(dir, glm::normalize(d)) < 0.75 && glm::dot(dir, glm::normalize(d + newPosition)) < 0.75f) // TODO: Calculate from FOV
 		{
 			return true;
 		}
@@ -1290,6 +1290,7 @@ void Renderer::Render(float delta)
 	BlurRender->Blur(PostProcess->GetBloom(), 10, ScreenVao);
 	PostProcess->BindTextures();
 	SSAO(width, height);
+	PostProcess->BindTextures();
 	SSAORender->BindTextures(8);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
