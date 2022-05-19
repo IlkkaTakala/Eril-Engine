@@ -32,4 +32,13 @@ typedef struct Transformation
 		lhs.Rotation.FastNormalize();
 		lhs.Scale *= rhs.Scale;
 	}
+
+	static _forceinline Transformation Interpolate(const Transformation& previous, const Transformation& target, float factor) {
+		Transform out;
+		out.Location = previous.Location * (1 - factor) + target.Location * factor;
+		out.Rotation = Rotator::Slerp(previous.Rotation, target.Rotation, factor).FastNormalize();
+		out.Scale = previous.Scale * (1 - factor) + target.Scale * factor;
+		return out;
+	}
+
 } Transform;

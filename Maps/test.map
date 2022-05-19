@@ -1,0 +1,172 @@
+<Assets>
+	Maps/Meshes/Mesh.Bank,
+	Maps/Meshes/Mesh.Factory,
+	Maps/Meshes/Mesh.Crane,
+	Maps/Meshes/Mesh.Skyscraper,
+	Maps/Meshes/Mesh.Skyscraper2,
+	Maps/Meshes/Mesh.FireStation,
+	Maps/Meshes/Mesh.Burger,
+	Maps/Meshes/Mesh.Pizzerria,
+	Maps/Meshes/Mesh.Corner,
+	Maps/Meshes/Mesh.GasStation,
+	Maps/Meshes/Mesh.LoftSmall,
+	Maps/Meshes/Mesh.LoftBrown,
+	Maps/Meshes/Mesh.LoftGrey,
+	Maps/Meshes/Mesh.HouseBlue,
+	Maps/Meshes/Mesh.Caravan,
+	Maps/Meshes/Plane.001,
+	Maps/Meshes/Plane.002,
+	Maps/Meshes/Plane.003,
+	Maps/Meshes/Plane.004,
+	Maps/Meshes/Plane.005,
+	Maps/Meshes/Plane.006,
+	Maps/Meshes/Plane.007,
+</Assets>
+<TestPlayer id="4"/>
+<VisibleObject id="abbb" args="Location:-64.009,15.754,0.000; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.Bank; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="ce2c" args="Location:-116.127,-104.141,1.496; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.Factory; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="f55b" args="Location:-137.172,48.886,2.424; Rotation:0.000,90.000,72.200; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.Crane; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="c755" args="Location:-90.265,16.287,-0.599; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.Skyscraper; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="ec8d" args="Location:-64.525,-44.829,0.000; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.Skyscraper2; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="dfc0" args="Location:-90.481,-47.509,0.455; Rotation:0.000,90.000,-179.845; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.FireStation; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="10cf" args="Location:103.988,-45.554,0.190; Rotation:0.000,90.000,-180.034; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.Burger; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="5b43" args="Location:75.215,-43.288,-0.127; Rotation:0.000,90.000,90.037; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.Pizzerria; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="d6ad" args="Location:20.181,-46.875,0.289; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.Corner; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="8598" args="Location:-120.545,-46.464,0.213; Rotation:0.000,90.000,-179.845; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.GasStation; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="b6ab" args="Location:-78.794,91.678,0.312; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.LoftSmall; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="1919" args="Location:107.577,26.366,0.340; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.LoftBrown; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="7ceb" args="Location:19.916,-98.247,-0.150; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.LoftGrey; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="3cc7" args="Location:16.560,24.425,0.369; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.HouseBlue; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="ec8b" args="Location:43.016,34.859,0.237; Rotation:0.000,90.000,-104.476; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.Caravan; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="6b55" args="Location:46.337,24.425,0.369; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.HouseBlue; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="e52d" args="Location:74.922,24.425,0.369; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.HouseBlue; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="1d4d" args="Location:-119.393,15.280,-0.453; Rotation:0.000,90.000,179.727; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.Skyscraper2; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="634c" args="Location:-66.113,91.678,0.398; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.LoftSmall; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="37ca" args="Location:-53.027,91.678,0.233; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.LoftSmall; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="be93" args="Location:-54.322,54.337,0.222; Rotation:0.000,90.000,-179.847; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.LoftSmall; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="593b" args="Location:-67.004,54.521,0.224; Rotation:0.000,90.000,-179.847; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.LoftSmall; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="2363" args="Location:-79.739,54.353,0.225; Rotation:0.000,90.000,-179.847; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.LoftSmall; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="b2c7" args="Location:46.120,-47.538,0.327; Rotation:0.000,90.000,-90.017; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.Corner; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="76e9" args="Location:-60.101,-94.326,1.496; Rotation:0.000,90.000,90.017; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.Factory; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="54eb" args="Location:18.779,-72.425,0.310; Rotation:0.000,90.000,90.017; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.Corner; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="efca" args="Location:70.881,55.013,0.369; Rotation:0.000,90.000,-180.034; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.HouseBlue; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="0a62" args="Location:41.106,54.748,0.369; Rotation:0.000,90.000,-180.034; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.HouseBlue; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="648f" args="Location:12.522,54.494,0.369; Rotation:0.000,90.000,-180.034; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.HouseBlue; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="6003" args="Location:14.456,95.111,0.369; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.HouseBlue; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="4d63" args="Location:44.233,95.111,0.369; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.HouseBlue; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="5fbb" args="Location:72.818,95.111,0.369; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.HouseBlue; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="f64f" args="Location:46.676,-98.247,-0.117; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.LoftGrey; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="ba93" args="Location:74.193,-98.247,-0.032; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.LoftGrey; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="1401" args="Location:100.953,-98.247,-0.153; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.LoftGrey; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="cd81" args="Location:107.998,52.452,0.237; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.LoftBrown; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="7963" args="Location:72.144,34.919,0.280; Rotation:0.000,90.000,-90.815; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.Caravan; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="f520" args="Location:22.967,95.030,0.231; Rotation:0.000,90.000,-179.190; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.Caravan; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="7b87" args="Location:-100.331,46.790,0.556; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.LoftBrown; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="cd4f" args="Location:-98.316,97.824,-0.050; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.LoftGrey; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="990d" args="Location:-124.391,98.384,-0.000; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Mesh.LoftBrown; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="c8cf" args="Location:-19.679,-35.153,0.000; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Plane.001; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="0546" args="Location:-100.944,32.894,0.319; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Plane.002; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="2628" args="Location:72.938,32.894,0.319; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Plane.003; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="3176" args="Location:74.178,-90.663,0.319; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Plane.004; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="4434" args="Location:-100.387,-90.663,0.319; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Plane.005; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="e0c4" args="Location:-101.500,108.133,0.319; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Plane.006; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<VisibleObject id="e0b7" args="Location:74.300,108.133,0.319; Rotation:0.000,90.000,0.000; Scale:1,1,1; Mesh:Maps/Meshes/Plane.007; Material1:Assets/Materials/house; Material2:Assets/Materials/house; Material3:Assets/Materials/house; Material4:Assets/Materials/house;" />
+<BoxCollisionShape id="a28b" args="Location:14.962,24.326,3.355; Rotation:0.000,90.000,0.000; Size:7.062,5.921,4.201; Type:Static" />
+<BoxCollisionShape id="bd0f" args="Location:44.804,24.336,3.355; Rotation:0.000,90.000,0.000; Size:7.095,5.866,4.201; Type:Static" />
+<BoxCollisionShape id="52b5" args="Location:73.292,24.332,3.355; Rotation:0.000,90.000,0.000; Size:7.049,5.881,4.201; Type:Static" />
+<BoxCollisionShape id="466e" args="Location:72.521,55.025,3.355; Rotation:0.000,90.000,0.000; Size:7.030,5.821,4.201; Type:Static" />
+<BoxCollisionShape id="c9c8" args="Location:42.654,54.813,3.355; Rotation:0.000,90.000,0.000; Size:7.099,5.813,4.201; Type:Static" />
+<BoxCollisionShape id="621d" args="Location:14.093,54.481,3.355; Rotation:0.000,90.000,0.000; Size:7.066,5.875,4.201; Type:Static" />
+<BoxCollisionShape id="d2b2" args="Location:12.834,95.016,3.355; Rotation:0.000,90.000,0.000; Size:7.075,5.871,4.201; Type:Static" />
+<BoxCollisionShape id="12cf" args="Location:42.625,94.964,3.355; Rotation:0.000,90.000,0.000; Size:7.082,5.855,4.201; Type:Static" />
+<BoxCollisionShape id="7cc4" args="Location:71.120,94.991,3.355; Rotation:0.000,90.000,0.000; Size:7.099,5.864,4.201; Type:Static" />
+<BoxCollisionShape id="e50d" args="Location:107.958,52.306,9.445; Rotation:0.000,90.000,0.000; Size:11.499,11.336,8.741; Type:Static" />
+<BoxCollisionShape id="6cff" args="Location:107.534,26.480,8.955; Rotation:0.000,90.000,0.000; Size:11.551,11.336,8.741; Type:Static" />
+<BoxCollisionShape id="6172" args="Location:-124.254,98.201,9.261; Rotation:0.000,90.000,0.000; Size:11.499,11.336,8.741; Type:Static" />
+<BoxCollisionShape id="05e1" args="Location:-100.222,46.431,7.622; Rotation:0.000,90.000,0.000; Size:11.499,11.336,8.741; Type:Static" />
+<BoxCollisionShape id="e1aa" args="Location:-98.216,97.826,9.370; Rotation:0.000,90.000,0.000; Size:11.499,11.336,8.741; Type:Static" />
+<BoxCollisionShape id="97a7" args="Location:20.212,-98.190,9.074; Rotation:0.000,90.000,0.000; Size:11.230,11.336,8.741; Type:Static" />
+<BoxCollisionShape id="4953" args="Location:46.781,-98.190,9.307; Rotation:0.000,90.000,0.000; Size:11.230,11.336,8.741; Type:Static" />
+<BoxCollisionShape id="92ab" args="Location:74.280,-98.190,9.128; Rotation:0.000,90.000,0.000; Size:11.230,11.336,8.741; Type:Static" />
+<BoxCollisionShape id="f086" args="Location:100.890,-98.190,9.374; Rotation:0.000,90.000,0.000; Size:11.230,11.336,8.741; Type:Static" />
+<BoxCollisionShape id="5035" args="Location:-64.034,18.356,7.622; Rotation:0.000,90.000,0.000; Size:11.646,9.080,8.741; Type:Static" />
+<BoxCollisionShape id="223c" args="Location:-54.317,53.598,4.781; Rotation:0.000,90.000,0.000; Size:5.323,4.684,8.741; Type:Static" />
+<BoxCollisionShape id="f90e" args="Location:-66.990,53.718,4.712; Rotation:0.000,90.000,0.000; Size:5.323,4.684,8.741; Type:Static" />
+<BoxCollisionShape id="f867" args="Location:-79.783,53.598,4.709; Rotation:0.000,90.000,0.000; Size:5.323,4.684,8.741; Type:Static" />
+<BoxCollisionShape id="db95" args="Location:-78.827,92.456,4.824; Rotation:0.000,90.000,0.000; Size:5.323,4.684,8.741; Type:Static" />
+<BoxCollisionShape id="3647" args="Location:-66.153,92.456,4.894; Rotation:0.000,90.000,0.000; Size:5.323,4.684,8.741; Type:Static" />
+<BoxCollisionShape id="8266" args="Location:-53.001,92.456,4.737; Rotation:0.000,90.000,0.000; Size:5.323,4.684,8.741; Type:Static" />
+<BoxCollisionShape id="65db" args="Location:-137.228,48.821,1.101; Rotation:0.000,90.000,-17.548; Size:5.735,5.733,1.803; Type:Static" />
+<BoxCollisionShape id="b274" args="Location:-137.167,48.943,15.330; Rotation:0.000,90.000,-17.752; Size:1.063,1.193,16.943; Type:Static" />
+<BoxCollisionShape id="15bd" args="Location:-90.179,16.290,24.902; Rotation:0.000,90.000,0.000; Size:10.075,9.874,27.128; Type:Static" />
+<BoxCollisionShape id="96d7" args="Location:-122.522,15.257,24.902; Rotation:0.000,90.000,0.000; Size:7.425,10.515,27.128; Type:Static" />
+<BoxCollisionShape id="9ec3" args="Location:-61.533,-44.952,24.902; Rotation:0.000,90.000,0.000; Size:7.425,10.515,27.128; Type:Static" />
+<BoxCollisionShape id="f374" args="Location:-72.031,-50.118,25.414; Rotation:0.000,90.000,0.000; Size:2.933,5.445,27.673; Type:Static" />
+<BoxCollisionShape id="2473" args="Location:-111.853,20.239,25.414; Rotation:0.000,90.000,0.000; Size:2.933,5.445,27.673; Type:Static" />
+<BoxCollisionShape id="e1ca" args="Location:-90.476,-47.289,4.855; Rotation:0.000,90.000,0.000; Size:11.460,11.707,6.701; Type:Static" />
+<BoxCollisionShape id="3784" args="Location:-120.433,-53.190,2.340; Rotation:0.000,90.000,0.000; Size:11.460,4.474,3.471; Type:Static" />
+<BoxCollisionShape id="4962" args="Location:-60.156,-94.306,10.628; Rotation:0.000,90.000,0.000; Size:11.230,23.210,11.940; Type:Static" />
+<BoxCollisionShape id="037c" args="Location:-116.021,-104.138,10.628; Rotation:0.000,90.000,0.000; Size:23.217,11.244,11.940; Type:Static" />
+<BoxCollisionShape id="0562" args="Location:104.002,-44.779,3.665; Rotation:0.000,90.000,0.000; Size:10.853,7.731,4.680; Type:Static" />
+<BoxCollisionShape id="67c0" args="Location:75.536,-43.345,4.514; Rotation:0.000,90.000,0.000; Size:8.273,5.156,4.814; Type:Static" />
+<BoxCollisionShape id="6253" args="Location:23.115,-78.467,9.198; Rotation:0.000,90.000,0.000; Size:7.785,2.765,10.419; Type:Static" />
+<BoxCollisionShape id="f0e0" args="Location:50.792,-51.610,9.198; Rotation:0.000,90.000,0.000; Size:3.116,7.410,10.419; Type:Static" />
+<BoxCollisionShape id="2c8c" args="Location:21.695,-42.149,9.198; Rotation:0.000,90.000,0.000; Size:10.072,3.194,10.419; Type:Static" />
+<BoxCollisionShape id="0840" args="Location:14.105,-70.917,9.121; Rotation:0.000,90.000,0.000; Size:3.082,10.215,10.419; Type:Static" />
+<BoxCollisionShape id="a71f" args="Location:71.924,34.822,1.311; Rotation:0.000,90.000,0.000; Size:3.546,1.268,2.083; Type:Static" />
+<BoxCollisionShape id="610f" args="Location:42.748,34.782,1.269; Rotation:0.000,90.000,0.000; Size:3.759,2.209,2.083; Type:Static" />
+<BoxCollisionShape id="76b2" args="Location:22.901,94.961,1.115; Rotation:0.000,90.000,0.000; Size:1.269,3.546,2.083; Type:Static" />
+<BoxCollisionShape id="8a8a" args="Location:-8.674,-8.752,0.000; Rotation:0.000,90.000,0.000; Size:184.686,163.949,0.896; Type:Static" />
+<BoxCollisionShape id="0253" args="Location:43.987,-41.484,9.198; Rotation:0.000,90.000,0.000; Size:9.984,2.730,10.419; Type:Static" />
+<BoxCollisionShape id="60b9" args="Location:14.120,-52.207,9.121; Rotation:0.000,90.000,0.000; Size:2.727,6.755,10.419; Type:Static" />
+<BoxCollisionShape id="bf9f" args="Location:14.985,16.739,1.720; Rotation:0.000,90.000,0.000; Size:0.167,0.175,1.602; Type:Static" />
+<BoxCollisionShape id="7c1c" args="Location:18.230,16.739,1.720; Rotation:0.000,90.000,0.000; Size:0.167,0.175,1.602; Type:Static" />
+<BoxCollisionShape id="dcd7" args="Location:44.753,16.774,1.720; Rotation:0.000,90.000,0.000; Size:0.167,0.175,1.602; Type:Static" />
+<BoxCollisionShape id="25f9" args="Location:48.020,16.783,1.720; Rotation:0.000,90.000,0.000; Size:0.167,0.175,1.602; Type:Static" />
+<BoxCollisionShape id="4795" args="Location:73.337,16.769,1.720; Rotation:0.000,90.000,0.000; Size:0.167,0.175,1.602; Type:Static" />
+<BoxCollisionShape id="df03" args="Location:76.585,16.782,1.720; Rotation:0.000,90.000,0.000; Size:0.167,0.175,1.602; Type:Static" />
+<BoxCollisionShape id="cc43" args="Location:72.434,62.724,1.720; Rotation:0.000,90.000,0.000; Size:0.167,0.175,1.602; Type:Static" />
+<BoxCollisionShape id="351e" args="Location:69.265,62.663,1.720; Rotation:0.000,90.000,0.000; Size:0.167,0.175,1.602; Type:Static" />
+<BoxCollisionShape id="4eef" args="Location:42.668,62.408,1.720; Rotation:0.000,90.000,0.000; Size:0.167,0.175,1.602; Type:Static" />
+<BoxCollisionShape id="0d72" args="Location:39.486,62.405,1.720; Rotation:0.000,90.000,0.000; Size:0.167,0.175,1.602; Type:Static" />
+<BoxCollisionShape id="b7cd" args="Location:14.120,62.155,1.720; Rotation:0.000,90.000,0.000; Size:0.167,0.175,1.602; Type:Static" />
+<BoxCollisionShape id="6ec7" args="Location:10.972,62.123,1.720; Rotation:0.000,90.000,0.000; Size:0.167,0.175,1.602; Type:Static" />
+<BoxCollisionShape id="b7d0" args="Location:12.923,87.495,1.720; Rotation:0.000,90.000,0.000; Size:0.167,0.175,1.602; Type:Static" />
+<BoxCollisionShape id="a727" args="Location:16.044,87.461,1.720; Rotation:0.000,90.000,0.000; Size:0.167,0.175,1.602; Type:Static" />
+<BoxCollisionShape id="2b61" args="Location:42.660,87.411,1.720; Rotation:0.000,90.000,0.000; Size:0.167,0.175,1.602; Type:Static" />
+<BoxCollisionShape id="b23e" args="Location:45.844,87.478,1.720; Rotation:0.000,90.000,0.000; Size:0.167,0.175,1.602; Type:Static" />
+<BoxCollisionShape id="46e4" args="Location:71.320,87.441,1.720; Rotation:0.000,90.000,0.000; Size:0.167,0.175,1.602; Type:Static" />
+<BoxCollisionShape id="950a" args="Location:74.468,87.459,1.720; Rotation:0.000,90.000,0.000; Size:0.167,0.175,1.602; Type:Static" />
+<BoxCollisionShape id="cda5" args="Location:-114.683,-39.503,1.720; Rotation:0.000,90.000,0.000; Size:1.113,0.311,1.602; Type:Static" />
+<BoxCollisionShape id="31c6" args="Location:-120.451,-39.503,1.720; Rotation:0.000,90.000,0.000; Size:1.113,0.311,1.602; Type:Static" />
+<BoxCollisionShape id="b46d" args="Location:-120.451,-44.018,1.720; Rotation:0.000,90.000,0.000; Size:1.113,0.311,1.602; Type:Static" />
+<BoxCollisionShape id="20dd" args="Location:-114.663,-44.018,1.720; Rotation:0.000,90.000,0.000; Size:1.113,0.311,1.602; Type:Static" />
+<BoxCollisionShape id="a752" args="Location:-126.216,-44.018,1.720; Rotation:0.000,90.000,0.000; Size:1.113,0.311,1.602; Type:Static" />
+<BoxCollisionShape id="b8f7" args="Location:-126.216,-39.528,1.720; Rotation:0.000,90.000,0.000; Size:1.113,0.311,1.602; Type:Static" />
+<LightSpawner id="92ce" args="Lights:16.632,16.512,3.038,1.000,1.000,1.000,50.009,5.001/
+106.339,-15.415,20.000,1.000,1.000,1.000,101.919,-0.000/
+96.199,74.931,20.000,1.000,1.000,1.000,101.919,-0.000/
+-96.415,74.653,20.000,1.000,1.000,1.000,101.919,-0.000/
+-111.118,-15.255,20.000,1.000,1.000,1.000,101.919,-0.000/
+-19.901,18.031,20.000,1.000,1.000,1.000,101.919,-0.000/
+-114.810,-43.938,3.094,1.000,1.000,1.000,50.009,5.001/
+-120.494,-43.938,3.094,1.000,1.000,1.000,50.009,5.001/
+-126.300,-43.938,3.094,1.000,1.000,1.000,50.009,5.001/
+-126.300,-39.496,3.094,1.000,1.000,1.000,50.009,5.001/
+-120.522,-39.496,3.094,1.000,1.000,1.000,50.009,5.001/
+-114.861,-39.496,3.094,1.000,1.000,1.000,50.009,5.001/
+46.056,16.512,3.038,1.000,1.000,1.000,50.009,5.001/
+75.077,16.512,3.038,1.000,1.000,1.000,50.009,5.001/
+70.846,63.037,3.038,1.000,1.000,1.000,50.009,5.001/
+41.055,62.884,3.038,1.000,1.000,1.000,50.009,5.001/
+12.468,62.645,3.038,1.000,1.000,1.000,50.009,5.001/
+14.464,87.001,3.038,1.000,1.000,1.000,50.009,5.001/
+44.178,86.992,3.038,1.000,1.000,1.000,50.009,5.001/
+72.842,87.030,3.038,1.000,1.000,1.000,50.009,5.001/
+-56.448,87.313,3.823,1.000,1.000,1.000,50.009,5.001/
+-69.518,87.313,3.823,1.000,1.000,1.000,50.009,5.001/
+-82.089,87.313,3.823,1.000,1.000,1.000,50.009,5.001/
+-76.408,58.754,3.823,1.000,1.000,1.000,50.009,5.001/
+-63.695,58.754,3.823,1.000,1.000,1.000,50.009,5.001/
+-51.074,58.754,3.823,1.000,1.000,1.000,50.009,5.001/
+;" />

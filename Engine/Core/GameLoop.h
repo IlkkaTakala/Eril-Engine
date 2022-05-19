@@ -1,7 +1,6 @@
 #pragma once
 #include "Core.h"
 #include <mutex>
-#include <vector>
 #include <list>
 
 class GameState;

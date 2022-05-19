@@ -8,6 +8,7 @@ class ParticleSystemConstruction;
 class ParticleSystem;
 class CurveData;
 class VectorCurveData;
+struct MaterialParams;
 
 class ParticleSystemConstruction
 {
@@ -100,6 +101,7 @@ private:
 	Material* Material;
 	RefWeak<SceneComponent> Parent;
 
+	std::vector<MaterialParams> MatData;
 	uint MaterialBuffer;
 
 public:

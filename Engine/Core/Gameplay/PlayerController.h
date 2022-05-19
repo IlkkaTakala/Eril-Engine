@@ -14,6 +14,8 @@ public:
 	virtual void OnDestroyed() override;
 	Camera* GetCamera() const { return PlayerCamera; }
 
+	void SetShowCursor(bool show, uint window = 0);
+	bool GetShowCursor(uint window = 0);
 protected:
 
 private:

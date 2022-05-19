@@ -2,6 +2,22 @@
 #include <Physics/BulletPhysics.h>
 
 
+void BoxCollisionShape::LoadWithParameters(const String& args)
+{
+	SceneComponent::LoadWithParameters(args);
+	auto data = ParseOptions(args);
+
+	auto type = data.find("Type");
+	auto size = data.find("Size");
+
+	int typeIndex = 0;
+	if (type != data.end() && type->second == "Static") typeIndex = 0;
+	else if (type != data.end() && type->second == "Dynamic") typeIndex = 1;
+
+	if (type != data.end()) SetType(typeIndex);
+	if (size != data.end()) SetSize(AABB(-Vector(size->second), Vector(size->second)));
+}
+
 void BoxCollisionShape::SetType(int t)
 {
 	type = t;
@@ -27,8 +43,8 @@ void BoxCollisionShape::SetType(int t)
 void BoxCollisionShape::SetSize(AABB s)
 {
 	float width = s.maxs.X - s.mins.X;
-	float height = s.maxs.Z - s.mins.Z;
-	float depth = s.maxs.Y - s.mins.Y;
+	float height = s.maxs.Y - s.mins.Y;
+	float depth = s.maxs.Z - s.mins.Z;
 	size = s;
 	btBoxShape* box = new btBoxShape(btVector3(width / 2.f, height / 2.f, depth / 2.f));
 	body->setCollisionShape(box);

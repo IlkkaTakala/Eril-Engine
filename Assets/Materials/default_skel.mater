@@ -1,0 +1,5 @@
+[Shader]
+name=shader_002_skel
+[Textures]
+Albedo=Assets/Textures/default/default_d.png
+Normal=Assets/Textures/default/map_n.png

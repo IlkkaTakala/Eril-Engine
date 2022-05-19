@@ -85,7 +85,7 @@ public:
 		return (lhs * scale) + (rhs * time);
 	}	
 
-	inline static Rotator Slerp(Rotator lhs, Rotator rhs, float time, float threshold)
+	inline static Rotator Slerp(Rotator lhs, Rotator rhs, float time, float threshold = 0.001)
 	{
 		float angle = Dot(lhs, rhs);
 		if (angle < 0.0f)
@@ -105,15 +105,11 @@ public:
 		return Lerp(lhs, rhs, time).FastNormalize();
 	}
 
-	static Rotator LookAt(const Vector& point, const Vector& position, const Vector& front, const Vector& up)
-	{
-		Vector forwardVector = (point - position).Normalize();
-		float dot = Vector::Dot((0.0f, 1.0f, 0.0f), forwardVector);
+	static Vector RotatorToEuler(const Rotator& vec) {
 
-		float rotationAngle = (float)acos(dot);
-		Vector rotationAxis = Vector::Cross({ 0.0f, 1.0f, 0.0f }, forwardVector).Normalize();
-		return Rotator::FromAxisAngle(rotationAngle, rotationAxis).FastNormalize();
 	}
+
+	static Rotator LookAt(const Vector& sourcePoint, const Vector& destPoint, const Vector& front, const Vector& up);
 
 	inline double Yaw() const {
 		double siny_cosp = 2 * (W * Z + X * Y);

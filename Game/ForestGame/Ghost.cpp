@@ -13,9 +13,9 @@ Ghost::Ghost() : Actor()
 	Mesh = SpawnObject<VisibleObject>();
 	AddComponent(Mesh);
 	Mesh->SetModel("ghost");
-	Mesh->GetModel()->SetMaterial(2, RI->LoadMaterialByName("Assets/Materials/ghost"));
-	Mesh->GetModel()->SetMaterial(1, RI->LoadMaterialByName("Assets/Materials/ghost"));
-	Mesh->GetModel()->SetMaterial(0, RI->LoadMaterialByName("Assets/Materials/ghost"));
+	Mesh->GetModel()->SetMaterial(2, IRender::LoadMaterialByName("Assets/Materials/ghost"));
+	Mesh->GetModel()->SetMaterial(1, IRender::LoadMaterialByName("Assets/Materials/ghost"));
+	Mesh->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/ghost"));
 
 	move = SpawnObject<MovementComponent>();
 	move->SetTarget(this);

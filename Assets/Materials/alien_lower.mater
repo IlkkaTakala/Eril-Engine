@@ -1,0 +1,6 @@
+[Shader]
+name=shader_002_skel
+[Textures]
+Albedo=Assets/Textures/Alien/lower_diffuse_d.png
+Normal=Assets/Textures/Alien/lower_normal_n.png
+Roughness=Assets/Textures/Alien/lower_rough.png
