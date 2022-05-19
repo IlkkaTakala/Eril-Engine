@@ -1,4 +1,4 @@
-2;0;0;
+2;0;0;1;
 ###VERTEX###
 #version 430 core
 layout (location = 0) in vec3 in_position;
@@ -73,6 +73,7 @@ struct LightData {
 	vec4 positionAndSize;
 	vec4 rotation;
 	ivec4 type;
+	mat4 transform;
 };
 
 struct VisibleIndex {
@@ -247,7 +248,7 @@ void main()
 				H = normalize(V + L);
 
 				radiance = light.color.rgb;
-				//shadow = ShadowCalculation(light.transform * vec4(fs_in.FragPos, 1.0), L, N);
+				shadow = ShadowCalculation(light.transform * vec4(fs_in.FragPos.xyz, 1.0), L, N);
 			} break;
 			
 			case 1:

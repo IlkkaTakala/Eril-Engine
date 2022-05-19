@@ -57,6 +57,7 @@ struct LightData {
 	vec4 positionAndSize;
 	vec4 rotation;
 	ivec4 type;
+	mat4 transform;
 };
 
 struct VisibleIndex {

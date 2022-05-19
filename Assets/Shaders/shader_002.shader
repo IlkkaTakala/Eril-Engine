@@ -57,6 +57,7 @@ struct LightData {
 	vec4 positionAndSize;
 	vec4 rotation;
 	ivec4 type;
+	mat4 transform;
 };
 
 struct VisibleIndex {
@@ -86,6 +87,8 @@ layout (location = 1) out vec4 BloomBuffer;
 layout (location = 4) out vec4 NormalBuffer;
 layout (location = 5) out vec4 PositionBuffer;
 layout (location = 6) out vec4 DataBuffer;
+
+layout (binding = 0, r32f) uniform image2D gShadow;
 
 in VS_OUT{
 	vec2 TexCoords;
@@ -158,16 +161,17 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightDir, vec3 normal)
 {
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
 	projCoords = projCoords * 0.5 + 0.5;
-    float closestDepth = 0; //texture(gShadow, projCoords.xy).r; 
+	ivec2 texSize = imageSize(gShadow);
+    float closestDepth = imageLoad(gShadow, ivec2(projCoords.xy * texSize)).r; 
     float currentDepth = projCoords.z;
 	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005); 
 	float shadow = 0.0;
-	vec2 texelSize = 1.0 / vec2(1024.0); //textureSize(gShadow, 0);
+	vec2 texelSize = 1.0 / vec2(imageSize(gShadow).xy);
 	for(int x = -1; x <= 1; ++x)
 	{
 		for(int y = -1; y <= 1; ++y)
 		{
-			float pcfDepth = 0; //texture(gShadow, projCoords.xy + vec2(x, y) * texelSize).r; 
+			float pcfDepth = imageLoad(gShadow, ivec2((projCoords.xy + vec2(x, y) * texelSize) * texSize)).r; 
 			shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
 		}    
 	}
@@ -193,9 +197,9 @@ void main()
 	//vec4 data = texture(gData, TexCoords);
 	float gamma = 2.2;	
 	vec3 albedo = pow(texture(Albedo, fs_in.TexCoords).rgb, vec3(gamma));
-	float metallic = 1.0;//texture(Metallic, fs_in.TexCoords).r;
+	float metallic = 0.0;//texture(Metallic, fs_in.TexCoords).r;
 	float AOt = texture(AO, fs_in.TexCoords).r;
-	float roughness = 0.3;//1.0 - texture(Roughness, fs_in.TexCoords).r;
+	float roughness = 0.9;//1.0 - texture(Roughness, fs_in.TexCoords).r;
 	vec3 normal = texture(Normal, fs_in.TexCoords).rgb;
 	//normal.r = 1.0 - normal.r;
 	//normal.g = 1.0 - normal.g;
@@ -233,7 +237,7 @@ void main()
 				H = normalize(V + L);
 
 				radiance = light.color.rgb;
-				//shadow = ShadowCalculation(light.transform * vec4(fs_in.FragPos, 1.0), L, N);
+				shadow = ShadowCalculation(light.transform * vec4(fs_in.FragPos.xyz, 1.0), L, N);
 			} break;
 			
 			case 1:
@@ -283,7 +287,7 @@ void main()
 		kD *= 1.0 - metallic;
 
 		float NdotL = max(dot(N, L), 0.0);
-		Lo += (kD * albedo / PI + specular) * radiance * NdotL;
+		Lo += (kD * albedo / PI + specular) * radiance * NdotL * (1.0 - shadow);
 		
 	}
 	
@@ -296,7 +300,7 @@ void main()
 	//const float gamma = 2.2;
 	const float exposure = 1.0;
 	
-	ColorBuffer = vec4(N, 1.0);
+	ColorBuffer = vec4(vec3(Lo), 1.0);
 	BloomBuffer = clamp(color - exposure, 0.0, 100.0);
 	NormalBuffer = vec4(N, 1.0);
 	PositionBuffer = vec4(fs_in.FragPos);
