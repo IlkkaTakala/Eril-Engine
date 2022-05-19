@@ -189,21 +189,8 @@ void TestPlayer::RunInputSpace(bool KeyDown)
 
 void TestPlayer::InputOne(bool KeyDown)
 {
-	static String object = R"~~~(
-def execute() {
-	var objId = CreateObject("VisibleObject", 1);
-	SetModel(objId, "Cube");
-	SetMaterial(objId, "hunter");
-	SetLocation(objId, 5, 5, 2);
-	#SetRotation(objId, 0, 0, 0);
-	#SetScale(objId, 1, 1, 1);
-	#DestroyObject(objId);
-})~~~";
 	if (!KeyDown) {
-		InputMode = !InputMode;
-		int id = ScriptCore::CompileScript(object.c_str());
-		ScriptCore::EvaluateScript(id);
-		ScriptCore::CleanScript(id);
+		gunOut = !gunOut;
 	}
 }
 
@@ -223,7 +210,9 @@ void TestPlayer::RunInputShift(bool KeyDown)
 
 void TestPlayer::LeftMouseDown(bool keydown)
 {
-	if (keydown) gunOut = !gunOut;
+	if (keydown) {
+
+	}
 }
 
 void TestPlayer::RightMouseDown(bool KeyDown)
@@ -338,6 +327,9 @@ void TestPlayer::BeginPlay()
 		}
 	}
 	Console::Log("Hello beautiful world");
+
+	auto hunt = SpawnObject<Hunter>(this);
+	hunt->SetLocation({10, 20, 1});
 }
 
 void TestPlayer::OnDestroyed()

@@ -66,7 +66,7 @@ public:
 	}
 
 	float GetFactor() const {
-		return anim->GetSpeedFactor();
+		return anim ? anim->GetSpeedFactor() : 1.f;
 	}
 
 	void Update(float delta, float factor) {
@@ -80,11 +80,12 @@ public:
 	}
 
 	void MakeTransforms(BoneArray bones) const {
+		if (!anim) return;
 		for (int i = 0; i < bones.size(); i++) bones[i] = anim->GetTransform(i, frametime);
 	}
 
 	Transform GetTransform(int bone) const {
-		return anim->GetTransform(bone, frametime);
+		return anim ? anim->GetTransform(bone, frametime) : Transform();
 	}
 };
 

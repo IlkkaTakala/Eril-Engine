@@ -22,6 +22,7 @@ MovementComponent::MovementComponent()
 	air_control = 0.05f;
 	Physics::AddMovable(this);
 	stepHeight = 0.5f;
+	orientToVelocity = false;
 	//rigid = nullptr;
 }
 
@@ -45,7 +46,7 @@ void MovementComponent::Tick(float time)
 {
 	if (!allowMovement || Object == nullptr || !IsActive()) return;
 	DesiredState.location = Object->GetLocation();
-	DesiredState.rotation = Object->GetRotation();
+	DesiredState.rotation = Object->desired.Rotation;
 	//getrotation
 	
 	//btTransform colliderloc;
@@ -145,6 +146,16 @@ void MovementComponent::ApplyMovement()
 		/*auto l = rigid->body->getWorldTransform().getOrigin();*/
 		Object->Location = DesiredState.location;//Vector(l[0], l[2], l[1]);
 		Object->Rotation = DesiredState.rotation;
+
+		if (orientToVelocity) {
+			const Rotator& rot = Object->Rotation;
+			Object->Rotation = Vector(
+				rot.RollDegrees(),
+				rot.PitchDegrees(),
+				rot.YawDegrees() + degrees(Vector::Dot(rot.GetForwardVector(), DesiredState.velocity.Normalize()))
+			);
+		}
+		//Object->desired.Rotation = DesiredState.rotation;
 		//rotation
 	}
 }

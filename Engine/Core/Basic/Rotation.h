@@ -99,6 +99,19 @@ public:
 		return *this;
 	}
 
+	Rotator CopyNormalize() const
+	{
+		Rotator res;
+		double qmagsq = W * W + X * X + Y * Y + Z * Z;
+		if (std::abs(1.0 - qmagsq) < 2.107342e-08) {
+			res = *this * float(2.0 / (1.0 + qmagsq));
+		}
+		else {
+			res = *this * float(1.0 / sqrt(qmagsq));
+		}
+		return res;
+	}
+
 	static float Dot(const Rotator& lhs, const Rotator& rhs)
 	{
 		return (lhs.X * rhs.X) + (lhs.Y * rhs.Y) + (lhs.Z * rhs.Z) + (lhs.W * rhs.W);
@@ -127,7 +140,7 @@ public:
 			return (lhs * scale) + (rhs * invscale);
 		}
 		else // linear interploation
-		return Lerp(lhs, rhs, time).FastNormalize();
+		return Lerp(lhs, rhs, time).CopyNormalize();
 	}
 
 	static Vector RotatorToEuler(const Rotator& vec) {
@@ -164,20 +177,20 @@ public:
 		return (float)degrees(Roll());
 	}
 
-	inline Vector GetUpVector() {
+	inline Vector GetUpVector() const {
 		return RotateVector({ 0, 0, 1 }).Normalize();
 	}
 
-	inline Vector GetRightVector() {
+	inline Vector GetRightVector() const {
 		return RotateVector({ 1, 0, 0 }).Normalize();
 	}
 
-	inline Vector GetForwardVector() {
+	inline Vector GetForwardVector() const {
 		return RotateVector({ 0, 1, 0 }).Normalize();
 	}
 
-	inline Vector RotateVector(const Vector& vector) {
-		return (*this).FastNormalize() * vector;
+	inline Vector RotateVector(const Vector& vector) const {
+		return (*this).CopyNormalize() * vector;
 	}
 
 	static Rotator FromAxisAngle(float angle, const Vector& axis) {
@@ -191,7 +204,7 @@ public:
 	}
 
 	inline Rotator RotateAroundAxis(float angle, const Vector& axis) const {
-		return (*this * FromAxisAngle(angle, axis)).FastNormalize();
+		return (*this * FromAxisAngle(angle, axis)).CopyNormalize();
 	}
 
 	friend Rotator operator*(Rotator lhs, const Rotator& rhs) {
