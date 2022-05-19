@@ -258,7 +258,7 @@ void RenderMeshStaticGL::SetInstances(int count, Transformation* dispArray)
 		Vector loc = dispArray[i].Location;
 		Rotator rot = dispArray[i].Rotation;
 		Vector sca = dispArray[i].Scale;
-		arr[i] = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Y, loc.Z))
+		Instances[i] = glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Y, loc.Z))
 			* glm::toMat4(glm::quat(rot.W, rot.X, rot.Y, rot.Z))
 			* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Y, sca.Z));
 	}

@@ -5,6 +5,7 @@
 
 #include <glad/gl.h>
 #include <glm/glm.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 struct MaterialParams
 {
@@ -104,9 +105,13 @@ void ParticleSystem::Update(float delta)
 		Transforms[t_idx].Scale = p.scale;
 		Transforms[t_idx].Location = p.location;
 		if (FaceCamera) {
-			Vector camDir = (RI->GetActiveCamera()->GetLocation() - p.location).Normalize();
-			Vector cam = RI->GetActiveCamera()->GetRotation().AsEuler();
-			Transforms[t_idx].Rotation = Vector(p.rotation.W, cam.Y + 90.f, cam.Z);
+			Vector camDir = (p.location - IRender::GetActiveCamera()->GetLocation()).Normalize();
+			Rotator cam = IRender::GetActiveCamera()->GetRotation();
+			auto up = glm::vec3(cam.GetUpVector().X, cam.GetUpVector().Y, cam.GetUpVector().Z);
+			glm::vec3 dir{ camDir.X, camDir.Y, camDir.Z };
+			auto q = glm::quatLookAt(dir, up);
+			q = glm::rotate(q, radians(p.rotation.W), dir);
+			Transforms[t_idx].Rotation = Rotator(q.w, q.x, q.y, q.z);
 		}
 		else Transforms[t_idx].Rotation = p.rotation;
 
