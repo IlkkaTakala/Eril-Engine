@@ -1290,6 +1290,7 @@ void Renderer::Render(float delta)
 	BlurRender->Blur(PostProcess->GetBloom(), 10, ScreenVao);
 	PostProcess->BindTextures();
 	SSAO(width, height);
+	PostProcess->BindTextures();
 	SSAORender->BindTextures(8);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);

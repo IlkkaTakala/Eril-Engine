@@ -30,7 +30,7 @@ layout (binding = 4) uniform sampler2D Depth;
 layout (binding = 5) uniform sampler2D Normal;
 layout (binding = 6) uniform sampler2D Position;
 layout (binding = 7) uniform sampler2D Data;
-layout (binding = 9) uniform sampler2D SSAO;
+layout (binding = 8) uniform sampler2D SSAO;
 
 in vec2 TexCoords;
 out vec4 FragColor;
@@ -143,10 +143,10 @@ vec4 rayCast(vec3 dir, inout vec3 hitCoord, out float dDepth){
 		dDepth = hitCoord.z - depth;
 		
 		if ((dir.z - dDepth) < 1.2) {
-			if (dDepth <= 0.0) {
-				vec4 Result;
-				Result = vec4(binarySearch(dir, hitCoord, dDepth), 1.0);
-				return Result;
+		if (dDepth <= 0.0) {
+			vec4 Result;
+			Result = vec4(binarySearch(dir, hitCoord, dDepth), 1.0);
+			return Result;
 			}
 		}
 	}
@@ -155,7 +155,7 @@ vec4 rayCast(vec3 dir, inout vec3 hitCoord, out float dDepth){
 
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
-    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+    return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
 }   
 
 vec3 hash(vec3 a){
@@ -177,8 +177,7 @@ void main()
 	vec3 viewNormal = mat3(view) * texture(Normal, TexCoords).xyz;
     vec3 viewPosition = (view * texture(Position, TexCoords)).xyz;
 	vec3 albedo = hdrColor.rgb;
-	//float spec = texture(Data, TexCoords).g;
-	float spec = texture(Color, TexCoords).w;
+	float spec = texture(Data, TexCoords).g;
 	
 	vec3 F0 = vec3(0.04);
 	F0		= mix(F0, albedo, metallic);
@@ -188,27 +187,21 @@ void main()
 	vec3 hitPos = viewPosition;
 	float dDepth;
 	
-	//vec3 worldPos = texture(Position, TexCoords).xyz;
-	vec3 worldPos = vec3(vec4(viewPosition, 1.0) * inverse(view));
-	//vec3 jitt = mix(vec3(0.0), normalize(vec3(hash(worldPos))), spec * 0.3);
-	vec3 jitt = mix(vec3(0.0), vec3(hash(worldPos)), spec);
-	//vec4 coords = rayCast(jitt + reflected * max(minRayStep, -viewPosition.z), hitPos, dDepth);
-	vec4 coords = rayCast((vec3(jitt) + reflected * max(minRayStep, -viewPosition.z)), hitPos, dDepth);
+	vec3 worldPos = texture(Position, TexCoords).xyz;
+	vec3 jitt = mix(vec3(0.0), normalize(vec3(hash(worldPos))), spec * 0.3);
+	vec4 coords = rayCast(jitt + reflected * max(minRayStep, -viewPosition.z), hitPos, dDepth);
 	vec2 dCoords = smoothstep(0.2, 0.6, abs(vec2(0.5, 0.5) - coords.xy));
 	float screenEdge = clamp(1.0 - (dCoords.x + dCoords.y), 0.0, 1.0);
 	float multiplier = pow(metallic, reflectionSpecularFalloffExponent) * screenEdge * -reflected.z;
 	int ssrMultiplier = 1;
 	if(metallic < 0.01) ssrMultiplier = 0;
 	
-	//vec3 ssr = texture(Color, coords.xy).rgb * clamp(multiplier, 0.0, 0.9) * fresnel * ssrMultiplier;
 	vec3 ssr = texture(Color, coords.xy).rgb * clamp(multiplier, 0.0, 0.9) * fresnel * ssrMultiplier;
 	
 	vec3 result = ssr + hdrColor.rgb;
 	result = vec3(1.0) - exp(-result * exposure);  
     result = pow(result, vec3(1.0 / gamma));
 	
-	//FragColor = vec4(vec3(texture(SSAO, TexCoords).r), 1.0);
-	//FragColor = vec4(ssr, 1.0);
 	FragColor = vec4(result, 1.0);
 }
 
