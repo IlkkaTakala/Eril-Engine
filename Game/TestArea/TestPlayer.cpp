@@ -63,7 +63,7 @@ TestPlayer::TestPlayer() : Player()
 {
 
 	mouseSens = 0.5f;
-	Speed = 12.f;
+	Speed = 4.f;
 	InputMode = true;
 	cursorState = true;
 	spawnCounter = 0;
@@ -73,14 +73,14 @@ TestPlayer::TestPlayer() : Player()
 	Rotation = Rotator(0.f);
 
 	//Player Model
-	Mesh = SpawnObject<VisibleObject>();
+	/*Mesh = SpawnObject<VisibleObject>();
 	Mesh->SetModel("Assets/Meshes/Cube");
 	Mesh->GetModel()->SetAABB(AABB(Vector(-1.f, -1.f, 0.f), Vector(1.f, 1.f, 2.f)));
-	SetLocation(Vector(15, 15, 1));
+	SetLocation(Vector(15, 15, 1));*/
 
 	//Player Movement
 	Movement = SpawnObject<MovementComponent>();
-	Movement->SetTarget(dynamic_cast<Actor*>(this), Mesh->GetModel()->GetAABB());
+	Movement->SetTarget(dynamic_cast<Actor*>(this), AABB(Vector(-1.f, -1.f, 0.f), Vector(1.f, 1.f, 2.f)));
 	Movement->SetGravity(true);
 	Movement->SetPhysics(false);
 	Movement->SetMaxSpeed(Speed);
@@ -128,10 +128,10 @@ TestPlayer::TestPlayer() : Player()
 	BoxCol = SpawnObject<BoxCollisionShape>();
 	Box->AddComponent(BoxCol);
 	BoxCol->SetType(0);
-	BoxCol->SetSize(BoxModel->GetModel()->GetAABB());*/
+	BoxCol->SetSize(BoxModel->GetModel()->GetAABB());
 	
 
-	/*Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
+	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
 
 	auto skel = SpawnObject<SkeletalObject>();
 	skel->SetModel("Assets/Skeletal/Alien");
@@ -142,10 +142,10 @@ TestPlayer::TestPlayer() : Player()
 	animC->BeginPlay();
 	animC->SetSkeleton(skel->GetModel());
 	skel->SetAnimController(animC);
-	//skel->SetParent(this);
+	skel->SetParent(this);
 
-	//animC->SetOverrideAnimation(AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Breakdance", skel->GetModel()));
-	//skel->SetScale(Vector(0.01f));
+	animC->SetOverrideAnimation(AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Breakdance", skel->GetModel()));
+	skel->SetScale(Vector(0.01f));*/
 
 	auto Particle = SpawnObject<ParticleComponent>();
 	Particle->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
@@ -327,7 +327,7 @@ void TestPlayer::BeginPlay()
 	//AudioControllerSystem* audioControllerSystem = static_cast<AudioControllerSystem*>(systemsManager->GetSystemByName("AudioControllerSystem"));
 	//audioComponentID = audio->GetID();
 
-	Vector audioPos = Vector(20.0f, 20.0f, 1.5f);
+	/*Vector audioPos = Vector(20.0f, 20.0f, 1.5f);
 	audio->SetSourceID(AudioManager::LoadAudio("clicketi.WAV"));
 	audio->SetPosition(audioPos);
 	Mesh->SetLocation(audioPos);
@@ -335,7 +335,7 @@ void TestPlayer::BeginPlay()
 	audio->SetPitch(1.0f);
 	audio->SetLooping(true);
 	audio->SetSourceRelative(false);
-	audio->Play();
+	audio->Play();*/
 
 	//Lights Testing
 	IComponentArrayQuerySystem<LightComponent>* lightSystem = static_cast<IComponentArrayQuerySystem<LightComponent>*> (systemsManager->GetSystemByName("LightControllerSystem"));

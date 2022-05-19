@@ -1,0 +1,15 @@
+<header version='1.0' />
+<TestPlayer id="1" />
+<VisibleObject id="12" args="Location:0,0,0; Rotation:0,0,0; Scale:25,25,1; Mesh:Assets/Meshes/Cube;"/>
+<BoxCollisionShape id="24" args="Location:0,0,0; Rotation:0,0,0; Size:100,100,1; Type:Static"/>
+
+<VisibleObject id="122" args="Location:2,2,2; Mesh:Assets/Meshes/Cube;"/>
+<BoxCollisionShape id="242" args="Location:2,2,2; Rotation:0,0,0; Size:1,1,1; Type:Static"/>
+
+<VisibleObject id="123" args="Location:7,3,2; Mesh:Assets/Meshes/Cube;"/>
+<VisibleObject id="124" args="Location:2.2,2.1,4; Mesh:Assets/Meshes/Cube;"/>
+<VisibleObject id="125" args="Location:-12,2,2; Mesh:Assets/Meshes/Cube;"/>
+<VisibleObject id="126" args="Location:3,8,2; Mesh:Assets/Meshes/Cube;"/>
+<VisibleObject id="127" args="Location:8,-2,2; Mesh:Assets/Meshes/Cube;"/>
+<VisibleObject id="128" args="Location:8.2,-2.2,4; Mesh:Assets/Meshes/Cube;"/>
+<VisibleObject id="129" args="Location:3,-4,2; Mesh:Assets/Meshes/Cube;"/>
