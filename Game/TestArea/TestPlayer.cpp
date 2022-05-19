@@ -89,7 +89,7 @@ TestPlayer::TestPlayer() : Player()
 	AddComponent(Spring);
 
 	GetCamera()->SetParent(Spring);
-	Spring->SetLocation({-0.6f, 0.f, 1.5f});
+	Spring->SetLocation({0.6f, 0.f, 1.5f});
 	GetCamera()->SetLocation({0.f, -2.5f, 0.f});
 
 	AddComponent(Mesh);
@@ -223,7 +223,15 @@ void TestPlayer::RunInputShift(bool KeyDown)
 
 void TestPlayer::LeftMouseDown(bool keydown)
 {
-	if (keydown) gunOut = !gunOut;
+	if (keydown) {
+		gunOut = !gunOut;
+		auto p = SpawnObject<VisibleObject>(this);
+		p->SetModel("Assets/Meshes/tracer");
+		p->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/default"));
+		p->SetLocation(Location + Vector{0, 0, 1});
+		p->SetRotation(GetCamera()->GetRotation());
+		p->SetLifetime(0.5f);
+	}
 }
 
 void TestPlayer::RightMouseDown(bool KeyDown)

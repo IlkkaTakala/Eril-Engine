@@ -60,6 +60,8 @@ public:
 
 	static std::map<String, SpawnFunction>& TypeList();
 
+	static void UpdateLifetimes(float delta);
+
 private:
 	friend class GC;
 	static long counter;

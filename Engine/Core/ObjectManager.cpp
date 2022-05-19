@@ -121,3 +121,17 @@ std::map<String, SpawnFunction>& ObjectManager::TypeList()
 	static std::map<String, SpawnFunction> Type;
 	return Type;
 }
+
+void ObjectManager::UpdateLifetimes(float delta)
+{
+	auto it = ObjectRecords.begin();
+	while (it != ObjectRecords.end()) {
+		if (it->second->object->hasLife) {
+			it->second->object->lifetime -= delta;
+			if (it->second->object->lifetime <= 0.f) {
+				it++->second->object->DestroyObject();
+			}
+		}
+		if (it != ObjectRecords.end()) ++it;
+	}
+}

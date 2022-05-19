@@ -20,6 +20,8 @@ void Data::DestroyObject()
 Data::Data()
 {
 	RecordNumber = 0;
+	hasLife = false;
+	lifetime = 0.f;
 	bMarked = false;
 	ObjectManager::CreateRecord(this);
 }
@@ -37,6 +39,17 @@ void Data::AddToRoot()
 void Data::RemoveFromRoot()
 {
 	ObjectManager::Unprotect(RecordNumber);
+}
+
+void Data::SetLifetime(float in)
+{
+	lifetime = in;
+	hasLife = !(in - 0.000001f < 0.f && in + 0.000001f > 0.f);
+}
+
+float Data::GetRemainingLifetime()
+{
+	return lifetime;
 }
 
 BaseObject::BaseObject()

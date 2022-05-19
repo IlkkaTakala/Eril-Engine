@@ -28,10 +28,14 @@ public:
 	RecordInt GetRecord() { return RecordNumber; }
 	void AddToRoot();
 	void RemoveFromRoot();
+	void SetLifetime(float in);
+	float GetRemainingLifetime();
 protected:
 	friend struct Record;
 	virtual ~Data();
 	bool bMarked;
+	float lifetime;
+	bool hasLife;
 private:
 	friend class ObjectManager;
 	friend class GC;
