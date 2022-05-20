@@ -294,7 +294,7 @@ int Renderer::SetupWindow(int width, int height)
 	float near = 0.1f;
 	float far = 1000.0f;
 	ShadowProj = glm::perspective(glm::radians(90.0f), aspect, near, far);
-	ShadowOrtho = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near, far);
+	ShadowOrtho = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, near, far);
 
 	float envmap[] = {
 		-1.0f,  1.0f, -1.0f,
@@ -441,7 +441,7 @@ void Renderer::UpdateLights()
 			light.type.x = Lights->at(i).LightType;
 			glm::vec3 loc = glm::vec3(ActiveCamera->GetLocation().X, ActiveCamera->GetLocation().Y, ActiveCamera->GetLocation().Z);
 			glm::vec3 dir(Lights->at(i).Rotation.X, Lights->at(i).Rotation.Y, Lights->at(i).Rotation.Z);
-			glm::vec3 up(0, 0, 1);
+			glm::vec3 up(glm::cross(dir, { 0,1,0 }));
 			glm::vec3 newLoc = loc + (-dir * 70.f);
 			glm::mat4 view = glm::lookAt(newLoc, newLoc + dir, up);
 			light.transform = ShadowOrtho * view;
@@ -856,7 +856,8 @@ void Renderer::Shadows(int width, int height)
 	}
 
 	ShadowMapping->Bind();
-	glClear(GL_DEPTH_BUFFER_BIT);
+	glClearColor(1.f, 1.f, 1.f, 1.f);
+	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	glDepthFunc(GL_LESS);
 	ShadowColorShader->Bind();
 
@@ -864,7 +865,7 @@ void Renderer::Shadows(int width, int height)
 		if (l.LightType != 0) continue;
 		glm::vec3 loc = glm::vec3(ActiveCamera->GetLocation().X, ActiveCamera->GetLocation().Y, ActiveCamera->GetLocation().Z);
 		glm::vec3 dir(l.Rotation.X, l.Rotation.Y, l.Rotation.Z);
-		glm::vec3 up(0,0,1);
+		glm::vec3 up(glm::cross(dir, {0,1,0}));
 		glm::vec3 newLoc = loc + (-dir * 70.f);
 		glm::mat4 view = glm::lookAt(newLoc, newLoc + dir, up);
 
@@ -935,7 +936,8 @@ void Renderer::Forward(int width, int height)
 
 	glEnable(GL_MULTISAMPLE);
 
-	glBindImageTexture(0, ShadowMapping->GetShadows(), 0, GL_FALSE, 0, GL_READ_ONLY, GL_R32F);
+	glActiveTexture(GL_TEXTURE15);
+	glBindTexture(GL_TEXTURE_2D, ShadowMapping->GetShadows());
 
 	// Opaque Pass
 	for (auto const& [name, s] : Shaders)

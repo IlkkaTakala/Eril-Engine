@@ -7,6 +7,7 @@ struct PointLight {
 	vec4 positionAndSize;
 	vec4 Rotation;
 	ivec4 type;
+	mat4 transform;
 };
 
 struct VisibleIndex {

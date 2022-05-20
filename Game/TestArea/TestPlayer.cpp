@@ -309,27 +309,30 @@ void TestPlayer::BeginPlay()
 		DirLight->Size = 3.f;
 		DirLight->Intensity = 1.f;
 		DirLight->Color = Vector(1.f);
-		DirLight->Rotation = Vector(0.5, 0.5, -0.5).Normalize();
+		DirLight->Rotation = Vector(0.5f, 0.5f, -0.5f).Normalize();
 
-		for (int i = 0; i < 50; i++)
-		{
-			//Console::Log("Light addded " + std::to_string(i));
-			float x = (float)(rand() % 100);
-			float y = (float)(rand() % 100);
-			//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
+		//for (int i = 0; i < 50; i++)
+		//{
+		//	//Console::Log("Light addded " + std::to_string(i));
+		//	float x = (float)(rand() % 100);
+		//	float y = (float)(rand() % 100);
+		//	//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
 
-			LightComponent* light = lightSystem->AddComponentToSystem();
-			light->Location = Vector(x, y, 1.f);
-			light->LightType = LIGHT_POINT;
-			light->Size = 5.f;
-			light->Intensity = rand() / (float)RAND_MAX * 20.f;
-			light->Color = Vector(x, y, 2.5f);
-		}
+		//	LightComponent* light = lightSystem->AddComponentToSystem();
+		//	light->Location = Vector(x, y, 1.f);
+		//	light->LightType = LIGHT_POINT;
+		//	light->Size = 5.f;
+		//	light->Intensity = rand() / (float)RAND_MAX * 20.f;
+		//	light->Color = Vector(x, y, 2.5f);
+		//}
 	}
 	Console::Log("Hello beautiful world");
 
 	auto hunt = SpawnObject<Hunter>(this);
 	hunt->SetLocation({10, 20, 1});
+
+	hunt = SpawnObject<Hunter>(this);
+	hunt->SetLocation({ 20, 20, 1 });
 }
 
 void TestPlayer::OnDestroyed()

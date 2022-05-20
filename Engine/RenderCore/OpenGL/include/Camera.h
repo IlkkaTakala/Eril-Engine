@@ -19,8 +19,8 @@ public:
 	virtual const Vector GetUpVector() const override;
 	virtual const Vector GetForwardVector() const override;
 	virtual const Vector GetRightVector() const override;
-	virtual const Rotator& GetRotation() const override;
-	virtual const Vector& GetLocation() const override;
+	virtual Rotator GetRotation() const override;
+	virtual Vector GetLocation() const override;
 
 	virtual void SetLookAt(const Vector& to, const Vector& up = Vector(0.0f, 0.0f, 1.0f)) override;
 

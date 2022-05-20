@@ -16,7 +16,7 @@ Hunter::Hunter() : Actor()
 	Mesh->GetModel()->SetMaterial(1, IRender::LoadMaterialByName("Assets/Materials/alien_upper"));
 	Mesh->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/alien_lower"));
 	Mesh->GetModel()->SetAABB(AABB(Vector(-1.f, -1.f, 0.f), Vector(1.f, 1.f, 2.f)));
-	Mesh->SetRotation(-180);
+	Mesh->SetRotation(90);
 	Mesh->SetScale(0.01);
 	auto animC = SpawnObject<HunterAnimControl>(this, Mesh);
 	animC->SetSkeleton(Mesh->GetModel());
@@ -71,43 +71,23 @@ void Hunter::Tick(float delta)
 
 void Hunter::SetNewTarget(float delta)
 {
-	Console::Log("New target set");
 	if (GetGameState()->CurrentPlayer != nullptr)
 		targetLoc = GetGameState()->CurrentPlayer->GetLocation();
 }
 
 void HunterAnimControl::BeginPlay()
 {
-	blender.AddKey(0.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Idle", owner->GetModel()));
-	blender.AddKey(2.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/RightStrafeWalk", owner->GetModel()));
-	blender.AddKey(-2.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/LeftStrafeWalk", owner->GetModel()));
-	blender.AddKey(0.f, 2.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Walking", owner->GetModel()));
-	blender.AddKey(0.f, -2.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/WalkBack", owner->GetModel()));
-	blender.AddKey(4.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/RightStrafe", owner->GetModel()));
-	blender.AddKey(-4.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/LeftStrafe", owner->GetModel()));
-	blender.AddKey(0.f, 4.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Running", owner->GetModel()));
-	blender.AddKey(0.f, -4.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/RunBack", owner->GetModel()));
+	blender.AddKey(0.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/rifleIdle", owner->GetModel()));
+	blender.AddKey(2.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/rifleStrafeWalkRight", owner->GetModel()));
+	blender.AddKey(-2.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/rifleStrafeWalkLeft", owner->GetModel()));
+	blender.AddKey(0.f, 2.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/rifleWalk", owner->GetModel()));
+	blender.AddKey(0.f, -2.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/rifleWalkBack", owner->GetModel()));
+	blender.AddKey(4.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/rifleStrafeRunRight", owner->GetModel()));
+	blender.AddKey(-4.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/rifleStrafeRunLeft", owner->GetModel()));
+	blender.AddKey(0.f, 4.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/rifleRun", owner->GetModel()));
+	blender.AddKey(0.f, -4.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/rifleRunBack", owner->GetModel()));
 
 	walk = 0.f;
-	gunStatus = false;
-	gun = 0.f;
-	gunTime = 0.3f;
-	gunInterp = false;
-
-	idle = AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Idle", owner->GetModel());
-	gunPose = AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/GunPose", owner->GetModel());
-
-	states.AddState("Walk", [&](float delta, BoneArray arr) {
-		blender.Evaluate(delta, arr, walk.X, walk.Y);
-	});
-
-	auto skel = dynamic_cast<RenderMeshSkeletalGL*>(owner->GetModel())->GetSkeleton();
-	perBoneGun.Init([&](float delta, BoneArray bones) {
-		blender.Evaluate(delta, bones, walk.X, walk.Y);
-	}, [&](float delta, BoneArray bones) {
-		gunPose.MakeTransforms(bones);
-	}, skel, "mixamorig:Spine");
-	auto mesh = dynamic_cast<RenderMeshSkeletalGL*>(owner->GetModel());
 }
 
 void HunterAnimControl::Tick(float delta)
@@ -119,34 +99,10 @@ void HunterAnimControl::Tick(float delta)
 		walk = Vector(Vector::Dot(player->GetRotation().GetRightVector(), player->move->DesiredState.velocity),
 			Vector::Dot(player->GetRotation().GetForwardVector(), player->move->DesiredState.velocity),
 			0.f);
-
-		if (gunStatus != player->gun) {
-			gunInterp = true;
-			gunStatus = player->gun;
-		}
-	}
-	if (gunInterp) {
-		if (gunStatus) {
-			gun += delta;
-			if (gun > gunTime) {
-				gun = gunTime;
-				gunInterp = false;
-			}
-		}
-		else {
-			gun -= delta;
-			if (gun < 0.f) {
-				gun = 0.f;
-				gunInterp = false;
-			}
-		}
 	}
 }
 
 void HunterAnimControl::EvaluateBones(BoneArray bones)
 {
-	idle.Update(last_delta, idle.GetFactor());
-	gunPose.Update(last_delta, gunPose.GetFactor());
-	perBoneGun.SetBlendFactor(gun / gunTime);
-	perBoneGun.Evaluate(last_delta, bones);
+	blender.Evaluate(last_delta, bones, walk.Y, walk.X);
 }

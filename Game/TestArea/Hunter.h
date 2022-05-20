@@ -17,15 +17,7 @@ public:
 	void EvaluateBones(BoneArray bones) override;
 
 	AnimationBlendSpace2D blender;
-	AnimationStateMachine states;
-	AnimationInstance idle;
-	AnimationInstance gunPose;
-	AnimationPerBoneBlend perBoneGun;
 	Vector walk;
-	float gun;
-	bool gunStatus;
-	bool gunInterp;
-	float gunTime;
 };
 
 class Hunter : public Actor

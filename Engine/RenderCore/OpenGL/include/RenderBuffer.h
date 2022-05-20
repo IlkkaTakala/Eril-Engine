@@ -107,29 +107,6 @@ private:
 	BlurBuffer& operator=(const BlurBuffer&);
 };
 
-class ShadowBuffer
-{
-public:
-	ShadowBuffer(int width, int height);
-	~ShadowBuffer();
-
-	void Bind();
-	void Unbind();
-	uint GetBuffer() const { return FrameBuffer; }
-	uint GetShadows() const { return Shadow; }
-
-	void BindTextures(int offset = 0);
-
-private:
-	uint FrameBuffer;
-
-	uint Shadow;
-	uint DepthBuffer;
-
-	ShadowBuffer(const ShadowBuffer&);
-	ShadowBuffer& operator=(const ShadowBuffer&);
-};
-
 class ShadowMapBuffer
 {
 public:
@@ -139,11 +116,13 @@ public:
 	void Bind();
 	void Unbind();
 	uint GetBuffer() const { return FrameBuffer; }
-	uint GetShadows() const { return DepthBuffer; }
+	uint GetDepth() const { return DepthBuffer; }
+	uint GetShadows() const { return Shadow; }
 
 private:
 	uint FrameBuffer;
 
+	uint Shadow;
 	uint DepthBuffer;
 
 	ShadowMapBuffer(const ShadowMapBuffer&);

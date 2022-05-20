@@ -114,6 +114,8 @@ in VS_OUT{
 	vec3 Colors;
 } fs_in;
 
+layout(binding=15) uniform sampler2D gShadow;
+
 uniform sampler2D Albedo;
 uniform sampler2D Normal;
 uniform sampler2D Roughness;
@@ -172,24 +174,26 @@ const vec3 sampleOffsetDirections[20] = vec3[]
 
 float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightDir, vec3 normal)
 {
-    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-	projCoords = projCoords * 0.5 + 0.5;
-    float closestDepth = 0; //texture(gShadow, projCoords.xy).r; 
+	vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    projCoords = projCoords * 0.5 + 0.5;
+    float closestDepth = texture(gShadow, projCoords.xy).r; 
     float currentDepth = projCoords.z;
-	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005); 
-	float shadow = 0.0;
-	vec2 texelSize = 1.0 / vec2(1024.0); //textureSize(gShadow, 0);
-	for(int x = -1; x <= 1; ++x)
+    float shadow = 1.0;
+	float bias = 0.0001;
+	vec2 texelSize = 1.0 / textureSize(gShadow, 0);
+	for(int x = -2; x <= 2; ++x)
 	{
-		for(int y = -1; y <= 1; ++y)
+		for(int y = -2; y <= 2; ++y)
 		{
-			float pcfDepth = 0; //texture(gShadow, projCoords.xy + vec2(x, y) * texelSize).r; 
-			shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
+			float pcfDepth = texture(gShadow, (projCoords.xy + vec2(x, y) * texelSize)).r; 
+			shadow += currentDepth - bias > pcfDepth ? 0.0 : 1.0;        
 		}    
 	}
-	shadow /= 9.0;
-	if(projCoords.z > 1.0)
-        shadow = 0.0;
+	shadow /= 25.0;
+
+    if(projCoords.z > 1.0)
+        shadow = 1.0;
+    
     return shadow;
 }
 
@@ -244,7 +248,7 @@ void main()
 		{
 			case 0:
 			{
-				L = normalize(light.rotation.xyz);
+				L = normalize(-light.rotation.xyz);
 				H = normalize(V + L);
 
 				radiance = light.color.rgb;
@@ -298,7 +302,7 @@ void main()
 		kD *= 1.0 - metallic;
 
 		float NdotL = max(dot(N, L), 0.0);
-		Lo += (kD * albedo / PI + specular) * radiance * NdotL;
+		Lo += (kD * albedo / PI + specular) * radiance * NdotL * shadow;
 		
 	}
 	

@@ -22,7 +22,7 @@ public:
 	void AddRotation(const Rotator& NewRotation) { SetRotation(NewRotation + Rotation); };
 	const Vector GetLocation() const { return Location; }
 	const Rotator GetRotation() const { return Rotation; }
-	const Vector GetWorldLocation() const { return (Parent ? Parent->GetWorldLocation() : Vector(0.f)) + Location; }
+	const Vector GetWorldLocation() const { return (Parent ? Parent->GetWorldLocation() : Vector(0.f)) + (Parent ? Parent->GetWorldRotation() : 1.f) * Location; }
 	const Rotator GetWorldRotation() const { return (Parent ? Parent->GetWorldRotation() : Rotator(0.f)) * Rotation; }
 	const Vector GetScale() const { return Scale; }
 	const Vector GetWorldScale() const { return Parent ? Parent->GetWorldScale() : Vector(0.f) * Scale; }

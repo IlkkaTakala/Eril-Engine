@@ -83,14 +83,14 @@ const Vector GLCamera::GetRightVector() const
 	return Vector(inverted[0][0], inverted[0][1], inverted[0][2]);
 }
 
-const Rotator& GLCamera::GetRotation() const
+Rotator GLCamera::GetRotation() const
 {
-	return Rotation;
+	return Parent->GetWorldRotation() * Rotation;
 }
 
-const Vector& GLCamera::GetLocation() const
+Vector GLCamera::GetLocation() const
 {
-	return Location;
+	return Parent->GetWorldLocation() + Parent->GetWorldRotation() * Location;
 }
 
 void GLCamera::SetLookAt(const Vector& to, const Vector& up) {
