@@ -118,12 +118,12 @@ TestPlayer::TestPlayer() : Player()
 	Sky = SpawnObject<VisibleObject>(this);
 	Sky->SetModel("Assets/Meshes/SkySphere");
 	Sky->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/Sky"));
-	Sky->SetScale(Sky->GetScale() * 2.0f);
+	Sky->SetScale(Sky->GetScale() * 4.0f);
 
 	pause = nullptr;
 
-	Plane = SpawnObject<VisibleObject>(this);
-	Plane->SetModel("Assets/Meshes/Cube");
+	/*Plane = SpawnObject<VisibleObject>();
+	Plane->SetModel("Cube");
 	Plane->GetModel()->SetAABB(AABB(Vector(-20.f, -20.f, -0.5f), Vector(20.f, 20.f, 0.5f)));
 	Plane->SetScale(Vector(20.f, 20.f, 0.5f));
 	Plane->SetLocation(Vector(10.f, 10.f, 0.f));
@@ -131,10 +131,25 @@ TestPlayer::TestPlayer() : Player()
 	PlaneCol = SpawnObject<BoxCollisionShape>(this);
 	PlaneCol->SetType(0);
 	PlaneCol->SetSize(Plane->GetModel()->GetAABB());
-	Plane->AddComponent(PlaneCol);
+	Plane->AddComponent(PlaneCol);*/
 
 	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
 
+	auto Particle = SpawnObject<ParticleComponent>();
+	Particle->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
+	Particle->SetLocation(Vector(-116.f, -104.f, 44.f));
+
+	auto Particle2 = SpawnObject<ParticleComponent>();
+	Particle2->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
+	Particle2->SetLocation(Vector(-60.f, -94.f, 44.f));
+
+	auto smoke = SpawnObject<ParticleComponent>();
+	smoke->SetSystem(ParticleSystem::MakeSystem<SmokeParticle>());
+	smoke->SetLocation(Vector(71.f, -40.f, 11.f));
+
+	auto part = SpawnObject<ParticleComponent>();
+	part->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
+	part->SetLocation({ 10.f, 5.f, 0.5f });
 }
 
 void TestPlayer::TestTimer(float d)
@@ -302,10 +317,10 @@ void TestPlayer::BeginPlay()
 	if (lightSystem != nullptr)
 	{
 		LightComponent* DirLight = lightSystem->AddComponentToSystem();
-		DirLight->Location = Vector(0.f, 0.f, 1.f);
+		DirLight->Location = Vector(0.f, 0.f, 0.f);
 		DirLight->LightType = LIGHT_DIRECTIONAL;
 		DirLight->Size = 3.f;
-		DirLight->Intensity = 1.f;
+		DirLight->Intensity = 2.f;
 		DirLight->Color = Vector(1.f);
 		DirLight->Rotation = Vector(0.5f, 0.5f, -0.5f).Normalize();
 

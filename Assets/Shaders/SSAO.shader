@@ -34,7 +34,7 @@ layout(std430, binding = 1) readonly buffer SSAOKernels {
 layout (binding = 4) uniform sampler2D gDepth;
 layout (binding = 5) uniform sampler2D gNormal;
 layout (binding = 6) uniform sampler2D gPosition;
-layout (binding = 7) uniform sampler2D texNoise;
+layout (binding = 8) uniform sampler2D texNoise;
 
 in vec2 TexCoords;
 
@@ -66,7 +66,7 @@ void main()
 	
 	int kernelSize = 64;
 	float radius = 0.6;
-	float bias = 1.0;
+	float bias = 0.4;
 	
 	float occlusion = 0.0;
 	for(int i = 0; i < kernelSize; ++i)

@@ -5,6 +5,7 @@ class BoxCollisionShape : public ColliderComponent
 {
 	REGISTER(BoxCollisionShape);
 public:
+	virtual void LoadWithParameters(const String& args) override;
 	virtual void SetType(int t) override;
 	void SetSize(AABB s);
 };

@@ -99,6 +99,9 @@ in VS_OUT{
 } fs_in;
 
 uniform sampler2D Albedo;
+uniform sampler2D Normal;
+uniform sampler2D Roughness;
+uniform sampler2D AO;
 
 uniform int numberOfTilesX;
 
@@ -186,11 +189,12 @@ void main()
 	ivec2 tileID = location / ivec2(16, 16);
 	uint index = tileID.y * numberOfTilesX + tileID.x;
 
+	// Get color and normal components from texture maps
 	float gamma = 2.2;	
-	vec3 albedo = pow(texture(Albedo, fs_in.TexCoords).rgb, vec3(gamma));
+	vec3 albedo = fs_in.Colors;
 	float metallic = 0.0;
-	float roughness = 1.0;
-
+	float roughness = 0.9;
+	
 	float shadow = 0;
 	//float SSAO = texture(gSSAO, TexCoords).r;
 	
@@ -219,7 +223,7 @@ void main()
 		{
 			case 0:
 			{
-				L = normalize(light.rotation.xyz);
+				L = normalize(-light.rotation.xyz);
 				H = normalize(V + L);
 
 				radiance = light.color.rgb;
@@ -286,7 +290,7 @@ void main()
 	//const float gamma = 2.2;
 	const float exposure = 1.0;
 	
-	ColorBuffer = vec4(N, 1.0);
+	ColorBuffer = color;
 	BloomBuffer = clamp(color - exposure, 0.0, 100.0);
 	NormalBuffer = vec4(N, 1.0);
 	PositionBuffer = vec4(fs_in.FragPos);

@@ -95,14 +95,6 @@ void TestAnimControl::BeginPlay()
 	states.AddPaths("Rifle", { {"Walk", [&]()->bool { return !gunStatus; }, 0.1f} });
 	states.AddPaths("Walk", { {"Rifle", [&]()->bool { return gunStatus; }, 0.1f} });
 
-	/*auto skel = dynamic_cast<RenderMeshSkeletalGL*>(owner->GetModel())->GetSkeleton();
-	perBoneGun.Init([&](float delta, BoneArray bones) {
-		blender.Evaluate(delta, bones, walk.X, walk.Y);
-	}, [&](float delta, BoneArray bones) {
-		gunPose.MakeTransforms(bones);
-	}, skel, "mixamorig:Spine");
-	auto mesh = dynamic_cast<RenderMeshSkeletalGL*>(owner->GetModel());
-	*/
 }
 
 void TestAnimControl::Tick(float delta)

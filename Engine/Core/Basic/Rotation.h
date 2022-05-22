@@ -40,32 +40,7 @@ public:
 	// Roll, Pitch, Yaw
 	Vector AsEuler() const
 	{
-		Vector euler;
-		const float sqw = W * W;
-		const float sqx = X * X;
-		const float sqy = Y * Y;
-		const float sqz = Z * Z;
-		const float test = 2.f * (Y * W - X * Z);
-		
-		if (Math::Equals(test, 1.0))
-		{
-			euler.Z = (float)(-2.0 * atan2(X, W));
-			euler.X = 0;
-			euler.Y = (float)(PI * 0.5);
-		}
-		else if (Math::Equals(test, -1.0))
-		{
-			euler.Z = (float)(2.0 * atan2(X, W));
-			euler.X = 0;
-			euler.Y = (float)(PI * -0.5);
-		}
-		else
-		{
-			euler.Z = (float)atan2(2.0 * (X * Y + Z * W), (sqx - sqy - sqz + sqw));
-			euler.X = (float)atan2(2.0 * (Y * Z + X * W), (-sqx - sqy + sqz + sqw));
-			euler.Y = (float)asin(Math::Clamp(test, -1.0, 1.0));
-		}
-		return euler;
+		return { RollDegrees(), PitchDegrees(), YawDegrees() };
 	}
 
 	inline Vector GetImaginary() const
@@ -146,6 +121,8 @@ public:
 	static Vector RotatorToEuler(const Rotator& vec) {
 
 	}
+
+	static Rotator LookAt(const Vector& sourcePoint, const Vector& destPoint, const Vector& front, const Vector& up);
 
 	inline double Yaw() const {
 		double siny_cosp = 2 * (W * Z + X * Y);
