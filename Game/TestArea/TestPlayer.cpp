@@ -159,6 +159,9 @@ TestPlayer::TestPlayer() : Player()
 	smoke->SetSystem(ParticleSystem::MakeSystem<SmokeParticle>());
 	smoke->SetLocation(Vector(71.f, -40.f, 11.f));
 
+	auto part = SpawnObject<ParticleComponent>();
+	part->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
+	part->SetLocation({10.f, 5.f, 0.5f});
 
 }
 

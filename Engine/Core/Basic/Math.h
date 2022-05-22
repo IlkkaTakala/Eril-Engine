@@ -22,8 +22,15 @@ inline float degrees(const float& v) {
 
 namespace Math
 {
-	inline float Clamp(float value, float min, float max);
-	inline bool Equals(float a, float b, float epsilon = 0.00001);
+	inline float Clamp(float value, float min, float max) {
+		if (value <= min) return min;
+		if (value >= max) return max;
+		return value;
+	}
+
+	inline bool Equals(float a, float b, float epsilon = 0.00001) {
+		return a <= b + epsilon && a >= b - epsilon;
+	}
 
 	// Input angle in degrees
 	inline float Sin(float a) { return (float)sin(radians(a)); }

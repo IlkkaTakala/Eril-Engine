@@ -30,6 +30,7 @@ CloudParticle::CloudParticle() : ParticleSystem()
 		});
 
 	SetSpawner(ParticleSystemConstruction::MakeSpawnRate(this, 15.f));
+
 }
 
 SmokeParticle::SmokeParticle() : ParticleSystem()
