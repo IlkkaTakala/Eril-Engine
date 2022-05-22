@@ -3,7 +3,7 @@
 
 void Actor::LoadWithParameters(const String& args)
 {
-	InputComp = SpawnObject<InputComponent>();
+	InputComp = SpawnObject<InputComponent>(this);
 	RegisterInputs(InputComp);
 	SceneComponent::LoadWithParameters(args);
 }
@@ -26,6 +26,10 @@ InputComponent* Actor::GetInputComponent()
 void Actor::Tick(float)
 {
 	//AddRotation(Vector(0, 0, 1.0));
+}
+
+void Actor::BeginPlay()
+{
 }
 
 

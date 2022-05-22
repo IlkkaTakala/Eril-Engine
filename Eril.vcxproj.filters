@@ -127,9 +127,6 @@
     <ClCompile Include="Engine\Core\LightData.cpp">
       <Filter>Engine\Deprecated</Filter>
     </ClCompile>
-    <ClCompile Include="Game\ECS_Examples\ECSExample.cpp">
-      <Filter>Game\ECSExamples</Filter>
-    </ClCompile>
     <ClCompile Include="Game\TestArea\FPSCounter.cpp">
       <Filter>Game\TestArea</Filter>
     </ClCompile>
@@ -157,23 +154,11 @@
     <ClCompile Include="Game\PauseUI.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="Game\UIEditor\Editor.cpp">
-      <Filter>Game\UIEditor</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\UIEditor\EditorPlayer.cpp">
-      <Filter>Game\UIEditor</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\RenderCore\OpenGL\UI\VerticalPanel.cpp">
       <Filter>Engine\OpenGL\UI</Filter>
     </ClCompile>
-    <ClCompile Include="Game\UIEditor\EditorItemWrapper.cpp">
-      <Filter>Game\UIEditor</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\external\tinyfiledialogs\tinyfiledialogs.c">
       <Filter>Engine\Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\Disco\DiscoPlayer.cpp">
-      <Filter>Game\Disco</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Interface\AudioManager.cpp">
       <Filter>Engine\Interface</Filter>
@@ -186,12 +171,6 @@
     </ClCompile>
     <ClCompile Include="Engine\Core\Objects\ColliderComponent.cpp">
       <Filter>Engine\Objects\Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\UITest\TestPlayerLoad.cpp">
-      <Filter>Game\UITesting</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\UITest\TestUILoad.cpp">
-      <Filter>Game\UITesting</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Core\Objects\InputComponent.cpp">
       <Filter>Engine\Objects</Filter>
@@ -207,18 +186,6 @@
     </ClCompile>
     <ClCompile Include="Game\TestArea\CloudParticle.cpp">
       <Filter>Game\TestArea</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\ForestGame\EndScreen.cpp">
-      <Filter>Game\ForestGame</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\ForestGame\ForestPlayer.cpp">
-      <Filter>Game\ForestGame</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\ForestGame\Ghost.cpp">
-      <Filter>Game\ForestGame</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\ForestGame\StartScreen.cpp">
-      <Filter>Game\ForestGame</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Interface\AssetManager.cpp">
       <Filter>Engine\Interface</Filter>
@@ -249,6 +216,9 @@
     </ClCompile>
     <ClCompile Include="Game\TestArea\LightSpawner.cpp">
       <Filter>Game\TestArea</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\LoadingScreen\LoadingPlayer.cpp">
+      <Filter>Game\LoadingScreen</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -294,38 +264,20 @@
     <Filter Include="Engine\Deprecated">
       <UniqueIdentifier>{81affc60-0a93-4279-86e2-3f0b96432cee}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\ECSExamples">
-      <UniqueIdentifier>{c8e82cee-858e-4003-9acc-8d4f0c477561}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\ECSExamples\Components">
-      <UniqueIdentifier>{9396e3fc-5c63-4a13-906f-db6658fb8090}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\ECSExamples\Systems">
-      <UniqueIdentifier>{79204ca8-a3de-490a-8718-506adad13f46}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\TestArea">
       <UniqueIdentifier>{e3393857-bd5b-4bc0-b563-ca68ca30af05}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game\MainMenu">
       <UniqueIdentifier>{2ab0c0ce-2ceb-4351-ae11-5553dc38f389}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\UIEditor">
-      <UniqueIdentifier>{76c549e1-baf8-4ebb-861f-efc6d3daf410}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resources">
       <UniqueIdentifier>{27cfd01c-53e4-4436-b300-9133214a1517}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Disco">
-      <UniqueIdentifier>{c1638df8-5fae-4cd8-9d38-56e874a765f3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\UITesting">
-      <UniqueIdentifier>{7ceb856b-ccf9-40a6-98dc-2a4226f8f168}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\ForestGame">
-      <UniqueIdentifier>{734f2662-5704-48ce-8f67-7c7c45fe62c9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\Basic">
       <UniqueIdentifier>{496e8a96-ea8b-458f-9cc1-45d3a7bb71c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\LoadingScreen">
+      <UniqueIdentifier>{5e20af15-7d2f-4bfe-ab23-c18745b5363c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -479,15 +431,6 @@
     <ClInclude Include="Engine\Core\LightData.h">
       <Filter>Engine\Deprecated</Filter>
     </ClInclude>
-    <ClInclude Include="Game\ECS_Examples\ECSExample.h">
-      <Filter>Game\ECSExamples</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\ECS_Examples\Systems\MovementSystem.h">
-      <Filter>Game\ECSExamples\Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\ECS_Examples\Components\PositionComponent.h">
-      <Filter>Game\ECSExamples\Components</Filter>
-    </ClInclude>
     <ClInclude Include="Game\EngineInterface.h">
       <Filter>Engine\Interface</Filter>
     </ClInclude>
@@ -530,26 +473,11 @@
     <ClInclude Include="Game\PauseUI.h">
       <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="Game\UIEditor\Editor.h">
-      <Filter>Game\UIEditor</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\UIEditor\EditorPlayer.h">
-      <Filter>Game\UIEditor</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\RenderCore\OpenGL\include\UI\VerticalPanel.h">
       <Filter>Engine\OpenGL\UI</Filter>
     </ClInclude>
-    <ClInclude Include="Game\UIEditor\EditorItemWrapper.h">
-      <Filter>Game\UIEditor</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\external\tinyfiledialogs\tinyfiledialogs.h">
       <Filter>Engine\Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\UITest\TestPlayerLoad.h">
-      <Filter>Game\UITesting</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\UITest\TestUILoad.h">
-      <Filter>Game\UITesting</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Assets\Resources\resource.h">
       <Filter>Resources</Filter>
@@ -578,6 +506,12 @@
     <ClInclude Include="Game\TestArea\LightSpawner.h">
       <Filter>Game\TestArea</Filter>
     </ClInclude>
+    <ClInclude Include="Game\LoadingScreen\LoadingUI.h">
+      <Filter>Game\LoadingScreen</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\LoadingScreen\LoadingPlayer.h">
+      <Filter>Game\LoadingScreen</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Core\Objects\ParticleComponent.h">
@@ -594,18 +528,6 @@
     </ClInclude>
     <ClInclude Include="Game\TestArea\CloudParticle.h">
       <Filter>Game\TestArea</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\ForestGame\EndScreen.h">
-      <Filter>Game\ForestGame</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\ForestGame\ForestPlayer.h">
-      <Filter>Game\ForestGame</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\ForestGame\Ghost.h">
-      <Filter>Game\ForestGame</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\ForestGame\StartScreen.h">
-      <Filter>Game\ForestGame</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\Basic\QueueSafe.h">
       <Filter>Engine\Basic</Filter>
@@ -630,17 +552,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Game\Disco\DiscoPlayer.h">
-      <Filter>Game\Disco</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\Disco\DiscoLightComponent.h">
-      <Filter>Game\Disco</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\Disco\DiscoLightSystem.h">
-      <Filter>Game\Disco</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="Engine\Assets\Resources\Eril.rc">
       <Filter>Resources</Filter>
     </ResourceCompile>
@@ -649,10 +560,5 @@
     <Image Include="Engine\Assets\Icons\icon.ico">
       <Filter>Resources</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Game\ForestGame\forest.map">
-      <Filter>Game\ForestGame</Filter>
-    </None>
   </ItemGroup>
 </Project>

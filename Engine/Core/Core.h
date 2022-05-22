@@ -113,8 +113,10 @@ public:
 
 namespace helpers{
 	
+	void SpawnHelper(BaseObject* obj, Scene* spawn, const String& args);
+
 	template <typename T>
-	BaseObject* invokeCreate(const String& args, uint32 ID, uint SpawnType, bool isServer, uint16 mod) {
+	BaseObject* invokeCreate(Scene* spawner, const String& args, uint32 ID, uint SpawnType, bool isServer, uint16 mod) {
 		if (ID != 0) {
 			ObjectManager::PrepareRecord(ID, SpawnType, isServer, mod);
 		}
@@ -123,11 +125,10 @@ namespace helpers{
 		if (base == nullptr) {
 			next->DestroyObject();
 		}
-		if (SpawnType != Constants::Record::LOADED) base->LoadWithParameters(args);
+		if (SpawnType != Constants::Record::LOADED) SpawnHelper(base, spawner, args);
 		return next;
 	}
 
-	void SpawnHelper(BaseObject* obj, const String& args);
 }
 
 template <typename T>
@@ -143,7 +144,7 @@ bool do_register(String name) {
 //#define FOO(...) GET_MACRO(__VA_ARGS__, REGISTER_NAME, REGISTER)(__VA_ARGS__)
 
 template <class T = BaseObject>
-T* SpawnObjectWithID(String args, uint32 ID)
+T* SpawnObjectWithID(BaseObject* spawner, String args, uint32 ID)
 {
 	if (ID != 0) ObjectManager::PrepareRecord(ID);
 	Ref<T> next = new T();
@@ -152,12 +153,12 @@ T* SpawnObjectWithID(String args, uint32 ID)
 	if (base == nullptr) {
 		next->DestroyObject();
 	}
-	helpers::SpawnHelper(base, args);
+	helpers::SpawnHelper(base, spawner ? spawner->GetScene() : nullptr, args);
 	return next;
 }
 
 template <class T = BaseObject, typename... Args>
-T* SpawnObject(Args&&... args)
+T* SpawnObject(BaseObject* spawner, Args&&... args)
 {
 	Ref<T> next = new T(std::forward<Args>(args)...);
 	//ObjectManager::CreateRecord(next, 0, Constants::Record::SPAWNED);
@@ -165,7 +166,7 @@ T* SpawnObject(Args&&... args)
 	if (base == nullptr) {
 		next->DestroyObject();
 	}
-	helpers::SpawnHelper(base, "");
+	helpers::SpawnHelper(base, spawner ? spawner->GetScene() : nullptr, "");
 	return next;
 }
 

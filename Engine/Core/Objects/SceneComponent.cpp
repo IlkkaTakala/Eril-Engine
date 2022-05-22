@@ -72,7 +72,11 @@ SceneComponent::SceneComponent() : BaseObject()
 	transformForce = false;
 
 	Parent = nullptr;
-	GetScene()->AddSceneRoot(this);
+}
+
+void SceneComponent::BeginPlay()
+{
+	if (GetScene()) GetScene()->AddSceneRoot(this);
 }
 
 void SceneComponent::OnDestroyed()

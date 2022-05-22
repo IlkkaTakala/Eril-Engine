@@ -37,6 +37,7 @@ public:
 
 	uint8 Pass;
 	uint8 FaceCulling;
+	uint8 castShadows;
 
 private:
 	void AddUniforms(const char* const string);

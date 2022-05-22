@@ -5,7 +5,7 @@
 #include <Objects/BaseObject.h>
 #include <mutex>
 
-typedef BaseObject* (*SpawnFunction)(const String&, uint32, uint, bool, uint16);
+typedef BaseObject* (*SpawnFunction)(Scene*, const String&, uint32, uint, bool, uint16);
 
 struct Record
 {
@@ -59,6 +59,8 @@ public:
 	static bool PrepareRecord(const uint32 ID, const uint SpawnType = Constants::Record::SPAWNED, const bool isServer = false, const uint16 mod = 0);
 
 	static std::map<String, SpawnFunction>& TypeList();
+
+	static void UpdateLifetimes(float delta);
 
 private:
 	friend class GC;

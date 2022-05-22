@@ -57,6 +57,7 @@ struct LightData {
 	vec4 positionAndSize;
 	vec4 rotation;
 	ivec4 type;
+	mat4 transform;
 };
 
 struct VisibleIndex {
@@ -222,7 +223,7 @@ void main()
 		{
 			case 0:
 			{
-				L = normalize(light.rotation.xyz);
+				L = normalize(-light.rotation.xyz);
 				H = normalize(V + L);
 
 				radiance = light.color.rgb;

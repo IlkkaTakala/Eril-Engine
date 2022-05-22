@@ -12,15 +12,18 @@ enum class AssetType : uint8
 	Texture
 };
 
+typedef std::function<void(const String&, bool)> AssetLoadCallback;
+
 namespace AssetManager
 {
 	void StartLoader();
 
-	void LoadAssetAsync(const String& name);
-	void LoadMeshAsync(const String& name, RenderMesh* empty);
-	void LoadSkeletalMeshAsync(const String& name, RenderMesh* empty);
-	void LoadTextureAsync(const String& name, Texture* empty);
-	void LoadAnimationAsync(const String& name, Animation* empty);
+	void LoadAssetAsync(const String& name, const AssetLoadCallback& callback = nullptr);
+	bool LoadAsset(const String& name);
+	void LoadMeshAsync(const String& name, RenderMesh* empty, const AssetLoadCallback& callback = nullptr);
+	void LoadSkeletalMeshAsync(const String& name, RenderMesh* empty, const AssetLoadCallback& callback = nullptr);
+	void LoadTextureAsync(const String& name, Texture* empty, const AssetLoadCallback& callback = nullptr);
+	void LoadAnimationAsync(const String& name, Animation* empty, const AssetLoadCallback& callback = nullptr);
 	AssetType GetAssetType(const String& name);
 	RenderMesh* LoadSkeletalMesh(const String& name);
 

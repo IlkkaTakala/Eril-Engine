@@ -5,5 +5,6 @@
 
 void EngineInterface::CreateDefaults()
 {
-    Scene::OpenLevel("Assets/Maps/demo");
+	Scene::SetLoadingMap("Game/LoadingScreen/loading");
+	Scene::OpenLevel("Assets/Maps/demo");
 }

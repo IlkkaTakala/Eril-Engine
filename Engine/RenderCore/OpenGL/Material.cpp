@@ -32,6 +32,7 @@ Shader::Shader(const char* const vertexShaderString, const char* const fragmentS
 	Success = false;
 	Pass = 0;
 	FaceCulling = 0;
+	castShadows = 0;
 	
 	int vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertexShaderString, NULL);
@@ -78,6 +79,7 @@ Shader::Shader(const char* const vertexShaderString, const char* geomShaderStrin
 	Success = false;
 	Pass = 0;
 	FaceCulling = 0;
+	castShadows = 0;
 
 	int vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertexShaderString, NULL);
@@ -135,6 +137,7 @@ Shader::Shader(const char* const vertexShaderString, const char* geomShaderStrin
 Shader::Shader(int type, const char* const ShaderString)
 {
 	FaceCulling = 0;
+	castShadows = 0;
 	char infoLog[512];
 	switch (type)
 	{

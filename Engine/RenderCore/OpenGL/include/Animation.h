@@ -32,6 +32,8 @@ public:
 	typedef std::tuple<Vector, InterpType> KeyframeLocation;
 	typedef std::tuple<Rotator, InterpType> KeyframeRotation;
 	typedef std::tuple<Vector, InterpType> KeyframeScale;
+	
+	String name;
 
 	std::vector<std::vector<std::pair<float, Vector>>> LocationTrack;
 	std::vector<std::vector<std::pair<float, Rotator>>> RotationTrack;
@@ -45,25 +47,45 @@ public:
 	float speedFactor;
 
 	Skeleton* skeleton;
+
 };
 
 struct AnimationInstance
 {
+private:
 	Animation* anim{nullptr};
 	float frametime{0};
 
+public:
+	AnimationInstance() : anim(nullptr) {}
+	AnimationInstance(Animation* a) : anim(a) {}
+
+	void SetAnimation(Animation* a) {
+		anim = a;
+		frametime = 0.f;
+	}
+
+	float GetFactor() const {
+		return anim ? anim->GetSpeedFactor() : 1.f;
+	}
+
 	void Update(float delta, float factor) {
 		frametime += delta * factor;
-		if (frametime > 1.f) frametime -= 1.f;
-		else if (frametime < 0.f) frametime += 1.f;
+		if (frametime > 1.f) frametime -= floor(frametime);
+		else if (frametime < 0.f) frametime -= floor(1.f);
+		if (isnan(frametime))
+		{
+			frametime = 0.f;
+		}
 	}
 
 	void MakeTransforms(BoneArray bones) const {
+		if (!anim) return;
 		for (int i = 0; i < bones.size(); i++) bones[i] = anim->GetTransform(i, frametime);
 	}
 
 	Transform GetTransform(int bone) const {
-		return anim->GetTransform(bone, frametime);
+		return anim ? anim->GetTransform(bone, frametime) : Transform();
 	}
 };
 

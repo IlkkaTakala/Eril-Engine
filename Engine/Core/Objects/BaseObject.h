@@ -28,10 +28,14 @@ public:
 	RecordInt GetRecord() { return RecordNumber; }
 	void AddToRoot();
 	void RemoveFromRoot();
+	void SetLifetime(float in);
+	float GetRemainingLifetime();
 protected:
 	friend struct Record;
 	virtual ~Data();
 	bool bMarked;
+	float lifetime;
+	bool hasLife;
 private:
 	friend class ObjectManager;
 	friend class GC;
@@ -56,8 +60,10 @@ public:
 	virtual void BeginPlay() = 0;
 	virtual void OnDestroyed() {};
 	Scene* GetScene() const { return World; }
-	void SetScene(Scene* scene) { World = scene; }
+	void SetScene(Scene* scene);
 	virtual void LoadWithParameters(const String& args) {}
+	bool IsActive() const { return active; }
+	void SetActive(bool status) { active = status; }
 
 protected:
 	virtual ~BaseObject() {};
@@ -65,4 +71,5 @@ protected:
 	static const std::map<String, String> ParseOptions(const String& args);
 private:
 	Scene* World;
+	bool active;
 };

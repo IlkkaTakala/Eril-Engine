@@ -3,6 +3,7 @@
 #include <fstream>
 #include "GarbageCollector.h"
 #include "ObjectManager.h"
+#include <Gameplay/Scene.h>
 
 GC::GC()
 {
@@ -28,7 +29,7 @@ void GC::CleanRunner()
 		auto start = std::chrono::steady_clock::now();
 		auto time = std::chrono::milliseconds(5000) - duration;
 		if (time.count() > 0) std::this_thread::sleep_for(time);
-
+		if (Scene::isLoading()) continue;
 		std::vector<RecordInt> removal;
 		for (auto const& d : ObjectManager::ObjectRecords) {
 			if (d.second->pointerRefs.size() < 1 && !d.second->protection) {

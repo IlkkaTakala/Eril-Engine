@@ -19,7 +19,6 @@
 
 //ECS
 #include <Interface/IECS.h>
-#include <ECS_Examples/ECSExample.h>
 #include <ECS/Components/LightComponent.h>
 #include <ECS/Systems/LightControllerSystem.h>
 #include <ECS/Components/AudioComponent.h>
@@ -63,33 +62,52 @@ TestPlayer::TestPlayer() : Player()
 {
 
 	mouseSens = 0.5f;
-	Speed = 4.f;
+	Speed = 2.f;
 	InputMode = true;
 	cursorState = true;
 	spawnCounter = 0;
 	Changing = false;
 	walk = 0.f;
+	gunOut = false;
 	
 	Rotation = Rotator(0.f);
+	SetLocation(Vector(2, 0, 1));
 
 	//Player Model
-	/*Mesh = SpawnObject<VisibleObject>();
-	Mesh->SetModel("Assets/Meshes/Cube");
+	Mesh = SpawnObject<SkeletalObject>(this);
+
+	Mesh->SetModel("Assets/Skeletal/Alien");
+	Mesh->GetModel()->SetMaterial(1, IRender::LoadMaterialByName("Assets/Materials/alien_upper"));
+	Mesh->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/alien_lower"));
 	Mesh->GetModel()->SetAABB(AABB(Vector(-1.f, -1.f, 0.f), Vector(1.f, 1.f, 2.f)));
-	SetLocation(Vector(15, 15, 1));*/
+	Mesh->SetRotation(-180);
+	auto animC = SpawnObject<TestAnimControl>(this, Mesh);
+	animC->SetSkeleton(Mesh->GetModel());
+	Mesh->SetAnimController(animC);
+
+	Spring = SpawnObject<SceneComponent>(this);
+	AddComponent(Spring);
+
+	GetCamera()->SetParent(Spring);
+	Spring->SetLocation({0.6f, 0.f, 1.5f});
+	GetCamera()->SetLocation({0.f, -2.5f, 0.f});
+
+	AddComponent(Mesh);
+
+	Mesh->SetScale(Vector(0.01f));
 
 	//Player Movement
-	Movement = SpawnObject<MovementComponent>();
-	Movement->SetTarget(dynamic_cast<Actor*>(this), AABB(Vector(-1.f, -1.f, 0.f), Vector(1.f, 1.f, 2.f)));
+	Movement = SpawnObject<MovementComponent>(this);
+	Movement->SetTarget(dynamic_cast<Actor*>(this), Mesh->GetModel()->GetAABB());
 	Movement->SetGravity(true);
 	Movement->SetPhysics(false);
 	Movement->SetMaxSpeed(Speed);
-	Movement->SetFlightMaxSpeed(Speed);
-	Movement->SetAirBrake(10.f);
-	Movement->SetAcceleration(500.f);
-	Movement->SetAirControl(0.9f);
+	Movement->SetFlightMaxSpeed(10000.f);
+	Movement->SetAirBrake(2000.f);
+	Movement->SetAcceleration(50.f);
+	Movement->SetAirControl(0.2f);
 
-	PlayerCol = SpawnObject<CapsuleCollisionShape>();
+	PlayerCol = SpawnObject<CapsuleCollisionShape>(this);
 	AddComponent(PlayerCol);
 	PlayerCol->SetLocation(Vector(0.f, 0.f, 1.f), true);
 	PlayerCol->SetType(2);
@@ -97,7 +115,7 @@ TestPlayer::TestPlayer() : Player()
 	PlayerCol->SetMovementTarget(Movement);
 
 	//Skybox
-	Sky = SpawnObject<VisibleObject>();
+	Sky = SpawnObject<VisibleObject>(this);
 	Sky->SetModel("Assets/Meshes/SkySphere");
 	Sky->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/Sky"));
 	Sky->SetScale(Sky->GetScale() * 4.0f);
@@ -110,47 +128,17 @@ TestPlayer::TestPlayer() : Player()
 	Plane->SetScale(Vector(20.f, 20.f, 0.5f));
 	Plane->SetLocation(Vector(10.f, 10.f, 0.f));
 
-	PlaneCol = SpawnObject<BoxCollisionShape>();
+	PlaneCol = SpawnObject<BoxCollisionShape>(this);
 	PlaneCol->SetType(0);
 	PlaneCol->SetSize(Plane->GetModel()->GetAABB());
 	Plane->AddComponent(PlaneCol);*/
 
-	Box = SpawnObject<Actor>();
-
-	//Moment Model -> ColliderModel
-	/*BoxModel = SpawnObject<VisibleObject>();
-	BoxModel->SetModel("Assets/Meshes/Cube");
-	BoxModel->GetModel()->SetAABB(AABB(Vector(-1.0f), Vector(1.0f)));
-
-	Box->AddComponent(BoxModel);
-	Box->SetLocation(Vector(10.f, 10.f, 2.f));
-
-	BoxCol = SpawnObject<BoxCollisionShape>();
-	Box->AddComponent(BoxCol);
-	BoxCol->SetType(0);
-	BoxCol->SetSize(BoxModel->GetModel()->GetAABB());
-	
-
 	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
-
-	auto skel = SpawnObject<SkeletalObject>();
-	skel->SetModel("Assets/Skeletal/Alien");
-	skel->GetModel()->SetMaterial(1, IRender::LoadMaterialByName("Assets/Materials/alien_upper"));
-	skel->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/alien_lower"));
-	skel->SetLocation({5.f, 5.f, -0.5f});
-	auto animC = SpawnObject<TestAnimControl>(skel);
-	animC->BeginPlay();
-	animC->SetSkeleton(skel->GetModel());
-	skel->SetAnimController(animC);
-	skel->SetParent(this);
-
-	animC->SetOverrideAnimation(AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Breakdance", skel->GetModel()));
-	skel->SetScale(Vector(0.01f));*/
 
 	auto Particle = SpawnObject<ParticleComponent>();
 	Particle->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
 	Particle->SetLocation(Vector(-116.f, -104.f, 44.f));
-	
+
 	auto Particle2 = SpawnObject<ParticleComponent>();
 	Particle2->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
 	Particle2->SetLocation(Vector(-60.f, -94.f, 44.f));
@@ -161,14 +149,11 @@ TestPlayer::TestPlayer() : Player()
 
 	auto part = SpawnObject<ParticleComponent>();
 	part->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
-	part->SetLocation({10.f, 5.f, 0.5f});
-
+	part->SetLocation({ 10.f, 5.f, 0.5f });
 }
 
 void TestPlayer::TestTimer(float d)
 {
-	//Console::Log("Location changed");
-	//Collider->SetLocation(Vector(30, 0, 1), true);
 }
 
 
@@ -216,42 +201,36 @@ void TestPlayer::RunInputSpace(bool KeyDown)
 
 void TestPlayer::InputOne(bool KeyDown)
 {
-	static String object = R"~~~(
-def execute() {
-	var objId = CreateObject("VisibleObject", 1);
-	SetModel(objId, "Cube");
-	SetMaterial(objId, "hunter");
-	SetLocation(objId, 5, 5, 2);
-	#SetRotation(objId, 0, 0, 0);
-	#SetScale(objId, 1, 1, 1);
-	#DestroyObject(objId);
-})~~~";
 	if (!KeyDown) {
-		InputMode = !InputMode;
-		int id = ScriptCore::CompileScript(object.c_str());
-		ScriptCore::EvaluateScript(id);
-		ScriptCore::CleanScript(id);
+		gunOut = !gunOut;
 	}
 }
 
 void TestPlayer::InputTwo(bool KeyDown)
 {
 	if (KeyDown)
-		InputMode = !InputMode;
-	Scene::OpenLevel("Assets/Maps/test");
+		Scene::OpenLevel("Assets/Maps/test");
 	
 }
 
 void TestPlayer::RunInputShift(bool KeyDown)
 {
-	if (KeyDown) Movement->SetMaxSpeed(10.f);
-	else Movement->SetMaxSpeed(5.f);
+	if (KeyDown) Movement->SetMaxSpeed(6.f);
+	else Movement->SetMaxSpeed(Speed);
 }
 
 
-void TestPlayer::LeftMouseDown(bool)
+void TestPlayer::LeftMouseDown(bool keydown)
 {
-
+	if (keydown && gunOut) {
+		auto p = SpawnObject<VisibleObject>(this);
+		p->SetModel("Assets/Meshes/tracer");
+		p->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/tracer"));
+		p->SetLocation(Location + Vector{ 0.f, 0.f, 1.3f });
+		p->SetRotation(Spring->GetWorldRotation());
+		p->SetLifetime(0.5f);
+		audio->Play();
+	}
 }
 
 void TestPlayer::RightMouseDown(bool KeyDown)
@@ -263,12 +242,17 @@ void TestPlayer::MouseMoved(float X, float Y)
 {
 	if (cursorState && !Changing) {
 		Camera* cam = GetCamera();
-		Rotator rot = cam->GetRotation();
+		Rotator rot = Spring->GetRotation();
 		float y = rot.PitchDegrees();
-		cam->SetRotation(Vector(
+		Spring->SetRotation(Vector(
 			rot.RollDegrees(),
 			y + Y * mouseSens < 89.f && y + Y * mouseSens > -89.f ? y + Y * mouseSens : y,
-			rot.YawDegrees() + X * mouseSens
+			rot.YawDegrees()
+		));
+		SetRotation(Vector(
+			0.f, 
+			0.f,
+			Rotation.YawDegrees() + X * mouseSens
 		));
 	}
 	if (Changing) {
@@ -280,7 +264,7 @@ void TestPlayer::InputExit(bool down)
 {
 	if (!down) return;
 	if (pause == nullptr) {
-		pause = SpawnObject<PauseUI>();
+		pause = SpawnObject<PauseUI>(this);
 		UI::AddToScreen(pause, this);
 		WindowManager::SetShowCursor(0, true);
 		cursorState = false;
@@ -300,45 +284,32 @@ void TimeFunction (float d)
 
 void TestPlayer::Tick(float deltaTime)
 {
-	//Console::Log((BoxCol2->GetWorldLocation()).ToString() + " BoxCol2");
-	//Console::Log((BoxCol->GetWorldLocation()).ToString() + " BoxCol2");
-	//Console::Log((Box->GetWorldLocation()).ToString() + " Box");
-	//Console::Log((GetWorldLocation()).ToString() + " Player");
-	//Console::Log((PlayerCol->GetWorldLocation()).ToString() + " PlayerCol");
-
-	Vector loc = Box->GetLocation();
-	GetCamera()->SetLocation(Location + Vector(0.f, 0.f, 1.5f));
 	Sky->SetLocation(Location);
 	
-	/*Vector listenerPos = Location;
+	Vector listenerPos = Location;
 	Vector listenerOrientation = GetCamera()->GetForwardVector();
-	AudioManager::SetListener(listenerPos, GetCamera()->GetForwardVector(), GetCamera()->GetUpVector());*/
+	AudioManager::SetListener(listenerPos, GetCamera()->GetForwardVector(), GetCamera()->GetUpVector());
+
 }
 
 void TestPlayer::BeginPlay()
 {
+	Player::BeginPlay();
 
-	//Terrain* terrain = ObjectManager::GetByRecord<Terrain>(0xA0005554);
 
-	
 	//ECS
 	SystemsManager* systemsManager = IECS::GetSystemsManager();
 	//Audio Testing
 	IComponentArrayQuerySystem<AudioComponent>* audioComponentArraySystem = static_cast<IComponentArrayQuerySystem<AudioComponent>*> (systemsManager->GetSystemByName("AudioControllerSystem"));
-	AudioComponent* audio = audioComponentArraySystem->AddComponentToSystem();
+	audio = audioComponentArraySystem->AddComponentToSystem();
 	
-	//AudioControllerSystem* audioControllerSystem = static_cast<AudioControllerSystem*>(systemsManager->GetSystemByName("AudioControllerSystem"));
-	//audioComponentID = audio->GetID();
-
-	/*Vector audioPos = Vector(20.0f, 20.0f, 1.5f);
-	audio->SetSourceID(AudioManager::LoadAudio("clicketi.WAV"));
+	Vector audioPos = Vector(20.0f, 20.0f, 1.5f);
+	audio->SetSourceID(AudioManager::LoadAudio("gun.WAV"));
 	audio->SetPosition(audioPos);
-	Mesh->SetLocation(audioPos);
 	audio->SetGain(1.0f);
 	audio->SetPitch(1.0f);
-	audio->SetLooping(true);
+	audio->SetLooping(false);
 	audio->SetSourceRelative(false);
-	audio->Play();*/
 
 	//Lights Testing
 	IComponentArrayQuerySystem<LightComponent>* lightSystem = static_cast<IComponentArrayQuerySystem<LightComponent>*> (systemsManager->GetSystemByName("LightControllerSystem"));
@@ -351,26 +322,28 @@ void TestPlayer::BeginPlay()
 		DirLight->Size = 3.f;
 		DirLight->Intensity = 2.f;
 		DirLight->Color = Vector(1.f);
-		DirLight->Rotation = Vector(0.5, -0.5, 1.0).Normalize();
+		DirLight->Rotation = Vector(0.5f, 0.5f, -0.5f).Normalize();
 
-		//for (int i = 0; i < 50; i++)
-		//{
-		//	//Console::Log("Light addded " + std::to_string(i));
-		//	float x = (float)(rand() % 100);
-		//	float y = (float)(rand() % 100);
-		//	//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
-
-		//	LightComponent* light = lightSystem->AddComponentToSystem();
-		//	light->Location = Vector(x, y, 2.f);
-		//	light->LightType = LIGHT_POINT;
-		//	light->Size = 5.f;
-		//	light->Intensity = rand() / (float)RAND_MAX * 20.f;
-		//	light->Color = Vector(x, y, 2.5f);
-		//}
 	}
 	Console::Log("Hello beautiful world");
+
+	auto hunt = SpawnObject<Hunter>(this);
+	hunt->SetLocation({10, 20, 1});
+
+	hunt = SpawnObject<Hunter>(this);
+	hunt->SetLocation({ 20, 20, 1 });
 }
 
 void TestPlayer::OnDestroyed()
 {
+}
+
+Vector TestPlayer::GetWalk()
+{
+	Vector w = {
+		Vector::Dot(Rotation.GetRightVector(), Movement->DesiredState.velocity),
+		Vector::Dot(Rotation.GetForwardVector(), Movement->DesiredState.velocity),
+		0.f
+	};
+	return w;
 }

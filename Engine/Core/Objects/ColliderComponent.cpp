@@ -110,6 +110,9 @@ void ColliderComponent::Tick(float delta)
 	if (type != 2 || !moveObject) return;
 	Vector temp = moveObject->DesiredState.velocity;
 	body->setLinearVelocity(ToBullet(temp));
+	auto t = body->getWorldTransform();
+	t.setRotation(ToBullet(Object->GetRotation()));
+	body->setWorldTransform(t);
 }
 
 void ColliderComponent::SetType(int t)

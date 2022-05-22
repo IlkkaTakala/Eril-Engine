@@ -4,18 +4,14 @@
 #include "Gameplay/PlayerController.h"
 
 class Actor;
-class InstancedObject;
-class Light;
 class MovementComponent;
 class Terrain;
-class Hunter;
 class PauseUI;
-class BoxCollisionShape;
-class SphereCollisionShape;
-class CylinderCollisionShape;
-class ConeCollisionShape;
 class CapsuleCollisionShape;
+class BoxCollisionShape;
 class VisibleObject;
+class SkeletalObject;
+struct AudioComponent;
 
 //ECS TEST
 class ECSExample;
@@ -30,7 +26,8 @@ public:
 	virtual void BeginPlay() override;
 	virtual void OnDestroyed() override;
 
-	float GetWalk() const { return walk; }
+	Vector GetWalk();
+	bool GetGun() const { return gunOut; }
 
 private:
 	float mouseSens;
@@ -57,19 +54,13 @@ private:
 	void RegisterInputs(InputComponent* com);
 
 	Ref<MovementComponent> Movement;
-	Ref<VisibleObject> Mesh;
+	Ref<SkeletalObject> Mesh;
+
+	Ref<SceneComponent> Spring;
 
 	bool cursorState;
 	bool InputMode;
-	Ref<Light> DirLight;
 	Ref<VisibleObject> Sky;
-	Ref<Actor> Box;
-	Ref<Actor> Box2;
-	Ref<MovementComponent> BoxModelMove;
-	Ref<VisibleObject> BoxModel;
-	Ref<BoxCollisionShape> BoxCol;
-	Ref<VisibleObject> BoxModel2;
-	Ref<CylinderCollisionShape> BoxCol2;
 	Ref<CapsuleCollisionShape> PlayerCol;
 
 	Ref<VisibleObject> Plane;
@@ -80,12 +71,15 @@ private:
 	//ECS TEST
 	Ref<ECSExample> ecsExample;
 
+	AudioComponent* audio;
+
 	int audioComponentID;
 
 	int spawnCounter;
 
 	float walk;
 	bool Changing;
+	bool gunOut;
 
 	void TestTimer(float d);
 };

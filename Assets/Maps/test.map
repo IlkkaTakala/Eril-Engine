@@ -1,5 +1,12 @@
 <header version='1.0' />
+<Asset>
+	Assets/Textures/Alien/upper_diffuse_d.png,
+	Assets/Textures/Alien/upper_normal_n.png,
+	Assets/Textures/Alien/upper_rough.png,
+	Assets/Textures/Alien/lower_diffuse_d.png,
+	Assets/Textures/Alien/lower_normal_n.png,
+	Assets/Textures/Alien/lower_rough.png,
+</Asset>
 <TestPlayer id="4" />
-<Terrain id="A0005554" args="Scale:1,1,1;Resolution:100" />
 
 

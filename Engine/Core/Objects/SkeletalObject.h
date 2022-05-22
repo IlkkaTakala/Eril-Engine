@@ -23,7 +23,7 @@ public:
 
 	const std::string GetName() const { return std::string(""); }
 
-	virtual void BeginPlay() override {};
+	virtual void BeginPlay() override { SceneComponent::BeginPlay(); };
 protected:
 	friend class GC;
 

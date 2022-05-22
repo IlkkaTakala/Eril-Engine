@@ -19,8 +19,8 @@ public:
 	virtual const Vector GetUpVector() const override;
 	virtual const Vector GetForwardVector() const override;
 	virtual const Vector GetRightVector() const override;
-	virtual const Rotator& GetRotation() const override;
-	virtual const Vector& GetLocation() const override;
+	virtual Rotator GetRotation() const override;
+	virtual Vector GetLocation() const override;
 
 	virtual void SetLookAt(const Vector& to, const Vector& up = Vector(0.0f, 0.0f, 1.0f)) override;
 
@@ -30,6 +30,7 @@ public:
 	virtual void SetPostProcess(const String& name) override;
 	Material* GetPostProcess() const { return postProcess; }
 
+	void ApplyTransformation();
 private:
 	glm::mat4 Projection;
 	glm::mat4 View;
@@ -38,7 +39,6 @@ private:
 	Rotator Rotation;
 	Material* postProcess;
 
-	inline void ApplyTransformation();
 
 	float Fov;
 	bool Perspective;

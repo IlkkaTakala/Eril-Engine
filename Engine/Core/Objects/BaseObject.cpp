@@ -3,6 +3,7 @@
 #include "ObjectManager.h"
 #include <GameLoop.h>
 #include <locale>
+#include <Gameplay/Scene.h>
 
 //void BaseObject::operator delete(void* ptr)
 //{ 
@@ -19,6 +20,8 @@ void Data::DestroyObject()
 Data::Data()
 {
 	RecordNumber = 0;
+	hasLife = false;
+	lifetime = 0.f;
 	bMarked = false;
 	ObjectManager::CreateRecord(this);
 }
@@ -38,8 +41,20 @@ void Data::RemoveFromRoot()
 	ObjectManager::Unprotect(RecordNumber);
 }
 
+void Data::SetLifetime(float in)
+{
+	lifetime = in;
+	hasLife = !(in - 0.000001f < 0.f && in + 0.000001f > 0.f);
+}
+
+float Data::GetRemainingLifetime()
+{
+	return lifetime;
+}
+
 BaseObject::BaseObject()
 {
+	active = false;
 	World = Loop->World;
 }
 
@@ -51,6 +66,13 @@ void BaseObject::RegisterInputs(InputComponent* IC)
 void BaseObject::SetColliders(ColliderComponent* CC)
 {
 
+}
+
+void BaseObject::SetScene(Scene* scene)
+{
+	if (World) World->RemoveObject(this);
+	if (scene) scene->AddObject(this); 
+	World = scene;
 }
 
 const std::map<String, String> BaseObject::ParseOptions(const String& args)

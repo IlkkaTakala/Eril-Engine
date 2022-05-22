@@ -57,6 +57,7 @@ struct LightData {
 	vec4 positionAndSize;
 	vec4 rotation;
 	ivec4 type;
+	mat4 transform;
 };
 
 struct VisibleIndex {
@@ -86,6 +87,8 @@ layout (location = 1) out vec4 BloomBuffer;
 layout (location = 4) out vec4 NormalBuffer;
 layout (location = 5) out vec4 PositionBuffer;
 layout (location = 6) out vec4 DataBuffer;
+
+layout(binding=15) uniform sampler2D gShadow;
 
 in VS_OUT{
 	vec2 TexCoords;
@@ -157,23 +160,25 @@ const vec3 sampleOffsetDirections[20] = vec3[]
 float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightDir, vec3 normal)
 {
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-	projCoords = projCoords * 0.5 + 0.5;
-    float closestDepth = 0; //texture(gShadow, projCoords.xy).r; 
+    projCoords = projCoords * 0.5 + 0.5;
+    float closestDepth = texture(gShadow, projCoords.xy).r; 
     float currentDepth = projCoords.z;
-	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005); 
-	float shadow = 0.0;
-	vec2 texelSize = 1.0 / vec2(1024.0); //textureSize(gShadow, 0);
-	for(int x = -1; x <= 1; ++x)
+    float shadow = 1.0;
+	float bias = 0.0001;
+	vec2 texelSize = 1.0 / textureSize(gShadow, 0);
+	for(int x = -2; x <= 2; ++x)
 	{
-		for(int y = -1; y <= 1; ++y)
+		for(int y = -2; y <= 2; ++y)
 		{
-			float pcfDepth = 0; //texture(gShadow, projCoords.xy + vec2(x, y) * texelSize).r; 
-			shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
+			float pcfDepth = texture(gShadow, (projCoords.xy + vec2(x, y) * texelSize)).r; 
+			shadow += currentDepth - bias > pcfDepth ? 0.0 : 1.0;        
 		}    
 	}
-	shadow /= 9.0;
-	if(projCoords.z > 1.0)
-        shadow = 0.0;
+	shadow /= 25.0;
+
+    if(projCoords.z > 1.0)
+        shadow = 1.0;
+    
     return shadow;
 }
 
@@ -195,7 +200,7 @@ void main()
 	vec3 albedo = pow(texture(Albedo, fs_in.TexCoords).rgb, vec3(gamma));
 	float metallic = 0.0;//texture(Metallic, fs_in.TexCoords).r;
 	float AOt = texture(AO, fs_in.TexCoords).r;
-	float roughness = 0.3;//1.0 - texture(Roughness, fs_in.TexCoords).r;
+	float roughness = 0.9;//1.0 - texture(Roughness, fs_in.TexCoords).r;
 	vec3 normal = texture(Normal, fs_in.TexCoords).rgb;
 	//normal.r = 1.0 - normal.r;
 	//normal.g = 1.0 - normal.g;
@@ -229,11 +234,11 @@ void main()
 		{
 			case 0:
 			{
-				L = normalize(light.rotation.xyz);
+				L = normalize(-light.rotation.xyz);
 				H = normalize(V + L);
 
 				radiance = light.color.rgb;
-				//shadow = ShadowCalculation(light.transform * vec4(fs_in.FragPos, 1.0), L, N);
+				shadow = ShadowCalculation(light.transform * vec4(fs_in.FragPos.xyz, 1.0), L, N);
 			} break;
 			
 			case 1:
@@ -283,7 +288,7 @@ void main()
 		kD *= 1.0 - metallic;
 
 		float NdotL = max(dot(N, L), 0.0);
-		Lo += (kD * albedo / PI + specular) * radiance * NdotL;
+		Lo += (kD * albedo / PI + specular) * radiance * NdotL * shadow;
 		
 	}
 	
@@ -296,7 +301,7 @@ void main()
 	//const float gamma = 2.2;
 	const float exposure = 1.0;
 	
-	ColorBuffer = vec4(N, 1.0);
+	ColorBuffer = color;
 	BloomBuffer = clamp(color - exposure, 0.0, 100.0);
 	NormalBuffer = vec4(N, 1.0);
 	PositionBuffer = vec4(fs_in.FragPos);

@@ -27,8 +27,8 @@ public:
 	virtual const Vector GetUpVector() const = 0;
 	virtual const Vector GetForwardVector() const = 0;
 	virtual const Vector GetRightVector() const = 0;
-	virtual const Rotator& GetRotation() const = 0;
-	virtual const Vector& GetLocation() const = 0;
+	virtual Rotator GetRotation() const = 0;
+	virtual Vector GetLocation() const = 0;
 
 	virtual void SetLookAt(const Vector& to, const Vector& up = Vector(0.0f, 1.0f, 0.0f)) = 0;
 	virtual void SetPostProcess(const String& name) = 0;

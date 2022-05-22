@@ -10,6 +10,7 @@ AnimationController::AnimationController(SkeletalObject* owner) : owner(owner)
 {
 	temp_anim = nullptr;
 	animtime = 0.f;
+	last_delta = 0.f;
 	animoverride = false;
 }
 
@@ -25,6 +26,7 @@ void AnimationController::SetSkeleton(RenderMesh* s)
 
 void AnimationController::UpdateBoneTransforms(float delta, RenderMesh* mesh)
 {
+	if (!IsActive()) return;
 	auto m = dynamic_cast<RenderMeshSkeletalGL*>(mesh);
 	if (!m) return;
 
@@ -60,28 +62,39 @@ void AnimationController::UpdateBoneTransforms(float delta, RenderMesh* mesh)
 
 void TestAnimControl::BeginPlay()
 {
-	blender.anims.emplace_back(0.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Walking", owner->GetModel()));
-	blender.anims.emplace_back(1.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Running", owner->GetModel()));
 
-	dance.anim = AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Breakdance", owner->GetModel());
 	walk = 0.f;
+	gunStatus = false;
+	blender.AddKey(0.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Idle", owner->GetModel()));
+	blender.AddKey(2.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/RightStrafeWalk", owner->GetModel()));
+	blender.AddKey(-2.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/LeftStrafeWalk", owner->GetModel()));
+	blender.AddKey(0.f, 2.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Walking", owner->GetModel()));
+	blender.AddKey(0.f, -2.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/WalkBack", owner->GetModel()));
+	blender.AddKey(4.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/RightStrafe", owner->GetModel()));
+	blender.AddKey(-4.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/LeftStrafe", owner->GetModel()));
+	blender.AddKey(0.f, 4.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Running", owner->GetModel()));
+	blender.AddKey(0.f, -4.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/RunBack", owner->GetModel()));
+
+	blenderRifle.AddKey(0.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/rifleIdle", owner->GetModel()));
+	blenderRifle.AddKey(2.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/rifleStrafeWalkRight", owner->GetModel()));
+	blenderRifle.AddKey(-2.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/rifleStrafeWalkLeft", owner->GetModel()));
+	blenderRifle.AddKey(0.f, 2.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/rifleWalk", owner->GetModel()));
+	blenderRifle.AddKey(0.f, -2.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/rifleWalkBack", owner->GetModel()));
+	blenderRifle.AddKey(4.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/rifleStrafeRunRight", owner->GetModel()));
+	blenderRifle.AddKey(-4.f, 0.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/rifleStrafeRunLeft", owner->GetModel()));
+	blenderRifle.AddKey(0.f, 4.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/rifleRun", owner->GetModel()));
+	blenderRifle.AddKey(0.f, -4.f, AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/rifleRunBack", owner->GetModel()));
 
 	states.AddState("Walk", [&](float delta, BoneArray arr) {
-		blender.Evaluate(delta, arr, walk, 0.f);
+		blender.Evaluate(delta, arr, walk.X, walk.Y);
 	});
-	states.AddState("Dance", [&](float delta, BoneArray arr) {
-		dance.MakeTransforms(arr);
+	states.AddState("Rifle", [&](float delta, BoneArray arr) {
+		blenderRifle.Evaluate(delta, arr, walk.X, walk.Y);
 	});
-	auto mesh = dynamic_cast<RenderMeshSkeletalGL*>(owner->GetModel());
-	
-	perBone.Init([&](float delta, BoneArray base) {
-		blender.Evaluate(delta, base, walk, 0.f);
-	}, [&](float delta, BoneArray blend) {
-		dance.MakeTransforms(blend);
-	}, mesh->GetSkeleton(), "mixamorig:Spine");
 
-	//states.AddPaths("Walk", { {"Dance", [&]()->bool {return walk <= 0.f; }, 0.5f} });
-	//states.AddPaths("Dance", {{"Walk", [&]()->bool {return walk > 0.f; }, 0.5f}});
+	states.AddPaths("Rifle", { {"Walk", [&]()->bool { return !gunStatus; }, 0.1f} });
+	states.AddPaths("Walk", { {"Rifle", [&]()->bool { return gunStatus; }, 0.1f} });
+
 }
 
 void TestAnimControl::Tick(float delta)
@@ -91,12 +104,11 @@ void TestAnimControl::Tick(float delta)
 	auto player = dynamic_cast<TestPlayer*>(GetGameState()->CurrentPlayer.GetPointer());
 	if (player) {
 		walk = player->GetWalk();
+		gunStatus = player->GetGun();
 	}
 }
 
 void TestAnimControl::EvaluateBones(BoneArray bones)
 {
-	dance.Update(last_delta, dance.anim->GetSpeedFactor());
-	perBone.Evaluate(last_delta, bones);
-	//states.Evaluate(last_delta, bones);
+	states.Evaluate(last_delta, bones);
 }

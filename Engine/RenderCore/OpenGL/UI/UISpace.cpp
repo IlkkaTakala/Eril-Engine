@@ -213,7 +213,7 @@ void UISpace::RemoveComponent(UI* com)
 void UISpace::RegisterInputs()
 {
 	if (UInputComp != nullptr) UInputComp->DestroyObject();
-	UInputComp = SpawnObject<InputComponent>();
+	UInputComp = SpawnObject<InputComponent>(nullptr);
 	UInputComp->RegisterKeyInput(0, &UISpace::LeftClick, this);
 	UInputComp->RegisterTextInput(&UISpace::GetTextInput, this);
 }

@@ -22,6 +22,7 @@ MovementComponent::MovementComponent()
 	air_control = 0.05f;
 	Physics::AddMovable(this);
 	stepHeight = 0.5f;
+	orientToVelocity = false;
 	//rigid = nullptr;
 }
 
@@ -43,9 +44,9 @@ void MovementComponent::OnDestroyed()
 
 void MovementComponent::Tick(float time)
 {
-	if (!allowMovement || Object == nullptr) return;
+	if (!allowMovement || Object == nullptr || !IsActive()) return;
 	DesiredState.location = Object->GetLocation();
-	DesiredState.rotation = Object->GetRotation();
+	DesiredState.rotation = Object->desired.Rotation;
 	//getrotation
 	
 	//btTransform colliderloc;
@@ -79,7 +80,7 @@ void MovementComponent::Tick(float time)
 		Vector brake_a = 0.f;
 		Vector ground;
 		Vector groundNormal;
-		inAir = !Physics::LineTraceSingle(DesiredState.location + Vector(0.f,0.f,0.0f), DesiredState.location + Vector(0.f, 0.f, -1.5f), ground, groundNormal);
+		inAir = !Physics::LineTraceSingle(DesiredState.location + Vector(0.f, 0.f, 0.1f), DesiredState.location + Vector(0.f, 0.f, -0.05f), ground, groundNormal);
 		if (inAir) air_time += time;
 		else air_time = 0.f;
 		if (direction_count > 0) {
@@ -100,13 +101,8 @@ void MovementComponent::Tick(float time)
 
 		velocity = OldState.velocity + delta_a * time + brake_a;
 
-		//float drag = velocity.LengthSquared() * (0.5f / max_speed);
-
-		//velocity -= velocity.Normalize() * drag;
-
 		if (!inAir && velocity.LengthSquared() > max_speed * max_speed) velocity = velocity.Normalize() * max_speed;
 		else if (velocity.LengthSquared() > flight_max_speed * flight_max_speed) velocity = velocity.Normalize() * flight_max_speed;
-		//velocity += DesiredState.gravity * time * air_time;
 		
 		if (velocity.LengthSquared() < 0.01f) velocity = 0.f;
 		if (isGravity) DesiredState.gravity = Vector(0, 0, -10);
@@ -150,6 +146,16 @@ void MovementComponent::ApplyMovement()
 		/*auto l = rigid->body->getWorldTransform().getOrigin();*/
 		Object->Location = DesiredState.location;//Vector(l[0], l[2], l[1]);
 		Object->Rotation = DesiredState.rotation;
+
+		if (orientToVelocity) {
+			const Rotator& rot = Object->Rotation;
+			Object->Rotation = Vector(
+				rot.RollDegrees(),
+				rot.PitchDegrees(),
+				rot.YawDegrees() + degrees(Vector::Dot(rot.GetForwardVector(), DesiredState.velocity.Normalize()))
+			);
+		}
+		//Object->desired.Rotation = DesiredState.rotation;
 		//rotation
 	}
 }

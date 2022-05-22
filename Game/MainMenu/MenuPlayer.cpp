@@ -4,7 +4,7 @@
 
 void MenuPlayer::LoadWithParameters(const String& args)
 {
-	auto ui = SpawnObject<MenuUI>();
+	auto ui = SpawnObject<MenuUI>(this);
 	UI::AddToScreen(ui, this);
 
 	SetShowCursor(true);

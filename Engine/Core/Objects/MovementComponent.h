@@ -49,7 +49,10 @@ public:
 	void SetGravity(bool g) { isGravity = g; }
 	void SetAllowMovement(bool value) { allowMovement = value; }
 	bool GetAllowMovement() const { return allowMovement; }
+	void SetRotateToVelocity(bool v) { orientToVelocity = v; }
+
 	void ApplyMovement();
+
 
 	void AddInput(const Vector& dir);
 	void AddImpulse(const Force& f) { forces[force_count++] = f; }
@@ -68,6 +71,7 @@ private:
 	bool isGravity;
 	bool inAir;
 	bool allowMovement;
+	bool orientToVelocity;
 
 	float mass;
 	float in_acceleration;

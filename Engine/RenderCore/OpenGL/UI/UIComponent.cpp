@@ -64,9 +64,9 @@ void UIComponent::UpdateMatrices(const Vector2D& size)
 {
 	const Vector2D ScreenSize = IRender::GetUIManager()->GetSize();
 	const glm::mat4 view = glm::ortho(0.f, (float)ScreenSize.X, (float)ScreenSize.Y, 0.f, 10.f, 0.1f);;
-	const Vector loc = transform.Location;
-	const Rotator rot = transform.Rotation;
-	const Vector sca = transform.Scale;
+	const Vector& loc = transform.Location;
+	const Rotator& rot = transform.Rotation;
+	const Vector& sca = transform.Scale;
 
 	glm::vec3 gloc = parent == nullptr ? glm::vec3(0.f) : glm::vec3(parent->topLeft.X, parent->topLeft.Y, 0.f);
 	glm::vec3 scale(1.f);
@@ -93,7 +93,9 @@ void UIComponent::UpdateMatrices(const Vector2D& size)
 	glm::mat4 model = glm::translate(glm::mat4(1.f), gloc) * glm::scale(glm::mat4(1.f), scale);
 
 	model *= glm::translate(glm::mat4(1.0f), glm::vec3(loc.X, loc.Z, realDepth))
-		* glm::toMat4(glm::quat(glm::vec3(glm::radians(rot.X), glm::radians(rot.Z), glm::radians(rot.Y))))
+		* glm::translate(glm::mat4(1.0f), glm::vec3(origin.X, origin.Y, 0.f))
+		* glm::toMat4(glm::quat(rot.W, rot.X, rot.Y, rot.Z))
+		* glm::translate(glm::mat4(1.0f), -glm::vec3(origin.X, origin.Y, 0.f))
 		* glm::scale(glm::mat4(1.0f), glm::vec3(sca.X, sca.Z, sca.Y));
 
 	realSize.X = (long)(scale.x * sca.X);

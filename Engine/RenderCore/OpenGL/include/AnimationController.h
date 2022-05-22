@@ -6,9 +6,15 @@
 
 class SkeletalObject;
 
-struct AnimationBlendSpace1D
+class AnimationBlendSpace1D
 {
 	std::vector<std::pair<float, AnimationInstance>> anims;
+
+public:
+
+	void AddKey(float time, Animation* animation) {
+		anims.emplace_back(time, animation);
+	}
 
 	void Evaluate(float delta, BoneArray bones, float axisValue) {
 
@@ -23,7 +29,7 @@ struct AnimationBlendSpace1D
 		if (axisValue <= anims[0].first) {
 
 			for (auto& a : anims)
-				a.second.Update(delta, anims[0].second.anim->GetSpeedFactor());
+				a.second.Update(delta, anims[0].second.GetFactor());
 
 			anims[0].second.MakeTransforms(bones);
 			return;
@@ -31,7 +37,7 @@ struct AnimationBlendSpace1D
 		else if (axisValue >= anims.rbegin()->first) {
 
 			for (auto& a : anims)
-				a.second.Update(delta, anims.rbegin()->second.anim->GetSpeedFactor());
+				a.second.Update(delta, anims.rbegin()->second.GetFactor());
 
 			anims.rbegin()->second.MakeTransforms(bones);
 			return;
@@ -50,7 +56,7 @@ struct AnimationBlendSpace1D
 					float last = first->first;
 					float next = second->first;
 					float scale = (axisValue - last) / (next - last);
-					float p = first->second.anim->GetSpeedFactor() * (1 - scale) + second->second.anim->GetSpeedFactor() * scale;
+					float p = first->second.GetFactor() * (1 - scale) + second->second.GetFactor() * scale;
 
 					for (auto& a : anims)
 						a.second.Update(delta, p);
@@ -71,9 +77,28 @@ struct AnimationBlendSpace1D
 	}
 };
 
-struct AnimationBlendSpace2D 
+class AnimationBlendSpace2D 
 {
 	std::vector<std::tuple<float, float, AnimationInstance>> anims;
+
+	std::vector<Transform> old;
+	std::vector<Transform> current;
+
+	float interpTime;
+	float currentTime;
+	float interpolating;
+	Vector values;
+
+public:
+	AnimationBlendSpace2D() {
+		interpTime = 0.1f;
+		currentTime = 0.f;
+		interpolating = false;
+	}
+
+	void AddKey(float x, float y, Animation* animation) {
+		anims.emplace_back(x, y, animation);
+	}
 
 	void Evaluate(float delta, BoneArray bones, float axisValueX, float axisValueY) {
 
@@ -82,83 +107,111 @@ struct AnimationBlendSpace2D
 			return;
 		}
 
-		// Find closest datapoint in each diagonal
-		const AnimationInstance* first = nullptr;
-		const AnimationInstance* second = nullptr;
-		const AnimationInstance* third = nullptr;
-		const AnimationInstance* fourth = nullptr;
+		old.resize(bones.size());
+		current.resize(bones.size());
 
-		float upleft, downleft, upright, downright;
-		upleft = downleft = upright = downright = std::numeric_limits<float>::infinity();
+		std::tuple<float, float, const AnimationInstance*> instances[4] = {
+			{ std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), nullptr },
+			{ std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), nullptr },
+			{ std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), nullptr },
+			{ std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), nullptr },
+		};
 
+		int count = 0;
 		for (const auto& [x, y, anim] : anims) {
-			float deltaY = y - axisValueY;
-			float deltaX = x - axisValueX;
-			float distance = deltaX * deltaX + deltaY * deltaY;
-			if (deltaX <= 0.f) {
-				if (deltaY <= 0.f) {
-					if (distance < upleft) {
-						downleft = distance;
-						fourth = &anim;
+			float deltax = x - axisValueX;
+			float deltay = y - axisValueY;
+			float distance = deltax * deltax + deltay * deltay;
+
+			float det = -deltax;
+			float dot = Vector::Dot({0, 1, 0}, Vector(deltax, deltay, 0.f).Normalize());
+			float angle = atan2(det, dot);
+
+			bool success = false;
+			int counter = 0;
+			for (const auto& [d, a, anima] : instances) {
+				if (a != std::numeric_limits<float>::infinity() && (angle < a + 0.1f && angle > a - 0.1f)) {
+					if (distance < d) {
+						instances[counter] = { distance, angle, &anim };
+						success = true;
+						count++;
+						break;
 					}
 				}
-				else {
-					if (distance < upleft) {
-						upleft = distance;
-						first = &anim;
-					}
-				}
+				counter++;
 			}
-			else {
-				if (deltaY <= 0.f) {
-					if (distance < downright) {
-						downright = distance;
-						third = &anim;
+
+			if (!success)
+			for (int i = 0; i < 4; ++i) {
+				float savedAngle = std::get<1>(instances[i]);
+				
+				if (distance < std::get<0>(instances[i])) {
+					for (int j = 3; j > i; --j) {
+						instances[j] = std::move(instances[j - 1]);
 					}
-				}
-				else {
-					if (distance < upright) {
-						upright = distance;
-						second = &anim;
-					}
+					instances[i] = {distance, angle, &anim};
+					count++;
+					break;
 				}
 			}
 		}
-
-		int count = 4;
-		if (!first) { upleft = 0.f; --count; }
-		if (!second) { upright = 0.f; --count; }
-		if (!third) { downright = 0.f; --count; }
-		if (!fourth) { downleft = 0.f; --count; }
-
-		float norm = 1.f / (upleft + downleft + upright + downright);
-		upleft = upleft * norm;
-		downleft = downleft * norm;
-		upright = upright * norm;
-		downright = downright * norm;
-
-		if (count > 1) {
-			upleft = 1.f - upleft;
-			downleft = 1.f - downleft;
-			upright = 1.f - upright;
-			downright = 1.f - downright;
+		count = 0;
+		for (const auto& [d, a, anim] : instances) {
+			if (anim) ++count;
 		}
 
 		float speed = 0.f;
 
-		if (first) speed += first->anim->GetSpeedFactor() * upleft;
-		if (second) speed += second->anim->GetSpeedFactor() * upright;
-		if (third) speed += third->anim->GetSpeedFactor() * downright;
-		if (fourth) speed += fourth->anim->GetSpeedFactor() * downleft;
+		if (count > 1) {
+
+			float max = 0.f;
+			for (int i = 0; i < count; i++) {
+				max += 1.f / std::get<0>(instances[i]);
+			}
+
+			for (int i = 0; i < count; i++) {
+				std::get<0>(instances[i]) = (1.f / std::get<0>(instances[i])) / max;
+				if (isnan(std::get<0>(instances[i]))) std::get<0>(instances[i]) = 1.f;
+			}
+
+			for (int i = 0; i < count; i++) {
+				speed += std::get<2>(instances[i])->GetFactor() * std::get<0>(instances[i]);
+			}
+		}
+		else {
+			std::get<0>(instances[0]) = 1.f;
+			speed = std::get<2>(instances[0])->GetFactor();
+		}
+
+
 
 		for (auto& [x, y, anim] : anims)
 			anim.Update(delta, speed);
 
+		float nextFactor = 1.f;
+		float animFactor = delta / interpTime;
+		Vector current(axisValueX, axisValueY, 0.f);
+		float distance = (current - values).Length();
+		if (distance > 0.01f) {
+			values = current;
+			interpolating = true;
+			currentTime = 0.f;
+		}
+		if (interpolating) {
+			currentTime += delta;
+			if (currentTime > interpTime) {
+				interpolating = false;
+			}
+			else 
+				nextFactor = currentTime / interpTime;
+		}
+
 		for (int i = 0; i < bones.size(); i++) {
-			if (first && upleft > 0.f) bones[i] = Transform::Interpolate(bones[i], first->GetTransform(i), upleft);
-			if (second && upright > 0.f) bones[i] = Transform::Interpolate(bones[i], second->GetTransform(i), upright);
-			if (third && downright > 0.f) bones[i] = Transform::Interpolate(bones[i], third->GetTransform(i), downright);
-			if (fourth && downleft > 0.f) bones[i] = Transform::Interpolate(bones[i], fourth->GetTransform(i), downleft);
+			for (const auto& [factor, dot, anim] : instances) {
+				if (factor < 0.001 || anim == nullptr) continue;
+				bones[i] = Transform::Interpolate(bones[i], anim->GetTransform(i), factor);
+			}
+			old[i] = bones[i] = Transform::Interpolate(old[i], bones[i], nextFactor);
 		}
 	}
 };
@@ -251,14 +304,20 @@ class AnimationPerBoneBlend
 	std::vector<float> weightArray;
 	std::vector<Transform> base;
 	std::vector<Transform> blend;
+	float factor;
 
 public:
+	void SetBlendFactor(float in) {
+		factor = in;
+	}
+
 	void Init(const std::function<void(float, BoneArray)>& basef, const std::function<void(float, BoneArray)>& blendf, Skeleton* skeleton, const String& rootbone, float blendweight = 1.f) {
 		base.resize(skeleton->BoneCount);
 		blend.resize(skeleton->BoneCount);
 		weightArray.resize(skeleton->BoneCount);
 		getBase = basef;
 		getBlend = blendf;
+		factor = 0.f;
 
 		int parent = -1;
 
@@ -292,7 +351,7 @@ public:
 		getBlend(delta, blend);
 
 		for (int i = 0; i < bones.size(); ++i) {
-			bones[i] = Transform::Interpolate(base[i], blend[i], weightArray[i]);
+			bones[i] = Transform::Interpolate(base[i], blend[i], weightArray[i] * factor);
 		}
 	}
 };
@@ -334,8 +393,8 @@ public:
 	void EvaluateBones(BoneArray bones) override;
 
 	AnimationBlendSpace2D blender;
+	AnimationBlendSpace2D blenderRifle;
 	AnimationStateMachine states;
-	AnimationPerBoneBlend perBone;
-	AnimationInstance dance;
-	float walk;
+	Vector walk;
+	bool gunStatus;
 };

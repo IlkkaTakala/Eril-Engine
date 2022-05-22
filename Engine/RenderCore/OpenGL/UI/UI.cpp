@@ -29,7 +29,7 @@ void UI::AddToScreen(UI* component, Player* Owner, int screen)
 
 	manager->AddComponent(component);
 
-	component->InputComp = SpawnObject<InputComponent>();
+	component->InputComp = SpawnObject<InputComponent>(component);
 
 	component->RegisterInputs(component->InputComp);
 }

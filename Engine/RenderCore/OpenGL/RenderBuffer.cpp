@@ -381,59 +381,6 @@ void SSAOBuffer::BindTextures(int offset)
 	glBindTexture(GL_TEXTURE_2D, DepthBuffer);
 }
 
-ShadowBuffer::ShadowBuffer(int width, int height)
-{
-	glGenFramebuffers(1, &FrameBuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, FrameBuffer);
-
-	glGenTextures(1, &Shadow);
-	glBindTexture(GL_TEXTURE_2D, Shadow);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Shadow, 0);
-
-	glGenTextures(1, &DepthBuffer);
-	glBindTexture(GL_TEXTURE_2D, DepthBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, DepthBuffer, 0);
-
-	glDrawBuffer(GL_COLOR_ATTACHMENT0);
-
-	if (GL_FRAMEBUFFER_COMPLETE != glCheckFramebufferStatus(GL_FRAMEBUFFER))
-	{
-		throw std::runtime_error("Texture could not add texture to framebuffer!\n");
-	}
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-ShadowBuffer::~ShadowBuffer()
-{
-	glDeleteTextures(1, &DepthBuffer);
-	glDeleteFramebuffers(1, &FrameBuffer);
-}
-
-void ShadowBuffer::Bind()
-{
-	glBindFramebuffer(GL_FRAMEBUFFER, FrameBuffer);
-}
-
-void ShadowBuffer::Unbind()
-{
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-void ShadowBuffer::BindTextures(int offset)
-{
-}
-
 ReflectionBuffer::ReflectionBuffer(int width, int height)
 {
 	glGenFramebuffers(1, &FrameBuffer);
@@ -518,6 +465,22 @@ ShadowMapBuffer::ShadowMapBuffer(int width, int height)
 
 	glGenFramebuffers(1, &FrameBuffer);
 	glGenTextures(1, &DepthBuffer);
+
+	glGenTextures(1, &Shadow);
+	glBindTexture(GL_TEXTURE_2D, Shadow);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_RED, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	GLfloat value, max_anisotropy = 16.0f;
+	glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &value);
+
+	value = (value > max_anisotropy) ? max_anisotropy : value;
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, value);
+	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
 	glBindTexture(GL_TEXTURE_2D, DepthBuffer);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F,
 		SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
@@ -525,19 +488,19 @@ ShadowMapBuffer::ShadowMapBuffer(int width, int height)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, FrameBuffer);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Shadow, 0);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, DepthBuffer, 0);
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
+	glDrawBuffer(GL_COLOR_ATTACHMENT0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 ShadowMapBuffer::~ShadowMapBuffer()
 {
 	glDeleteTextures(1, &DepthBuffer);
+	glDeleteTextures(1, &Shadow);
 	glDeleteFramebuffers(1, &FrameBuffer);
 }
 
