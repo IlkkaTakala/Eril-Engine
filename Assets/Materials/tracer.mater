@@ -1,4 +1,4 @@
 [Shader]
-name=shader_004
+name=shader_003
 [Textures]
-Albedo=Assets/Textures/default/default_d.png
+Albedo=Assets/Textures/tracer_d.png

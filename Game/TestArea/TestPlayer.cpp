@@ -94,7 +94,6 @@ TestPlayer::TestPlayer() : Player()
 
 	AddComponent(Mesh);
 
-	//animC->SetOverrideAnimation(AssetManager::LoadAnimationAsyncWithPromise("Assets/Animations/Breakdance", skel->GetModel()));
 	Mesh->SetScale(Vector(0.01f));
 
 	//Player Movement
@@ -140,8 +139,6 @@ TestPlayer::TestPlayer() : Player()
 
 void TestPlayer::TestTimer(float d)
 {
-	//Console::Log("Location changed");
-	//Collider->SetLocation(Vector(30, 0, 1), true);
 }
 
 
@@ -210,8 +207,14 @@ void TestPlayer::RunInputShift(bool KeyDown)
 
 void TestPlayer::LeftMouseDown(bool keydown)
 {
-	if (keydown) {
-
+	if (keydown && gunOut) {
+		auto p = SpawnObject<VisibleObject>(this);
+		p->SetModel("Assets/Meshes/tracer");
+		p->GetModel()->SetMaterial(0, IRender::LoadMaterialByName("Assets/Materials/tracer"));
+		p->SetLocation(Location + Vector{ 0.f, 0.f, 1.3f });
+		p->SetRotation(Spring->GetWorldRotation());
+		p->SetLifetime(0.5f);
+		audio->Play();
 	}
 }
 
@@ -278,25 +281,20 @@ void TestPlayer::BeginPlay()
 {
 	Player::BeginPlay();
 
-	//Terrain* terrain = ObjectManager::GetByRecord<Terrain>(0xA0005554);
 
 	//ECS
 	SystemsManager* systemsManager = IECS::GetSystemsManager();
 	//Audio Testing
 	IComponentArrayQuerySystem<AudioComponent>* audioComponentArraySystem = static_cast<IComponentArrayQuerySystem<AudioComponent>*> (systemsManager->GetSystemByName("AudioControllerSystem"));
-	AudioComponent* audio = audioComponentArraySystem->AddComponentToSystem();
+	audio = audioComponentArraySystem->AddComponentToSystem();
 	
-	//AudioControllerSystem* audioControllerSystem = static_cast<AudioControllerSystem*>(systemsManager->GetSystemByName("AudioControllerSystem"));
-	//audioComponentID = audio->GetID();
-
 	Vector audioPos = Vector(20.0f, 20.0f, 1.5f);
-	audio->SetSourceID(AudioManager::LoadAudio("clicketi.WAV"));
+	audio->SetSourceID(AudioManager::LoadAudio("gun.WAV"));
 	audio->SetPosition(audioPos);
 	audio->SetGain(1.0f);
 	audio->SetPitch(1.0f);
-	audio->SetLooping(true);
+	audio->SetLooping(false);
 	audio->SetSourceRelative(false);
-	audio->Play();
 
 	//Lights Testing
 	IComponentArrayQuerySystem<LightComponent>* lightSystem = static_cast<IComponentArrayQuerySystem<LightComponent>*> (systemsManager->GetSystemByName("LightControllerSystem"));
@@ -311,20 +309,6 @@ void TestPlayer::BeginPlay()
 		DirLight->Color = Vector(1.f);
 		DirLight->Rotation = Vector(0.5f, 0.5f, -0.5f).Normalize();
 
-		//for (int i = 0; i < 50; i++)
-		//{
-		//	//Console::Log("Light addded " + std::to_string(i));
-		//	float x = (float)(rand() % 100);
-		//	float y = (float)(rand() % 100);
-		//	//float s = 1.f - rand() / (float)RAND_MAX * 0.7f;
-
-		//	LightComponent* light = lightSystem->AddComponentToSystem();
-		//	light->Location = Vector(x, y, 1.f);
-		//	light->LightType = LIGHT_POINT;
-		//	light->Size = 5.f;
-		//	light->Intensity = rand() / (float)RAND_MAX * 20.f;
-		//	light->Color = Vector(x, y, 2.5f);
-		//}
 	}
 	Console::Log("Hello beautiful world");
 

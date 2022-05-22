@@ -11,6 +11,7 @@ class CapsuleCollisionShape;
 class BoxCollisionShape;
 class VisibleObject;
 class SkeletalObject;
+struct AudioComponent;
 
 //ECS TEST
 class ECSExample;
@@ -69,6 +70,8 @@ private:
 
 	//ECS TEST
 	Ref<ECSExample> ecsExample;
+
+	AudioComponent* audio;
 
 	int audioComponentID;
 
