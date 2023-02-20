@@ -24,8 +24,9 @@
 #include <ECS/Components/AudioComponent.h>
 #include <ECS/Systems/AudioControllerSystem.h>
 
+#ifdef USE_SCRIPTCORE
 #include <ScriptCore.h>
-
+#endif
 void TestPlayer::OpenConsole(bool) {
 	Console::Create();
 }
@@ -135,19 +136,19 @@ TestPlayer::TestPlayer() : Player()
 
 	Timer::CreateTimer<TestPlayer>(5.0f, &TestPlayer::TestTimer, this, false, false);
 
-	auto Particle = SpawnObject<ParticleComponent>();
+	auto Particle = SpawnObject<ParticleComponent>(this);
 	Particle->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
 	Particle->SetLocation(Vector(-116.f, -104.f, 44.f));
 
-	auto Particle2 = SpawnObject<ParticleComponent>();
+	auto Particle2 = SpawnObject<ParticleComponent>(this);
 	Particle2->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
 	Particle2->SetLocation(Vector(-60.f, -94.f, 44.f));
 
-	auto smoke = SpawnObject<ParticleComponent>();
+	auto smoke = SpawnObject<ParticleComponent>(this);
 	smoke->SetSystem(ParticleSystem::MakeSystem<SmokeParticle>());
 	smoke->SetLocation(Vector(71.f, -40.f, 11.f));
 
-	auto part = SpawnObject<ParticleComponent>();
+	auto part = SpawnObject<ParticleComponent>(this);
 	part->SetSystem(ParticleSystem::MakeSystem<CloudParticle>());
 	part->SetLocation({ 10.f, 5.f, 0.5f });
 }

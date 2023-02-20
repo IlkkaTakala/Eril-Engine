@@ -964,7 +964,7 @@ void Renderer::Forward(int width, int height)
 
 			int round = 0;
 			for (auto const& param : m->GetTextures()) {
-				if (param.second > 0) {
+				if (param.second != nullptr) {
 					s->SetUniform(param.first, round);
 					glActiveTexture(GL_TEXTURE0 + round);
 					if (param.second->GetTextureID() != 0) glBindTexture(GL_TEXTURE_2D, param.second->GetTextureID());
@@ -1017,7 +1017,7 @@ void Renderer::Forward(int width, int height)
 
 			int round = 0;
 			for (auto const& param : m->GetTextures()) {
-				if (param.second > 0) {
+				if (param.second != nullptr) {
 					s->SetUniform(param.first, round);
 					glActiveTexture(GL_TEXTURE0 + round);
 					if (param.second->GetTextureID() != 0) glBindTexture(GL_TEXTURE_2D, param.second->GetTextureID());
@@ -1079,7 +1079,7 @@ void Renderer::Forward(int width, int height)
 
 			int round = 0;
 			for (auto const& param : m->GetTextures()) {
-				if (param.second > 0) {
+				if (param.second != nullptr) {
 					s->SetUniform(param.first, round);
 					glActiveTexture(GL_TEXTURE0 + round);
 					if (param.second->GetTextureID() != 0) glBindTexture(GL_TEXTURE_2D, param.second->GetTextureID());

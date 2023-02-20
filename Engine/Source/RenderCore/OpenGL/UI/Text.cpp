@@ -16,6 +16,8 @@
 #include <UI/Button.h>
 #include <UI/VerticalPanel.h>
 
+#include <sstream>
+
 struct UIMatrix
 {
 	glm::mat4 model_m;
@@ -292,7 +294,7 @@ void Text::Render()
 {
 	if (visible != Visibility::Visible) return;
 
-	if (textChanged) {
+	if (textChanged && !value.empty()) {
 		float ratio = fontSize / (float)fonts[font].originalSize;
 		Letter* storage = new Letter[value.size()]();
 		for (int i = 0; i < value.size(); i++) {

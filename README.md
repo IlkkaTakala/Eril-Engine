@@ -15,12 +15,5 @@ Work in progress documentation for newest features can be found on the "[docs](.
 
 ## Building the project
 
-* Run cmake on Engine/external/bullet3/ directory and enable "Use MSVC runtime library" option.
-* Open and build the created solution  
-* Copy created library files to build/lib/
-* Run cmake on Engine/external/openal-soft/
-* Build the solution and copy openal library to build/lib/ and OpenAL32.dll to build/(BuildConfig)/
-* Run cmake on Engine/ScriptCore/
-* Build the solution and copy ErilScript.lib to build/lib/ and ErilScript.dll to build/(BuildConfig)/
-* Open Eril solution and rebuild solution
+* Run cmake and enable "Use MSVC runtime library" option.
 * Game should build correctly after that, contact ilkkatakala@kamk.fi if the steps didn't work

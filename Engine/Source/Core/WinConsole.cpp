@@ -64,6 +64,7 @@
 #include <dwrite.h>
 #include <wincodec.h>
 #include <fstream>
+#include <sstream>
 
 #define WM_ADDLOG (WM_USER + 0x0021)
 #define IDC_CMDLINE 2

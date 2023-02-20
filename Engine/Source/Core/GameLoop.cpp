@@ -14,7 +14,9 @@
 #include "Timer.h"
 #include <GamePlay/Scene.h>
 
+#ifdef USE_SCRIPTCORE
 #include <ScriptCore.h>
+#endif
 
 using namespace std;
 

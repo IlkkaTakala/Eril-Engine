@@ -9,6 +9,7 @@
 #include <Interface/IECS.h>
 #include <Physics/BulletPhysics.h>
 #include <Interface/AssetManager.h>
+#include <algorithm>
 
 String Scene::newLevel = "";
 String Scene::loadMap = "";

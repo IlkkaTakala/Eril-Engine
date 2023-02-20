@@ -143,7 +143,7 @@ protected:
 	std::function<void(void)> binds;
 	std::unordered_map<String, std::function<void(float)>> renderCallbacks;
 	MeshType type { MeshType::None };
-	bool requireUpdate;
+	bool requireUpdate{ false };
 };
 
 class IMesh
